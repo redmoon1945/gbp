@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AboutDialog</class>
+ <widget class="QDialog" name="AboutDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>735</width>
+    <height>466</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>About Graphical Budget Planner</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="appLabel">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>---</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="buildOnLabel">
+       <property name="font">
+        <font>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>---</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPlainTextEdit" name="plainTextEdit">
+       <property name="plainText">
+        <string>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
+
+=&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
+
+=&gt; Easy zooming : use middle mouse button or dedicated UI buttons 
+
+=&gt; Easy panning : just left-click &amp; hold, then move mouse
+
+=&gt; Specify painlessly all your forecasted income/expense budget items, with flexibility to define periodic or irregular flow of incomes/expenses.
+
+=&gt; Optionnaly define inflation, either as a constant value or a complex series of changing values.
+
+=&gt; Optionnaly define a custom monthly growth pattern for any income/expense specification , expressed either as a constant value or a complex series of changing values.
+
+=&gt; Perform automatically different types of analysis on your data, like relative weight of incomes/expenses over custom period, monthly and yearly reports.
+
+=&gt; Your data is not locked in : all scenarios are in open JSON format, and resulting data are exportable in CSV format.
+
+GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want know how and when your money has been spent in the past (that is &quot;before today&quot;).
+
+This application and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It's Free Software. Both source code and the AppImage executable can be found here : &lt;insert URL when known&gt;
+
+Credits : 
+* Tobias Leupold : code to calculate difference between 2 dates
+  -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
+* QCustomPlot : AQCustomPlot : A Qt C++ widget for plotting and data visualization
+  -&gt; see https://www.qcustomplot.com/</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="closePushButton">
+         <property name="text">
+          <string>Close</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
