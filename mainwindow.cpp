@@ -487,7 +487,7 @@ void MainWindow::on_actionOpen_triggered()
     checkIfCurrentScenarioMatchesDiskVersion(match);
     if (match==false){
         if ( QMessageBox::StandardButton::Yes != QMessageBox::question(this,tr("Modifications not saved"),
-                    tr("Scenario has been modified. Do you still want to open another scenario and loose these changes ?")) ){
+                    tr("Scenario has been modified. Do you still want to open another scenario and lose these changes ?")) ){
             return;
         }
     }
@@ -735,7 +735,7 @@ void MainWindow::on_actionNew_triggered()
     checkIfCurrentScenarioMatchesDiskVersion(match);
     if (match==false){
         if ( QMessageBox::StandardButton::Yes != QMessageBox::question(this,tr("Modifications not saved"),
-                tr("Scenario has been modified. Do you still want to open another scenario and loose these changes ?")) ){
+                tr("Scenario has been modified. Do you still want to open another scenario and lose these changes ?")) ){
             return;
         }
     }

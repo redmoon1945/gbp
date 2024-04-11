@@ -26,6 +26,33 @@
 
 =&gt; Specify painlessly all your forecasted income/expense budget items, with flexibility to define periodic or irregular flow of incomes/expenses.
 
+=&gt; Optionaly define inflation, either as a constant value or a complex series of changing values.
+
+=&gt; Optionaly define a custom monthly growth pattern for any income/expense specification , expressed either as a constant value or a complex series of changing values.
+
+=&gt; Perform automatically different types of analysis on your data, like relative weight of incomes/expenses over custom period, monthly and yearly reports.
+
+=&gt; Your data is not locked in : all scenarios are in open JSON format, and resulting data are exportable in CSV format.
+
+GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want know how and when your money has been spent in the past (that is &quot;before today&quot;).
+
+This application and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. Both source code and the AppImage executable can be found here : &lt;insert URL when known&gt;
+
+Credits : 
+* Tobias Leupold : code to calculate difference between 2 dates
+  -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
+* QCustomPlot : AQCustomPlot : A Qt C++ widget for plotting and data visualization
+  -&gt; see https://www.qcustomplot.com/</source>
+        <oldsource>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
+
+=&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
+
+=&gt; Easy zooming : use middle mouse button or dedicated UI buttons 
+
+=&gt; Easy panning : just left-click &amp; hold, then move mouse
+
+=&gt; Specify painlessly all your forecasted income/expense budget items, with flexibility to define periodic or irregular flow of incomes/expenses.
+
 =&gt; Optionnaly define inflation, either as a constant value or a complex series of changing values.
 
 =&gt; Optionnaly define a custom monthly growth pattern for any income/expense specification , expressed either as a constant value or a complex series of changing values.
@@ -42,7 +69,7 @@ Credits :
 * Tobias Leupold : code to calculate difference between 2 dates
   -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
 * QCustomPlot : AQCustomPlot : A Qt C++ widget for plotting and data visualization
-  -&gt; see https://www.qcustomplot.com/</source>
+  -&gt; see https://www.qcustomplot.com/</oldsource>
         <translation>Graphical Budget Planner (GBP) est une application Qt de bureau qui a comme objectif de faciliter significativement le processus d&apos;élaboration et de maintenance d&apos;un budget personnel. Il permet entre autres choses de :
 
 =&gt; Visualiser graphiquement l&apos;évolution de l&apos;encaisse à travers le temps, à n&apos;importe quel moment à l&apos;intérieur d&apos;une période d&apos;au maximum 100 ans. 
@@ -708,9 +735,13 @@ Détails : %1</translation>
         <translation>Agrandir...</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="117"/>
         <source>Active :</source>
-        <translation>Actif :</translation>
+        <translation type="vanished">Actif :</translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="117"/>
+        <source>Enabled</source>
+        <translation>Activé</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="126"/>
@@ -1070,8 +1101,12 @@ Détails : %1</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="650"/>
+        <source>Enabled</source>
+        <translation>Activé</translation>
+    </message>
+    <message>
         <source>Active : </source>
-        <translation>Actif : </translation>
+        <translation type="vanished">Actif : </translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="665"/>
@@ -2606,8 +2641,9 @@ Details : %1</source>
     <message>
         <location filename="mainwindow.cpp" line="490"/>
         <location filename="mainwindow.cpp" line="738"/>
-        <source>Scenario has been modified. Do you still want to open another scenario and loose these changes ?</source>
-        <translation>Le scénario courant a été modifié. Désirez-vous tout de même ouvrir un autre scénario et ainsi perdre ces changements ?</translation>
+        <source>Scenario has been modified. Do you still want to open another scenario and lose these changes ?</source>
+        <oldsource>Scenario has been modified. Do you still want to open another scenario and loose these changes ?</oldsource>
+        <translation>Le scénario courant a été modifié. Désirez-vous tout de même ouvrir un autre scénario et ainsi perdre les changements effectués ?</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="497"/>

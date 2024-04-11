@@ -319,7 +319,7 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>25</day>
+             <day>24</day>
             </date>
            </property>
            <property name="displayFormat">
@@ -384,7 +384,7 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>27</day>
+             <day>26</day>
             </date>
            </property>
            <property name="displayFormat">
@@ -647,7 +647,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Active : </string>
+          <string>Enabled</string>
          </property>
         </widget>
        </item>

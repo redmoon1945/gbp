@@ -26,9 +26,9 @@
 
 =&gt; Specify painlessly all your forecasted income/expense budget items, with flexibility to define periodic or irregular flow of incomes/expenses.
 
-=&gt; Optionnaly define inflation, either as a constant value or a complex series of changing values.
+=&gt; Optionaly define inflation, either as a constant value or a complex series of changing values.
 
-=&gt; Optionnaly define a custom monthly growth pattern for any income/expense specification , expressed either as a constant value or a complex series of changing values.
+=&gt; Optionaly define a custom monthly growth pattern for any income/expense specification , expressed either as a constant value or a complex series of changing values.
 
 =&gt; Perform automatically different types of analysis on your data, like relative weight of incomes/expenses over custom period, monthly and yearly reports.
 
@@ -63,14 +63,14 @@ Credits :
 
 GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want know how and when your money has been spent in the past (that is &quot;before today&quot;).
 
-This application and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software.
+This application and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. Both source code and the AppImage executable can be found here : &lt;insert URL when known&gt;
 
 Credits : 
 * Tobias Leupold : code to calculate difference between 2 dates
   -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
 * QCustomPlot : AQCustomPlot : A Qt C++ widget for plotting and data visualization
   -&gt; see https://www.qcustomplot.com/</oldsource>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="130"/>
@@ -692,8 +692,8 @@ Details : %1</source>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="117"/>
-        <source>Active :</source>
-        <translation></translation>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="126"/>
@@ -1049,8 +1049,8 @@ Details : %1</source>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="650"/>
-        <source>Active : </source>
-        <translation></translation>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="665"/>
@@ -2508,7 +2508,8 @@ Details : %1</source>
     <message>
         <location filename="mainwindow.cpp" line="490"/>
         <location filename="mainwindow.cpp" line="738"/>
-        <source>Scenario has been modified. Do you still want to open another scenario and loose these changes ?</source>
+        <source>Scenario has been modified. Do you still want to open another scenario and lose these changes ?</source>
+        <oldsource>Scenario has been modified. Do you still want to open another scenario and loose these changes ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>

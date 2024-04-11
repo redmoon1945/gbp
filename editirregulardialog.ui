@@ -114,7 +114,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Active :</string>
+          <string>Enabled</string>
          </property>
         </widget>
        </item>

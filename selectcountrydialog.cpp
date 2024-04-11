@@ -24,6 +24,11 @@ SelectCountryDialog::SelectCountryDialog(QLocale theLocale, QWidget *parent) :
     ui(new Ui::SelectCountryDialog)
 {
     ui->setupUi(this);
+
+    // fill combobox
+    QList<QString> list = CurrencyHelper::getCountries(locale).values();
+    list.sort();
+    ui->countriesComboBox->addItems(list);
 }
 
 
@@ -35,10 +40,6 @@ SelectCountryDialog::~SelectCountryDialog()
 
 void SelectCountryDialog::slotPrepareContent()
 {
-    // fill combobox
-    QList<QString> list = CurrencyHelper::getCountries(locale).values();
-    list.sort();
-    ui->countriesComboBox->addItems(list);
     // pre-select the country defined in the Locale
     selectCountryInComboBox("");
     updateCurrencyLabels();
