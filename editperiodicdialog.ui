@@ -319,7 +319,7 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>24</day>
+             <day>23</day>
             </date>
            </property>
            <property name="displayFormat">
@@ -384,7 +384,7 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>26</day>
+             <day>25</day>
             </date>
            </property>
            <property name="displayFormat">
@@ -849,7 +849,7 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>30</height>
+         <height>20</height>
         </size>
        </property>
       </spacer>

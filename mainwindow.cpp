@@ -66,10 +66,14 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     ui->ciDeltaLabel->setMinimumWidth(fm.averageCharWidth()*10);
     ui->baselineDoubleSpinBox->setMinimumWidth(fm.averageCharWidth()*6);
 
-    // set minmum/maximum value of baseline and erase currency label
+    // set minimum/maximum value of baseline and erase currency label
     ui->baselineDoubleSpinBox->setMaximum(CurrencyHelper::maxValueAllowedForAmountInDouble(3)); // no currency has more than 3 decinal digits
     ui->baselineDoubleSpinBox->setMinimum(-CurrencyHelper::maxValueAllowedForAmountInDouble(3)); // no currency has more than 3 decinal digits
     ui->baselineCurrencyLabel->setText("");
+
+    // display todays's date in bottom startAmountLabel
+    ui->startAmountLabel->setText(tr("Start Amount for Today %1 :").arg(
+        locale.toString(GbpController::getInstance().getToday(),"yyyy-MMM-dd")));
 
     // set scaling factor from settings
     chartScalingFactor = 1 + (GbpController::getInstance().getPercentageMainChartScaling())/100.0;
@@ -90,8 +94,6 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     fullToDateX = fullFromDateX.addYears(GbpController::getInstance().getScenarioMaxYearsSpan()).addDays(-1);
     fullFromDoubleX = Util::dateToDateTimeLocal(fullFromDateX,QTimeZone::systemTimeZone()).toSecsSinceEpoch();
     fullToDoubleX = Util::dateToDateTimeLocal(fullToDateX,QTimeZone::systemTimeZone()).toSecsSinceEpoch();
-    // fitFromDateX = fullFromDateX;
-    // fitToDateX = fullToDateX;
     fitFromDoubleX = fullFromDoubleX;
     fitToDoubleX = fullToDoubleX;
     fullMinY = 0;
@@ -1033,7 +1035,7 @@ void MainWindow::rangeChangedY(const QCPRange &newRange)
 
 
 void MainWindow::msgStatusbar(QString msg){
-    ui->statusbar->showMessage(Util::elideText(msg,100,true));
+    ui->statusbar->showMessage(Util::elideText(msg,100,true),5000);
 }
 
 
