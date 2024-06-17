@@ -37,26 +37,12 @@ GbpController::GbpController()
     useDefaultSystemFont = true;
     customApplicationFont = "";
     initialSystemApplicationFont = QApplication::font().toString();
+    todayUseSystemDate = true;
+    todayCustomDate = QDate();
 
-    // try to get application argument "-today=something", where something is a valid ISO date (e.g. 2024-02-29)
-    bool todayPassed = false;
     QStringList argList = QCoreApplication::arguments();
-    for (int i = 0; i < argList.size(); ++i) {      // search arg that set "today"
-        if ( argList.at(i).length() != 17){
-            continue;
-        }
-        if (false == argList.at(i).startsWith("-today=")) {
-            continue;
-        }
-        QString s = argList.at(i).last(10);
-        QDate d = QDate::fromString(s, Qt::ISODate);
-        if (d.isValid()==false){
-            continue;
-        }
-        today = d;
-        tomorrow = today.addDays(1);
-        todayPassed = true;
-    }
+
+    // Process arguments that could affect options
     for (int i = 0; i < argList.size(); ++i) {      // search arg that set loglevel
         if ( argList.at(i).length() != 11){
             continue;
@@ -80,14 +66,13 @@ GbpController::GbpController()
         }
     }
 
-    // set ONCE the date corresponding to "today" and "tomorrow". There are 3 reasons why we dont want the app to call everywhere "QDate::currentDate()"
+    // Initi the value of "today".
+    // Set ONCE the date corresponding to "today" and "tomorrow". There are 3 reasons why we dont want the app to call everywhere "QDate::currentDate()"
     // 1) the app could have been started near midnight and the transition to another day while running could mess up things (for log for example)
-    // 2) we want to offer the option of passing the "today" date as parameter, for test purpose (repeatability)
+    // 2) we want to offer the option of setting the "today" date as configuration parameter (in the "options")
     // 3) we want to make sure today is in LOCAL time
-    if (todayPassed == false) {
-        today = QDateTime::currentDateTime().toLocalTime().date();
-        tomorrow = today.addDays(1);
-    }
+    today = QDateTime::currentDateTime().toLocalTime().date();
+    tomorrow = today.addDays(1);
 
     // *** LOG FILES ***
 
@@ -164,8 +149,14 @@ bool GbpController::isScenarioLoaded() const
 }
 
 
+// This should be done only ONCE, as early as possible after the applicationis started
 void GbpController::loadSettings()
 {
+    // Ensure loading has not been already done
+    if (settingsLoaded==true) {
+        return;
+    }
+
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Attempting to load settings from %1").arg(settingsPtr->fileName()));
 
     QVariant v;
@@ -314,8 +305,8 @@ void GbpController::loadSettings()
     // Custom Application Font
     if (settingsPtr->contains("custom_application_font")){
         v = settingsPtr->value("custom_application_font");
-        QString s = v.toString();
-        if( s.trimmed().length() != 0){
+        QString s = v.toString().trimmed();
+        if( s.length() != 0){
             QFont f ;
             bool ok = f.fromString(s);  // test if it is a valid font string description
             if ( ok )  {
@@ -331,7 +322,35 @@ void GbpController::loadSettings()
         customApplicationFont = "";
     }
 
+    // Date of Today
+    todayUseSystemDate = true;
+    todayCustomDate = QDate();
+    if (settingsPtr->contains("today_use_system_date")){
+        v = settingsPtr->value("today_use_system_date");
+        bool ok = Util::isValidBoolString(v.toString());
+        if(ok==true){
+            if (v.toBool()==false) {
+                // grab the specific date
+                if (settingsPtr->contains("today_specific_date")){
+                    v = settingsPtr->value("today_specific_date");
+                    QString s = v.toString().trimmed();
+                    QDate date = QDate::fromString(s, Qt::DateFormat::ISODate) ;
+                    if ( (date.isNull()==false) && (date.isValid()==true) ) {
+                        todayUseSystemDate = false;
+                        todayCustomDate = date;
+                        // update "today"
+                        today = todayCustomDate;
+                        tomorrow = today.addDays(1);
+                    }
+                }
+            }
+        }
+    }
 
+    // loaded is completed and successful
+    settingsLoaded = true;
+
+    // Some loggings
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("Settings loaded successfully"));
     GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info, QString("    recent_files = %1").arg(recentFilenames.join(",")));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    scenario_max_years = %1").arg(scenarioMaxYearsSpan));
@@ -345,6 +364,8 @@ void GbpController::loadSettings()
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    main_chart_scaling_percentage = %1").arg(percentageMainChartScaling));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    use_default_system_font = %1").arg(useDefaultSystemFont));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    custom_application_font = %1").arg(customApplicationFont));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    today_use_system_date = %1").arg(todayUseSystemDate));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    today_custom_date = %1").arg(todayCustomDate.toString(Qt::DateFormat::ISODate)));
 
 }
 
@@ -363,6 +384,8 @@ void GbpController::saveSettings()
     settingsPtr->setValue("main_chart_scaling_percentage",percentageMainChartScaling);
     settingsPtr->setValue("use_default_system_font",useDefaultSystemFont);
     settingsPtr->setValue("custom_application_font",customApplicationFont);
+    settingsPtr->setValue("today_use_system_date",todayUseSystemDate);
+    settingsPtr->setValue("today_specific_date",todayCustomDate.toString(Qt::DateFormat::ISODate));
 }
 
 
@@ -593,5 +616,27 @@ QString GbpController::getInitialSystemApplicationFont() const
 {
     return initialSystemApplicationFont;
 }
+
+bool GbpController::getTodayUseSystemDate() const
+{
+    return todayUseSystemDate;
+}
+
+void GbpController::setTodayUseSystemDate(bool newTodayUseSystemDate)
+{
+    todayUseSystemDate = newTodayUseSystemDate;
+}
+
+QDate GbpController::getTodayCustomDate() const
+{
+    return todayCustomDate;
+}
+
+void GbpController::setTodayCustomDate(const QDate &newTodayCustomDate)
+{
+    todayCustomDate = newTodayCustomDate;
+}
+
+
 
 

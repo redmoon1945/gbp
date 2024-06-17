@@ -40,6 +40,7 @@ OptionsDialog::OptionsDialog(QWidget *parent)
     }
     QString widgetString = QString(tr("System Font : %1")).arg(sysFontString);
     ui->systemFontRadioButton->setText(widgetString);
+
 }
 
 
@@ -97,6 +98,16 @@ void OptionsDialog::slotPrepareContent()
     } else {
         ui->setCustomFontPushButton->setEnabled(true);
     }
+    // Today's Date
+    if (GbpController::getInstance().getTodayUseSystemDate()==true) {
+        ui->todaySystemRadioButton->setChecked(true);
+        ui->todayDateEdit->setDate(QDate::currentDate());
+        ui->todayDateEdit->setEnabled(false);
+    } else {
+        ui->todaySpecificRadioButton->setChecked(true);
+        ui->todayDateEdit->setDate(GbpController::getInstance().getTodayCustomDate());
+        ui->todayDateEdit->setEnabled(true);
+    }
 
 }
 
@@ -133,14 +144,30 @@ void OptionsDialog::on_applyPushButton_clicked()
         }
     }
 
-
-    // if application font has changed warn user the app has to be restarted
+    // if application font has changed, warn user the app has to be restarted
     if ( (GbpController::getInstance().getUseDefaultSystemFont() != ui->systemFontRadioButton->isChecked()) ||
         (GbpController::getInstance().getCustomApplicationFont() != newCustomFontString) ) {
         QMessageBox::warning(nullptr,tr("Font Changed"),tr("Application must be restarted for font changes to take effect"));
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Font Setting changed");
     }
 
+    // if today's date determination mechanism or custom date have changed, warn user the app has to be restarted
+    QString oldCustomDateString = GbpController::getInstance().getTodayCustomDate().toString(Qt::DateFormat::ISODate);
+    QString newCustomDateString = ui->todayDateEdit->date().toString(Qt::DateFormat::ISODate);
+    if ( GbpController::getInstance().getTodayUseSystemDate() != ui->todaySystemRadioButton->isChecked() ) {
+        QMessageBox::warning(nullptr,tr("Today's Determination Changed"),
+            tr("Today's date determination mechanism changed. Application must be restarted for changes to take effect"));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Today's date determination mechanism changed : new settings -> System Date=%1").arg(ui->todaySystemRadioButton->isChecked()) );
+    } else if ( (ui->todaySpecificRadioButton->isChecked()) &&
+               (GbpController::getInstance().getTodayCustomDate() != ui->todayDateEdit->date()) ){
+        QMessageBox::warning(nullptr,tr("Today's Custom Date Changed"),
+            tr("Today's replacement date has changed from %1 to %2. Application must be restarted for changes to take effect").arg(oldCustomDateString).arg(newCustomDateString));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Today's custom date has changed from %1 to %2").arg(oldCustomDateString).arg(newCustomDateString));
+    }
+
+    // set settings new values
     GbpController::getInstance().setScenarioMaxYearsSpan(years);
     GbpController::getInstance().setChartDarkMode(chartDarkMode);
     GbpController::getInstance().setCurveDarkModeColor(curveDarkModeColor);
@@ -151,6 +178,12 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().setChartExportImageType(chartExportType);
     GbpController::getInstance().setUseDefaultSystemFont(ui->systemFontRadioButton->isChecked());
     GbpController::getInstance().setCustomApplicationFont(newCustomFontString);
+    GbpController::getInstance().setTodayUseSystemDate(ui->todaySystemRadioButton->isChecked());
+    if (ui->todaySpecificRadioButton->isChecked()) {
+        GbpController::getInstance().setTodayCustomDate(ui->todayDateEdit->date());
+    } else {
+        GbpController::getInstance().setTodayCustomDate(QDate());
+    }
 
     GbpController::getInstance().saveSettings();
 
@@ -166,6 +199,9 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ChartExportQuality = %1").arg(ui->qualitySpinBox->value()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    UseDefaultSystemFont = %1").arg(ui->systemFontRadioButton->isChecked()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CustomApplicationFont = %1").arg(newCustomFontString));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    UseSystemDateForToday = %1").arg(ui->todaySystemRadioButton->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CustomTodayDate = %1").arg(
+        GbpController::getInstance().getTodayCustomDate().toString(Qt::DateFormat::ISODate)));
 
     emit signalOptionsResult(impact);
     this->hide();
@@ -369,6 +405,16 @@ void OptionsDialog::on_systemFontRadioButton_toggled(bool checked)
         ui->setCustomFontPushButton->setEnabled(false);
     } else {
         ui->setCustomFontPushButton->setEnabled(true);
+    }
+}
+
+
+void OptionsDialog::on_todaySystemRadioButton_toggled(bool checked)
+{
+    if (ui->todaySystemRadioButton->isChecked()) {
+        ui->todayDateEdit->setEnabled(false);
+    } else {
+        ui->todayDateEdit->setEnabled(true);
     }
 }
 

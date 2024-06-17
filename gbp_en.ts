@@ -2720,45 +2720,60 @@ Details : %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="242"/>
+        <location filename="optionsdialog.ui" line="247"/>
         <source>Exported Text - Amounts are localized :</source>
         <oldsource>Exported Text - Amount are localized :</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="256"/>
+        <location filename="optionsdialog.ui" line="266"/>
         <source>Overscaling for main chart :</source>
         <oldsource>Overscaling percentage for main chart :</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="269"/>
+        <location filename="optionsdialog.ui" line="279"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="279"/>
+        <location filename="optionsdialog.ui" line="294"/>
         <source>Application Font :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="294"/>
-        <location filename="optionsdialog.ui" line="315"/>
+        <location filename="optionsdialog.ui" line="309"/>
+        <location filename="optionsdialog.ui" line="330"/>
         <source>---</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="341"/>
+        <location filename="optionsdialog.ui" line="356"/>
         <source>Choose...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="387"/>
+        <location filename="optionsdialog.ui" line="372"/>
+        <source>How Date of &quot;Today&quot; is obtained :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="383"/>
+        <source>System&apos;s Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="400"/>
+        <source>Specific Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="472"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="394"/>
+        <location filename="optionsdialog.ui" line="479"/>
         <source>Save</source>
         <translation></translation>
     </message>
@@ -2769,37 +2784,57 @@ Details : %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="84"/>
+        <location filename="optionsdialog.cpp" line="85"/>
         <source>None defined</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="131"/>
+        <location filename="optionsdialog.cpp" line="142"/>
         <source>Font Unselected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="131"/>
+        <location filename="optionsdialog.cpp" line="142"/>
         <source>You must choose a custom font if you don&apos;t use the default system font</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="140"/>
+        <location filename="optionsdialog.cpp" line="150"/>
         <source>Font Changed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="140"/>
+        <location filename="optionsdialog.cpp" line="150"/>
         <source>Application must be restarted for font changes to take effect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="289"/>
+        <location filename="optionsdialog.cpp" line="158"/>
+        <source>Today&apos;s Determination Changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.cpp" line="159"/>
+        <source>Today&apos;s date determination mechanism changed. Application must be restarted for changes to take effect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.cpp" line="164"/>
+        <source>Today&apos;s Custom Date Changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.cpp" line="165"/>
+        <source>Today&apos;s replacement date has changed from %1 to %2. Application must be restarted for changes to take effect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.cpp" line="325"/>
         <source>Custom : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="296"/>
+        <location filename="optionsdialog.cpp" line="332"/>
         <source>R:%1 G:%2 B:%3</source>
         <translation type="unfinished"></translation>
     </message>

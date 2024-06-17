@@ -32,6 +32,7 @@ class OptionsDialog : public QDialog
 
 
 public:
+    // impact of options changes on charts content
     enum OptionsChangesImpact{NONE=0, FULL_RECALCULATION_REQUIRED=1, REPLOT=2, RESCALE_AND_REPLOT=3};
 
     explicit OptionsDialog(QWidget *parent = nullptr);
@@ -53,8 +54,8 @@ private slots:
     void on_curveDarkModeColorToolButton_clicked();
     void on_curveLightModeColorToolButton_clicked();
     void on_setCustomFontPushButton_clicked();
-
     void on_systemFontRadioButton_toggled(bool checked);
+    void on_todaySystemRadioButton_toggled(bool checked);
 
 private:
     Ui::OptionsDialog *ui;

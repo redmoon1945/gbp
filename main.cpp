@@ -26,7 +26,7 @@
 #include "gbpcontroller.h"
 
 #define APP_NAME "graphical-budget-planner"
-#define APP_VERSION "1.0.2"
+#define APP_VERSION "1.1"
 
 int main(int argc, char *argv[])
 {

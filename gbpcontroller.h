@@ -87,6 +87,10 @@ public:
     QString getCustomApplicationFont() const;
     void setCustomApplicationFont(const QString &newCustomApplicationFont);
     QString getInitialSystemApplicationFont() const;
+    bool getTodayUseSystemDate() const;
+    void setTodayUseSystemDate(bool newTodayUseSystemDate);
+    QDate getTodayCustomDate() const;
+    void setTodayCustomDate(const QDate &newTodayCustomDate);
 
 private:
 
@@ -103,10 +107,11 @@ private:
     uint percentageMainChartScaling;        // how much space is given on the chart above X&Y axis min/max, in percentage over 100%
     bool useDefaultSystemFont;
     QString customApplicationFont;
-
+    bool todayUseSystemDate;                 // If true, today's date if determined by real date-time (this is the default). If false, it is set using the value "todayCustomDate"
+    QDate todayCustomDate;
 
     // *** misc variables ***
-    QDate today;                        // immutable Date of "today" in local time, set ONCE, when the application start up
+    QDate today;                        // Date of "today" in local time, set ONCE, when the settings is loaded
     QDate tomorrow;                     // derived from "today"
     QString fullFileName;               // path+file name for current scenario. Empty means no file yet assigned (e.g. for new)
     // logging
@@ -119,6 +124,7 @@ private:
     QString initialSystemApplicationFont;   // font upon app starts, before anything changed
     // Settings
     QSettings* settingsPtr=nullptr; // cant find a way to use QSharedPointer...
+    bool settingsLoaded=false;  // to prevent more than 1 loading
 
     // *** methods ***
     GbpController();
