@@ -32,8 +32,13 @@ class OptionsDialog : public QDialog
 
 
 public:
-    // impact of options changes on charts content
-    enum OptionsChangesImpact{NONE=0, FULL_RECALCULATION_REQUIRED=1, REPLOT=2, RESCALE_AND_REPLOT=3};
+    // impact of options changes
+    struct OptionsChangesImpact{
+        quint32 chart;
+        quint32 decorationColorStreamDef;
+    };
+    enum OPTIONS_IMPACT_CHART {CHART_NONE=0, CHART_FULL_RECALCULATION_REQUIRED=1, CHART_REPLOT=2, CHART_RESCALE_AND_REPLOT=3};
+    enum OPTIONS_IMPACT_DECORATION_COLOR {DECO_NONE=0, DECO_REFRESH=1 };
 
     explicit OptionsDialog(QWidget *parent = nullptr);
     ~OptionsDialog();
@@ -72,7 +77,6 @@ private:
     QString fontStyleToString(const QFont font) const;
     QString fontWeightToString(const QFont font) const;
     void setCustomFontlabel(QString fontLabel);
-    QString buildColorDisplayName(QColor color);
 };
 
 #endif // OPTIONSDIALOG_H

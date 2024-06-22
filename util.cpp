@@ -373,4 +373,42 @@ QString Util::getColorSmartName(QColor color, bool &found)
 }
 
 
+QString Util::buildColorDisplayName(QColor color)
+{
+    QString s = QString(tr("R:%1 G:%2 B:%3")).arg(color.red()).arg(color.green()).arg(color.blue());
+    bool found;
+    QString smartName = Util::getColorSmartName(color,found);
+    if(found){
+        s = s.append(QString(" (%1)").arg(smartName));
+    }
+    return s;
+}
+
+// Set nth bit of number to 1. First bit (less significant) is n=1
+quint32 Util::bitSet(quint32 number, quint32 n)
+{
+    return number | ( (quint32)1 << (n-1) );
+}
+
+
+// Set the nth bit of number to 0. First bit (less significant) is n=1
+quint32 Util::bitClear(quint32 number, quint32 n)
+{
+    return number & ~((quint32)1 << (n-1));
+}
+
+
+// toggle the nth bit of number. First bit (less significant) is n=1
+quint32 Util::bitToggle(quint32 number, quint32 n)
+{
+    return number ^ ((quint32)1 << (n-1));
+}
+
+// Check if nth bit of number is set or not. First bit (less significant) is n=1
+quint32 Util::bitCheck(quint32 number, quint32 n)
+{
+    return (number >> (n-1)) & (quint32)1;
+}
+
+
 

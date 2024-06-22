@@ -84,7 +84,6 @@ private slots:
     void on_yearlyReportChartExpensesRadioButton_clicked();
     void on_yearlyReportChartIncomesExpensesRadioButton_clicked();
     void on_yearlyReportChartDeltasRadioButton_clicked();
-
     void on_exportImageYearlyReportChartPushButton_clicked();
 
 private:

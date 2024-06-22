@@ -29,8 +29,8 @@ IrregularFeStreamDef::IrregularFeStreamDef() : FeStreamDef()
 }
 
 
-IrregularFeStreamDef::IrregularFeStreamDef(QMap<QDate,AmountInfo> amountSet, const QUuid &id, const QString &name, const QString &desc, bool active, bool isIncome)
-    : FeStreamDef(id, name,desc,FeStreamType::IRREGULAR,active,isIncome)
+IrregularFeStreamDef::IrregularFeStreamDef(QMap<QDate,AmountInfo> amountSet, const QUuid &id, const QString &name, const QString &desc, bool active, bool isIncome, const QColor& decorationColor)
+    : FeStreamDef(id, name,desc,FeStreamType::IRREGULAR,active,isIncome, decorationColor)
 {
     // make sure amountSet is valid
     IrregularFeStreamDef::validateKeysResult r = validateKeysAndValues(amountSet);
@@ -162,8 +162,9 @@ IrregularFeStreamDef IrregularFeStreamDef::fromJson(const QJsonObject &jsonObjec
     QString name,desc;
     bool active;
     bool isIncome;
+    QColor decoColor;
     Util::OperationResult resultBaseClass;
-    FeStreamDef::fromJson(jsonObject, IRREGULAR, id, name, desc, active, isIncome,resultBaseClass);
+    FeStreamDef::fromJson(jsonObject, IRREGULAR, id, name, desc, active, isIncome, decoColor, resultBaseClass);
     if(resultBaseClass.success==false){
         result.errorStringUI = tr("IrregularFeStreamDef - ")+resultBaseClass.errorStringUI;
         result.errorStringLog = "IrregularFeStreamDef - "+resultBaseClass.errorStringLog;
@@ -217,7 +218,7 @@ IrregularFeStreamDef IrregularFeStreamDef::fromJson(const QJsonObject &jsonObjec
 
     // build new IrregularFeStreamDef and return
     result.success=true;
-    return IrregularFeStreamDef(f, id, name, desc, active, isIncome);
+    return IrregularFeStreamDef(f, id, name, desc, active, isIncome, decoColor);
 }
 
 

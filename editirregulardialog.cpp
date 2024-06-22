@@ -16,6 +16,7 @@
  */
 
 #include "editirregulardialog.h"
+#include "qcolordialog.h"
 #include "ui_editirregulardialog.h"
 #include "gbpcontroller.h"
 #include <QMessageBox>
@@ -106,6 +107,26 @@ void EditIrregularDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
     // update model (the view will be automatically updated)
     tableModel->setCurrInfo(currInfo);
     tableModel->setItems(irStreamDef.getAmountSet());
+
+    // decoration color
+    if (isNewStreamDef) {
+        decorationColor = QColor(); // use normal color for new Stream Def
+    } else {
+        decorationColor = irStreamDef.getDecorationColor(); // can be normal or custom
+    }
+    if (decorationColor.isValid()==false) {
+        // use normal color
+        ui->decorationColorCheckBox->setChecked(false);
+        ui->decorationColorTextLabel->setEnabled(false);
+        ui->decorationColorPushButton->setVisible(false);
+    } else {
+        // Use custom color for text
+        ui->decorationColorCheckBox->setChecked(true);
+        ui->decorationColorTextLabel->setEnabled(true);
+        ui->decorationColorPushButton->setEnabled(true);
+        ui->decorationColorPushButton->setVisible(true);
+    }
+    setDecorationColorInfo();
 
     if(editingExistingStreamDef){
         // *** EXISTING ***
@@ -236,8 +257,11 @@ void EditIrregularDialog::on_applyPushButton_clicked()
     }
 
     QMap<QDate, IrregularFeStreamDef::AmountInfo> items = tableModel->getItems();
-    IrregularFeStreamDef irStreamDef(items, initialId, ui->nameLineEdit->text(), ui->descPlainTextEdit->toPlainText(), ui->activeYesRadioButton->isChecked(), isIncome);
+    IrregularFeStreamDef irStreamDef(items, initialId, ui->nameLineEdit->text(), ui->descPlainTextEdit->toPlainText(),
+                                     ui->activeYesRadioButton->isChecked(), isIncome, decorationColor);
+
     emit signalEditIrregularStreamDefResult(ui->activeYesRadioButton->isChecked(), irStreamDef);
+
     if (editingExistingStreamDef) {
         hide();
         emit signalEditIrregularStreamDefCompleted();
@@ -338,6 +362,25 @@ void EditIrregularDialog::cleanUpForNewStreamDef(){
     ui->activeYesRadioButton->setChecked(true);
     initialId = QUuid::createUuid();
     tableModel->setItems(QMap<QDate, IrregularFeStreamDef::AmountInfo>());// erase data
+    // decoration color
+    ui->decorationColorCheckBox->setChecked(false);
+    on_decorationColorCheckBox_clicked();
+}
+
+
+void EditIrregularDialog::setDecorationColorInfo()
+{
+    QString COLOR_STYLE("QPushButton { background-color : %1; border: none;}");
+
+    if (decorationColor.isValid()) {
+        ui->decorationColorPushButton->setStyleSheet(COLOR_STYLE.arg(decorationColor.name()));
+        QColor c = decorationColor.name(QColor::HexRgb);
+        ui->decorationColorTextLabel->setText(Util::buildColorDisplayName(c));
+    } else {
+        ui->decorationColorTextLabel->setText("");
+        ui->decorationColorPushButton->setStyleSheet(""); // reset to border and default background color
+    }
+
 }
 
 
@@ -350,5 +393,39 @@ void EditIrregularDialog::on_selectAllPushButton_clicked()
 void EditIrregularDialog::on_unselectAllPushButton_clicked()
 {
     ui->itemsTableView->clearSelection();
+}
+
+
+
+void EditIrregularDialog::on_decorationColorPushButton_clicked()
+{
+    QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
+    QColor color;
+    color = QColorDialog::getColor(decorationColor, this, "Color Chooser",opt);
+    if (color.isValid()==false) {
+        return; // user cancelled
+    } else {
+        decorationColor = color;
+        setDecorationColorInfo();
+    }
+}
+
+
+void EditIrregularDialog::on_decorationColorCheckBox_clicked()
+{
+    if (ui->decorationColorCheckBox->isChecked()){
+        // normal to custom color
+        ui->decorationColorTextLabel->setEnabled(true);
+        ui->decorationColorPushButton->setVisible(true);
+        decorationColor = QColor::fromRgb(128,128,128); // default custom color (we dont remember the last one used)
+        setDecorationColorInfo();   // take note of it
+        on_decorationColorPushButton_clicked(); // user must select a color now (cancelling is allowed)
+    } else{
+        // custom to normal color
+        ui->decorationColorTextLabel->setEnabled(false);
+        ui->decorationColorPushButton->setVisible(false);
+        decorationColor = QColor();
+        setDecorationColorInfo();
+    }
 }
 

@@ -71,7 +71,7 @@
 
 =&gt; Easy panning : just left-click &amp; hold, then move mouse
 
-=&gt; Specify painlessly all your forecasted income/expense budget items, with flexibility to define periodic or irregular flow of incomes/expenses.
+=&gt; Specify painlessly all your forecasted income/expense budget items, with flexibility to define periodic or irregular flows of incomes/expenses.
 
 =&gt; Optionaly define inflation, either as a constant value or a complex series of changing values.
 
@@ -79,11 +79,11 @@
 
 =&gt; Perform automatically different types of analysis on your data, like relative weight of incomes/expenses over custom period, monthly and yearly reports.
 
-=&gt; Your data is not locked in : all scenarios are in open JSON format, and resulting data are exportable in CSV format.
+=&gt; Your data is not locked in : all scenarios are formatted as JSON file, and resulting/analysis data are exportable in CSV format.
 
-GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want know how and when your money has been spent in the past (that is &quot;before today&quot;).
+GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want to know how and when your money has been spent in the past (that is &quot;before today&quot;).
 
-This application and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It's Free Software. Both source code and the AppImage executable can be found here : &lt;insert URL when known&gt;
+This application and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It's Free Software. 
 
 Credits : 
 * Tobias Leupold : code to calculate difference between 2 dates

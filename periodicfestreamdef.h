@@ -42,9 +42,9 @@ public:
     // constructors and destructor
     PeriodicFeStreamDef();    // required for qmap.value default
     PeriodicFeStreamDef(const PeriodicFeStreamDef& o);
-    PeriodicFeStreamDef(PeriodType periodicType, quint16 periodMultiplier, qint64 amount, const Growth &growth, GrowthStrategy &growthStrategy,
-                        quint16 &growthApplicationPeriod, const QUuid &id, const QString &name, const QString &desc, bool active,
-                        bool isIncome, const DateRange &validityRange);
+    PeriodicFeStreamDef(PeriodType periodicType, quint16 periodMultiplier, qint64 amount, const Growth &growth, const GrowthStrategy &growthStrategy,
+                        quint16 growthApplicationPeriod, const QUuid &id, const QString &name, const QString &desc, bool active,
+                        bool isIncome, const QColor& decorationColor, const DateRange &validityRange);
     virtual ~PeriodicFeStreamDef();
 
     // operators

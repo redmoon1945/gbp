@@ -69,14 +69,15 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     infoInactiveTableFont.setPointSize(Util::changeFontSize(false, true,infoInactiveTableFont.pointSize()));
 
     // set up list model for items ListView : filtering buttons must have been set according to model's default
-    itemTableModel = new ScenarioFeTableModel(locale, defaultTableFont, strikeOutTableFont, monoTableFont,
-                                              monoInactiveTableFont, infoActiveTableFont, infoInactiveTableFont);
+    itemTableModel = new ScenarioFeTableModel(  locale, defaultTableFont, strikeOutTableFont, monoTableFont,
+                                                monoInactiveTableFont, infoActiveTableFont, infoInactiveTableFont,
+                                                GbpController::getInstance().getAllowDecorationColor());
     ui->itemsTableView->setModel(itemTableModel);
 
     // it appears this must be done AFTER setting the model (don't know why...)
     QFontMetrics fm2 = ui->itemsTableView->fontMetrics();
-    ui->itemsTableView->setColumnWidth(0,fm2.averageCharWidth()*9);     // type
-    ui->itemsTableView->setColumnWidth(1,fm2.averageCharWidth()*28);    // name
+    ui->itemsTableView->setColumnWidth(0,fm2.averageCharWidth()*12);     // type
+    ui->itemsTableView->setColumnWidth(1,fm2.averageCharWidth()*50);    // name
     ui->itemsTableView->setColumnWidth(2,fm2.averageCharWidth()*18);    // amount
 
     // use smaller font for description list
@@ -134,6 +135,12 @@ EditScenarioDialog::~EditScenarioDialog()
 {
     delete ui;
     delete itemTableModel;   // dont forget, because we have not set "parent" !
+}
+
+
+void EditScenarioDialog::allowDecorationColor(bool value)
+{
+    itemTableModel->setAllowDecorationColor(value);
 }
 
 

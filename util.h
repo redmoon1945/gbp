@@ -89,7 +89,11 @@ public:
     static bool isValidBoolString(const QString& input);
     static uint changeFontSize(bool aggressive, bool decreaseSize, uint originalSize);
     static QString getColorSmartName(QColor color, bool& found);
-
+    static QString buildColorDisplayName(QColor color);
+    static quint32 bitSet(quint32 number, quint32 n);
+    static quint32 bitClear(quint32 number, quint32 n);
+    static quint32 bitToggle(quint32 number, quint32 n);
+    static quint32 bitCheck(quint32 number, quint32 n);
 
 private:
 

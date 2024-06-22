@@ -22,6 +22,7 @@
 #include "optionsdialog.h"
 #include "ui_optionsdialog.h"
 #include "gbpcontroller.h"
+#include "util.h"
 
 
 OptionsDialog::OptionsDialog(QWidget *parent)
@@ -38,8 +39,10 @@ OptionsDialog::OptionsDialog(QWidget *parent)
     if ( ok ){
         sysFontString = fontLabel(f);
     }
-    QString widgetString = QString(tr("System Font : %1")).arg(sysFontString);
+    QString widgetString = QString(tr("System font : %1")).arg(sysFontString);
     ui->systemFontRadioButton->setText(widgetString);
+    // make sure first tab is selected
+    ui->tabWidget->setCurrentIndex(0);
 
 }
 
@@ -108,6 +111,12 @@ void OptionsDialog::slotPrepareContent()
         ui->todayDateEdit->setDate(GbpController::getInstance().getTodayCustomDate());
         ui->todayDateEdit->setEnabled(true);
     }
+    // Allow Decoration Colors
+    if (GbpController::getInstance().getAllowDecorationColor()==true) {
+        ui->allowDecorationColorCheckBox->setChecked(true);
+    } else {
+        ui->allowDecorationColorCheckBox->setChecked(false);
+    }
 
 }
 
@@ -119,21 +128,23 @@ void OptionsDialog::on_applyPushButton_clicked()
     bool chartDarkMode = ui->chartDarkModeCheckBox->isChecked();
     QString chartExportType = (ui->pngRadioButton->isChecked() ? ("PNG") : ("JPG"));
 
-    OptionsChangesImpact impact = NONE;
+    OptionsChangesImpact impact = {.chart=CHART_NONE, .decorationColorStreamDef=DECO_NONE}; // init
 
     // determine impact of options changes for the charts : from worst to less worst
     if ( years !=  GbpController::getInstance().getScenarioMaxYearsSpan()) {
-        impact= FULL_RECALCULATION_REQUIRED;    // all data need to be recalculate, rescale and replot also
+        impact.chart = CHART_FULL_RECALCULATION_REQUIRED;    // all data need to be recalculate, rescale and replot also
     } else if (newMainChartScaling != GbpController::getInstance().getPercentageMainChartScaling()  ) {
-        impact= RESCALE_AND_REPLOT;             // data stay the same, but rescale is required
+        impact.chart = CHART_RESCALE_AND_REPLOT;             // data stay the same, but rescale is required
     } else if (
         ( chartDarkMode != GbpController::getInstance().getChartDarkMode() ) ||
         ( curveDarkModeColor != GbpController::getInstance().getCurveDarkModeColor() ) ||
         ( curveLightModeColor != GbpController::getInstance().getCurveLightModeColor() )
         ) {
-        impact = REPLOT;                        // just redraw with different colors or background
-    } else {
-        impact = NONE;
+        impact.chart = CHART_REPLOT;                        // just redraw with different colors or background
+    }
+    // determine impact for decoration change
+    if (ui->allowDecorationColorCheckBox->isChecked() != GbpController::getInstance().getAllowDecorationColor()){
+        impact.decorationColorStreamDef = DECO_REFRESH;
     }
 
     // if custom font selected, a choice must have been made
@@ -179,6 +190,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().setUseDefaultSystemFont(ui->systemFontRadioButton->isChecked());
     GbpController::getInstance().setCustomApplicationFont(newCustomFontString);
     GbpController::getInstance().setTodayUseSystemDate(ui->todaySystemRadioButton->isChecked());
+    GbpController::getInstance().setAllowDecorationColor(ui->allowDecorationColorCheckBox->isChecked());
     if (ui->todaySpecificRadioButton->isChecked()) {
         GbpController::getInstance().setTodayCustomDate(ui->todayDateEdit->date());
     } else {
@@ -188,7 +200,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().saveSettings();
 
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Options have been changed"));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    Impact = %1").arg(impact));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    Impact : chart=%1  deco=%2").arg(impact.chart).arg(impact.decorationColorStreamDef));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ScenarioMaxYearsSpan = %1").arg(years));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ChartDarkMode = %1").arg(chartDarkMode));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CurveDarkModeColor = %1").arg(curveDarkModeColor.rgba()));
@@ -202,6 +214,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    UseSystemDateForToday = %1").arg(ui->todaySystemRadioButton->isChecked()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CustomTodayDate = %1").arg(
         GbpController::getInstance().getTodayCustomDate().toString(Qt::DateFormat::ISODate)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    AllowDecorationColor = %1").arg(ui->allowDecorationColorCheckBox->isChecked()));
 
     emit signalOptionsResult(impact);
     this->hide();
@@ -224,21 +237,21 @@ void OptionsDialog::on_OptionsDialog_rejected()
 
 void OptionsDialog::setDarkModeColorInfo()
 {
-    QString COLOR_STYLE("QPushButton { background-color : %1; }");
+    QString COLOR_STYLE("QPushButton { background-color : %1; border: none;}");
     ui->curveDarkModeColorToolButton->setStyleSheet(COLOR_STYLE.arg(curveDarkModeColor.name()));
 
     QColor c = curveDarkModeColor.name(QColor::HexRgb);
-    ui->curveDMcolorLabel->setText(buildColorDisplayName(c));
+    ui->curveDMcolorLabel->setText(Util::buildColorDisplayName(c));
 }
 
 
 void OptionsDialog::setLightModeColorInfo()
 {
-    QString COLOR_STYLE("QPushButton { background-color : %1; }");
+    QString COLOR_STYLE("QPushButton { background-color : %1; border: none;}");
     ui->curveLightModeColorToolButton->setStyleSheet(COLOR_STYLE.arg(curveLightModeColor.name()));
 
     QColor c = curveLightModeColor.name(QColor::HexRgb);
-    ui->curveLMcolorLabel->setText(buildColorDisplayName(c));
+    ui->curveLMcolorLabel->setText(Util::buildColorDisplayName(c));
 }
 
 
@@ -324,18 +337,6 @@ void OptionsDialog::setCustomFontlabel(QString fontLabel)
 {
     QString widgetString = QString(tr("Custom : %1")).arg(fontLabel);
     ui->customFontRadioButton->setText(widgetString);
-}
-
-
-QString OptionsDialog::buildColorDisplayName(QColor color)
-{
-    QString s = QString(tr("R:%1 G:%2 B:%3")).arg(color.red()).arg(color.green()).arg(color.blue());
-    bool found;
-    QString smartName = Util::getColorSmartName(color,found);
-    if(found){
-        s = s.append(QString(" (%1)").arg(smartName));
-    }
-    return s;
 }
 
 

@@ -31,6 +31,7 @@ FeStreamDef::FeStreamDef()
     this->streamType = PERIODIC;
     this->active = false;
     this->isIncome = true;
+    this->decorationColor = QColor(); // invalid color, so it means not used
 }
 
 FeStreamDef::FeStreamDef(const FeStreamDef& o )
@@ -41,16 +42,18 @@ FeStreamDef::FeStreamDef(const FeStreamDef& o )
     this->streamType = o.streamType;
     this->active = o.active;
     this->isIncome = o.isIncome;
+    this->decorationColor = o.decorationColor;
 }
 
 
-FeStreamDef::FeStreamDef(const QUuid &id, const QString &name, const QString &desc, FeStreamDef::FeStreamType streamType, bool active, bool isIncome) :
+FeStreamDef::FeStreamDef(const QUuid &id, const QString &name, const QString &desc, FeStreamDef::FeStreamType streamType, bool active, bool isIncome, const QColor &decorationColor) :
     id(id),
     name(name.left(NAME_MAX_LEN)),
     desc(desc.left(DESC_MAX_LEN)),
     streamType(streamType),
     active(active),
-    isIncome(isIncome)
+    isIncome(isIncome),
+    decorationColor(decorationColor)
 {
 }
 
@@ -69,6 +72,7 @@ FeStreamDef &FeStreamDef::operator=(const FeStreamDef &o)
     this->streamType = o.streamType;
     this->active = o.active;
     this->isIncome = o.isIncome;
+    this->decorationColor = o.decorationColor;
     return *this;
 }
 
@@ -80,7 +84,8 @@ bool FeStreamDef::operator==(const FeStreamDef &o) const
         (this->desc != o.desc) ||
         (this->streamType != o.streamType) ||
         (this->active != o.active) ||
-        (this->isIncome != o.isIncome) ){
+        (this->isIncome != o.isIncome) ||
+        (this->decorationColor != o.decorationColor) ){
         return false;
     } else{
         return true;
@@ -96,12 +101,17 @@ void FeStreamDef::toJson(QJsonObject &jsonObject) const
     jsonObject["StreamType"] = streamType;
     jsonObject["Active"] = active;
     jsonObject["IsIncome"] = isIncome;
+    // color (optional)
+    if (decorationColor.isValid()) {
+        jsonObject["DecorationColor"] = decorationColor.name(QColor::HexRgb);
+    }
+
 }
 
 
 // From JsonObject, get the data required to build later an object of this class
 void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedStreamType, QUuid &id, QString &name, QString &desc,
-                           bool &active, bool &isIncome, Util::OperationResult &result)
+                           bool &active, bool &isIncome, QColor& decorationColor, Util::OperationResult &result)
 {
     QJsonValue jsonValue;
     FeStreamType streamType;
@@ -245,6 +255,23 @@ void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedS
         return;
     }
     isIncome = jsonValue.toBool();
+    // decoration color (optional)
+    jsonValue = jsonObject.value("DecorationColor");
+    if (jsonValue == QJsonValue::Undefined){
+        // that is perfectly fine : define "not used" decoration color (= invalid color)
+        decorationColor = QColor();
+    } else{
+        if (jsonValue.isString()==false){
+            result.errorStringUI = tr("DecorationColor tag is not a string");
+            result.errorStringLog = QString("DecorationColor tag is not a string");
+            return;
+        }
+        decorationColor = QColor(jsonValue.toString());
+        if (decorationColor.isValid()==false) {
+            decorationColor = QColor();
+        }
+    }
+
     result.success = true;
     result.errorStringUI = "";
     result.errorStringLog = "";
@@ -315,4 +342,16 @@ void FeStreamDef::setIsIncome(bool newIsIncome)
 {
     isIncome = newIsIncome;
 }
+
+QColor FeStreamDef::getDecorationColor() const
+{
+    return decorationColor;
+}
+
+void FeStreamDef::setDecorationColor(const QColor &newDecorationColor)
+{
+    decorationColor = newDecorationColor;
+}
+
+
 

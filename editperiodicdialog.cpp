@@ -18,9 +18,11 @@
 #include "editperiodicdialog.h"
 #include "ui_editperiodicdialog.h"
 #include "gbpcontroller.h"
+#include "util.h"
 #include "periodicfestreamdef.h"
 #include <QMessageBox>
 #include <QCoreApplication>
+#include <QColorDialog>
 
 EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     QDialog(parent),
@@ -84,6 +86,7 @@ EditPeriodicDialog::~EditPeriodicDialog()
     delete ui;
 }
 
+
 void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, PeriodicFeStreamDef psStreamDef, CurrencyInfo newCurrInfo, Growth inflation)
 {
     // remember some variables
@@ -95,6 +98,25 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, 
     // common settings
     ui->amountDoubleSpinBox->setDecimals(currInfo.noOfDecimal);
     ui->currencyIsoCodeLabel->setText(currInfo.isoCode);
+
+    // decoration color
+    if (isNewStreamDef) {
+        decorationColor = QColor(); // use normal color for new Stream Def
+    } else {
+        decorationColor = psStreamDef.getDecorationColor(); // can be normal or custom
+    }
+    if (decorationColor.isValid()==false) {
+        // use normal color
+        ui->decorationColorCheckBox->setChecked(false);
+        ui->decorationColorCustomTextLabel->setEnabled(false);
+        ui->decorationColorPushButton->setVisible(false);
+    } else {
+        // Use custom color for text
+        ui->decorationColorCheckBox->setChecked(true);
+        ui->decorationColorCustomTextLabel->setEnabled(true);
+        ui->decorationColorPushButton->setVisible(true);
+    }
+    setDecorationColorInfo();
 
     if(editingExistingStreamDef){
         // editing an existing PeriodicFeStreamDef
@@ -239,6 +261,7 @@ void EditPeriodicDialog::on_applyPushButton_clicked()
         // reset some parameters so we are ready to create yet another Stream Def
         prepareDataToCreateANewStreamDef();
         updateAuxCustomGrowthWidgetAccessibility();
+
         ui->nameLineEdit->setFocus();
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    New Periodic item created"));
     }
@@ -261,8 +284,9 @@ void EditPeriodicDialog::prepareDataToCreateANewStreamDef()
     ui->growthDoubleSpinBox->setValue(0);
     // but initialize an empty Variable Growth if ever user decide to switch to that type
     tempVariableGrowth = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>());
-
-
+    // decoration color
+    ui->decorationColorCheckBox->setChecked(false);
+    on_decorationColorCheckBox_clicked();
 }
 
 void EditPeriodicDialog::updateAuxCustomGrowthWidgetAccessibility()
@@ -329,10 +353,12 @@ void EditPeriodicDialog::buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataR
     DateRange validityRange(ui->fromDateEdit->date(), ui->toDateEdit->date());
     qint16 periodMultiplier = static_cast<quint16>(ui->periodMultiplierSpinBox->value());
     quint16 gap = static_cast<quint16>(ui->gapSpinBox->value());
+
+    // build item
     try {
         result.pStreamDef = PeriodicFeStreamDef(periodicType, periodMultiplier, amount, growth, gs,
                                                 gap, initialId, ui->nameLineEdit->text(), ui->descPlainTextEdit->toPlainText(),
-                                                ui->activeYesRadioButton->isChecked(), isIncome, validityRange);
+                                                ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, validityRange);
     } catch (...) {
         // unexpected error, should never happen
         std::exception_ptr p = std::current_exception();
@@ -359,6 +385,22 @@ void EditPeriodicDialog::updatePeriodCombobox(PeriodicFeStreamDef::PeriodType ty
         ui->periodComboBox->setCurrentIndex(3) ;
     } else if (type == PeriodicFeStreamDef::PeriodType::YEARLY){
         ui->periodComboBox->setCurrentIndex(4) ;
+    }
+}
+
+
+// use the decorationColor variable
+void EditPeriodicDialog::setDecorationColorInfo()
+{
+    QString COLOR_STYLE("QPushButton { background-color : %1; border: none;}");
+
+    if (decorationColor.isValid()) {
+        ui->decorationColorPushButton->setStyleSheet(COLOR_STYLE.arg(decorationColor.name()));
+        QColor c = decorationColor.name(QColor::HexRgb);
+        ui->decorationColorCustomTextLabel->setText(Util::buildColorDisplayName(c));
+    } else {
+        ui->decorationColorCustomTextLabel->setText("");
+        ui->decorationColorPushButton->setStyleSheet(""); // reset
     }
 }
 
@@ -481,5 +523,35 @@ void EditPeriodicDialog::on_showResultPushButton_clicked()
 }
 
 
+void EditPeriodicDialog::on_decorationColorPushButton_clicked()
+{
+    QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
+    QColor color;
+    color = QColorDialog::getColor(decorationColor, this, "Color Chooser",opt);
+    if (color.isValid()==false) {
+        return; // user cancelled
+    } else {
+        decorationColor = color;
+        setDecorationColorInfo();
+    }
+}
 
+
+void EditPeriodicDialog::on_decorationColorCheckBox_clicked()
+{
+    if (ui->decorationColorCheckBox->isChecked()){
+        // normal to custom color
+        ui->decorationColorCustomTextLabel->setEnabled(true);
+        ui->decorationColorPushButton->setVisible(true);
+        decorationColor = QColor::fromRgb(128,128,128); // default custom color (we dont remember the last one used)
+        setDecorationColorInfo();   // take note of it
+        on_decorationColorPushButton_clicked(); // user must select a color now (cancelling is allowed)
+    } else{
+        // custom to normal color
+        ui->decorationColorCustomTextLabel->setEnabled(false);
+        ui->decorationColorPushButton->setVisible(false);
+        decorationColor = QColor();
+        setDecorationColorInfo();
+    }
+}
 

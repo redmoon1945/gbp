@@ -48,9 +48,9 @@ PeriodicFeStreamDef::PeriodicFeStreamDef(const PeriodicFeStreamDef &o) :
 
 
 PeriodicFeStreamDef::PeriodicFeStreamDef( PeriodicFeStreamDef::PeriodType periodicType,  quint16 periodMultiplier,  qint64 amount,
-                                          const Growth &growth, GrowthStrategy &growthStrategy, quint16 &growthApplicationPeriod, const QUuid &id,
-                                          const QString &name, const QString &desc, bool active, bool isIncome, const DateRange &validityRange)
-    : FeStreamDef(id, name,desc,FeStreamType::PERIODIC,active,isIncome)
+                                          const Growth &growth, const GrowthStrategy &growthStrategy,  quint16 growthApplicationPeriod, const QUuid &id,
+                                          const QString &name, const QString &desc, bool active, bool isIncome, const QColor& decorationColor, const DateRange &validityRange)
+    : FeStreamDef(id, name,desc,FeStreamType::PERIODIC,active,isIncome, decorationColor)
 {
     if (amount<0){
         throw std::invalid_argument("Amount must not be negative");
@@ -231,8 +231,9 @@ PeriodicFeStreamDef PeriodicFeStreamDef::fromJson(const QJsonObject &jsonObject,
     QString name,desc;
     bool active;
     bool isIncome;
+    QColor decoColor;
     Util::OperationResult resultBaseClass;
-    FeStreamDef::fromJson(jsonObject, PERIODIC, id, name, desc, active, isIncome, resultBaseClass);
+    FeStreamDef::fromJson(jsonObject, PERIODIC, id, name, desc, active, isIncome, decoColor, resultBaseClass);
     if (resultBaseClass.success==false){
         result.success = false;
         result.errorStringUI = tr("PeriodicFeStreamDef - ") + resultBaseClass.errorStringUI;
@@ -450,7 +451,7 @@ PeriodicFeStreamDef PeriodicFeStreamDef::fromJson(const QJsonObject &jsonObject,
     // *** build and return ***
     result.success = true;
     return PeriodicFeStreamDef(
-        periodType, periodMultiplier, amount, growth, gs, gap,id, name, desc,active, isIncome, validity);
+        periodType, periodMultiplier, amount, growth, gs, gap,id, name, desc,active, isIncome, decoColor, validity);
 }
 
 

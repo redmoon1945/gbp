@@ -85,6 +85,8 @@ private slots:
     void on_itemsTableView_doubleClicked(const QModelIndex &index);
     void on_selectAllPushButton_clicked();
     void on_unselectAllPushButton_clicked();
+    void on_decorationColorPushButton_clicked();
+    void on_decorationColorCheckBox_clicked();
 
 private:
 
@@ -93,6 +95,7 @@ private:
     bool isIncome;
     bool editingExistingStreamDef;
     QUuid initialId;
+    QColor decorationColor;
 
     // dialogs
     Ui::EditIrregularDialog *ui;
@@ -106,6 +109,7 @@ private:
     // private methods
     QList<int> getSelectedRows();
     void cleanUpForNewStreamDef();
+    void setDecorationColorInfo();
 
 };
 

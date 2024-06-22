@@ -56,7 +56,7 @@ EditVariableGrowthDialog::~EditVariableGrowthDialog()
 void EditVariableGrowthDialog::slotPrepareContent(Growth newGrowth)
 {
     this->setWindowTitle(QString(tr("Edit Variable %1")).arg(tableModel->getGrowthName()));
-    ui->noteLabel->setText(QString(tr("Note : %1 is 0 before the oldest transition date. %2 is always applied on a monthly basis and stay the same until a new value is defined.")).arg(tableModel->getGrowthName()).arg(tableModel->getGrowthName()));
+    ui->noteLabel->setText(QString(tr("%1 : Value is 0 before the oldest transition date is defined. It is always applied on a monthly basis, even if defined on an annual basis (for convenience purpose). Value stays the same until a new transition date + value is defined.")).arg(tableModel->getGrowthName()));
     tableModel->setGrowthName(tableModel->getGrowthName());
     // update model (the view will be automatically updated)
     tableModel->setGrowthData(newGrowth);

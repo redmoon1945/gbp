@@ -51,7 +51,7 @@ public:
     IrregularFeStreamDef();     // used only for some QMap operations
     IrregularFeStreamDef(const IrregularFeStreamDef& o);
     IrregularFeStreamDef(const QMap<QDate, AmountInfo> &amountSet);
-    IrregularFeStreamDef(QMap<QDate,AmountInfo> amountSet, const QUuid &id, const QString &name, const QString &desc, bool active, bool isIncome);
+    IrregularFeStreamDef(QMap<QDate,AmountInfo> amountSet, const QUuid &id, const QString &name, const QString &desc, bool active, bool isIncome, const QColor& decorationColor);
     virtual ~IrregularFeStreamDef();
 
     // operators

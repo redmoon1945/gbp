@@ -75,6 +75,8 @@ private slots:
     void on_growthVariableRadioButton_clicked();
     void on_pushButton_clicked();
     void on_showResultPushButton_clicked();
+    void on_decorationColorPushButton_clicked();
+    void on_decorationColorCheckBox_clicked();
 
 private:
     Ui::EditPeriodicDialog *ui;
@@ -87,6 +89,7 @@ private:
     Growth tempVariableGrowth;
     QUuid initialId;
     Growth scenarioInflation;
+    QColor decorationColor;
 
     // children dialogs
     EditVariableGrowthDialog* editVariableGrowthDlg;
@@ -105,6 +108,7 @@ private:
     void updateAuxCustomGrowthWidgetAccessibility();
     void buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataResult &result);
     void updatePeriodCombobox(PeriodicFeStreamDef::PeriodType type);
+    void setDecorationColorInfo();
 };
 
 #endif // EDITPERIODICDIALOG_H

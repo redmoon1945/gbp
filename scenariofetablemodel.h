@@ -36,7 +36,8 @@ class ScenarioFeTableModel : public QAbstractTableModel
 
 public:
     explicit ScenarioFeTableModel(QLocale aLocale, QFont activeTableFont, QFont inactiveTableFont, QFont amountActiveTableFont,
-                                  QFont amountInactiveTableFont, QFont infoActiveTableFont, QFont infoInactiveTableFont, QObject *parent = nullptr);
+                                  QFont amountInactiveTableFont, QFont infoActiveTableFont, QFont infoInactiveTableFont, bool allowDecorationColor,
+                                  QObject *parent = nullptr);
     ~ScenarioFeTableModel();
 
     // model's methods to implement as subclass of QAbstractListModel
@@ -69,10 +70,12 @@ public:
     QMap<QUuid, IrregularFeStreamDef> getIncomesDefIrregular() const;
     QMap<QUuid, PeriodicFeStreamDef> getExpensesDefPeriodic() const;
     QMap<QUuid, IrregularFeStreamDef> getExpensesDefIrregular() const;
-
+    bool getAllowDecorationColor() const;
+    void setAllowDecorationColor(bool newAllowDecorationColor);
 
 private:
 
+    // compact structure holding all the info required to quickly fill the table
     struct ItemInfo
     {
         QString name;
@@ -81,6 +84,7 @@ private:
         QString info;
         bool isActive;
         QUuid id;
+        QColor decorationColor;
     };
     // some misc variables
     QLocale theLocale;
@@ -91,6 +95,7 @@ private:
     QFont amountInactiveTableFont;  // Inactive amount
     QFont infoActiveFont;           // Info active
     QFont infoInactiveFont;         // Info inactive
+    bool allowDecorationColor;
 
     // real data (raw)
     QMap<QUuid,PeriodicFeStreamDef> incomesDefPeriodic;         // key is Stream Def ID

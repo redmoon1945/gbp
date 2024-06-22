@@ -324,7 +324,9 @@ void AnalysisDialog::updateRelativeWeightChart()
             seriesRelativeWeigth->append(tr("Others"), fabs(p.amount));
             originalSliceNames.append(tr("Others"));
         } else{
-            QString name = scenario->getStreamDefNameFromId(p.id, found); // will always be found
+            QString name;
+            QColor color;
+            scenario->getStreamDefNameAndColorFromId(p.id, name, color,found); // will always be found
             originalSliceNames.append(name);
             seriesRelativeWeigth->append(name, fabs(p.amount));
         }

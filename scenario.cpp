@@ -249,33 +249,41 @@ QMap<QDate, CombinedFeStreams::DailyInfo> Scenario::generateFinancialEvents(QLoc
 }
 
 
-QString Scenario::getStreamDefNameFromId(QUuid id, bool &found) const
+void Scenario::getStreamDefNameAndColorFromId(QUuid id, QString& name, QColor& color, bool &found) const
 {
     found = true;
 
     foreach(PeriodicFeStreamDef item,incomesDefPeriodic){
         if (item.getId()==id){
-            return item.getName();
+            name = item.getName();
+            color = item.getDecorationColor();
+            return;
         }
     }
     foreach(PeriodicFeStreamDef item,expensesDefPeriodic){
         if (item.getId()==id){
-            return item.getName();
+            name = item.getName();
+            color = item.getDecorationColor();
+            return;
         }
     }
     foreach(IrregularFeStreamDef item,incomesDefIrregular){
         if (item.getId()==id){
-            return item.getName();
+            name = item.getName();
+            color = item.getDecorationColor();
+            return;
         }
     }
     foreach(IrregularFeStreamDef item,expensesDefIrregular){
         if (item.getId()==id){
-            return item.getName();
+            name = item.getName();
+            color = item.getDecorationColor();
+            return;
         }
     }
 
     found = false;
-    return "";
+    return ;
 
 }
 

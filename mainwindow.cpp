@@ -78,10 +78,12 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     // set scaling factor from settings
     chartScalingFactor = 1 + (GbpController::getInstance().getPercentageMainChartScaling())/100.0;
 
-    // use smaller font for Info list
+    // use smaller font for Info list and enable custom sorting
     QFont listFont = ui->ciDetailsListWidget->font();
     listFont.setPointSize(Util::changeFontSize(false,true, listFont.pointSize()));
     ui->ciDetailsListWidget->setFont(listFont);
+    ui->ciDetailsListWidget->setSortingEnabled(true);
+
 
     // ***********************************************
     // *** CHART SETTINGS ***
@@ -372,17 +374,48 @@ void MainWindow::fillDailyInfoSection(const QDate& date, double amount, const Co
     QSharedPointer<Scenario> sc = GbpController::getInstance().getScenario();
 
     // list box
-    QStringList sl;
+    // we need this in ordert o sort the list by StreamDef name
+    class CustomListItem : public QListWidgetItem {
+    public:
+        CustomListItem(const QString& text, QString theName) : QListWidgetItem(text) {
+            this->setData(Qt::UserRole, theName);
+        }
+        bool operator<(const QListWidgetItem& other) const {
+            QString theName = this->data(Qt::UserRole).toString();
+            QString otherName = other.data(Qt::UserRole).toString();
+            if ( QString::localeAwareCompare(theName,otherName) < 0 ){
+                return true;
+            } else {
+                return false;
+            }
+        }
+    };
+    ui->ciDetailsListWidget->clear();
+    QString sName;
+    QColor color;
+    QListWidgetItem *item;
+    ui->ciDetailsListWidget->clear();
     foreach(FeDisplay fed, di.incomesList){
-        QString sName = sc->getStreamDefNameFromId(fed.id, streamFound); // should always be found
-        sl.append(fed.toString(sName, currInfo, locale));
+        sc->getStreamDefNameAndColorFromId(fed.id, sName, color, streamFound);
+        if(found){// should always be found
+            item = new CustomListItem(fed.toString(sName, currInfo, locale),sName);
+            if( (GbpController::getInstance().getAllowDecorationColor()==true) && (color.isValid())){
+                item->setForeground(color);
+            }
+            ui->ciDetailsListWidget->addItem(item) ;    // list widget will take ownership of the item
+        }
     }
     foreach(FeDisplay fed, di.expensesList){
-        QString sName = sc->getStreamDefNameFromId(fed.id, streamFound); // should always be found
-        sl.append(fed.toString(sName, currInfo, locale));
-    }
-    ui->ciDetailsListWidget->clear();
-    ui->ciDetailsListWidget->insertItems(0,sl);
+        sc->getStreamDefNameAndColorFromId(fed.id, sName, color, streamFound);
+        if(found){// should always be found
+            item = new CustomListItem(fed.toString(sName, currInfo, locale), sName);
+            if( (GbpController::getInstance().getAllowDecorationColor()==true) && (color.isValid())){
+                item->setForeground(color);
+            }
+            ui->ciDetailsListWidget->addItem(item) ;    // list widget will take ownership of the item
+        }
+     }
+
 }
 
 
@@ -406,8 +439,9 @@ void MainWindow::updateBaselineWidgets(CurrencyInfo currInfo)
 }
 
 
-// Compared current scenario in memory with its counterpart on disk. If an error
+// Compared current scenario in memory with its counterpart on disk. If an error (i.e. mismatch)
 // occured, true is returned in "match".
+// If no scenario loaded, match = true
 void MainWindow::checkIfCurrentScenarioMatchesDiskVersion(bool &match) const {
     match = true;
     // anything loaded ?
@@ -415,7 +449,7 @@ void MainWindow::checkIfCurrentScenarioMatchesDiskVersion(bool &match) const {
         match = true;
         return; // no scenario load matches with "empty" disk file
     }
-    // current scenario has already been saved on file (so this is a new scenario) ?
+    // current scenario is a new scenario, so it is a mismatched by default
     if ( GbpController::getInstance().getFullFileName()== "" ){
         match = false;
         return;
@@ -446,14 +480,13 @@ void MainWindow::on_actionQuit_triggered()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    // before quitting, check if current scenario has been modified compared to what is on disk
+    // check first if the current scenario needs to be saved
     bool match;
     checkIfCurrentScenarioMatchesDiskVersion(match);
     if (match==false){
-        if ( QMessageBox::StandardButton::Yes != QMessageBox::question(this,tr("Modifications not saved"),
-                tr("Scenario has been modified. Do you still want to quit without saving the changes ?")) ){
-            event->ignore();
-            return;
+        if ( QMessageBox::StandardButton::Yes == QMessageBox::question(this,tr("Modifications not saved"),
+                tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?")) ){
+            on_actionSave_triggered();  // save current scenario
         }
     } else {
         if ( QMessageBox::StandardButton::Yes != QMessageBox::question(this,tr("About to quit"),
@@ -463,8 +496,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
     }
 
-    // proceed to quitting
-    delete editScenarioDlg;
+    // proceed with quitting the application
     GbpController::getInstance().saveSettings();
     event->accept();
 }
@@ -488,9 +520,9 @@ void MainWindow::on_actionOpen_triggered()
     bool match;
     checkIfCurrentScenarioMatchesDiskVersion(match);
     if (match==false){
-        if ( QMessageBox::StandardButton::Yes != QMessageBox::question(this,tr("Modifications not saved"),
-                    tr("Scenario has been modified. Do you still want to open another scenario and lose these changes ?")) ){
-            return;
+        if ( QMessageBox::StandardButton::Yes == QMessageBox::question(this,tr("Modifications not saved"),
+                tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?")) ){
+            on_actionSave_triggered();  // save current scenario
         }
     }
 
@@ -736,9 +768,9 @@ void MainWindow::on_actionNew_triggered()
     bool match;
     checkIfCurrentScenarioMatchesDiskVersion(match);
     if (match==false){
-        if ( QMessageBox::StandardButton::Yes != QMessageBox::question(this,tr("Modifications not saved"),
-                tr("Scenario has been modified. Do you still want to open another scenario and lose these changes ?")) ){
-            return;
+        if ( QMessageBox::StandardButton::Yes == QMessageBox::question(this,tr("Modifications not saved"),
+                tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?")) ){
+            on_actionSave_triggered();  // save current scenario
         }
     }
 
@@ -919,7 +951,7 @@ void MainWindow::slotEditScenarioCompleted()
 }
 
 
-void MainWindow::slotOptionsResult(OptionsDialog::OptionsChangesImpact chartImpact)
+void MainWindow::slotOptionsResult(OptionsDialog::OptionsChangesImpact impact)
 {
     // update main chart scaling factor in case it has been changed
     chartScalingFactor = 1 + (GbpController::getInstance().getPercentageMainChartScaling())/100.0;
@@ -927,23 +959,30 @@ void MainWindow::slotOptionsResult(OptionsDialog::OptionsChangesImpact chartImpa
     setVisibilityZoomButtons();
     setChartColors();
     analysisDlg->themeChanged();
-    // Conditional actions
-    switch(chartImpact){
-        case OptionsDialog::OptionsChangesImpact::FULL_RECALCULATION_REQUIRED:
+    // Act on impact for main chart
+    switch(impact.chart){
+    case OptionsDialog::OPTIONS_IMPACT_CHART::CHART_FULL_RECALCULATION_REQUIRED:
             updateScenarioDataDisplayed(true, false);
             break;
-        case OptionsDialog::OptionsChangesImpact::RESCALE_AND_REPLOT:
+        case OptionsDialog::OPTIONS_IMPACT_CHART::CHART_RESCALE_AND_REPLOT:
             // order is important !
             chart->graph(0)->rescaleAxes(false);
             chart->xAxis->scaleRange(chartScalingFactor);
             chart->yAxis->scaleRange(chartScalingFactor);
             chart->replot();
             break;
-        case OptionsDialog::OptionsChangesImpact::REPLOT:
+        case OptionsDialog::OPTIONS_IMPACT_CHART::CHART_REPLOT:
             chart->replot();
             break;
         default:
             break;
+    }
+    // Act for decoration color changes
+    if (impact.decorationColorStreamDef==OptionsDialog::OPTIONS_IMPACT_DECORATION_COLOR::DECO_REFRESH){
+        if ( GbpController::getInstance().isScenarioLoaded()==true){
+            editScenarioDlg->allowDecorationColor(GbpController::getInstance().getAllowDecorationColor());  // update scenation StreamDef list now
+            selectionChangedByUser();   // update the daily info now
+        }
     }
 }
 
@@ -1097,6 +1136,18 @@ void MainWindow::on_actionClear_List_triggered()
 void MainWindow::on_actionRecentFile_triggered(){
     QAction *action = qobject_cast<QAction *>(sender());
     if (action){
+
+        // check first if the current scenario needs to be saved
+        bool match;
+        checkIfCurrentScenarioMatchesDiskVersion(match);
+        if (match==false){
+            if ( QMessageBox::StandardButton::Yes == QMessageBox::question(this,tr("Modifications not saved"),
+                    tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?")) ){
+                on_actionSave_triggered();  // save current scenario
+            }
+        }
+
+        // switch scenario
         bool result = loadScenarioFile(action->data().toString());
         if (result==true){
             // update recent file opened list

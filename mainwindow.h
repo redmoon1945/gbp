@@ -68,7 +68,7 @@ public slots:
     void slotEditScenarioResult(bool currentlyEditingNewScenario);
     void slotEditScenarioCompleted();
     // From Options Edit : result and edition completion notification
-    void slotOptionsResult(OptionsDialog::OptionsChangesImpact chartImpact);
+    void slotOptionsResult(OptionsDialog::OptionsChangesImpact impact);
     void slotOptionsCompleted();
     // From DateInterval Edit : result and edition completion notification
     void slotDateIntervalResult(QDate from, QDate to);

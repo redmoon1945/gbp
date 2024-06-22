@@ -39,6 +39,7 @@ GbpController::GbpController()
     initialSystemApplicationFont = QApplication::font().toString();
     todayUseSystemDate = true;
     todayCustomDate = QDate();
+    allowDecorationColor = true;
 
     QStringList argList = QCoreApplication::arguments();
 
@@ -347,6 +348,19 @@ void GbpController::loadSettings()
         }
     }
 
+    // allow the use of decoration color for incomes/expenses
+    if (settingsPtr->contains("allow_decoration_color")){
+        v = settingsPtr->value("allow_decoration_color");
+        bool ok = Util::isValidBoolString(v.toString());
+        if (ok){
+            allowDecorationColor = v.toBool();
+        } else {
+            allowDecorationColor = true;    // default if data is invalid
+        }
+    } else{
+        allowDecorationColor = true;
+    }
+
     // loaded is completed and successful
     settingsLoaded = true;
 
@@ -366,6 +380,7 @@ void GbpController::loadSettings()
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    custom_application_font = %1").arg(customApplicationFont));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    today_use_system_date = %1").arg(todayUseSystemDate));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    today_custom_date = %1").arg(todayCustomDate.toString(Qt::DateFormat::ISODate)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    allow_decoration_color = %1").arg(allowDecorationColor));
 
 }
 
@@ -386,6 +401,7 @@ void GbpController::saveSettings()
     settingsPtr->setValue("custom_application_font",customApplicationFont);
     settingsPtr->setValue("today_use_system_date",todayUseSystemDate);
     settingsPtr->setValue("today_specific_date",todayCustomDate.toString(Qt::DateFormat::ISODate));
+    settingsPtr->setValue("allow_decoration_color",allowDecorationColor);
 }
 
 
@@ -635,6 +651,16 @@ QDate GbpController::getTodayCustomDate() const
 void GbpController::setTodayCustomDate(const QDate &newTodayCustomDate)
 {
     todayCustomDate = newTodayCustomDate;
+}
+
+bool GbpController::getAllowDecorationColor() const
+{
+    return allowDecorationColor;
+}
+
+void GbpController::setAllowDecorationColor(bool newAllowDecorationColor)
+{
+    allowDecorationColor = newAllowDecorationColor;
 }
 
 

@@ -67,7 +67,7 @@ public:
 
     // Methods
     QMap<QDate,CombinedFeStreams::DailyInfo>generateFinancialEvents(QLocale systemLocale, DateRange fromto, uint &saturationCount) const;
-    QString getStreamDefNameFromId(QUuid id, bool& found) const;
+    void getStreamDefNameAndColorFromId(QUuid id,  QString& name, QColor& color, bool& found) const;
     FileResult saveToFile(QString fullFileName) const;
     static FileResult loadFromFile(QString fullFileName);
     // static QSharedPointer<Scenario> createNewEmptyScenario();

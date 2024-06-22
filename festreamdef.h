@@ -48,7 +48,7 @@ public:
     // constructors and destructor
     FeStreamDef();  // required for default value in some QMap operations
     FeStreamDef(const FeStreamDef& o);
-    FeStreamDef(const QUuid &id, const QString &name, const QString &desc, FeStreamType streamType, bool active, bool isIncome);
+    FeStreamDef(const QUuid &id, const QString &name, const QString &desc, FeStreamType streamType, bool active, bool isIncome, const QColor& decorationColor);
     virtual ~FeStreamDef();
 
     // operators
@@ -60,7 +60,7 @@ public:
     virtual QString toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const = 0;
     void toJson(QJsonObject &jsonObject) const;
     static void fromJson(const QJsonObject &jsonObject, FeStreamType expectedStreamType, QUuid &id, QString &name, QString &desc,
-                         bool &active, bool &isIncome, Util::OperationResult &result); // we cant build a base class, so we return instead the components
+                         bool &active, bool &isIncome, QColor& decorationColor, Util::OperationResult &result); // we cant build a base class, so we return instead the components
 
     // Getters/setters
     QUuid getId() const;
@@ -75,6 +75,9 @@ public:
     void setActive(bool newActive);
     bool getIsIncome() const;
     void setIsIncome(bool newIsIncome);
+    QColor getDecorationColor() const;
+    void setDecorationColor(const QColor &newDecorationColor);
+
 
 protected:
     QUuid id;                   // this is the unique key of this FeStreamDef, but created by the parent class
@@ -83,6 +86,7 @@ protected:
     FeStreamType streamType;    // type of Financial Event Stream
     bool active;                // do not generate any Financial Event Stream if set to False
     bool isIncome;
+    QColor decorationColor;    // to differentiate this Stream Def from others in scenario data display. QColor is invalid if not used.
 
 };
 

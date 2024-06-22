@@ -41,6 +41,9 @@ public:
     explicit EditScenarioDialog(QLocale locale, QWidget *parent = nullptr);
     ~EditScenarioDialog();
 
+    // methods
+    void allowDecorationColor(bool value);
+
 signals:
     // For client of EditScenarioDialog : sending result and edition completion notification
     void signalEditScenarioResult(bool currentlyEditingNewScenario);

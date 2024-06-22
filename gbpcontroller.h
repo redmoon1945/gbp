@@ -91,6 +91,8 @@ public:
     void setTodayUseSystemDate(bool newTodayUseSystemDate);
     QDate getTodayCustomDate() const;
     void setTodayCustomDate(const QDate &newTodayCustomDate);
+    bool getAllowDecorationColor() const;
+    void setAllowDecorationColor(bool newAllowDecorationColor);
 
 private:
 
@@ -109,6 +111,7 @@ private:
     QString customApplicationFont;
     bool todayUseSystemDate;                 // If true, today's date if determined by real date-time (this is the default). If false, it is set using the value "todayCustomDate"
     QDate todayCustomDate;
+    bool allowDecorationColor;
 
     // *** misc variables ***
     QDate today;                        // Date of "today" in local time, set ONCE, when the settings is loaded

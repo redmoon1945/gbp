@@ -19,7 +19,8 @@
 
 
 ScenarioFeTableModel::ScenarioFeTableModel(QLocale aLocale, QFont activeTableFont, QFont inactiveTableFont, QFont amountActiveTableFont,
-                                           QFont amountInactiveTableFont, QFont infoActiveTableFont, QFont infoInactiveTableFont, QObject *parent)
+                                           QFont amountInactiveTableFont, QFont infoActiveTableFont, QFont infoInactiveTableFont, bool allowDecorationColor,
+                                           QObject *parent)
     : QAbstractTableModel{parent}
 {
     this->theLocale = aLocale;
@@ -29,6 +30,7 @@ ScenarioFeTableModel::ScenarioFeTableModel(QLocale aLocale, QFont activeTableFon
     this->amountInactiveTableFont = amountInactiveTableFont;
     this->infoActiveFont = infoActiveTableFont;
     this->infoInactiveFont = infoInactiveTableFont;
+    this->allowDecorationColor = allowDecorationColor;
 
     // *** WARNING ***
     // CurencyInfo must be set before using the model (it changes with the scenario loaded)
@@ -110,6 +112,12 @@ QVariant ScenarioFeTableModel::data(const QModelIndex &index, int role) const
             return int(Qt::AlignLeft | Qt::AlignVCenter);
         } else {
             return int(Qt::AlignHCenter| Qt::AlignVCenter);
+        }
+    } else if (role == Qt::ForegroundRole){
+        if ( (allowDecorationColor==true) && (col==1) && (info.decorationColor.isValid()) ) {
+            return QVariant(info.decorationColor);
+        } else {
+            return QVariant();
         }
     } else if (role==Qt::FontRole){
         if (info.isActive){
@@ -377,16 +385,30 @@ int ScenarioFeTableModel::getNoItems()
 
 // *** PRIVATE ***
 
+// From raw data, recreate the compact list of data used to fill the table.
+// Sorting must be done at this stage (locale-aware sorting)
 void ScenarioFeTableModel::rebuildLists()
 {
     emit beginResetModel();
 
-    QString sortKey;
+    // we need this in order to sort in a locale-aware way
+    class MyString : public QString {
+    public:
+        MyString(const QString& text) : QString(text) {
+        }
+        bool operator<(const MyString& other) const {
+            if ( QString::localeAwareCompare(*this,other) < 0 ){
+                return true;
+            } else {
+                return false;
+            }
+        }
+    };
 
-    // intermediate data structure, used just to sort items by name. Name are decapitalized to prevent sorting oddities.
+    // intermediate data structure, used just to sort items by name.
     // Name must be made unique, because there could be duplicates, even if this is not recommended.
-    // For that, we append the ID. It means that duplicate will be sorted by QUuid.
-    QMap<QString,ItemInfo> proxyList;
+    // For that, we append the ID at the very end, filling with Space. It means that duplicate will be sorted by QUuid.
+    QMap<MyString,ItemInfo> proxyList;
 
     // clear the items list
     itemsList.clear();
@@ -402,13 +424,14 @@ void ScenarioFeTableModel::rebuildLists()
                     info.type = tr("Periodic");
                     info.isActive = item.getActive();
                     info.info = item.toStringForDisplay(currInfo,theLocale);
+                    info.decorationColor = item.getDecorationColor();
                     int ok;
                     info.amount = CurrencyHelper::quint64ToDoubleString(item.getAmount(), currInfo, theLocale, false, ok);;
                     if ( ok != 0 ){
                         info.amount = QString("Error");  // amount or noOfCurrencyDecimals is too big, should not happen
                     }
-                    sortKey = item.getName().leftJustified(FeStreamDef::NAME_MAX_LEN,' ').append(info.id.toString());
-                    proxyList.insert(sortKey.toLower(), info);
+                    MyString sortKey = MyString(item.getName().leftJustified(FeStreamDef::NAME_MAX_LEN,' ', true).append(info.id.toString()));
+                    proxyList.insert(sortKey, info);
                 }
             }
         }
@@ -423,8 +446,9 @@ void ScenarioFeTableModel::rebuildLists()
                     info.isActive = item.getActive();
                     info.info = item.toStringForDisplay(currInfo,theLocale);
                     info.amount = "";
-                    sortKey = item.getName().leftJustified(FeStreamDef::NAME_MAX_LEN,' ').append(info.id.toString());
-                    proxyList.insert(sortKey.toLower(), info);
+                    info.decorationColor = item.getDecorationColor();
+                    MyString sortKey = MyString(item.getName().leftJustified(FeStreamDef::NAME_MAX_LEN,' ',true).append(info.id.toString()));
+                    proxyList.insert(sortKey, info);
                 }
             }
         }
@@ -442,11 +466,12 @@ void ScenarioFeTableModel::rebuildLists()
                     info.isActive = item.getActive();
                     info.info = item.toStringForDisplay(currInfo,theLocale);
                     int ok;
-                    info.amount = CurrencyHelper::quint64ToDoubleString(item.getAmount(), currInfo, theLocale, false, ok);;
+                    info.amount = CurrencyHelper::quint64ToDoubleString(item.getAmount(), currInfo, theLocale, false, ok);
+                    info.decorationColor = item.getDecorationColor();
                     if ( ok != 0 ){
                         info.amount = QString("Error");  // amount or noOfCurrencyDecimals is too big, should not happen
                     }
-                    sortKey = item.getName().leftJustified(FeStreamDef::NAME_MAX_LEN,' ').append(info.id.toString());
+                    MyString sortKey = MyString(item.getName().leftJustified(FeStreamDef::NAME_MAX_LEN,' ',true).append(info.id.toString()));
                     proxyList.insert(sortKey.toLower(), info);
                 }
             }
@@ -462,7 +487,8 @@ void ScenarioFeTableModel::rebuildLists()
                     info.isActive = item.getActive();
                     info.info = item.toStringForDisplay(currInfo,theLocale);
                     info.amount = "";
-                    sortKey = item.getName().leftJustified(FeStreamDef::NAME_MAX_LEN,' ').append(info.id.toString());
+                    info.decorationColor = item.getDecorationColor();
+                    MyString sortKey = MyString(item.getName().leftJustified(FeStreamDef::NAME_MAX_LEN,' ',true).append(info.id.toString()));
                     proxyList.insert(sortKey.toLower(), info);
                 }
             }
@@ -511,6 +537,19 @@ QMap<QUuid, PeriodicFeStreamDef> ScenarioFeTableModel::getExpensesDefPeriodic() 
 QMap<QUuid, IrregularFeStreamDef> ScenarioFeTableModel::getExpensesDefIrregular() const
 {
     return expensesDefIrregular;
+}
+
+bool ScenarioFeTableModel::getAllowDecorationColor() const
+{
+    return allowDecorationColor;
+}
+
+void ScenarioFeTableModel::setAllowDecorationColor(bool newAllowDecorationColor)
+{
+    // we want to refresh the display right afterward
+    emit beginResetModel();
+    allowDecorationColor = newAllowDecorationColor;
+    emit endResetModel();
 }
 
 
