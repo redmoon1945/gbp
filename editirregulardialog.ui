@@ -31,7 +31,7 @@
         <widget class="QLabel" name="label">
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -46,7 +46,7 @@
         <widget class="QLabel" name="label_2">
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -110,7 +110,7 @@
         <widget class="QLabel" name="label_3">
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -132,6 +132,22 @@
             <string notr="true">buttonGroup</string>
            </attribute>
           </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_10">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
           <widget class="QRadioButton" name="activeNoRadioButton">
@@ -162,7 +178,7 @@
         <widget class="QLabel" name="label_4">
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -174,6 +190,12 @@
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
           <widget class="QCheckBox" name="decorationColorCheckBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -197,6 +219,12 @@
          </item>
          <item>
           <widget class="QPushButton" name="decorationColorPushButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string/>
            </property>

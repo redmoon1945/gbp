@@ -701,69 +701,69 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="139"/>
+        <location filename="editirregulardialog.ui" line="155"/>
         <source>No</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="169"/>
+        <location filename="editirregulardialog.ui" line="185"/>
         <source>Colorize Name :</source>
         <oldsource>Use Decorative Color :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="227"/>
+        <location filename="editirregulardialog.ui" line="255"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="272"/>
+        <location filename="editirregulardialog.ui" line="300"/>
         <source>List of Occurences</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="310"/>
+        <location filename="editirregulardialog.ui" line="338"/>
         <source>Add...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="317"/>
+        <location filename="editirregulardialog.ui" line="345"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="324"/>
+        <location filename="editirregulardialog.ui" line="352"/>
         <source>Delete</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="331"/>
+        <location filename="editirregulardialog.ui" line="359"/>
         <source>Select All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="338"/>
+        <location filename="editirregulardialog.ui" line="366"/>
         <source>Unselect All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="383"/>
+        <location filename="editirregulardialog.ui" line="411"/>
         <source>* Elements in gray are past events and will not be taken into consideration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="410"/>
+        <location filename="editirregulardialog.ui" line="438"/>
         <source>Load from file...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="430"/>
+        <location filename="editirregulardialog.ui" line="458"/>
         <location filename="editirregulardialog.cpp" line="143"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="437"/>
+        <location filename="editirregulardialog.ui" line="465"/>
         <location filename="editirregulardialog.cpp" line="142"/>
         <source>Apply</source>
         <translation></translation>
@@ -1071,7 +1071,7 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="905"/>
+        <location filename="editperiodicdialog.ui" line="921"/>
         <source>No</source>
         <translation></translation>
     </message>
@@ -1096,18 +1096,18 @@ Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="950"/>
+        <location filename="editperiodicdialog.ui" line="966"/>
         <source>See all occurences...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="970"/>
+        <location filename="editperiodicdialog.ui" line="986"/>
         <location filename="editperiodicdialog.cpp" line="192"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="977"/>
+        <location filename="editperiodicdialog.ui" line="993"/>
         <location filename="editperiodicdialog.cpp" line="132"/>
         <source>Apply</source>
         <translation></translation>
@@ -2313,27 +2313,27 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="283"/>
+        <location filename="mainwindow.ui" line="289"/>
         <source>Show Points</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="330"/>
+        <location filename="mainwindow.ui" line="336"/>
         <source>Selected Point Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="376"/>
+        <location filename="mainwindow.ui" line="382"/>
         <source>Date :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="541"/>
+        <location filename="mainwindow.ui" line="582"/>
         <source>Delta :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="412"/>
+        <location filename="mainwindow.ui" line="418"/>
         <source>Amount :</source>
         <translation></translation>
     </message>
@@ -2353,149 +2353,149 @@ Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="309"/>
+        <location filename="mainwindow.ui" line="315"/>
         <source>CSV Export...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="394"/>
+        <location filename="mainwindow.ui" line="400"/>
         <source>Change :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="425"/>
-        <location filename="mainwindow.ui" line="438"/>
-        <location filename="mainwindow.ui" line="451"/>
+        <location filename="mainwindow.ui" line="436"/>
+        <location filename="mainwindow.ui" line="454"/>
+        <location filename="mainwindow.ui" line="472"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="485"/>
+        <location filename="mainwindow.ui" line="516"/>
         <source>Date Range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="503"/>
+        <location filename="mainwindow.ui" line="534"/>
         <source>From :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="515"/>
+        <location filename="mainwindow.ui" line="546"/>
         <source>To :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="576"/>
+        <location filename="mainwindow.ui" line="622"/>
         <source>Scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="580"/>
+        <location filename="mainwindow.ui" line="626"/>
         <source>Open Recent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="599"/>
+        <location filename="mainwindow.ui" line="645"/>
         <source>Tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="606"/>
+        <location filename="mainwindow.ui" line="652"/>
         <source>Help</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="622"/>
+        <location filename="mainwindow.ui" line="668"/>
         <source>New...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="625"/>
+        <location filename="mainwindow.ui" line="671"/>
         <source>Close the current scenario and create a new scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="628"/>
+        <location filename="mainwindow.ui" line="674"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="633"/>
+        <location filename="mainwindow.ui" line="679"/>
         <source>Open...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="636"/>
+        <location filename="mainwindow.ui" line="682"/>
         <source>Close the current scenario and open an existing scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="639"/>
+        <location filename="mainwindow.ui" line="685"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="644"/>
+        <location filename="mainwindow.ui" line="690"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="647"/>
+        <location filename="mainwindow.ui" line="693"/>
         <source>Edit the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="650"/>
+        <location filename="mainwindow.ui" line="696"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="655"/>
+        <location filename="mainwindow.ui" line="701"/>
         <source>Save</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="658"/>
+        <location filename="mainwindow.ui" line="704"/>
         <source>Save the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="661"/>
+        <location filename="mainwindow.ui" line="707"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="666"/>
+        <location filename="mainwindow.ui" line="712"/>
         <source>Save As...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="669"/>
+        <location filename="mainwindow.ui" line="715"/>
         <source>Save the current scenario under a new file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="674"/>
+        <location filename="mainwindow.ui" line="720"/>
         <source>Quit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="679"/>
+        <location filename="mainwindow.ui" line="725"/>
         <source>About Graphical Budget Planner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="684"/>
+        <location filename="mainwindow.ui" line="730"/>
         <source>About Qt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="689"/>
+        <location filename="mainwindow.ui" line="735"/>
         <source>Options...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="694"/>
+        <location filename="mainwindow.ui" line="740"/>
         <source>Analysis...</source>
         <translation></translation>
     </message>
@@ -2690,52 +2690,52 @@ Details : %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="45"/>
+        <location filename="optionsdialog.ui" line="48"/>
         <source>Scenario - No of years calculated :</source>
         <oldsource>Scenario - no of years calculated :</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="380"/>
-        <location filename="optionsdialog.ui" line="439"/>
+        <location filename="optionsdialog.ui" line="460"/>
+        <location filename="optionsdialog.ui" line="525"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="514"/>
+        <location filename="optionsdialog.ui" line="600"/>
         <source>Exported image type :</source>
         <oldsource>Chart - Exported image type :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="525"/>
+        <location filename="optionsdialog.ui" line="617"/>
         <source>Jpg</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="535"/>
+        <location filename="optionsdialog.ui" line="633"/>
         <source>Png</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="265"/>
+        <location filename="optionsdialog.ui" line="327"/>
         <source>Exported text - Amounts are localized :</source>
         <oldsource>Exported Text - Amounts are localized :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="557"/>
+        <location filename="optionsdialog.ui" line="655"/>
         <source>Overscaling for main chart :</source>
         <oldsource>Overscaling percentage for main chart :</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="572"/>
+        <location filename="optionsdialog.ui" line="670"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="90"/>
+        <location filename="optionsdialog.ui" line="93"/>
         <source>Application font :</source>
         <oldsource>Application Font :</oldsource>
         <translation type="unfinished"></translation>
@@ -2746,72 +2746,77 @@ Details : %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="107"/>
-        <location filename="optionsdialog.ui" line="130"/>
+        <location filename="optionsdialog.ui" line="110"/>
+        <location filename="optionsdialog.ui" line="133"/>
         <source>---</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="156"/>
+        <location filename="optionsdialog.ui" line="165"/>
         <source>Choose...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="172"/>
+        <location filename="optionsdialog.ui" line="194"/>
         <source>How date of &quot;Today&quot; is obtained :</source>
         <oldsource>How Date of &quot;Today&quot; is obtained :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="183"/>
+        <location filename="optionsdialog.ui" line="211"/>
         <source>System&apos;s date at start-up</source>
         <oldsource>System&apos;s Date at start-up</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="200"/>
+        <location filename="optionsdialog.ui" line="234"/>
         <source>Specific value</source>
         <oldsource>Specific Value</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="242"/>
+        <location filename="optionsdialog.ui" line="266"/>
+        <source>yyyy-MMM-dd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="298"/>
         <source>Allow colorization of Incomes/Expenses names :</source>
         <oldsource>Allow Colorization of Incomes/Expenses Names :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="288"/>
+        <location filename="optionsdialog.ui" line="356"/>
         <source>Charts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="312"/>
+        <location filename="optionsdialog.ui" line="380"/>
         <source>Use Dark Mode :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="348"/>
+        <location filename="optionsdialog.ui" line="422"/>
         <source>Dark Mode curve color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="407"/>
+        <location filename="optionsdialog.ui" line="487"/>
         <source>Light Mode curve color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="466"/>
+        <location filename="optionsdialog.ui" line="552"/>
         <source>Exported image quality :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="639"/>
+        <location filename="optionsdialog.ui" line="737"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="646"/>
+        <location filename="optionsdialog.ui" line="744"/>
         <source>Save</source>
         <translation></translation>
     </message>

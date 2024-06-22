@@ -40,7 +40,7 @@
          </property>
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -71,7 +71,7 @@
          </property>
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -147,7 +147,7 @@
          </property>
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -227,7 +227,7 @@
          </property>
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="whatsThis">
@@ -278,7 +278,7 @@
          </property>
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -329,7 +329,7 @@
          </property>
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="whatsThis">
@@ -377,7 +377,7 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>18</day>
+             <day>16</day>
             </date>
            </property>
            <property name="displayFormat">
@@ -442,7 +442,7 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>20</day>
+             <day>18</day>
             </date>
            </property>
            <property name="displayFormat">
@@ -481,7 +481,7 @@
          </property>
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="whatsThis">
@@ -677,7 +677,7 @@
         <widget class="QLabel" name="label_15">
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -771,7 +771,7 @@
          </property>
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -864,7 +864,7 @@
          </property>
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -892,6 +892,22 @@
             <string notr="true">buttonGroup_2</string>
            </attribute>
           </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_20">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
           <widget class="QRadioButton" name="activeNoRadioButton">

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>704</width>
     <height>500</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -28,6 +28,9 @@
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
           <layout class="QFormLayout" name="formLayout_2">
+           <property name="labelAlignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
            <property name="horizontalSpacing">
             <number>20</number>
            </property>
@@ -38,7 +41,7 @@
             <widget class="QLabel" name="label">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -51,7 +54,7 @@
              <item>
               <widget class="QSpinBox" name="scenarioYearsSpinBox">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -83,7 +86,7 @@
             <widget class="QLabel" name="label_9">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -98,7 +101,7 @@
                <item>
                 <widget class="QRadioButton" name="systemFontRadioButton">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -121,7 +124,7 @@
                <item>
                 <widget class="QRadioButton" name="customFontRadioButton">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -152,10 +155,29 @@
                </item>
                <item>
                 <widget class="QPushButton" name="setCustomFontPushButton">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Choose...</string>
                  </property>
                 </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_12">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </item>
@@ -165,7 +187,7 @@
             <widget class="QLabel" name="label_10">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -179,6 +201,12 @@
               <layout class="QHBoxLayout" name="horizontalLayout_21">
                <item>
                 <widget class="QRadioButton" name="todaySystemRadioButton">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>System's date at start-up</string>
                  </property>
@@ -196,6 +224,12 @@
               <layout class="QHBoxLayout" name="horizontalLayout_22">
                <item>
                 <widget class="QRadioButton" name="todaySpecificRadioButton">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Specific value</string>
                  </property>
@@ -222,10 +256,32 @@
                </item>
                <item>
                 <widget class="QDateEdit" name="todayDateEdit">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="displayFormat">
+                  <string>yyyy-MMM-dd</string>
+                 </property>
                  <property name="calendarPopup">
                   <bool>true</bool>
                  </property>
                 </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_13">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </item>
@@ -235,7 +291,7 @@
             <widget class="QLabel" name="label_11">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -247,6 +303,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout_23">
              <item>
               <widget class="QCheckBox" name="allowDecorationColorCheckBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -258,7 +320,7 @@
             <widget class="QLabel" name="label_7">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -270,6 +332,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout_24">
              <item>
               <widget class="QCheckBox" name="exportTextAmountLocalizedCheckBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -305,7 +373,7 @@
             <widget class="QLabel" name="label_2">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -317,6 +385,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout_11">
              <item>
               <widget class="QCheckBox" name="chartDarkModeCheckBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -341,7 +415,7 @@
             <widget class="QLabel" name="label_3">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -353,6 +427,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout_13">
              <item>
               <widget class="QPushButton" name="curveDarkModeColorToolButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -400,7 +480,7 @@
             <widget class="QLabel" name="label_4">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -412,6 +492,12 @@
             <layout class="QHBoxLayout" name="horizontalLayout_14">
              <item>
               <widget class="QPushButton" name="curveLightModeColorToolButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -459,7 +545,7 @@
             <widget class="QLabel" name="label_5">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -472,7 +558,7 @@
              <item>
               <widget class="QSpinBox" name="qualitySpinBox">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -507,7 +593,7 @@
             <widget class="QLabel" name="label_6">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -521,6 +607,12 @@
               <layout class="QVBoxLayout" name="verticalLayout_10">
                <item>
                 <widget class="QRadioButton" name="jpgRadioButton">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Jpg</string>
                  </property>
@@ -531,6 +623,12 @@
                </item>
                <item>
                 <widget class="QRadioButton" name="pngRadioButton">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>Png</string>
                  </property>
@@ -550,7 +648,7 @@
             <widget class="QLabel" name="label_8">
              <property name="font">
               <font>
-               <bold>true</bold>
+               <bold>false</bold>
               </font>
              </property>
              <property name="text">
@@ -563,7 +661,7 @@
              <item>
               <widget class="QSpinBox" name="scalingMainChartSpinBox">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>

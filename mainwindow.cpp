@@ -1052,9 +1052,9 @@ void MainWindow::rangeChangedX(const QCPRange &newRange)
     QDate to = dtTo.date();
     Util::DateDifference delta =  Util::dateDifference(from, to);
 
-    QString s = locale.toString(from,"yyyy-MMMM-dd");
+    QString s = locale.toString(from,"yyyy-MMM-dd");
     ui->dateRangeFromLabel->setText(s);
-    s = locale.toString(to,"yyyy-MMMM-dd");
+    s = locale.toString(to,"yyyy-MMM-dd");
     ui->dateRangeToLabel->setText(s);
 
     QString deltaStringYear = tr("y",this->metaObject()->className());

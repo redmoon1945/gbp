@@ -36,8 +36,8 @@
  * Growth is always applied on Day 1 of the month concerned.
  * There are 2 options available to define a growth pattern :
  * -> CONSTANT GROWTH : A constant annual growth value, that applies to past, present and future.
- * -> VARIABLE GROWTH : A set of (date, annual growth change value) that defines CHANGES in annual growth rate
- *    compared to before. Initial growth change value before the oldest dates defined is 0 (meaning no change).
+ * -> VARIABLE GROWTH : A set of (date, annual growth change value) that defines CHANGES in annual growth rate through time.
+ *    Initial growth change value before the oldest dates defined is 0 (meaning no change).
  *    Each time a new (date, growth change value) is defined, it changes the current "growth" factor by the
  *    given percentage and become the new monthly growth value, to be applied every month. For example, if one has 10%
  *    monthly growth (so a multiplier of 1.1) and then a new ( a date, -10%) is defined (0.9 multiplier), then, from now on,

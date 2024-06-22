@@ -31,7 +31,7 @@
         <widget class="QLabel" name="label">
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -43,7 +43,7 @@
         <widget class="QLabel" name="label_2">
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -61,7 +61,7 @@
          </property>
          <property name="maximumDateTime">
           <datetime>
-           <hour>23</hour>
+           <hour>16</hour>
            <minute>59</minute>
            <second>59</second>
            <year>2999</year>
@@ -80,7 +80,7 @@
           <date>
            <year>1999</year>
            <month>12</month>
-           <day>27</day>
+           <day>26</day>
           </date>
          </property>
          <property name="currentSection">
@@ -101,7 +101,7 @@
         <widget class="QLabel" name="label_3">
          <property name="font">
           <font>
-           <bold>true</bold>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">

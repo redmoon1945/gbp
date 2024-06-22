@@ -475,6 +475,7 @@ QString PeriodicFeStreamDef::toStringForDisplay(CurrencyInfo currInfo, QLocale l
     // order is : Every N <period> in [<start>,<end>] - Growth: <type>
     // E.G. :
     //     Occurs every 6 months in [2023-12-01,2030-05-13]
+    //     Occurs every 1 month in [2023-12-01,2030-05-13]
     Util::PeriodType utilPeriodType = convertPeriodTypeToUtil(period);
     QString periodName = Util::getPeriodName(utilPeriodType, false, periodMultiplier>1);
     l.append(tr("Every %1 %2 in %3").arg(periodMultiplier).arg(periodName).arg(validityRange.toString()));

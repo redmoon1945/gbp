@@ -23,7 +23,7 @@
       <widget class="QLabel" name="label">
        <property name="font">
         <font>
-         <bold>true</bold>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -35,7 +35,7 @@
       <widget class="QLabel" name="label_2">
        <property name="font">
         <font>
-         <bold>true</bold>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -111,7 +111,7 @@
       <widget class="QLabel" name="label_4">
        <property name="font">
         <font>
-         <bold>true</bold>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">

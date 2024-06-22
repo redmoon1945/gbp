@@ -156,7 +156,6 @@ private:
     void msgStatusbar(QString msg);
     void recentFilesMenuInit();
     void recentFilesMenuUpdate();
-    void setDurationLabel(const QDate& fromDate, const QDate& toDate);
     bool eventFilter(QObject *object, QEvent *event) override;
     void setChartTitle(QString theTitle);
     void setVisibilityZoomButtons();

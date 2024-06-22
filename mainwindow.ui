@@ -279,6 +279,12 @@
           </item>
           <item>
            <widget class="QCheckBox" name="showPointsCheckBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Show Points</string>
             </property>
@@ -323,7 +329,7 @@
          <widget class="QGroupBox" name="CiGB">
           <property name="font">
            <font>
-            <bold>false</bold>
+            <bold>true</bold>
            </font>
           </property>
           <property name="title">
@@ -369,7 +375,7 @@
                </property>
                <property name="font">
                 <font>
-                 <bold>true</bold>
+                 <bold>false</bold>
                 </font>
                </property>
                <property name="text">
@@ -387,7 +393,7 @@
                </property>
                <property name="font">
                 <font>
-                 <bold>true</bold>
+                 <bold>false</bold>
                 </font>
                </property>
                <property name="text">
@@ -405,7 +411,7 @@
                </property>
                <property name="font">
                 <font>
-                 <bold>true</bold>
+                 <bold>false</bold>
                 </font>
                </property>
                <property name="text">
@@ -421,6 +427,11 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="font">
+                <font>
+                 <bold>false</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -434,6 +445,11 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="font">
+                <font>
+                 <bold>false</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -446,6 +462,11 @@
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
+               </property>
+               <property name="font">
+                <font>
+                 <bold>false</bold>
+                </font>
                </property>
                <property name="text">
                 <string>TextLabel</string>
@@ -461,6 +482,11 @@
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <bold>false</bold>
+              </font>
              </property>
              <property name="sizeAdjustPolicy">
               <enum>QAbstractScrollArea::AdjustIgnored</enum>
@@ -481,6 +507,11 @@
         </item>
         <item>
          <widget class="QGroupBox" name="groupBox">
+          <property name="font">
+           <font>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="title">
            <string>Date Range</string>
           </property>
@@ -496,7 +527,7 @@
                 <widget class="QLabel" name="label_8">
                  <property name="font">
                   <font>
-                   <bold>true</bold>
+                   <bold>false</bold>
                   </font>
                  </property>
                  <property name="text">
@@ -508,7 +539,7 @@
                 <widget class="QLabel" name="label_7">
                  <property name="font">
                   <font>
-                   <bold>true</bold>
+                   <bold>false</bold>
                   </font>
                  </property>
                  <property name="text">
@@ -518,6 +549,11 @@
                </item>
                <item row="0" column="1">
                 <widget class="QLabel" name="dateRangeFromLabel">
+                 <property name="font">
+                  <font>
+                   <bold>false</bold>
+                  </font>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -525,6 +561,11 @@
                </item>
                <item row="1" column="1">
                 <widget class="QLabel" name="dateRangeToLabel">
+                 <property name="font">
+                  <font>
+                   <bold>false</bold>
+                  </font>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -534,7 +575,7 @@
                 <widget class="QLabel" name="label_3">
                  <property name="font">
                   <font>
-                   <bold>true</bold>
+                   <bold>false</bold>
                   </font>
                  </property>
                  <property name="text">
@@ -544,6 +585,11 @@
                </item>
                <item row="2" column="1">
                 <widget class="QLabel" name="deltaRangeXLabel">
+                 <property name="font">
+                  <font>
+                   <bold>false</bold>
+                  </font>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
