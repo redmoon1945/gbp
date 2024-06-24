@@ -377,11 +377,11 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>16</day>
+             <day>15</day>
             </date>
            </property>
            <property name="displayFormat">
-            <string notr="true">yyyy-MMMM-dd</string>
+            <string notr="true">yyyy-MMM-dd</string>
            </property>
            <property name="calendarPopup">
             <bool>true</bool>
@@ -442,11 +442,11 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>18</day>
+             <day>17</day>
             </date>
            </property>
            <property name="displayFormat">
-            <string notr="true">yyyy-MMMM-dd</string>
+            <string notr="true">yyyy-MMM-dd</string>
            </property>
            <property name="calendarPopup">
             <bool>true</bool>
@@ -1003,7 +1003,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>
