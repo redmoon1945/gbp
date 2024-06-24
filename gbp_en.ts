@@ -1818,167 +1818,167 @@ Details : %1</source>
 <context>
     <name>Growth</name>
     <message>
-        <location filename="growth.cpp" line="175"/>
+        <location filename="growth.cpp" line="176"/>
         <source>Cannot find NoOfDecimals tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="180"/>
+        <location filename="growth.cpp" line="181"/>
         <source>No of decimals value is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="187"/>
+        <location filename="growth.cpp" line="188"/>
         <source>No of decimals value %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="192"/>
+        <location filename="growth.cpp" line="193"/>
         <source>No of decimals value %1 is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="197"/>
+        <location filename="growth.cpp" line="198"/>
         <source>No of decimals value %1 is incompatible with expected value %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="204"/>
+        <location filename="growth.cpp" line="205"/>
         <source>Cannot find AnnualConstantGrowth tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="209"/>
+        <location filename="growth.cpp" line="210"/>
         <source>AnnualConstantGrowth value is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="216"/>
+        <location filename="growth.cpp" line="217"/>
         <source>AnnualConstantGrowth value %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="221"/>
+        <location filename="growth.cpp" line="222"/>
         <source>AnnualConstantGrowth value %1 is invalid for unknow reason</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="226"/>
+        <location filename="growth.cpp" line="227"/>
         <source>AnnualConstantGrowth value %1 is larger than the maximum allowed of %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="231"/>
+        <location filename="growth.cpp" line="232"/>
         <source>AnnualConstantGrowth value %1 is smaller than the minimum value allowed of %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="238"/>
+        <location filename="growth.cpp" line="239"/>
         <source>Cannot find AnnualVariableGrowth tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="243"/>
+        <location filename="growth.cpp" line="244"/>
         <source>AnnualVariableGrowth tag is not an Object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="253"/>
+        <location filename="growth.cpp" line="254"/>
         <source>Entry key %1 in AnnualVariableGrowth table is not a valid ISO Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="258"/>
+        <location filename="growth.cpp" line="259"/>
         <source>Entry key %1 in AnnualVariableGrowth table has Day not set to 1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="265"/>
+        <location filename="growth.cpp" line="266"/>
         <source>Value %1 in AnnualVariableGrowth table is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="272"/>
+        <location filename="growth.cpp" line="273"/>
         <source>AnnualVariableGrowth value %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="277"/>
+        <location filename="growth.cpp" line="278"/>
         <source>Value %1 in AnnualVariableGrowth table is invalid for unknown reason</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="282"/>
+        <location filename="growth.cpp" line="283"/>
         <source>Value %1 in AnnualVariableGrowth table is bigger than the maximum allowed of %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="287"/>
+        <location filename="growth.cpp" line="288"/>
         <source>Value %1 in AnnualVariableGrowth table is smaller than the minimum value of %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="297"/>
+        <location filename="growth.cpp" line="298"/>
         <source>Cannot find Type tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="302"/>
+        <location filename="growth.cpp" line="303"/>
         <source>Type tag %1 is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="309"/>
+        <location filename="growth.cpp" line="310"/>
         <source>Type tag %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="314"/>
+        <location filename="growth.cpp" line="315"/>
         <source>Type tag %1 is far too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="329"/>
+        <location filename="growth.cpp" line="330"/>
         <source>Type tag %1 value is unknown</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="383"/>
+        <location filename="growth.cpp" line="384"/>
         <source>OccurenceDates is not sorted properly</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="389"/>
+        <location filename="growth.cpp" line="390"/>
         <source>AppStrategy.noOfMonth is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="394"/>
+        <location filename="growth.cpp" line="395"/>
         <source>Amount is too big </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="399"/>
+        <location filename="growth.cpp" line="400"/>
         <source>Amount is smaller than 0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="529"/>
+        <location filename="growth.cpp" line="557"/>
         <source>Date %1 is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="534"/>
+        <location filename="growth.cpp" line="562"/>
         <source>Date %1 is invalid because Day is not set to 1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="542"/>
+        <location filename="growth.cpp" line="570"/>
         <source>Growth %1 is smaller than the minimum allowed of %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="547"/>
+        <location filename="growth.cpp" line="575"/>
         <source>Growth %1 is bigger than the maximum allowed of %2</source>
         <translation></translation>
     </message>
@@ -3022,22 +3022,22 @@ Details : %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="480"/>
+        <location filename="periodicfestreamdef.cpp" line="481"/>
         <source>Every %1 %2 in %3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="483"/>
+        <location filename="periodicfestreamdef.cpp" line="484"/>
         <source>Growth: None</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="486"/>
+        <location filename="periodicfestreamdef.cpp" line="487"/>
         <source>Growth: Inflation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="489"/>
+        <location filename="periodicfestreamdef.cpp" line="490"/>
         <source>Growth: Custom</source>
         <translation></translation>
     </message>

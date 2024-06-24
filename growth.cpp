@@ -19,6 +19,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QCoreApplication>
+#include "daterange.h"
 #include "math.h"
 #include "growth.h"
 #include "util.h"
@@ -356,8 +357,8 @@ long double Growth::fromDecimalToDouble(qint64 i)
 }
 
 
-// Given a series of occurence in time for a given amount, adjust each amount of each date to take
-// into account the growth pattern defined by this object.
+// Given a series of occurence in time for a given amount, adjust each amount for each occurence date
+// to take into account the growth pattern defined by this object.
 // If calculated amount goes over the max defined in CurrencyHelper, it is set to these max values and
 // the no of times it occurs is returned as a warning (this is called "saturation").
 // Amount must be >= 0.
@@ -411,9 +412,7 @@ QMap<QDate, qint64> Growth::adjustForGrowth(qint64 amount,  QList<QDate> occuren
     }
 
     // prepare
-    //qint64 currentAmount = amount;              // calculated amount at every occurence,
     qint64 lastAmountInserted = amount;         // last amount inserted in the result
-    //QDate lastDate = occurenceDates.first();    // insure first occurence has no growth applied to
     uint noOfMonthsCycle = appStrategy.noOfMonths;
     uint occurenceCounter = 0;                  // used to know when to apply new growth.
 
@@ -470,9 +469,10 @@ void Growth::recalculateMonthlyData()
 
 
 // Build a QT-wrapped long double vector containing, for each month in a given date interval, a "multiplier"
-// to be applied against an initial and constant amount in order to give the "cummulative growth adjusted" value for this amount.
-// noOfMonth must be > 0
-// "From" is the date of the first occurence and is always assigned multiplier "1" (no growth, as it is the reference value).
+// (the CGF or Cummulative Growth Factor) to be applied against an initial and constant amount in order to give
+// the "cummulative growth adjusted" value for this amount. noOfMonth must be > 0
+// "From" is the date of the first occurence of the amount and is always assigned CGF of "1"
+// (no growth, as it is the reference value).
 QSharedPointer<long double> Growth::buildMonthlyMultiplierVector(uint noOfMonths, QDate from) const {
     if (noOfMonths==0){
         throw std::domain_error("noOfMonth must be > 0");
@@ -481,36 +481,64 @@ QSharedPointer<long double> Growth::buildMonthlyMultiplierVector(uint noOfMonths
         throw std::domain_error("Date is invalid");
     }
 
-    QSharedPointer<long double> multiplierVector (new long double[noOfMonths] );
+    QSharedPointer<long double> multiplierVector (new long double[noOfMonths] ); // resulting vector
     long double* data = multiplierVector.data();  // easy alias
-    long double currentMultiplier = 1;      // long double to max no of significant digits
-    data[0] = 1; // first multiplier is always 1, for CONSTANT or VARIABLE
+    long double cgf = 1;    // CGF : long double to maximize no of significant digits
+    // init multiplier vector to all CGF=1 (no growth at all)
+    for(uint i=0; i < noOfMonths; i++){
+        data[i] = cgf;
+    }
+
+    if(noOfMonths==1){
+        return multiplierVector;
+    }
 
     if (type==CONSTANT){
         // *** CONSTANT ***
-        if (noOfMonths>1){
-            for(uint i=1; i < noOfMonths; i++){
-                currentMultiplier = currentMultiplier + (currentMultiplier * monthlyConstantGrowth/100.0L);
-                data[i] = currentMultiplier;
-            }
+        for(uint i=1; i < noOfMonths; i++){
+            cgf = cgf * ( 1 + monthlyConstantGrowth/100.0L);
+            data[i] = cgf;
         }
     } else {
         // *** VARIABLE ***
-        long double currentGrowthFactor = 0; // monthly growth
-        if (noOfMonths>1){
-            QDate indexDate = from; // Date corresponding to each index in Data array
+
+        if( monthlyVariableGrowth.size()!=0 ){
+
+            long double currentMonthlyGrowth = 0; // current monthly growth in effect, NOT inpercentage (e.g. 0.1 , -0.15)
+            uint index = 1; // position of insertion in multiplier vector : skip first one
+            QDate indexDate = from;
             indexDate.setDate(from.year(), from.month(),1); // reset Day to 1 to prevent problem (e.g. 29 feb)
-            for(uint i=1; i < noOfMonths; i++){
-                // date for this index
-                indexDate = indexDate.addMonths(1);
-                // any new growth value ? if yes, update the multiplier
-                if(monthlyVariableGrowth.contains(indexDate)){
-                    currentGrowthFactor = monthlyVariableGrowth.value(indexDate)/100.0L;
+            indexDate = indexDate.addMonths(1);
+            DateRange transitionSpace = DateRange(monthlyVariableGrowth.firstKey(),monthlyVariableGrowth.lastKey());
+
+            // get the latest growth value defined before SECOND date
+            if ( transitionSpace.includeDate(indexDate) && (monthlyVariableGrowth.contains(indexDate)==false) ){
+                // we have to find the closest growth defined in the past
+                for (QMap<QDate, long double>::const_iterator it = monthlyVariableGrowth.cbegin(), end = monthlyVariableGrowth.cend(); it != end; ++it) {
+                    if(it.key() >= indexDate){
+                        break;
+                    }
+                    currentMonthlyGrowth = it.value()/100.0L;
                 }
-                currentMultiplier = currentMultiplier + (currentMultiplier * (currentGrowthFactor));
-                data[i] = currentMultiplier;
+            } else if (transitionSpace.getEnd() < indexDate) {
+                currentMonthlyGrowth = monthlyVariableGrowth.last()/100.0L; // get last growth defined
+            }
+
+            while( index < noOfMonths ){
+                // any new growth defined for that date ?
+                if(monthlyVariableGrowth.contains(indexDate)==true){
+                    // set the new growth value
+                    currentMonthlyGrowth = monthlyVariableGrowth.value(indexDate)/100.0L;
+                }
+                cgf = cgf * (1.0 + currentMonthlyGrowth);
+                // set result entry
+                data[index] = cgf;
+                // go to next item
+                indexDate = indexDate.addMonths(1);
+                index ++;
             }
         }
+
     }
 
     return multiplierVector;

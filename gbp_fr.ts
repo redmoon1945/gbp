@@ -70,9 +70,9 @@ Credits :
   -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
 * QCustomPlot : AQCustomPlot : A Qt C++ widget for plotting and data visualization
   -&gt; see https://www.qcustomplot.com/</oldsource>
-        <translation type="unfinished">Graphical Budget Planner (GBP) est une application Qt de bureau qui a comme objectif de faciliter significativement le processus d&apos;élaboration et de maintenance d&apos;un budget personnel. Il permet entre autres choses de :
+        <translation>Graphical Budget Planner (GBP) est une application Qt de bureau qui a comme objectif de faciliter significativement le processus d&apos;élaboration et de maintenance d&apos;un budget personnel. Il permet entre autres choses de :
 
-=&gt; Visualiser graphiquement l&apos;évolution de l&apos;encaisse à travers le temps, à n&apos;importe quel moment à l&apos;intérieur d&apos;une période d&apos;au maximum 100 ans. 
+=&gt; Visualiser graphiquement l&apos;évolution de l&apos;encaisse (i.e. revenus moins dépenses) à travers le temps, à n&apos;importe quel moment à l&apos;intérieur d&apos;une période d&apos;au maximum 100 ans. 
 
 =&gt; Agrandissement facile du graphique principal (bouton du milieu de la souris ou boutons dédiés dans l&apos;interface) 
 
@@ -1935,167 +1935,167 @@ Détails : %1</translation>
 <context>
     <name>Growth</name>
     <message>
-        <location filename="growth.cpp" line="175"/>
+        <location filename="growth.cpp" line="176"/>
         <source>Cannot find NoOfDecimals tag</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="180"/>
+        <location filename="growth.cpp" line="181"/>
         <source>No of decimals value is not a number</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; a une valeur qui n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="187"/>
+        <location filename="growth.cpp" line="188"/>
         <source>No of decimals value %1 is not an integer</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; a une valeur %1 qui n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="192"/>
+        <location filename="growth.cpp" line="193"/>
         <source>No of decimals value %1 is invalid</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; a une valeur %1 qui est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="197"/>
+        <location filename="growth.cpp" line="198"/>
         <source>No of decimals value %1 is incompatible with expected value %2</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; a une valeur %1 qui est incompatible avec la valeur attendue %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="204"/>
+        <location filename="growth.cpp" line="205"/>
         <source>Cannot find AnnualConstantGrowth tag</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="209"/>
+        <location filename="growth.cpp" line="210"/>
         <source>AnnualConstantGrowth value is not a number</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur qui n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="216"/>
+        <location filename="growth.cpp" line="217"/>
         <source>AnnualConstantGrowth value %1 is not an integer</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur %1 qui n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="221"/>
+        <location filename="growth.cpp" line="222"/>
         <source>AnnualConstantGrowth value %1 is invalid for unknow reason</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur %1 qui est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="226"/>
+        <location filename="growth.cpp" line="227"/>
         <source>AnnualConstantGrowth value %1 is larger than the maximum allowed of %2</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur %1 qui est supérieure au maximum permis de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="231"/>
+        <location filename="growth.cpp" line="232"/>
         <source>AnnualConstantGrowth value %1 is smaller than the minimum value allowed of %2</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur %1 qui est plus petite que le minimum permis de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="238"/>
+        <location filename="growth.cpp" line="239"/>
         <source>Cannot find AnnualVariableGrowth tag</source>
         <translation>L&apos;étiquette &quot;AnnualVariableGrowth&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="243"/>
+        <location filename="growth.cpp" line="244"/>
         <source>AnnualVariableGrowth tag is not an Object</source>
         <translation>L&apos;étiquette &quot;AnnualVariableGrowth&quot; a une valeur qui n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="253"/>
+        <location filename="growth.cpp" line="254"/>
         <source>Entry key %1 in AnnualVariableGrowth table is not a valid ISO Date</source>
         <translation>La clé %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; n&apos;est pas une date ISO valide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="258"/>
+        <location filename="growth.cpp" line="259"/>
         <source>Entry key %1 in AnnualVariableGrowth table has Day not set to 1</source>
         <translation>La clé%1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; est assignée à la valeur illégale &quot;1&quot;</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="265"/>
+        <location filename="growth.cpp" line="266"/>
         <source>Value %1 in AnnualVariableGrowth table is not a number</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="272"/>
+        <location filename="growth.cpp" line="273"/>
         <source>AnnualVariableGrowth value %1 is not an integer</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="277"/>
+        <location filename="growth.cpp" line="278"/>
         <source>Value %1 in AnnualVariableGrowth table is invalid for unknown reason</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="282"/>
+        <location filename="growth.cpp" line="283"/>
         <source>Value %1 in AnnualVariableGrowth table is bigger than the maximum allowed of %2</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; est supérieure au maximum autorisée de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="287"/>
+        <location filename="growth.cpp" line="288"/>
         <source>Value %1 in AnnualVariableGrowth table is smaller than the minimum value of %2</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; est inférieure au minimum autorisée de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="297"/>
+        <location filename="growth.cpp" line="298"/>
         <source>Cannot find Type tag</source>
         <translation>L&apos;étiquette &quot;Type&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="302"/>
+        <location filename="growth.cpp" line="303"/>
         <source>Type tag %1 is not a number</source>
         <translation>L&apos;étiquette &quot;Type&quot; a une valeur %1 qui n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="309"/>
+        <location filename="growth.cpp" line="310"/>
         <source>Type tag %1 is not an integer</source>
         <translation>L&apos;étiquette &quot;Type&quot; a une valeur %1 qui n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="314"/>
+        <location filename="growth.cpp" line="315"/>
         <source>Type tag %1 is far too big</source>
         <translation>L&apos;étiquette &quot;Type&quot; a une valeur %1 qui est trop élevée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="329"/>
+        <location filename="growth.cpp" line="330"/>
         <source>Type tag %1 value is unknown</source>
         <translation>L&apos;étiquette &quot;Type&quot; a une valeur %1 qui est inconnue</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="383"/>
+        <location filename="growth.cpp" line="384"/>
         <source>OccurenceDates is not sorted properly</source>
         <translation>OccurenceDates n&apos;est pas trié correctement</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="389"/>
+        <location filename="growth.cpp" line="390"/>
         <source>AppStrategy.noOfMonth is invalid</source>
         <translation>AppStrategy.noOfMonth a une valeur invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="394"/>
+        <location filename="growth.cpp" line="395"/>
         <source>Amount is too big </source>
         <translation>La valeur du montant est trop élevé </translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="399"/>
+        <location filename="growth.cpp" line="400"/>
         <source>Amount is smaller than 0</source>
         <translation>La valeur du montant est inférieure à 0</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="529"/>
+        <location filename="growth.cpp" line="557"/>
         <source>Date %1 is invalid</source>
         <translation>La date %1 est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="534"/>
+        <location filename="growth.cpp" line="562"/>
         <source>Date %1 is invalid because Day is not set to 1</source>
         <translation>La date %1 est invalide, pcq le jour n&apos;est pas égale à 1</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="542"/>
+        <location filename="growth.cpp" line="570"/>
         <source>Growth %1 is smaller than the minimum allowed of %2</source>
         <translation>La valeur de la croissance %1 est inférieure au minimum permis de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="547"/>
+        <location filename="growth.cpp" line="575"/>
         <source>Growth %1 is bigger than the maximum allowed of %2</source>
         <translation>La valeur de la croissance %1 est supérieure au maximum permis de %2</translation>
     </message>
@@ -2948,7 +2948,7 @@ Details : %2</source>
     <message>
         <location filename="optionsdialog.ui" line="266"/>
         <source>yyyy-MMM-dd</source>
-        <translation type="unfinished">yyyy-MMM-dd</translation>
+        <translation>yyyy-MMM-dd</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="298"/>
@@ -3197,22 +3197,22 @@ Details : %2</source>
         <translation>Copie de</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="480"/>
+        <location filename="periodicfestreamdef.cpp" line="481"/>
         <source>Every %1 %2 in %3</source>
         <translation>Chaque %1 %2 dans %3</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="483"/>
+        <location filename="periodicfestreamdef.cpp" line="484"/>
         <source>Growth: None</source>
         <translation>Croissance: Aucune</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="486"/>
+        <location filename="periodicfestreamdef.cpp" line="487"/>
         <source>Growth: Inflation</source>
         <translation>Croissance: Inflation</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="489"/>
+        <location filename="periodicfestreamdef.cpp" line="490"/>
         <source>Growth: Custom</source>
         <translation>Croissance: Spécifique</translation>
     </message>
