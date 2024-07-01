@@ -1,5 +1,6 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>
+ *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

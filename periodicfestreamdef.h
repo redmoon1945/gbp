@@ -1,5 +1,6 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>
+ *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,8 +23,8 @@
 #include "festreamdef.h"
 #include "util.h"
 
-// Definition of a Fe stream based on a single amount generated at a specific interval. At the beginning of each year on Jan 1,
-// the amount may changed due to optional "growth" pattern (defined in this Stream Definition) or optional inflation (defined outside).
+// Definition of a Fe stream based on a single amount generated at a specific interval.
+// The amount may changed due to optional "growth" pattern (defined in this Stream Definition) or optional inflation (defined outside).
 // It is one of the other.
 class PeriodicFeStreamDef : public FeStreamDef
 {

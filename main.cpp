@@ -1,5 +1,6 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>
+ *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,7 +27,7 @@
 #include "gbpcontroller.h"
 
 #define APP_NAME "graphical-budget-planner"
-#define APP_VERSION "1.1.1"
+#define APP_VERSION "1.1.2"
 
 int main(int argc, char *argv[])
 {

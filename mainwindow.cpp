@@ -1,5 +1,6 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>
+ *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -61,10 +62,10 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
 
     // resize some QLabel to be sure we have enough space to display stuff
     QFontMetrics fm(ui->ciDateLabel->font());
-    ui->ciDateLabel->setMinimumWidth(fm.averageCharWidth()*10);
+    // ui->ciDateLabel->setMinimumWidth(fm.averageCharWidth()*10);
     ui->ciAmountLabel->setMinimumWidth(fm.averageCharWidth()*15);
     ui->ciDeltaLabel->setMinimumWidth(fm.averageCharWidth()*10);
-    ui->baselineDoubleSpinBox->setMinimumWidth(fm.averageCharWidth()*6);
+    // ui->baselineDoubleSpinBox->setMinimumWidth(fm.averageCharWidth()*6);
 
     // set minimum/maximum value of baseline and erase currency label
     ui->baselineDoubleSpinBox->setMaximum(CurrencyHelper::maxValueAllowedForAmountInDouble(3)); // no currency has more than 3 decinal digits
@@ -84,6 +85,32 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     ui->ciDetailsListWidget->setFont(listFont);
     ui->ciDetailsListWidget->setSortingEnabled(true);
 
+    // use smaller font for "resize" toolbar buttons
+    QFont resizeToolbar = ui->toolButton_1M->font();
+    resizeToolbar.setPointSize(Util::changeFontSize(false,true, listFont.pointSize()));
+    ui->toolButton_1M->setFont(resizeToolbar);
+    ui->toolButton_3M->setFont(resizeToolbar);
+    ui->toolButton_6M->setFont(resizeToolbar);
+    ui->toolButton_1Y->setFont(resizeToolbar);
+    ui->toolButton_2Y->setFont(resizeToolbar);
+    ui->toolButton_3Y->setFont(resizeToolbar);
+    ui->toolButton_5Y->setFont(resizeToolbar);
+    ui->toolButton_10Y->setFont(resizeToolbar);
+    ui->toolButton_15Y->setFont(resizeToolbar);
+    ui->toolButton_20Y->setFont(resizeToolbar);
+    ui->toolButton_25Y->setFont(resizeToolbar);
+    ui->toolButton_50Y->setFont(resizeToolbar);
+    ui->toolButton_Fit->setFont(resizeToolbar);
+    ui->toolButton_Left->setFont(resizeToolbar);
+    ui->toolButton_Right->setFont(resizeToolbar);
+    ui->toolButton_Max->setFont(resizeToolbar);
+    ui->customToolButton->setFont(resizeToolbar);
+
+    // configure splitter
+    ui->splitter->setCollapsible(0,false);
+    ui->splitter->setCollapsible(1,false);
+    ui->splitter->setStretchFactor(0,1);
+    ui->splitter->setStretchFactor(1,0);
 
     // ***********************************************
     // *** CHART SETTINGS ***

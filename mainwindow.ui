@@ -28,20 +28,23 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
-      <property name="spacing">
-       <number>20</number>
+     <widget class="QSplitter" name="splitter">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
       </property>
-      <property name="leftMargin">
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="handleWidth">
        <number>10</number>
       </property>
-      <property name="topMargin">
-       <number>10</number>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
       </property>
-      <property name="rightMargin">
-       <number>10</number>
-      </property>
-      <item>
+      <widget class="QWidget" name="">
        <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0">
         <property name="spacing">
          <number>3</number>
@@ -211,7 +214,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>800</width>
+            <width>400</width>
             <height>400</height>
            </size>
           </property>
@@ -223,7 +226,7 @@
            <widget class="QLabel" name="startAmountLabel">
             <property name="font">
              <font>
-              <bold>true</bold>
+              <bold>false</bold>
              </font>
             </property>
             <property name="text">
@@ -233,6 +236,12 @@
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="baselineDoubleSpinBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="buttonSymbols">
              <enum>QAbstractSpinBox::NoButtons</enum>
             </property>
@@ -319,11 +328,14 @@
          </layout>
         </item>
        </layout>
-      </item>
-      <item>
+      </widget>
+      <widget class="QWidget" name="">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
         <property name="spacing">
          <number>20</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QGroupBox" name="CiGB">
@@ -383,10 +395,10 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_4">
+             <item row="0" column="1">
+              <widget class="QLabel" name="ciDateLabel">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -397,7 +409,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Change :</string>
+                <string>TextLabel</string>
                </property>
               </widget>
              </item>
@@ -419,10 +431,10 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="ciDateLabel">
+             <item row="1" column="1">
+              <widget class="QLabel" name="ciAmountLabel">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -437,8 +449,8 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="ciAmountLabel">
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_4">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -451,14 +463,14 @@
                 </font>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>Change :</string>
                </property>
               </widget>
              </item>
              <item row="2" column="1">
               <widget class="QLabel" name="ciDeltaLabel">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -478,7 +490,7 @@
            <item>
             <widget class="QListWidget" name="ciDetailsListWidget">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -523,6 +535,9 @@
                <property name="labelAlignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
+               <property name="verticalSpacing">
+                <number>3</number>
+               </property>
                <item row="0" column="0">
                 <widget class="QLabel" name="label_8">
                  <property name="font">
@@ -549,6 +564,12 @@
                </item>
                <item row="0" column="1">
                 <widget class="QLabel" name="dateRangeFromLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="font">
                   <font>
                    <bold>false</bold>
@@ -561,6 +582,12 @@
                </item>
                <item row="1" column="1">
                 <widget class="QLabel" name="dateRangeToLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="font">
                   <font>
                    <bold>false</bold>
@@ -585,6 +612,12 @@
                </item>
                <item row="2" column="1">
                 <widget class="QLabel" name="deltaRangeXLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="font">
                   <font>
                    <bold>false</bold>
@@ -603,8 +636,8 @@
          </widget>
         </item>
        </layout>
-      </item>
-     </layout>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
