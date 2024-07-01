@@ -56,9 +56,6 @@ set(PROJECT_SOURCES
     editvariablegrowthdialog.ui
     editvariablegrowthmodel.cpp
     editvariablegrowthmodel.h
-    exportchartdialog.cpp
-    exportchartdialog.h
-    exportchartdialog.ui
     fe.cpp
     fe.h
     festreamdef.cpp

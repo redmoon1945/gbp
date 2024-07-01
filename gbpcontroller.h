@@ -75,10 +75,6 @@ public:
     void setCurveDarkModeColor(const QColor &newCurveDarkModeColor);
     QColor getCurveLightModeColor() const;
     void setCurveLightModeColor(const QColor &newCurveLightModeColor);
-    int getChartExportImageQuality() const;
-    void setChartExportImageQuality(int newChartExportImageQuality);
-    QString getChartExportImageType() const;
-    void setChartExportImageType(const QString &newChartExportImageType);
     bool getExportTextAmountLocalized() const;
     void setExportTextAmountLocalized(bool newExportTextAmountLocalized);
     uint getPercentageMainChartScaling() const;
@@ -103,8 +99,6 @@ private:
     bool chartDarkMode=false;
     QColor curveDarkModeColor;
     QColor curveLightModeColor;
-    int chartExportImageQuality;            // 1 to 100
-    QString chartExportImageType;           // "PNG" or "JPG"
     bool exportTextAmountLocalized=false;
     QString lastDir;                        // last dir used for opening/saving scenario.
     uint percentageMainChartScaling;        // how much space is given on the chart above X&Y axis min/max, in percentage over 100%

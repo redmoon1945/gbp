@@ -15,7 +15,117 @@
         <translation>---</translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="66"/>
+        <location filename="aboutdialog.ui" line="73"/>
+        <source>About</source>
+        <translation>Au sujet de</translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="81"/>
+        <source>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
+
+=&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
+
+=&gt; Easy zooming : use middle mouse button or dedicated UI buttons 
+
+=&gt; Easy panning : just left-click &amp; hold, then move mouse
+
+=&gt; Specify painlessly all your forecasted income/expense budget items, with flexibility to define periodic or irregular flows of incomes/expenses.
+
+=&gt; Optionaly define inflation, either as a constant value or a complex series of changing values.
+
+=&gt; Optionaly define a custom monthly growth pattern for any income/expense specification , expressed either as a constant value or a complex series of changing values.
+
+=&gt; Perform automatically different types of analysis on your data, like relative weight of incomes/expenses over custom period, monthly and yearly reports.
+
+=&gt; Your data is not locked in : all scenarios are formatted as JSON file, and resulting/analysis data are exportable in CSV format.
+
+GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want to know how and when your money has been spent in the past (that is &quot;before today&quot;).
+
+</source>
+        <translation>Graphical Budget Planner (GBP) est une application Qt de bureau qui a comme objectif de faciliter significativement le processus d&apos;élaboration et de maintenance d&apos;un budget personnel. Il permet entre autres choses de :
+
+=&gt; Visualiser graphiquement l&apos;évolution de l&apos;encaisse à travers le temps, à n&apos;importe quel moment à l&apos;intérieur d&apos;une période d&apos;au maximum 100 ans. 
+
+=&gt; Agrandissement facile du graphique principal (bouton du milieu de la souris ou boutons dédiés dans l&apos;interface) 
+
+=&gt; Défilement facile du même graphique : click gauche maintenu et déplacement de la souris
+
+=&gt; Spécification simple mais puissante des prévisions de revenus et dépenses, avec possibilité de flots périodiques ou irréguliers
+
+=&gt; Définition optionnelle de l&apos;inflation, soit via une valeur constante à travers les mois et années, ou bien via une série de valeurs changeantes dans le temps
+
+=&gt; Chaque revenu/dépense peut se voir attribuer une croissance qui est soit identique à l&apos;inflation du scénario, soit spécifique (constante ou variable)
+
+=&gt; Analyse automatique des données générées : Poid relatif des revenus ou dépenses à l&apos;intérieur d&apos;un intervalle de temps spécifié, Rapport mensuel, Rapport annuel
+
+=&gt; Vos données ne sont pas &quot;prisonnières&quot; de l&apos;application : plusieurs capacité d&apos;exportation en CSV, les scénarios sont sauvegardés en JSON
+
+Cette application ne se préoccupe que de l&apos;évolution ***future*** (c&apos;est-à-dire à partir de &quot;demain&quot;) de l&apos;encaisse. En conséquence, ce n&apos;est pas le bon outil si vous désirez connaitre où et comment votre argent a été dépensé dans le passé (c&apos;est à dire avant &quot;aujourd&apos;hui&quot;).
+
+</translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="111"/>
+        <source>Licence</source>
+        <translation>Licence</translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="119"/>
+        <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. See http://www.gnu.org/licenses/ for the GPL licence.
+
+graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+(c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</source>
+        <oldsource>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. See &lt;http://www.gnu.org/licenses/&gt; for the GPL licence.
+
+graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+(c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</oldsource>
+        <translation>Cette application (nommée graphical-budget-planner, aussi appelée GBP) et tout le code source associé sont licençés sous le &quot;GNU General Public License version 3 (GNU GPLv3) or later&quot;. Elles constituent ensemble un logiciel libre et gratuit (&quot;free and open source&quot; en anglais). Voir http://www.gnu.org/licenses/ pour le détail de la licence GPL.
+
+graphical-budget-planner est distribué avec l&apos;espoir qu&apos;il sera utile, mais SANS GARANTIE AUCUNE, sans même la garantie implicite de commerciabilité ou de pertinence pour un but particulier. Voir la &quot;GNU General Public License&quot; pour plus de détails.
+
+(c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="133"/>
+        <source>Credits</source>
+        <translation>Crédits</translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="141"/>
+        <source>Special thanks to : 
+
+* Tobias Leupold : code to calculate difference between 2 dates
+  -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
+
+* QCustomPlot : A Qt C++ widget for plotting and data visualization
+  -&gt; see https://www.qcustomplot.com/
+
+* The Qt Team :  Superb cross-plateform GUI Framework
+  -&gt; see https://www.qt.io/</source>
+        <oldsource>Special thanks to : 
+
+* Tobias Leupold : code to calculate difference between 2 dates
+  -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
+
+* QCustomPlot : A Qt C++ widget for plotting and data visualization
+  -&gt; see https://www.qcustomplot.com/
+
+* The Qt Team :  Superb cross-plateform GUI Framework
+-&gt; see https://www.qt.io/</oldsource>
+        <translation>Remerciements spéciaux à  : 
+
+* Tobias Leupold : code pour calculer la différence entre 2 dates
+  -&gt; Voir https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
+
+* QCustomPlot : &quot;A Qt C++ widget for plotting and data visualization&quot;
+  -&gt; Voir https://www.qcustomplot.com/
+
+* The Qt Team :  Excellente librairie graphique pour développement multi-plateformes
+  -&gt; Voir https://www.qt.io/</translation>
+    </message>
+    <message>
         <source>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
 
 =&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
@@ -70,7 +180,7 @@ Credits :
   -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
 * QCustomPlot : AQCustomPlot : A Qt C++ widget for plotting and data visualization
   -&gt; see https://www.qcustomplot.com/</oldsource>
-        <translation>Graphical Budget Planner (GBP) est une application Qt de bureau qui a comme objectif de faciliter significativement le processus d&apos;élaboration et de maintenance d&apos;un budget personnel. Il permet entre autres choses de :
+        <translation type="vanished">Graphical Budget Planner (GBP) est une application Qt de bureau qui a comme objectif de faciliter significativement le processus d&apos;élaboration et de maintenance d&apos;un budget personnel. Il permet entre autres choses de :
 
 =&gt; Visualiser graphiquement l&apos;évolution de l&apos;encaisse (i.e. revenus moins dépenses) à travers le temps, à n&apos;importe quel moment à l&apos;intérieur d&apos;une période d&apos;au maximum 100 ans. 
 
@@ -99,7 +209,7 @@ Credits :
   -&gt; voir https://www.qcustomplot.com/</translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="130"/>
+        <location filename="aboutdialog.ui" line="194"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
@@ -135,10 +245,10 @@ Credits :
         <location filename="analysisdialog.ui" line="165"/>
         <location filename="analysisdialog.ui" line="443"/>
         <location filename="analysisdialog.ui" line="691"/>
-        <location filename="analysisdialog.cpp" line="102"/>
-        <location filename="analysisdialog.cpp" line="113"/>
-        <location filename="analysisdialog.cpp" line="588"/>
-        <location filename="analysisdialog.cpp" line="917"/>
+        <location filename="analysisdialog.cpp" line="101"/>
+        <location filename="analysisdialog.cpp" line="112"/>
+        <location filename="analysisdialog.cpp" line="565"/>
+        <location filename="analysisdialog.cpp" line="919"/>
         <source>Incomes</source>
         <translation>Revenus</translation>
     </message>
@@ -146,10 +256,10 @@ Credits :
         <location filename="analysisdialog.ui" line="178"/>
         <location filename="analysisdialog.ui" line="453"/>
         <location filename="analysisdialog.ui" line="701"/>
-        <location filename="analysisdialog.cpp" line="102"/>
-        <location filename="analysisdialog.cpp" line="113"/>
-        <location filename="analysisdialog.cpp" line="590"/>
-        <location filename="analysisdialog.cpp" line="918"/>
+        <location filename="analysisdialog.cpp" line="101"/>
+        <location filename="analysisdialog.cpp" line="112"/>
+        <location filename="analysisdialog.cpp" line="567"/>
+        <location filename="analysisdialog.cpp" line="920"/>
         <source>Expenses</source>
         <translation>Dépenses</translation>
     </message>
@@ -276,89 +386,104 @@ Credits :
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="67"/>
-        <location filename="analysisdialog.cpp" line="719"/>
+        <location filename="analysisdialog.cpp" line="66"/>
+        <location filename="analysisdialog.cpp" line="696"/>
         <source>Relative Weight of Incomes For That Period</source>
         <translation>Poids relatif des revenus pour cette période</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="592"/>
+        <location filename="analysisdialog.cpp" line="569"/>
         <source>Deltas - Surplus</source>
         <translation>Écarts - Surplus</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="594"/>
+        <location filename="analysisdialog.cpp" line="571"/>
         <source>Deltas - Deficit</source>
         <translation>Écarts - Déficit</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="723"/>
+        <location filename="analysisdialog.cpp" line="700"/>
         <source>No of most significant expenses to use :</source>
         <translation>Nombre de dépenses les plus significatives à visualiser :</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="102"/>
+        <location filename="analysisdialog.cpp" line="101"/>
         <source>Month</source>
         <translation>Mois</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="102"/>
-        <location filename="analysisdialog.cpp" line="113"/>
-        <location filename="analysisdialog.cpp" line="839"/>
+        <location filename="analysisdialog.cpp" line="101"/>
+        <location filename="analysisdialog.cpp" line="112"/>
+        <location filename="analysisdialog.cpp" line="815"/>
         <source>Delta</source>
         <translation>Écart</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="113"/>
+        <location filename="analysisdialog.cpp" line="112"/>
         <source>Year</source>
         <translation>Année</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="224"/>
-        <location filename="analysisdialog.cpp" line="227"/>
-        <location filename="analysisdialog.cpp" line="239"/>
+        <location filename="analysisdialog.cpp" line="201"/>
+        <location filename="analysisdialog.cpp" line="204"/>
+        <location filename="analysisdialog.cpp" line="216"/>
         <source>Invalid Dates</source>
         <translation>Date invalide</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="224"/>
+        <location filename="analysisdialog.cpp" line="201"/>
         <source>From Date is invalid</source>
         <translation>La date &quot;de&quot; est invalide</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="227"/>
+        <location filename="analysisdialog.cpp" line="204"/>
         <source>To Date is invalid</source>
         <translation>La date &quot;à&quot; est invalide</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="232"/>
+        <location filename="analysisdialog.cpp" line="209"/>
         <source>&quot;To&quot; Date %1 cannot occur before &quot;From&quot; Date %2</source>
         <translation>La date %1 ne doit pas survenir avant la date %2</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="238"/>
+        <location filename="analysisdialog.cpp" line="215"/>
         <source>&quot;From&quot; Date %1 cannot be smaller than &quot;tomorrow&quot; %2</source>
         <translation>La date &quot;de&quot; (%1) ne doit pas survenir avant &quot;demain&quot; (%2)</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="325"/>
-        <location filename="analysisdialog.cpp" line="326"/>
+        <location filename="analysisdialog.cpp" line="302"/>
+        <location filename="analysisdialog.cpp" line="303"/>
         <source>Others</source>
         <translation>Autres</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="913"/>
+        <location filename="analysisdialog.cpp" line="850"/>
+        <source>PNG Files (*.png *.PNG)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.cpp" line="851"/>
+        <source>Select an Image File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.cpp" line="861"/>
+        <source>The creation of the image file did not succeed</source>
+        <translation type="unfinished">Échec de la création de l&apos;image</translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.cpp" line="915"/>
         <source>Yearly Incomes and Expenses</source>
         <translation>Revenus et dépenses annuels</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="68"/>
-        <location filename="analysisdialog.cpp" line="720"/>
+        <location filename="analysisdialog.cpp" line="67"/>
+        <location filename="analysisdialog.cpp" line="697"/>
         <source>No of most significant incomes to use :</source>
         <translation>Nombre de revenus les plus significatifs à visualiser :</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="906"/>
+        <location filename="analysisdialog.cpp" line="908"/>
         <source>Monthly Incomes and Expenses</source>
         <translation>Revenus et dépenses mensuels</translation>
     </message>
@@ -373,42 +498,43 @@ Credits :
         <translation>Écarts</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="722"/>
+        <location filename="analysisdialog.cpp" line="699"/>
         <source>Relative Weight of Expenses For That Period</source>
         <translation>Poids relatif des dépenses pour cette période</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="799"/>
+        <location filename="analysisdialog.cpp" line="775"/>
         <source>Text Files (*.txt *.TXT *.csv *.CSV)</source>
         <translation>Fichiers texte (*.txt *.TXT *.csv *.CSV)</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="800"/>
+        <location filename="analysisdialog.cpp" line="776"/>
         <source>Select a File</source>
         <translation>Choisir un fichier</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="810"/>
+        <location filename="analysisdialog.cpp" line="786"/>
+        <location filename="analysisdialog.cpp" line="861"/>
         <source>Export Failed</source>
         <translation>Échec de l&apos;exportation</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="810"/>
+        <location filename="analysisdialog.cpp" line="786"/>
         <source>Cannot open the file for saving</source>
         <translation>Le fichier n&apos;a pas pu être ouvert en mode écriture</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="839"/>
+        <location filename="analysisdialog.cpp" line="815"/>
         <source>Period</source>
         <translation>Période</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="839"/>
+        <location filename="analysisdialog.cpp" line="815"/>
         <source>Total Incomes</source>
         <translation>Total des revenus</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="839"/>
+        <location filename="analysisdialog.cpp" line="815"/>
         <source>Total Expenses</source>
         <translation>Total des dépenses</translation>
     </message>
@@ -2873,20 +2999,17 @@ Details : %2</source>
         <translation type="vanished">Graphique - Qualité de l&apos;image exportée :</translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="600"/>
         <source>Exported image type :</source>
         <oldsource>Chart - Exported image type :</oldsource>
-        <translation>Type d&apos;images exportées :</translation>
+        <translation type="vanished">Type d&apos;images exportées :</translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="617"/>
         <source>Jpg</source>
-        <translation>Jpg</translation>
+        <translation type="vanished">Jpg</translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="633"/>
         <source>Png</source>
-        <translation>Png</translation>
+        <translation type="vanished">Png</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="327"/>
@@ -2895,13 +3018,13 @@ Details : %2</source>
         <translation>Texte exporté - Localisation des montants :</translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="655"/>
+        <location filename="optionsdialog.ui" line="552"/>
         <source>Overscaling for main chart :</source>
         <oldsource>Overscaling percentage for main chart :</oldsource>
         <translation>Graphique principal - Surdimensionnement :</translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="670"/>
+        <location filename="optionsdialog.ui" line="567"/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -2977,17 +3100,16 @@ Details : %2</source>
         <translation>Couleur de la courbe en &quot;Mode Clair&quot; :</translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="552"/>
         <source>Exported image quality :</source>
-        <translation>Qualité des images exportées :</translation>
+        <translation type="vanished">Qualité des images exportées :</translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="737"/>
+        <location filename="optionsdialog.ui" line="634"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="744"/>
+        <location filename="optionsdialog.ui" line="641"/>
         <source>Save</source>
         <translation>Sauvegarder</translation>
     </message>
@@ -2998,52 +3120,52 @@ Details : %2</source>
         <translation>Police système : %1</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="89"/>
+        <location filename="optionsdialog.cpp" line="81"/>
         <source>None defined</source>
         <translation>Non définie</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="154"/>
+        <location filename="optionsdialog.cpp" line="145"/>
         <source>Font Unselected</source>
         <translation>Police non définie</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="154"/>
+        <location filename="optionsdialog.cpp" line="145"/>
         <source>You must choose a custom font if you don&apos;t use the default system font</source>
         <translation>Vous devez choisir une police de caractères si vous désirez ne pas utiliser le défaut système</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="162"/>
+        <location filename="optionsdialog.cpp" line="153"/>
         <source>Font Changed</source>
         <translation>Police modifiée</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="162"/>
+        <location filename="optionsdialog.cpp" line="153"/>
         <source>Application must be restarted for font changes to take effect</source>
         <translation>L&apos;application doit être redémarrée pour que le changement prenne effet</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="170"/>
+        <location filename="optionsdialog.cpp" line="161"/>
         <source>Today&apos;s Determination Changed</source>
         <translation>Changement pour évaluation d&apos; &quot;aujourd&apos;hui&quot;</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="171"/>
+        <location filename="optionsdialog.cpp" line="162"/>
         <source>Today&apos;s date determination mechanism changed. Application must be restarted for changes to take effect</source>
         <translation>Changement au mécanisme permettant de déterminer la date &quot;aujourd&apos;hui&quot;. L&apos;application doit être redémarrée pour que les changements soient pris en compte</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="176"/>
+        <location filename="optionsdialog.cpp" line="167"/>
         <source>Today&apos;s Custom Date Changed</source>
         <translation>La date de remplacement pour &quot;aujourd&apos;hui&quot; a changée</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="177"/>
+        <location filename="optionsdialog.cpp" line="168"/>
         <source>Today&apos;s replacement date has changed from %1 to %2. Application must be restarted for changes to take effect</source>
         <translation>La date de remplacement pour &quot;aujourd&apos;hui&quot; a changé de %1 à %2. L&apos;application doit être redémarrée pour que les changements soient pris en comte</translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="339"/>
+        <location filename="optionsdialog.cpp" line="326"/>
         <source>Custom : %1</source>
         <translation>Spécifique : %1</translation>
     </message>

@@ -70,14 +70,6 @@ void OptionsDialog::slotPrepareContent()
     ui->exportTextAmountLocalizedCheckBox->setChecked(GbpController::getInstance().getExportTextAmountLocalized());
     // main chart scaling
     ui->scalingMainChartSpinBox->setValue( GbpController::getInstance().getPercentageMainChartScaling());
-    // chart exported image type
-    if (GbpController::getInstance().getChartExportImageType()=="JPG"){
-        ui->jpgRadioButton->setChecked(true);
-    } else {
-        ui->pngRadioButton->setChecked(true);
-    }
-    // chart exported image quality
-    ui->qualitySpinBox->setValue(GbpController::getInstance().getChartExportImageQuality());
     // Application Font
     newCustomFontString = "";
     if (GbpController::getInstance().getUseDefaultSystemFont()){
@@ -127,7 +119,6 @@ void OptionsDialog::on_applyPushButton_clicked()
     qint16 years = ui->scenarioYearsSpinBox->value();
     uint newMainChartScaling = ui->scalingMainChartSpinBox->value();
     bool chartDarkMode = ui->chartDarkModeCheckBox->isChecked();
-    QString chartExportType = (ui->pngRadioButton->isChecked() ? ("PNG") : ("JPG"));
 
     OptionsChangesImpact impact = {.chart=CHART_NONE, .decorationColorStreamDef=DECO_NONE}; // init
 
@@ -186,8 +177,6 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().setCurveLightModeColor(curveLightModeColor);
     GbpController::getInstance().setExportTextAmountLocalized(ui->exportTextAmountLocalizedCheckBox->isChecked());
     GbpController::getInstance().setPercentageMainChartScaling(newMainChartScaling);
-    GbpController::getInstance().setChartExportImageQuality(ui->qualitySpinBox->value());
-    GbpController::getInstance().setChartExportImageType(chartExportType);
     GbpController::getInstance().setUseDefaultSystemFont(ui->systemFontRadioButton->isChecked());
     GbpController::getInstance().setCustomApplicationFont(newCustomFontString);
     GbpController::getInstance().setTodayUseSystemDate(ui->todaySystemRadioButton->isChecked());
@@ -208,8 +197,6 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CurveDarkLightColor = %1").arg(curveLightModeColor.rgba()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ExportTextAmountLocalized = %1").arg(ui->exportTextAmountLocalizedCheckBox->isChecked()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    PercentageMainChartScaling = %1").arg(newMainChartScaling));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ChartExportType = %1").arg(chartExportType));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ChartExportQuality = %1").arg(ui->qualitySpinBox->value()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    UseDefaultSystemFont = %1").arg(ui->systemFontRadioButton->isChecked()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CustomApplicationFont = %1").arg(newCustomFontString));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    UseSystemDateForToday = %1").arg(ui->todaySystemRadioButton->isChecked()));

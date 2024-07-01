@@ -31,8 +31,6 @@ GbpController::GbpController()
     scenario=nullptr;
     lastDir = QDir::homePath();
     fullFileName = "";
-    chartExportImageQuality = 75;
-    chartExportImageType = "PNG";
     recentFilenames.clear();
     logLevel = LogLevel::Minimal;
     useDefaultSystemFont = true;
@@ -220,32 +218,6 @@ void GbpController::loadSettings()
         curveLightModeColor = QColor(0, 0, 180);
     }
 
-    // Chart Export Image Quality
-    if (settingsPtr->contains("chart_export_image_quality")){
-        bool ok;
-        v = settingsPtr->value("chart_export_image_quality");
-        chartExportImageQuality = v.toInt(&ok);
-        if ( (!ok) || (chartExportImageQuality<1) || (chartExportImageQuality>100) )  {
-            // settings is invalid
-            chartExportImageQuality = 75;
-        }
-    } else{
-        chartExportImageQuality = 75;
-    }
-
-    // Chart Export Image Type
-    if (settingsPtr->contains("chart_export_image_type")){
-        bool ok;
-        v = settingsPtr->value("chart_export_image_type");
-        chartExportImageType = v.toString();
-        if ( (chartExportImageType!="PNG") && (chartExportImageType!="JPG") )  {
-            // settings is invalid
-            chartExportImageType = "PNG";
-        }
-    } else{
-        chartExportImageType = "PNG";
-    }
-
     // amount in exported text are localized or not (in which case format is : no thousand separator, decimal sep = "."
     if (settingsPtr->contains("export_text_amount_localized")){
         v = settingsPtr->value("export_text_amount_localized");
@@ -372,8 +344,6 @@ void GbpController::loadSettings()
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    chart_dark_mode = %1").arg(chartDarkMode));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    chart_dark_mode_curve_color = %1").arg(curveDarkModeColor.name(QColor::HexRgb)));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    chart_light_mode_curve_color = %1").arg(curveLightModeColor.name(QColor::HexRgb)));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    chart_export_image_type = %1").arg(chartExportImageType));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    chart_export_image_quality = %1").arg(chartExportImageQuality));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    export_text_amount_localized = %1").arg(exportTextAmountLocalized));
     GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info, QString("    last_dir = %1").arg(lastDir));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    main_chart_scaling_percentage = %1").arg(percentageMainChartScaling));
@@ -393,8 +363,6 @@ void GbpController::saveSettings()
     settingsPtr->setValue("chart_dark_mode",chartDarkMode);
     settingsPtr->setValue("chart_dark_mode_curve_color",curveDarkModeColor.name(QColor::HexRgb));
     settingsPtr->setValue("chart_light_mode_curve_color",curveLightModeColor.name(QColor::HexRgb));
-    settingsPtr->setValue("chart_export_image_type",chartExportImageType);
-    settingsPtr->setValue("chart_export_image_quality",chartExportImageQuality);
     settingsPtr->setValue("export_text_amount_localized",exportTextAmountLocalized);
     settingsPtr->setValue("last_dir",lastDir);
     settingsPtr->setValue("main_chart_scaling_percentage",percentageMainChartScaling);
@@ -569,25 +537,6 @@ void GbpController::setCurveLightModeColor(const QColor &newCurveLightModeColor)
     curveLightModeColor = newCurveLightModeColor;
 }
 
-int GbpController::getChartExportImageQuality() const
-{
-    return chartExportImageQuality;
-}
-
-void GbpController::setChartExportImageQuality(int newChartExportImageQuality)
-{
-    chartExportImageQuality = newChartExportImageQuality;
-}
-
-QString GbpController::getChartExportImageType() const
-{
-    return chartExportImageType;
-}
-
-void GbpController::setChartExportImageType(const QString &newChartExportImageType)
-{
-    chartExportImageType = newChartExportImageType;
-}
 
 bool GbpController::getExportTextAmountLocalized() const
 {

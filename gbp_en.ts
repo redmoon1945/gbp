@@ -15,7 +15,12 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="66"/>
+        <location filename="aboutdialog.ui" line="73"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="81"/>
         <source>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
 
 =&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
@@ -36,44 +41,59 @@
 
 GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want to know how and when your money has been spent in the past (that is &quot;before today&quot;).
 
-This application and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. 
-
-Credits : 
-* Tobias Leupold : code to calculate difference between 2 dates
-  -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
-* QCustomPlot : AQCustomPlot : A Qt C++ widget for plotting and data visualization
-  -&gt; see https://www.qcustomplot.com/</source>
-        <oldsource>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
-
-=&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
-
-=&gt; Easy zooming : use middle mouse button or dedicated UI buttons 
-
-=&gt; Easy panning : just left-click &amp; hold, then move mouse
-
-=&gt; Specify painlessly all your forecasted income/expense budget items, with flexibility to define periodic or irregular flow of incomes/expenses.
-
-=&gt; Optionaly define inflation, either as a constant value or a complex series of changing values.
-
-=&gt; Optionaly define a custom monthly growth pattern for any income/expense specification , expressed either as a constant value or a complex series of changing values.
-
-=&gt; Perform automatically different types of analysis on your data, like relative weight of incomes/expenses over custom period, monthly and yearly reports.
-
-=&gt; Your data is not locked in : all scenarios are in open JSON format, and resulting data are exportable in CSV format.
-
-GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want know how and when your money has been spent in the past (that is &quot;before today&quot;).
-
-This application and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. Both source code and the AppImage executable can be found here : &lt;insert URL when known&gt;
-
-Credits : 
-* Tobias Leupold : code to calculate difference between 2 dates
-  -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
-* QCustomPlot : AQCustomPlot : A Qt C++ widget for plotting and data visualization
-  -&gt; see https://www.qcustomplot.com/</oldsource>
+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="130"/>
+        <location filename="aboutdialog.ui" line="111"/>
+        <source>Licence</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="119"/>
+        <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. See http://www.gnu.org/licenses/ for the GPL licence.
+
+graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+(c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</source>
+        <oldsource>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. See &lt;http://www.gnu.org/licenses/&gt; for the GPL licence.
+
+graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+(c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="133"/>
+        <source>Credits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="141"/>
+        <source>Special thanks to : 
+
+* Tobias Leupold : code to calculate difference between 2 dates
+  -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
+
+* QCustomPlot : A Qt C++ widget for plotting and data visualization
+  -&gt; see https://www.qcustomplot.com/
+
+* The Qt Team :  Superb cross-plateform GUI Framework
+  -&gt; see https://www.qt.io/</source>
+        <oldsource>Special thanks to : 
+
+* Tobias Leupold : code to calculate difference between 2 dates
+  -&gt; see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
+
+* QCustomPlot : A Qt C++ widget for plotting and data visualization
+  -&gt; see https://www.qcustomplot.com/
+
+* The Qt Team :  Superb cross-plateform GUI Framework
+-&gt; see https://www.qt.io/</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="194"/>
         <source>Close</source>
         <translation></translation>
     </message>
@@ -109,10 +129,10 @@ Credits :
         <location filename="analysisdialog.ui" line="165"/>
         <location filename="analysisdialog.ui" line="443"/>
         <location filename="analysisdialog.ui" line="691"/>
-        <location filename="analysisdialog.cpp" line="102"/>
-        <location filename="analysisdialog.cpp" line="113"/>
-        <location filename="analysisdialog.cpp" line="588"/>
-        <location filename="analysisdialog.cpp" line="917"/>
+        <location filename="analysisdialog.cpp" line="101"/>
+        <location filename="analysisdialog.cpp" line="112"/>
+        <location filename="analysisdialog.cpp" line="565"/>
+        <location filename="analysisdialog.cpp" line="919"/>
         <source>Incomes</source>
         <translation></translation>
     </message>
@@ -120,10 +140,10 @@ Credits :
         <location filename="analysisdialog.ui" line="178"/>
         <location filename="analysisdialog.ui" line="453"/>
         <location filename="analysisdialog.ui" line="701"/>
-        <location filename="analysisdialog.cpp" line="102"/>
-        <location filename="analysisdialog.cpp" line="113"/>
-        <location filename="analysisdialog.cpp" line="590"/>
-        <location filename="analysisdialog.cpp" line="918"/>
+        <location filename="analysisdialog.cpp" line="101"/>
+        <location filename="analysisdialog.cpp" line="112"/>
+        <location filename="analysisdialog.cpp" line="567"/>
+        <location filename="analysisdialog.cpp" line="920"/>
         <source>Expenses</source>
         <translation></translation>
     </message>
@@ -242,118 +262,134 @@ Credits :
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="67"/>
-        <location filename="analysisdialog.cpp" line="719"/>
+        <location filename="analysisdialog.cpp" line="66"/>
+        <location filename="analysisdialog.cpp" line="696"/>
         <source>Relative Weight of Incomes For That Period</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="102"/>
+        <location filename="analysisdialog.cpp" line="101"/>
         <source>Month</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="102"/>
-        <location filename="analysisdialog.cpp" line="113"/>
-        <location filename="analysisdialog.cpp" line="839"/>
+        <location filename="analysisdialog.cpp" line="101"/>
+        <location filename="analysisdialog.cpp" line="112"/>
+        <location filename="analysisdialog.cpp" line="815"/>
         <source>Delta</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="113"/>
+        <location filename="analysisdialog.cpp" line="112"/>
         <source>Year</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="224"/>
-        <location filename="analysisdialog.cpp" line="227"/>
-        <location filename="analysisdialog.cpp" line="239"/>
+        <location filename="analysisdialog.cpp" line="201"/>
+        <location filename="analysisdialog.cpp" line="204"/>
+        <location filename="analysisdialog.cpp" line="216"/>
         <source>Invalid Dates</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="224"/>
+        <location filename="analysisdialog.cpp" line="201"/>
         <source>From Date is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="227"/>
+        <location filename="analysisdialog.cpp" line="204"/>
         <source>To Date is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="232"/>
+        <location filename="analysisdialog.cpp" line="209"/>
         <source>&quot;To&quot; Date %1 cannot occur before &quot;From&quot; Date %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="238"/>
+        <location filename="analysisdialog.cpp" line="215"/>
         <source>&quot;From&quot; Date %1 cannot be smaller than &quot;tomorrow&quot; %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="325"/>
-        <location filename="analysisdialog.cpp" line="326"/>
+        <location filename="analysisdialog.cpp" line="302"/>
+        <location filename="analysisdialog.cpp" line="303"/>
         <source>Others</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="592"/>
+        <location filename="analysisdialog.cpp" line="569"/>
         <source>Deltas - Surplus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="594"/>
+        <location filename="analysisdialog.cpp" line="571"/>
         <source>Deltas - Deficit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="722"/>
+        <location filename="analysisdialog.cpp" line="699"/>
         <source>Relative Weight of Expenses For That Period</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="723"/>
+        <location filename="analysisdialog.cpp" line="700"/>
         <source>No of most significant expenses to use :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="799"/>
+        <location filename="analysisdialog.cpp" line="775"/>
         <source>Text Files (*.txt *.TXT *.csv *.CSV)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="800"/>
+        <location filename="analysisdialog.cpp" line="776"/>
         <source>Select a File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="810"/>
+        <location filename="analysisdialog.cpp" line="786"/>
+        <location filename="analysisdialog.cpp" line="861"/>
         <source>Export Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="810"/>
+        <location filename="analysisdialog.cpp" line="786"/>
         <source>Cannot open the file for saving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="839"/>
+        <location filename="analysisdialog.cpp" line="815"/>
         <source>Period</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="839"/>
+        <location filename="analysisdialog.cpp" line="815"/>
         <source>Total Incomes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="839"/>
+        <location filename="analysisdialog.cpp" line="815"/>
         <source>Total Expenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="913"/>
+        <location filename="analysisdialog.cpp" line="850"/>
+        <source>PNG Files (*.png *.PNG)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.cpp" line="851"/>
+        <source>Select an Image File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.cpp" line="861"/>
+        <source>The creation of the image file did not succeed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.cpp" line="915"/>
         <source>Yearly Incomes and Expenses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -364,13 +400,13 @@ Credits :
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="68"/>
-        <location filename="analysisdialog.cpp" line="720"/>
+        <location filename="analysisdialog.cpp" line="67"/>
+        <location filename="analysisdialog.cpp" line="697"/>
         <source>No of most significant incomes to use :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="906"/>
+        <location filename="analysisdialog.cpp" line="908"/>
         <source>Monthly Incomes and Expenses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2702,35 +2738,19 @@ Details : %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="600"/>
-        <source>Exported image type :</source>
-        <oldsource>Chart - Exported image type :</oldsource>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="optionsdialog.ui" line="617"/>
-        <source>Jpg</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="optionsdialog.ui" line="633"/>
-        <source>Png</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="optionsdialog.ui" line="327"/>
         <source>Exported text - Amounts are localized :</source>
         <oldsource>Exported Text - Amounts are localized :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="655"/>
+        <location filename="optionsdialog.ui" line="552"/>
         <source>Overscaling for main chart :</source>
         <oldsource>Overscaling percentage for main chart :</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="670"/>
+        <location filename="optionsdialog.ui" line="567"/>
         <source>%</source>
         <translation></translation>
     </message>
@@ -2806,17 +2826,12 @@ Details : %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="552"/>
-        <source>Exported image quality :</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="optionsdialog.ui" line="737"/>
+        <location filename="optionsdialog.ui" line="634"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="744"/>
+        <location filename="optionsdialog.ui" line="641"/>
         <source>Save</source>
         <translation></translation>
     </message>
@@ -2827,52 +2842,52 @@ Details : %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="89"/>
+        <location filename="optionsdialog.cpp" line="81"/>
         <source>None defined</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="154"/>
+        <location filename="optionsdialog.cpp" line="145"/>
         <source>Font Unselected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="154"/>
+        <location filename="optionsdialog.cpp" line="145"/>
         <source>You must choose a custom font if you don&apos;t use the default system font</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="162"/>
+        <location filename="optionsdialog.cpp" line="153"/>
         <source>Font Changed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="162"/>
+        <location filename="optionsdialog.cpp" line="153"/>
         <source>Application must be restarted for font changes to take effect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="170"/>
+        <location filename="optionsdialog.cpp" line="161"/>
         <source>Today&apos;s Determination Changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="171"/>
+        <location filename="optionsdialog.cpp" line="162"/>
         <source>Today&apos;s date determination mechanism changed. Application must be restarted for changes to take effect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="176"/>
+        <location filename="optionsdialog.cpp" line="167"/>
         <source>Today&apos;s Custom Date Changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="177"/>
+        <location filename="optionsdialog.cpp" line="168"/>
         <source>Today&apos;s replacement date has changed from %1 to %2. Application must be restarted for changes to take effect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="339"/>
+        <location filename="optionsdialog.cpp" line="326"/>
         <source>Custom : %1</source>
         <translation></translation>
     </message>

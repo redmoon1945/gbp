@@ -30,7 +30,6 @@
 #include <QBarSet>
 #include <QBarCategoryAxis>
 #include <QValueAxis>
-#include <limits.h>
 
 
 
@@ -119,15 +118,6 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     ui->yearlyDiscountRateDoubleSpinBox->setValue(5);
     ui->yearlyDiscountRateDoubleSpinBox->setEnabled(false);;
 
-    // Child Dialogs
-    exportChartDlg = new ExportChartDialog(this); //  auto destroyed by Qt
-    exportChartDlg->setModal(true);
-
-    // connections
-    QObject::connect(this, &AnalysisDialog::signalExportChartPrepareContent, exportChartDlg, &ExportChartDialog::slotPrepareContent);
-    QObject::connect(exportChartDlg, &ExportChartDialog::signalExportChartResult, this, &AnalysisDialog::slotExportChartResult );
-    QObject::connect(exportChartDlg, &ExportChartDialog::signalExportChartCompleted, this, &AnalysisDialog::slotExportChartCompleted );
-
     ready = true;
 }
 
@@ -161,19 +151,6 @@ void AnalysisDialog::slotAnalysisPrepareContent(QMap<QDate,CombinedFeStreams::Da
     ui->monthlyReportChartSelectedTextLabel->setText("");
 
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog invoked"));
-}
-
-
-
-void AnalysisDialog::slotExportChartResult(bool success)
-{
-
-}
-
-
-void AnalysisDialog::slotExportChartCompleted()
-{
-
 }
 
 
@@ -773,8 +750,7 @@ void AnalysisDialog::on_toDateEdit_userDateChanged(const QDate &date)
 
 void AnalysisDialog::on_exportImageRelativeWeigthPushButton_clicked()
 {
-    emit signalExportChartPrepareContent(ui->chartRelativeWeigthWidget);
-    exportChartDlg->show();
+    exportChartAsImage(ui->chartRelativeWeigthWidget);
 }
 
 
@@ -862,6 +838,32 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Success of Yearly Report export");
     } else{
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Yearly Report export canceled");
+    }
+}
+
+
+void AnalysisDialog::exportChartAsImage(QWidget* chartWidget)
+{
+    // get file name
+    QString defaultExtension = ".png";
+    QString defaultExtensionUsed = ".png";
+    QString filter = tr("PNG Files (*.png *.PNG)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select an Image File"), GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
+    if (fileName != ""){
+        // fix the filename to add the proper suffix
+        QFileInfo fi(fileName);
+        if(fi.suffix()==""){    // user has not specified an extension
+            fileName.append(defaultExtension);
+        }
+        bool successful;
+        successful = chartWidget->grab().save(fileName,"PNG", 100) ;  // max quality
+        if(successful == false){
+            QMessageBox::critical(nullptr,tr("Export Failed"), tr("The creation of the image file did not succeed"));
+            return;
+        }
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Success of Chart export");
+    } else{
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Chart export canceled");
     }
 }
 
@@ -1157,8 +1159,7 @@ void AnalysisDialog::on_monthlyReportChartDeltasRadioButton_clicked()
 
 void AnalysisDialog::on_exportImageMonthlyReportChartPushButton_clicked()
 {
-    emit signalExportChartPrepareContent(ui->monthlyReportChartWidget);
-    exportChartDlg->show();
+    exportChartAsImage(ui->monthlyReportChartWidget);
 }
 
 
@@ -1218,7 +1219,6 @@ void AnalysisDialog::on_yearlyReportChartDeltasRadioButton_clicked()
 
 void AnalysisDialog::on_exportImageYearlyReportChartPushButton_clicked()
 {
-    emit signalExportChartPrepareContent(ui->yearlyReportChartWidget);
-    exportChartDlg->show();
+    exportChartAsImage(ui->yearlyReportChartWidget);
 }
 

@@ -26,7 +26,6 @@
 #include <QBarSeries>
 #include <QBarCategoryAxis>
 #include "combinedfestreams.h"
-#include "exportchartdialog.h"
 #include "qvalueaxis.h"
 
 namespace Ui {
@@ -37,16 +36,9 @@ class AnalysisDialog : public QDialog
 {
     Q_OBJECT
 
-signals:
-    // For ExportChart : prepare content before edition
-    void signalExportChartPrepareContent(QWidget* widget);
-
 public slots:
      // prepare Dialog before showing
     void slotAnalysisPrepareContent(QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData, CurrencyInfo currencyInfo);
-    // From Export Chart : result and edition completion notification
-    void slotExportChartResult(bool success);
-    void slotExportChartCompleted();
 
 public:
     explicit AnalysisDialog(QLocale theLocale, QWidget *parent = nullptr);
@@ -89,9 +81,6 @@ private slots:
 
 private:
     Ui::AnalysisDialog *ui;
-
-    // Dialogs
-    ExportChartDialog* exportChartDlg;
 
     // temp structure to sort things
     struct Pair{
@@ -142,6 +131,7 @@ private:
     uint noOfMonthDifference(const QDate& from, const QDate& to) const ;
     uint noOfYearDifference(const QDate& from, const QDate& to) const ;
     void exportTextMonthlyYearlyReport(ReportType rType) ;
+    void exportChartAsImage(QWidget* chartWidget);
     void fillMonthlyReportComboBoxWithMonthNames() const;
     QString buildBarChartCategoryName(ReportType type, QDate date) const;
     void initReportChart(ReportType type);
