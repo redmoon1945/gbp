@@ -38,12 +38,18 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
 
     // use smaller font for description list
     QFont descFont = ui->descPlainTextEdit->font();
-    descFont.setPointSize(Util::changeFontSize(false,true, descFont.pointSize()));
+    uint oldFontSize = descFont.pointSize();
+    uint newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Irregular Dialog - Description - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    descFont.setPointSize(newFontSize);
     ui->descPlainTextEdit->setFont(descFont);
 
     // use smaller font for the warning Label (for past events)
     QFont warninglabelFont = ui->warningLabel->font();
-    warninglabelFont.setPointSize(Util::changeFontSize(false,true, warninglabelFont.pointSize()));
+    oldFontSize = warninglabelFont.pointSize();
+    newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Irregular Dialog - Warning Label - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    warninglabelFont.setPointSize(newFontSize);
     ui->warningLabel->setFont(warninglabelFont);
 
     // set the model (no internal data for now)
@@ -52,8 +58,8 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
 
     // adjust table
     fm = ui->itemsTableView->fontMetrics();
-    ui->itemsTableView->setColumnWidth(0,fm.averageCharWidth()*25);  // date
-    ui->itemsTableView->setColumnWidth(1,fm.averageCharWidth()*20);  // amount
+    ui->itemsTableView->setColumnWidth(0,fm.averageCharWidth()*35);  // date
+    ui->itemsTableView->setColumnWidth(1,fm.averageCharWidth()*25);  // amount
     QFont defaultTableFont = ui->itemsTableView->font();
     QFont mono = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     mono.setPointSize(defaultTableFont.pointSize());
@@ -400,9 +406,9 @@ void EditIrregularDialog::on_unselectAllPushButton_clicked()
 
 void EditIrregularDialog::on_decorationColorPushButton_clicked()
 {
-    QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
     QColor color;
-    color = QColorDialog::getColor(decorationColor, this, "Color Chooser",opt);
+    color = QColorDialog::getColor(decorationColor, this, tr("Color Chooser"));
     if (color.isValid()==false) {
         return; // user cancelled
     } else {

@@ -330,8 +330,8 @@ void OptionsDialog::setCustomFontlabel(QString fontLabel)
 
 void OptionsDialog::on_curveDarkModeColorToolButton_clicked()
 {
-    QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
-    QColor color = QColorDialog::getColor(curveDarkModeColor, this, "Color Chooser",opt);
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
+    QColor color = QColorDialog::getColor(curveDarkModeColor, this, tr("Color Chooser"));
     if (color.isValid()==false) {
         return;
     } else {
@@ -343,8 +343,8 @@ void OptionsDialog::on_curveDarkModeColorToolButton_clicked()
 
 void OptionsDialog::on_curveLightModeColorToolButton_clicked()
 {
-    QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
-    QColor color = QColorDialog::getColor(curveLightModeColor,this, "Color Chooser", opt);
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
+    QColor color = QColorDialog::getColor(curveLightModeColor,this, tr("Color Chooser"));
     if (color.isValid()==false) {
         return;
     } else {

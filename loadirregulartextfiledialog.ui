@@ -106,7 +106,7 @@ All imported items will be tagged as &quot;active&quot;, meaning they will be co
           </font>
          </property>
          <property name="text">
-          <string>File Name : </string>
+          <string>File Name :</string>
          </property>
         </widget>
        </item>
@@ -123,7 +123,7 @@ All imported items will be tagged as &quot;active&quot;, meaning they will be co
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>40</width>
+           <width>50</width>
            <height>20</height>
           </size>
          </property>

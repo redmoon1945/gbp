@@ -40,17 +40,16 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     ui->periodComboBox->insertItem(0,Util::getPeriodName(Util::PeriodType::DAILY,true,false),PeriodicFeStreamDef::PeriodType::DAILY);
     updatePeriodCombobox(PeriodicFeStreamDef::PeriodType::MONTHLY);
 
-    // force description widget to be small (cant do it in Qt Designer...)
-    QFontMetrics fm(ui->descPlainTextEdit->font());
-    ui->descPlainTextEdit->setFixedHeight(fm.height()*5); // 4 lines
-
     // use smaller font for description list
     QFont descFont = ui->descPlainTextEdit->font();
-    descFont.setPointSize(Util::changeFontSize(false,true, descFont.pointSize()));
+    uint oldFontSize = descFont.pointSize();
+    uint newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Periodic Dialog - Description - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    descFont.setPointSize(newFontSize);
     ui->descPlainTextEdit->setFont(descFont);
 
-    // make DateWidget widget
-    fm = ui->fromDateEdit->fontMetrics();
+    // make DateWidget widget wide enough
+    QFontMetrics fm = ui->fromDateEdit->fontMetrics();
     ui->fromDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
     ui->toDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
 
@@ -100,7 +99,7 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, 
     ui->amountDoubleSpinBox->setDecimals(currInfo.noOfDecimal);
     ui->currencyIsoCodeLabel->setText(currInfo.isoCode);
 
-    // decoration color
+    // Name colorization
     if (isNewStreamDef) {
         decorationColor = QColor(); // use normal color for new Stream Def
     } else {
@@ -526,9 +525,9 @@ void EditPeriodicDialog::on_showResultPushButton_clicked()
 
 void EditPeriodicDialog::on_decorationColorPushButton_clicked()
 {
-    QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
     QColor color;
-    color = QColorDialog::getColor(decorationColor, this, "Color Chooser",opt);
+    color = QColorDialog::getColor(decorationColor, this, tr("Color Chooser"));
     if (color.isValid()==false) {
         return; // user cancelled
     } else {

@@ -69,10 +69,8 @@ void EditGrowthElementDialog::slotPrepareContent(bool newEditMode, QList<QDate> 
         ui->monthComboBox->setCurrentIndex(theDate.month()-1);
         ui->yearSpinBox->setValue(theDate.year());
         ui->growthDoubleSpinBox->setValue(growthInPercentage);
-        // calculate the monthly basis equivalent
-        double monthlyGrowth = Util::annualToMonthlyGrowth(growthInPercentage);
-        QString s = locale.toString(monthlyGrowth,'g',6);
-        ui->monthlyLabel->setText(s);
+        updateMonthlyGrowthEquivalentValue();
+
     } else{
         // *** new ***
         this->setWindowTitle(QString(tr("Add a New Monthly %1 Value")).arg(growthName));
@@ -90,7 +88,7 @@ void EditGrowthElementDialog::slotPrepareContent(bool newEditMode, QList<QDate> 
             ui->yearSpinBox->setValue(GbpController::getInstance().getTomorrow().year());
         }
         ui->growthDoubleSpinBox->setValue(0);
-        ui->monthlyLabel->setText("0");
+        updateMonthlyGrowthEquivalentValue();
     }
 }
 
@@ -176,13 +174,20 @@ void EditGrowthElementDialog::fillMonthComboBox()
 }
 
 
-
-void EditGrowthElementDialog::on_growthDoubleSpinBox_valueChanged(double arg1)
+// use value of annual growth from the widget spinbox
+void EditGrowthElementDialog::updateMonthlyGrowthEquivalentValue()
 {
     // update the monthly basis equivalent
     double annualGrowth = ui->growthDoubleSpinBox->value();
     double monthlyGrowth = Util::annualToMonthlyGrowth(annualGrowth);
     QString s = QString("%1 %2").arg(locale.toString(monthlyGrowth,'g',6)).arg("%");
     ui->monthlyLabel->setText(s);
+}
+
+
+
+void EditGrowthElementDialog::on_growthDoubleSpinBox_valueChanged(double arg1)
+{
+    updateMonthlyGrowthEquivalentValue();
 }
 

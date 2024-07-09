@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>787</width>
-    <height>500</height>
+    <width>797</width>
+    <height>445</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,10 +32,10 @@
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
            <property name="horizontalSpacing">
-            <number>20</number>
+            <number>30</number>
            </property>
            <property name="verticalSpacing">
-            <number>15</number>
+            <number>10</number>
            </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label">
@@ -364,10 +364,10 @@
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
            <property name="horizontalSpacing">
-            <number>20</number>
+            <number>30</number>
            </property>
            <property name="verticalSpacing">
-            <number>15</number>
+            <number>10</number>
            </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label_2">
@@ -649,7 +649,6 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup_3"/>
  </buttongroups>

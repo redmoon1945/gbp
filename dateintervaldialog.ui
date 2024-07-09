@@ -22,7 +22,7 @@
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
        <property name="horizontalSpacing">
-        <number>20</number>
+        <number>30</number>
        </property>
        <property name="verticalSpacing">
         <number>10</number>
@@ -47,12 +47,18 @@
           </font>
          </property>
          <property name="text">
-          <string>To : </string>
+          <string>To :</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
         <widget class="QDateEdit" name="fromDateEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="displayFormat">
           <string>yyyy-MMM-dd</string>
          </property>
@@ -63,6 +69,12 @@
        </item>
        <item row="1" column="1">
         <widget class="QDateEdit" name="toDateEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="displayFormat">
           <string>yyyy-MMM-dd</string>
          </property>

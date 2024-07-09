@@ -138,6 +138,7 @@ private:
     void getStartEndDateReportChart(ReportType type, QDate& startDate, QDate& endDate ) const;
     void getMinMaxReportChart(ReportType type, QBarSet* incomes, QBarSet* expenses, QBarSet* deltasPositive, QBarSet* deltasNegative, double& minY, double& maxY) ;
     void findWhichSetsIsToBeUsedReportChart(ReportType type, bool& incomesSet, bool& expensesSet, bool& deltasSet);
+    void setMonthlyYearlyChartTitle(QChart* chartPtr, bool useIncomes, bool useExpenses, bool useDeltas);
 };
 
 #endif // ANALYSISDIALOG_H

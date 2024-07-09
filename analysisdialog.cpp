@@ -17,6 +17,7 @@
  */
 
 #include "analysisdialog.h"
+#include "qgraphicslayout.h"
 #include "ui_analysisdialog.h"
 #include "gbpcontroller.h"
 #include "util.h"
@@ -49,6 +50,8 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     chartRelativeWeigth->legend()->setAlignment(Qt::AlignRight);
     chartViewRelativeWeigth = new QChartView(chartRelativeWeigth, ui->chartRelativeWeigthWidget);
     chartViewRelativeWeigth->setRenderHint(QPainter::Antialiasing);
+    chartRelativeWeigth->layout()->setContentsMargins(1, 1, 1, 1);
+    chartRelativeWeigth->setBackgroundRoundness(0);
     // Must have as many colors as max no of elements + 1. See https://www.w3.org/TR/SVG11/types.html#ColorKeywords
     colorsRelativeWeigth = {QColor("cyan"), QColor("magenta"), QColor("red"), QColor("lightpink"), QColor("darkRed"),
               QColor("darkCyan"), QColor("darkMagenta"), QColor("green"), QColor("darkGreen"), QColor("yellow"),
@@ -83,7 +86,10 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     ui->monthlyReportChartDurationSpinBox->setValue(12);
     // make smaller selected bar info
     QFont font = ui->monthlyReportChartSelectedLabel->font();
-    font.setPointSize(Util::changeFontSize(false, true, font.pointSize()));
+    uint oldFontSize = font.pointSize();
+    uint newFontSize = Util::changeFontSize(false, true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Monthly and Yearly Chart - Selected Bar Info font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    font.setPointSize(newFontSize);
     ui->monthlyReportChartSelectedTextLabel->setFont(font);
     ui->monthlyReportChartSelectedLabel->setFont(font);
 
@@ -648,6 +654,8 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
         });
     }
 
+    // Set Chart Title
+    setMonthlyYearlyChartTitle((*chartPtr), useIncomes, useExpenses, useDeltas);
 
     // rebuild the 2 axes and attach
     (*xAxisPtr)->setCategories(categories);
@@ -931,12 +939,42 @@ void AnalysisDialog::initReportChart(ReportType type)
     (*chartViewPtr)->setRenderHint(QPainter::Antialiasing);
     (*chartPtr)->legend()->show();
     (*chartPtr)->legend()->setAlignment(Qt::AlignBottom);
+    // 1 pixel wide border
+    (*chartPtr)->layout()->setContentsMargins(1, 1, 1, 1);
+    (*chartPtr)->setBackgroundRoundness(0);
+
+    // x axis
     QStringList categories={};
     (*xAxisPtr)  = new QBarCategoryAxis();
+    //
+    QFont fontX = (*xAxisPtr)->labelsFont();
+    uint oldFontSize = fontX.pointSize();
+    uint newFontSize = Util::changeFontSize(true, true, fontX.pointSize());
+    if (type == ReportType::MONTHLY) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Monthly Chart - X axis - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Yearly Chart - X axis - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    }
+    fontX.setPointSize(newFontSize);
+    (*xAxisPtr)->setLabelsFont(fontX);
+    //
     (*xAxisPtr)->append(categories);
     (*chartPtr)->addAxis((*xAxisPtr), Qt::AlignBottom); // the CHART (not the series) takes ownership
     series->attachAxis((*xAxisPtr));
+    // y axis
     (*yAxisPtr) = new QValueAxis();
+    //
+    QFont fontY = (*yAxisPtr)->labelsFont();
+    oldFontSize = fontY.pointSize();
+    newFontSize = Util::changeFontSize(true, true, fontY.pointSize());
+    if (type == ReportType::MONTHLY) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Monthly Chart - X axis font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Yearly Chart - X axis - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    }
+    fontY.setPointSize(newFontSize);
+    (*yAxisPtr)->setLabelsFont(fontY);
+    //
     (*yAxisPtr)->setRange(0,1);
     (*yAxisPtr)->setTickCount(11); // 10 bins
     (*yAxisPtr)->setMinorTickCount(4); // 5 bins
@@ -1042,6 +1080,20 @@ void AnalysisDialog::findWhichSetsIsToBeUsedReportChart(ReportType type, bool &i
         } else{
             deltasSet = false;
         }
+    }
+}
+
+
+void AnalysisDialog::setMonthlyYearlyChartTitle(QChart* chartPtr, bool useIncomes, bool useExpenses, bool useDeltas)
+{
+    if (useIncomes && useExpenses) {
+        chartPtr->setTitle(tr("Incomes and Expenses"));
+    } else if(useIncomes){
+        chartPtr->setTitle(tr("Incomes"));
+    } else if(useExpenses){
+        chartPtr->setTitle(tr("Expenses"));
+    } else if(useDeltas){
+        chartPtr->setTitle(tr("Deltas"));
     }
 }
 

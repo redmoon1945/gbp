@@ -61,6 +61,7 @@ private:
     QDate latestOldDate;    // to remember the old date when, during an edit, the date is changed.
 
     void fillMonthComboBox();
+    void updateMonthlyGrowthEquivalentValue();
 };
 
 #endif // EDITGROWTHELEMENTDIALOG_H

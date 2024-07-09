@@ -10,6 +10,12 @@
     <height>700</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
@@ -24,8 +30,11 @@
        <property name="labelAlignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
+       <property name="formAlignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
        <property name="horizontalSpacing">
-        <number>40</number>
+        <number>30</number>
        </property>
        <property name="verticalSpacing">
         <number>10</number>
@@ -44,12 +53,18 @@
           </font>
          </property>
          <property name="text">
-          <string>Name : </string>
+          <string>Name :</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
         <widget class="QLineEdit" name="nameLineEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maxLength">
           <number>100</number>
          </property>
@@ -75,7 +90,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Description : </string>
+          <string>Description :</string>
          </property>
         </widget>
        </item>
@@ -83,6 +98,12 @@
         <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="0,0,0,0">
          <item>
           <widget class="QPlainTextEdit" name="descPlainTextEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="font">
             <font>
              <italic>true</italic>
@@ -109,7 +130,7 @@
          <item>
           <widget class="QPushButton" name="pushButton">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -151,7 +172,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Amount : </string>
+          <string>Amount :</string>
          </property>
         </widget>
        </item>
@@ -234,7 +255,7 @@
           <string>Period of time for which this income/expense is repeated (times Period Multiplier)</string>
          </property>
          <property name="text">
-          <string>Period : </string>
+          <string>Period :</string>
          </property>
         </widget>
        </item>
@@ -282,7 +303,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Period Multiplier : </string>
+          <string>Period Multiplier :</string>
          </property>
         </widget>
        </item>
@@ -377,7 +398,7 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>15</day>
+             <day>10</day>
             </date>
            </property>
            <property name="displayFormat">
@@ -401,7 +422,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
+             <width>30</width>
              <height>20</height>
             </size>
            </property>
@@ -442,7 +463,7 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>17</day>
+             <day>12</day>
             </date>
            </property>
            <property name="displayFormat">
@@ -675,6 +696,12 @@
        </item>
        <item row="7" column="0">
         <widget class="QLabel" name="label_15">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="font">
           <font>
            <bold>false</bold>
@@ -727,7 +754,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>5</width>
+             <width>10</width>
              <height>20</height>
             </size>
            </property>
@@ -736,7 +763,7 @@
          <item>
           <widget class="QLabel" name="decorationColorCustomTextLabel">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -790,7 +817,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Apply growth every </string>
+            <string>Every </string>
            </property>
           </widget>
          </item>

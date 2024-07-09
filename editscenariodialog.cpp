@@ -51,23 +51,37 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     tempVariableInflation = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>());
 
     // tweak Item Table fonts
+    uint oldFontSize;
+    uint newFontSize;
+    //
     QFont defaultTableFont = ui->itemsTableView->font();
+    //
     QFont monoTableFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monoTableFont.setPointSize(defaultTableFont.pointSize());
+    //
     QFont strikeOutTableFont = ui->itemsTableView->font();
     strikeOutTableFont.setStrikeOut(true);
     strikeOutTableFont.setItalic(true);
+    //
     QFont monoInactiveTableFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monoInactiveTableFont.setPointSize(defaultTableFont.pointSize());
     monoInactiveTableFont.setStrikeOut(true);
     monoInactiveTableFont.setItalic(true);
+    //
     QFont infoActiveTableFont = ui->itemsTableView->font();
     infoActiveTableFont.setItalic(true);
-    infoActiveTableFont.setPointSize(Util::changeFontSize(false, true, infoActiveTableFont.pointSize()));
+    oldFontSize = infoActiveTableFont.pointSize();
+    newFontSize = Util::changeFontSize(false, true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - infoActiveTable - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    infoActiveTableFont.setPointSize(newFontSize);
+    //
     QFont infoInactiveTableFont = ui->itemsTableView->font();
     infoInactiveTableFont.setStrikeOut(true);
     infoInactiveTableFont.setItalic(true);
-    infoInactiveTableFont.setPointSize(Util::changeFontSize(false, true,infoInactiveTableFont.pointSize()));
+    oldFontSize = infoInactiveTableFont.pointSize();
+    newFontSize = Util::changeFontSize(false, true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - infoInactiveTable - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    infoInactiveTableFont.setPointSize(newFontSize);
 
     // set up list model for items ListView : filtering buttons must have been set according to model's default
     itemTableModel = new ScenarioFeTableModel(  locale, defaultTableFont, strikeOutTableFont, monoTableFont,
@@ -83,12 +97,18 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
 
     // use smaller font for description list
     QFont descFont = ui->DescPlainTextEdit->font();
-    descFont.setPointSize(Util::changeFontSize(false,true, descFont.pointSize()));
+    oldFontSize = descFont.pointSize();
+    newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - Description - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    descFont.setPointSize(newFontSize);
     ui->DescPlainTextEdit->setFont(descFont);
 
     // use smaller font for filter buttons
     QFont filterButtonFont = ui->periodicFilterPushButton->font();
-    filterButtonFont.setPointSize(Util::changeFontSize(true,true, filterButtonFont.pointSize()));
+    oldFontSize = filterButtonFont.pointSize();
+    newFontSize =Util::changeFontSize(true,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - Filter Buttons - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    filterButtonFont.setPointSize(newFontSize);
     ui->periodicFilterPushButton->setFont(filterButtonFont);
     ui->irregularFilterPushButton->setFont(filterButtonFont);
     ui->activeFilterPushButton->setFont(filterButtonFont);

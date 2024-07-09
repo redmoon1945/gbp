@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="relativeWeightTab">
       <attribute name="title">
@@ -43,7 +43,7 @@
            <item>
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>From:</string>
+              <string>From :</string>
              </property>
             </widget>
            </item>
@@ -87,7 +87,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>20</width>
+               <width>30</width>
                <height>20</height>
               </size>
              </property>
@@ -96,7 +96,7 @@
            <item>
             <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>To:</string>
+              <string>To :</string>
              </property>
             </widget>
            </item>
@@ -153,7 +153,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>50</width>
                <height>20</height>
               </size>
              </property>
@@ -205,7 +205,7 @@
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>No of most significant elements to show: </string>
+              <string>No of most significant elements to show :</string>
              </property>
             </widget>
            </item>
@@ -357,7 +357,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>50</width>
                <height>20</height>
               </size>
              </property>
@@ -400,7 +400,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>50</width>
                <height>20</height>
               </size>
              </property>
@@ -608,7 +608,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>50</width>
                <height>20</height>
               </size>
              </property>
@@ -648,7 +648,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>50</width>
                <height>20</height>
               </size>
              </property>

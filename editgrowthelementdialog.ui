@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>560</width>
-    <height>401</height>
+    <height>434</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,7 +72,7 @@
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
        <property name="horizontalSpacing">
-        <number>20</number>
+        <number>30</number>
        </property>
        <property name="verticalSpacing">
         <number>10</number>

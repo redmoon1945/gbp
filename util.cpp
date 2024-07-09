@@ -42,6 +42,7 @@ QString Util::strMonthlyPlNc = "";
 QString Util::strEndOfMonthlyPlNc = "";
 QString Util::strYearlyPlNc = "";
 
+QStringList Util::qtColorNames = {};
 
 Util::Util()
 {
@@ -75,6 +76,9 @@ void Util::init()
     strMonthlyPlNc = tr("months");
     strEndOfMonthlyPlNc = tr("ends-of-month");
     strYearlyPlNc = tr("years");
+
+    // Get QT smart lolor names
+    qtColorNames = QColor::colorNames();
 }
 
 
@@ -363,7 +367,7 @@ QString Util::getColorSmartName(QColor color, bool &found)
 {
     found = false;
     QColor cmp;
-    for(auto i : QColor::colorNames()) {
+    for(auto i : qtColorNames) {
         cmp.setNamedColor(i);
         if(cmp == color){
             found = true;
@@ -376,12 +380,14 @@ QString Util::getColorSmartName(QColor color, bool &found)
 
 QString Util::buildColorDisplayName(QColor color)
 {
-    QString s = QString(tr("R:%1 G:%2 B:%3")).arg(color.red()).arg(color.green()).arg(color.blue());
+    QString s = QString(tr("Red:%1  Green:%2  Blue:%3")).arg(color.red()).arg(color.green()).arg(color.blue());
     bool found;
-    QString smartName = Util::getColorSmartName(color,found);
-    if(found){
-        s = s.append(QString(" (%1)").arg(smartName));
-    }
+
+    // we disable smart color names, because Qt does not offer a localized version
+    // QString smartNames = Util::getColorSmartName(color,found);
+    // if(found){
+    //     s = s.append(QString("  (%1)").arg(smartNames));
+    // }
     return s;
 }
 

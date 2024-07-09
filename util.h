@@ -120,6 +120,9 @@ private:
     static QString strEndOfMonthlyPlNc;
     static QString strYearlyPlNc ;
 
+    // QT color names
+    static QStringList qtColorNames;
+
 
 private:
 

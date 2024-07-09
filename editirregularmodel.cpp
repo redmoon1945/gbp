@@ -80,7 +80,8 @@ QVariant EditIrregularModel::data(const QModelIndex &index, int role) const
         if ( row <= (listKeys.size()-1) ){
             QDate key = listKeys.at(row);
             if (col==0){    // *** date ***
-                return theLocale.toString(key,"yyyy-MMM-dd (ddd)");
+                return theLocale.toString(key);
+                //return theLocale.toString(key,"yyyy-MMM-dd (ddd)");
             } else if (col==1){ //*** Amount ***
                 IrregularFeStreamDef::AmountInfo ai = items.value(key);
                 int result;

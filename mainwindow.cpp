@@ -81,30 +81,36 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
 
     // use smaller font for Info list and enable custom sorting
     QFont listFont = ui->ciDetailsListWidget->font();
-    listFont.setPointSize(Util::changeFontSize(false,true, listFont.pointSize()));
+    uint oldFontSize = listFont.pointSize();
+    uint newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Main Window - FE List - Font size from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    listFont.setPointSize(newFontSize);
     ui->ciDetailsListWidget->setFont(listFont);
     ui->ciDetailsListWidget->setSortingEnabled(true);
 
     // use smaller font for "resize" toolbar buttons
-    QFont resizeToolbar = ui->toolButton_1M->font();
-    resizeToolbar.setPointSize(Util::changeFontSize(false,true, listFont.pointSize()));
-    ui->toolButton_1M->setFont(resizeToolbar);
-    ui->toolButton_3M->setFont(resizeToolbar);
-    ui->toolButton_6M->setFont(resizeToolbar);
-    ui->toolButton_1Y->setFont(resizeToolbar);
-    ui->toolButton_2Y->setFont(resizeToolbar);
-    ui->toolButton_3Y->setFont(resizeToolbar);
-    ui->toolButton_5Y->setFont(resizeToolbar);
-    ui->toolButton_10Y->setFont(resizeToolbar);
-    ui->toolButton_15Y->setFont(resizeToolbar);
-    ui->toolButton_20Y->setFont(resizeToolbar);
-    ui->toolButton_25Y->setFont(resizeToolbar);
-    ui->toolButton_50Y->setFont(resizeToolbar);
-    ui->toolButton_Fit->setFont(resizeToolbar);
-    ui->toolButton_Left->setFont(resizeToolbar);
-    ui->toolButton_Right->setFont(resizeToolbar);
-    ui->toolButton_Max->setFont(resizeToolbar);
-    ui->customToolButton->setFont(resizeToolbar);
+    QFont resizeToolbarFont = ui->toolButton_1M->font();
+    oldFontSize = resizeToolbarFont.pointSize();
+    newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Main Window - Toolbar - Font size from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    resizeToolbarFont.setPointSize(newFontSize);
+    ui->toolButton_1M->setFont(resizeToolbarFont);
+    ui->toolButton_3M->setFont(resizeToolbarFont);
+    ui->toolButton_6M->setFont(resizeToolbarFont);
+    ui->toolButton_1Y->setFont(resizeToolbarFont);
+    ui->toolButton_2Y->setFont(resizeToolbarFont);
+    ui->toolButton_3Y->setFont(resizeToolbarFont);
+    ui->toolButton_5Y->setFont(resizeToolbarFont);
+    ui->toolButton_10Y->setFont(resizeToolbarFont);
+    ui->toolButton_15Y->setFont(resizeToolbarFont);
+    ui->toolButton_20Y->setFont(resizeToolbarFont);
+    ui->toolButton_25Y->setFont(resizeToolbarFont);
+    ui->toolButton_50Y->setFont(resizeToolbarFont);
+    ui->toolButton_Fit->setFont(resizeToolbarFont);
+    ui->toolButton_Left->setFont(resizeToolbarFont);
+    ui->toolButton_Right->setFont(resizeToolbarFont);
+    ui->toolButton_Max->setFont(resizeToolbarFont);
+    ui->customToolButton->setFont(resizeToolbarFont);
 
     // configure splitter
     ui->splitter->setCollapsible(0,false);
