@@ -51,12 +51,12 @@ GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take
     </message>
     <message>
         <location filename="aboutdialog.ui" line="119"/>
-        <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. See http://www.gnu.org/licenses/ for the GPL licence.
+        <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It&apos;s Free Software. See https://www.gnu.org/licenses/#AGPL/  for the details of the licence.
 
-graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
 (c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</source>
-        <oldsource>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. See &lt;http://www.gnu.org/licenses/&gt; for the GPL licence.
+        <oldsource>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It&apos;s Free Software. See https://www.gnu.org/licenses/agpl-3.0.txt  for the details of the licence.
 
 graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
@@ -65,11 +65,23 @@ graphical-budget-planner is distributed in the hope that it will be useful, but 
     </message>
     <message>
         <location filename="aboutdialog.ui" line="133"/>
-        <source>Credits</source>
+        <source>Source Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="141"/>
+        <source>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
+https://codeberg.org/claude_dumas/gbp</source>
+        <oldsource>Source code of graphical-budget-planner can be found on Codeberg at this URL : https://codeberg.org/claude_dumas/gbp</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="152"/>
+        <source>Credits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="160"/>
         <source>Special thanks to : 
 
 * Tobias Leupold : code to calculate difference between 2 dates
@@ -93,7 +105,7 @@ graphical-budget-planner is distributed in the hope that it will be useful, but 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="194"/>
+        <location filename="aboutdialog.ui" line="213"/>
         <source>Close</source>
         <translation></translation>
     </message>

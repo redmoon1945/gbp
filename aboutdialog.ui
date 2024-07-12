@@ -116,11 +116,30 @@ GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take
            <item>
             <widget class="QPlainTextEdit" name="plainTextEdit_3">
              <property name="plainText">
-              <string>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It's Free Software. See http://www.gnu.org/licenses/ for the GPL licence.
+              <string>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It's Free Software. See https://www.gnu.org/licenses/#AGPL/  for the details of the licence.
 
-graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
 (c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Source Code</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <widget class="QPlainTextEdit" name="plainTextEdit_4">
+             <property name="plainText">
+              <string>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
+https://codeberg.org/claude_dumas/gbp</string>
              </property>
             </widget>
            </item>

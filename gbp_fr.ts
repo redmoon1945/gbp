@@ -71,29 +71,41 @@ Cette application ne se préoccupe que de l&apos;évolution ***future*** (c&apos
     </message>
     <message>
         <location filename="aboutdialog.ui" line="119"/>
-        <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. See http://www.gnu.org/licenses/ for the GPL licence.
+        <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It&apos;s Free Software. See https://www.gnu.org/licenses/#AGPL/  for the details of the licence.
 
-graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
 (c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</source>
-        <oldsource>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU General Public License version 3 (GNU GPLv3) or later. It&apos;s Free Software. See &lt;http://www.gnu.org/licenses/&gt; for the GPL licence.
+        <oldsource>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It&apos;s Free Software. See https://www.gnu.org/licenses/agpl-3.0.txt  for the details of the licence.
 
 graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 (c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</oldsource>
-        <translation>Cette application (nommée graphical-budget-planner, aussi appelée GBP) et tout le code source associé sont licençés sous le &quot;GNU General Public License version 3 (GNU GPLv3) or later&quot;. Elles constituent ensemble un logiciel libre et gratuit (&quot;free and open source&quot; en anglais). Voir http://www.gnu.org/licenses/ pour le détail de la licence GPL.
+        <translation>Cette application (nommée graphical-budget-planner, aussi appelée GBP) et tout le code source associé sont licençés sous le &quot;GNU Affero General Public License version 3 or later&quot; (AGPL-3.0-or-later). Elles constituent ensemble un logiciel libre et gratuit (&quot;free and open source&quot; en anglais). Voir https://www.gnu.org/licenses/#AGPL pour le détail de la licence.
 
-graphical-budget-planner est distribué avec l&apos;espoir qu&apos;il sera utile, mais SANS GARANTIE AUCUNE, sans même la garantie implicite de commerciabilité ou de pertinence pour un but particulier. Voir la &quot;GNU General Public License&quot; pour plus de détails.
+graphical-budget-planner est distribué avec l&apos;espoir qu&apos;il sera utile, mais SANS GARANTIE AUCUNE, sans même la garantie implicite de commerciabilité ou de pertinence pour un but particulier. 
 
 (c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="133"/>
+        <source>Source Code</source>
+        <translation>Code Source</translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="141"/>
+        <source>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
+https://codeberg.org/claude_dumas/gbp</source>
+        <oldsource>Source code of graphical-budget-planner can be found on Codeberg at this URL : https://codeberg.org/claude_dumas/gbp</oldsource>
+        <translation>Le code source de graphical-budget-planner se trouve sur Codeberg à cet URL : https://codeberg.org/claude_dumas/gbp</translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="152"/>
         <source>Credits</source>
         <translation>Crédits</translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="141"/>
+        <location filename="aboutdialog.ui" line="160"/>
         <source>Special thanks to : 
 
 * Tobias Leupold : code to calculate difference between 2 dates
@@ -209,7 +221,7 @@ Credits :
   -&gt; voir https://www.qcustomplot.com/</translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="194"/>
+        <location filename="aboutdialog.ui" line="213"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
