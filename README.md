@@ -4,11 +4,37 @@
 
 The Main Window
 
+![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/main-window.png)
 
 
-[gbp/doc/doc-source/images/main windowpng.png at master - claude_dumas/gbp - Codeberg.org](https://codeberg.org/claude_dumas/gbp/src/branch/master/doc/doc-source/images/main%20windowpng.png)
 
-![](https://codeberg.org/claude_dumas/gbp/src/commit/5c82c02dca105fd3980d326940fbb80b01fe3d62/doc/doc-source/images/main%20windowpng.png)
+Editing a scenario
+
+![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/edit-scenario.png)
+
+
+
+Editing a periodic income/expense
+
+![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/edit-periodic-income.png)
+
+
+
+Editing an irregular income/expense
+
+![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/edit-irregular-incomes.png)
+
+
+
+Analysis - Relative weigth of incomes/expenses
+
+![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/analysis-relative-weight.png)
+
+
+
+Analysis - Monthy Report Chart
+
+![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/analysis-monthly-chart.png)
 
 
 
@@ -74,7 +100,7 @@ Credits :
 
 See the detailed User Manual to get in depth information about this application : [gbp/doc/Graphical Budget Planner - User Manual.pdf at master - claude_dumas/gbp - Codeberg.org](https://codeberg.org/claude_dumas/gbp/src/branch/master/doc/Graphical%20Budget%20Planner%20-%20User%20Manual.pdf)
 
-Graphical Budget Planner (GBP) is an open source Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows the following :
+Graphical Budget Planner (GBP) is an open source Qt desktop application intended to ease significantly the process of creating, maintaining and analyzing a personal budget. It allows the following :
 
     1. See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
     2. Easy zooming and/or panning
@@ -90,3 +116,83 @@ GBP is all about CASH BALANCE **FORECASTING** : the key principle adopted in the
 Consequently, this is not the right application if you want know how and when your money has been earned/spent in the past (that is tracking your incomes/expenses made "before today"). 
 
 ## Building GBP
+
+If you want to build yourself the application for Linux and not use the provided binaries in the "Releases" folder, here is the procedure : 
+
+### Step 1
+
+On a new machine or VM, install Ubuntu 20.04 with 50 GB disk space on local File System. This is a rather old version, but it is LTS and allow for wide compatibility across Linux distributions. Perform all the updates mentioned by Ubuntu.
+
+### Step 2
+
+For development, some stuff must be installed on Ubuntu before trying to install Qt 6.2.4 later. See https://doc.qt.io/qt-6.2/linux.html. Essentially, it is :
+
+`sudo apt install build-essential libgl1-mesa-dev`
+
+### Step 3
+
+Download, install and run the online Qt installer. Install Qt 6.2.4 (with all “additional libraries”) and QtCreator 13 in default directory ($HOME). No need for Android and WebAssembly stuff. Test QtCreator by creating dummy widget app and verify that everything works.
+
+When launching QtCreator for the first time, you should have the following error : 
+`Could not load the Qt platform plugin "xcb" in "" even though it was found.
+This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.`
+
+To fix the problem, do : 
+`sudo apt-get install -y libxcb-cursor-dev`
+
+### Step 4
+
+Modify ~/.profile to include qmake path (for linuxdeployqt), that is , that is ~/Qt/6.2.4/gcc_64/bin. Reboot
+
+### Step 5
+
+Install gbp source ([gbp/src at master - claude_dumas/gbp - Codeberg.org](https://codeberg.org/claude_dumas/gbp/src/branch/master/src)) in a directory, for example : ~/data/dev/Qt/gbp. If you are running Ubuntu as a guest in a KVM virtualisation solution, you can look at https://sysguides.com/share-files-between-kvm-host-and-linux-guest-using-virtiofs to see how to shared folders with the host. This is required to transfer in the GBP source and transfer out the final built AppImage file. 
+
+### Step 6
+
+In QtCreator, load the project (CmakeLists.txt), and do a “rebuild” with the “Minimum Size Release” kit selected. Run and check that the application seems to basically work fine.
+
+## Step 7
+
+To run the application outside QtCreator, Ubuntu needs the FUSE library to run appimage. Otherwise, when lauching such appimage, you will get the following error : 
+
+`dlopen(): error loading libfuse.so.2`
+On Ubuntu, AppImages require FUSE to run. All other Linux distros do not need this. 
+
+To solve this, do : 
+`sudo apt install libfuse2`
+
+### Step 8
+
+Create an AppImage bundle to be used as the executable
+
+We will use the FOSS application “linuxdeploytqt” (see https://github.com/probonopd/linuxdeployqt) to produce an AppImage bundle. Download this application or use the copy found in the “build-resources” folder. Note that as of July 2024, the  author mentioned that he is now working on a GO version of this application (https://github.com/probonopd/go-appimage), but we never tested it yet. 
+
+#### A)
+
+Create the following directory structure to hold the data for AppImage creation : lets say this dir is called “appimage-gbp”
+=> appimage-gbp
+=> appimage-gbp/deploy_it
+
+#### B)
+
+Place the following files in the following directories :
+
+
+**appimage-gbp**
+=> linuxdeployqt AppImage application that you downloaded previously, taking care to set the permission to “execute”
+
+
+**appimage-gbp/deploy_it **
+=> gbp.desktop (from the “build-resources” folder)
+=> gbp.png (from the “build-resources” folder)
+=> gbp : this is the executable produced by QtCreator after a rebuilt, found in the QtCreator Build directory
+=> gbp_en.qm : compiled “english” translation file, produced by QtCreator after a rebuild, found in the QtCreator Build directory
+=> gbp_fr.qm :compiled “french” translation file, produced by QtCreator after a rebuild, found in the QtCreator Build directory
+
+#### C)
+
+Run linuxdeployqt
+`run ./linuxdeployqt-continuous-x86_64.AppImage appimage-gbp/deploy-it/gbp -appimage -verbose=1`
+
+the resulting AppImage is now in appimage-gbp . Set permission to “execute” . This is your gbp executable file for Linux.

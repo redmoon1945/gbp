@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Categories=Utility;
+Name=graphical-budget-planner
+Exec=AppRun %F
+Icon=gbp
+Comment=zis is gbp comment
+Terminal=false
