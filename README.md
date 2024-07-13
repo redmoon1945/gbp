@@ -6,37 +6,25 @@ The Main Window
 
 ![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/main-window.png)
 
-
-
 Editing a scenario
 
 ![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/edit-scenario.png)
-
-
 
 Editing a periodic income/expense
 
 ![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/edit-periodic-income.png)
 
-
-
 Editing an irregular income/expense
 
 ![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/edit-irregular-incomes.png)
-
-
 
 Analysis - Relative weigth of incomes/expenses
 
 ![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/analysis-relative-weight.png)
 
-
-
 Analysis - Monthy Report Chart
 
 ![](https://codeberg.org/claude_dumas/gbp/raw/branch/master/doc/doc-source/images/analysis-monthly-chart.png)
-
-
 
 ## Installation
 
@@ -49,8 +37,6 @@ On Ubuntu (tested on v 20.04, 22.04, 24.04), additional steps must be performed.
 AppImages require FUSE to run. To solve this, do : 
 
 `sudo apt install libfuse2`
-
-
 
 ## Supported Platforms and Languages, System Requirements
 
@@ -164,31 +150,30 @@ To solve this, do :
 
 ### Step 8
 
-Create an AppImage bundle to be used as the executable
-
-We will use the FOSS application “linuxdeploytqt” (see https://github.com/probonopd/linuxdeployqt) to produce an AppImage bundle. Download this application or use the copy found in the “build-resources” folder. Note that as of July 2024, the  author mentioned that he is now working on a GO version of this application (https://github.com/probonopd/go-appimage), but we never tested it yet. 
+We need to create an AppImage bundle to be used as the executable. For that, we will use the FOSS application “linuxdeploytqt” (see https://github.com/probonopd/linuxdeployqt) to produce an AppImage bundle. Download this application or use the copy found in the “build-resources” folder. Note that as of July 2024, the  author mentioned that he is now working on a GO version of this application (https://github.com/probonopd/go-appimage), but we never tested it yet. 
 
 #### A)
 
-Create the following directory structure to hold the data for AppImage creation : lets say this dir is called “appimage-gbp”
-=> appimage-gbp
-=> appimage-gbp/deploy_it
+Create the following directory structure to hold the data for AppImage creation : lets say this dir is called “appimage-gbp”<br>
+
+* appimage-gbp
+* appimage-gbp/deploy_it
 
 #### B)
 
 Place the following files in the following directories :
 
+* appimage-gbp  
+  
+  * linuxdeployqt AppImage application that you downloaded previously, taking care to set the permission to “execute”
 
-**appimage-gbp**
-=> linuxdeployqt AppImage application that you downloaded previously, taking care to set the permission to “execute”
-
-
-**appimage-gbp/deploy_it **
-=> gbp.desktop (from the “build-resources” folder)
-=> gbp.png (from the “build-resources” folder)
-=> gbp : this is the executable produced by QtCreator after a rebuilt, found in the QtCreator Build directory
-=> gbp_en.qm : compiled “english” translation file, produced by QtCreator after a rebuild, found in the QtCreator Build directory
-=> gbp_fr.qm :compiled “french” translation file, produced by QtCreator after a rebuild, found in the QtCreator Build directory
+* appimage-gbp/deploy_it
+  
+  * gbp.desktop (from the “build-resources” folder)  
+  * gbp.png (from the “build-resources” folder)  
+  * gbp : this is the executable produced by QtCreator after a rebuilt, found in the QtCreator Build directory  
+  * gbp_en.qm : compiled “english” translation file, produced by QtCreator after a rebuild, found in the QtCreator Build directory  
+    * gbp_fr.qm :compiled “french” translation file, produced by QtCreator after a rebuild, found in the QtCreator Build directory  
 
 #### C)
 
