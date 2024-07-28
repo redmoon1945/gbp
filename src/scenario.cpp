@@ -213,12 +213,32 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
 }
 
 
-QMap<QDate, CombinedFeStreams::DailyInfo> Scenario::generateFinancialEvents(QLocale systemLocale, DateRange fromto, uint &saturationCount) const
+// Generate the whole suite of financial events for that scenario
+// Input params :
+//   systemLocale : Locale used for amount formatting
+//   fromTo : interval of time inside which the events should be generated
+//   pvAnnualDiscountRate : annual discount rate in percentage, to transform future into present value.
+//       0 means keep future values. Cannot be negative.
+//   pvPresent : date considered the "present" for convertion to PV purpose
+// Output params:
+//   saturationCount : number of times the FE amount was over the maximum allowed
+QMap<QDate, CombinedFeStreams::DailyInfo> Scenario::generateFinancialEvents(QLocale systemLocale, DateRange fromto,
+                                                                            double pvAnnualDiscountRate, QDate pvPresent,
+                                                                            uint &saturationCount) const
 {
     CombinedFeStreams comb;
     uint saturationNo;
     saturationCount = 0;
     bool found;
+
+    // check input parameters
+    if (pvAnnualDiscountRate < 0 ) {
+        throw std::invalid_argument("PV discount rate cannot be negative");
+    }
+    if (pvPresent.isValid()==false) {
+        throw std::invalid_argument("PV present date is invalid");
+    }
+
     CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(systemLocale, countryCode, found);
     if (!found){
         // should never happen
@@ -226,22 +246,22 @@ QMap<QDate, CombinedFeStreams::DailyInfo> Scenario::generateFinancialEvents(QLoc
     }
 
     foreach(PeriodicFeStreamDef item,incomesDefPeriodic){
-        QList<Fe> stream = item.generateEventStream(fromto, inflation, saturationNo);
+        QList<Fe> stream = item.generateEventStream(fromto, inflation, pvAnnualDiscountRate, pvPresent, saturationNo);
         comb.addStream(stream,currInfo);
         saturationCount += saturationNo;
     }
     foreach(PeriodicFeStreamDef item,expensesDefPeriodic){
-        QList<Fe> stream = item.generateEventStream(fromto, inflation, saturationNo);
+        QList<Fe> stream = item.generateEventStream(fromto, inflation, pvAnnualDiscountRate, pvPresent, saturationNo);
         comb.addStream(stream,currInfo);
         saturationCount += saturationNo;
     }
     foreach(IrregularFeStreamDef item,incomesDefIrregular){
-        QList<Fe> stream = item.generateEventStream(fromto, inflation, saturationNo);
+        QList<Fe> stream = item.generateEventStream(fromto, pvAnnualDiscountRate, pvPresent, saturationNo);
         comb.addStream(stream,currInfo);
         saturationCount += saturationNo;
     }
     foreach(IrregularFeStreamDef item,expensesDefIrregular){
-        QList<Fe> stream = item.generateEventStream(fromto, inflation, saturationNo);
+        QList<Fe> stream = item.generateEventStream(fromto, pvAnnualDiscountRate, pvPresent, saturationNo);
         comb.addStream(stream,currInfo);
         saturationCount += saturationNo;
     }

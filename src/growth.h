@@ -87,11 +87,11 @@ public:
     static qint64 MIN_GROWTH_DECIMAL ;
 
     // Specify how growth is applied on the amount. 2 options :
-    // A) For every occurence of amount (noOfMonths = 1)
+    // A) For every occurrence of amount (noOfMonths = 1)
     //    Everytime the amount occurs for a given date, current cummulative growth for that date is applied
     //    using the current value of the "modification" factor.
-    // B) For only one occurence of amount every "noOfMonth" (noOfMonths > 1)
-    //    The cummulative growth is modified every "noOfMonth" occurences. For example, with monthly growth of 10%,
+    // B) For only one occurrence of amount every "noOfMonth" (noOfMonths > 1)
+    //    The cummulative growth is modified every "noOfMonth" occurrences. For example, with monthly growth of 10%,
     //    intial amount of 100 and "noOfMonth" = 3, we would have the following monthly corrected amount series :
     //        100,100,100, 133.1,133.1,133.1, 177.1561,177.1561,177.1561, etc
     struct ApplicationStrategy{
@@ -120,7 +120,7 @@ public:
     bool operator==(const Growth& o) const;
 
     // Methods
-    QMap<QDate,qint64> adjustForGrowth(qint64 amount, QList<QDate> occurenceDates, ApplicationStrategy appStrategy, AdjustForGrowthResult &ok) const;
+    QMap<QDate,qint64> adjustForGrowth(quint64 amount, QList<QDate> occurrenceDates, ApplicationStrategy appStrategy, double pvDiscountRate, QDate pvCalculationReferenceDate, AdjustForGrowthResult &ok) const;
     QJsonObject toJson() const;
     static Growth fromJson(const QJsonObject& jsonObject, Util::OperationResult &result);
     static qint64 fromDoubleToDecimal(long double d);
@@ -155,8 +155,8 @@ private:
 
     void recalculateMonthlyData();
     long double calculateNewAmountConstantGrowth(QDate previousDate, QDate nextDate, long double previousAmount, long double previousMonthlyGrowth) const;
-    uint noOfMonthSpanned(QDate from , QDate to) const;
     QSharedPointer<long double> buildMonthlyMultiplierVector(uint noOfMonthSpan, QDate from) const;
+    QSharedPointer<long double> buildPvMonthlyMultiplierVector(double annualDiscountrate, uint noOfMonthSpan, QDate firstOccurrence, QDate pvPresent) const;
     void isFactorsValid( QMap<QDate,qint64> factorsToBeChecked, Util::OperationResult &result );
 };
 

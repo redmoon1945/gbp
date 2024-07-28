@@ -19,6 +19,7 @@
 #include "periodicfestreamdef.h"
 #include "datehelper.h"
 #include "currencyhelper.h"
+#include "gbpcontroller.h"
 #include <QUuid>
 
 
@@ -116,7 +117,18 @@ PeriodicFeStreamDef::~PeriodicFeStreamDef()
 }
 
 
-QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto, const Growth &inflation, uint &saturationCount) const
+// Generate the whole suite of financial events for that Stream Definition.
+// Input params :
+//   DateRange fromTo : interval of time inside which the events should be generated
+//   Inflation : growth to apply to the events
+//   double pvDiscountRate : ANNUAL discount rate in percentage to apply to transform the amounts to Present Value.
+//                           Value of 0 means do not transform future values into present value
+//   QDate pvPresent : Define what is the "present" as far as PV conversation is concerned.
+//                     Note that this date can be afer the first occurence of events.
+// Output params:
+//   uint &saturationCount : number of times the FE amount was over the maximum allowed
+QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto, const Growth &inflation, double pvDiscountRate, QDate pvPresent,
+                                                   uint &saturationCount) const
 {
     QList<Fe> ss;
     saturationCount = 0;
@@ -149,29 +161,30 @@ QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto, const Growt
 
     // ** Step 2 : Correct for growth or inflation (not both) ***
     //    We need occurence from start of validation, to calculate growth, even if it is before fromto.start
-    //    For now, Keep amount positive even if this is an expense
+    //    For now, Keep amount positive even if this is an expense.
+    //    Also transform future values into present values, if requested (pvDiscountRate > 0)
     qint64 am = this->amount;
-    QMap<QDate,qint64> adjustedAmounts;
+    QMap<QDate,qint64> adjustedAmounts; // this will hold the resulting FE amounts
     Growth::ApplicationStrategy appStrategy = {.noOfMonths=growthApplicationPeriod};
     Growth::AdjustForGrowthResult afgResult;
     Growth noGrowth = Growth();
     switch (growthStrategy) {
         case GrowthStrategy::NONE:
-            adjustedAmounts = noGrowth.adjustForGrowth(am, occurenceDates, appStrategy,afgResult);
+            adjustedAmounts = noGrowth.adjustForGrowth(am, occurenceDates, appStrategy, pvDiscountRate, pvPresent, afgResult);
             saturationCount = afgResult.saturationCount;
             if(afgResult.success==false){   // should not happen
                 return ss;
             }
             break;
         case GrowthStrategy::INFLATION:
-            adjustedAmounts = inflation.adjustForGrowth(am, occurenceDates, appStrategy,afgResult);
+            adjustedAmounts = inflation.adjustForGrowth(am, occurenceDates, appStrategy, pvDiscountRate, pvPresent,afgResult);
             saturationCount = afgResult.saturationCount;
             if(afgResult.success==false){   // should not happen
                 return ss;
             }
             break;
         case GrowthStrategy::CUSTOM:
-            adjustedAmounts = growth.adjustForGrowth(am, occurenceDates, appStrategy,afgResult);
+            adjustedAmounts = growth.adjustForGrowth(am, occurenceDates, appStrategy, pvDiscountRate, pvPresent,afgResult);
             saturationCount = afgResult.saturationCount;
             if(afgResult.success==false){   // should not happen
                 return ss;

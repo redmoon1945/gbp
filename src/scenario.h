@@ -67,7 +67,7 @@ public:
     bool operator==(const Scenario &o) const;
 
     // Methods
-    QMap<QDate,CombinedFeStreams::DailyInfo>generateFinancialEvents(QLocale systemLocale, DateRange fromto, uint &saturationCount) const;
+    QMap<QDate,CombinedFeStreams::DailyInfo>generateFinancialEvents(QLocale systemLocale, DateRange fromto, double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount) const;
     void getStreamDefNameAndColorFromId(QUuid id,  QString& name, QColor& color, bool& found) const;
     FileResult saveToFile(QString fullFileName) const;
     static FileResult loadFromFile(QString fullFileName);

@@ -27,8 +27,11 @@
 
 
 // Definition of a Fe stream based on a set of amounts defined over infinite year range.
-// Each amount is occurs once and is not repeated. Amount can be negative.
-// There is no growth concept applicable, nor inflation adjustment.
+// Each amount occurs once and is not repeated. Amount can be negative.
+// There is no growth concept applicable, nor inflation adjustment : amounts cannot
+// be changed this way, since there are presumed to take this already into account. However,
+// amounts must always be considered as future values and conversion to present value is
+// available if requested.
 class IrregularFeStreamDef : public FeStreamDef
 {
 
@@ -60,7 +63,7 @@ public:
     bool operator==(const IrregularFeStreamDef &o) const;
 
     // methods
-    QList<Fe> generateEventStream(DateRange fromto, const Growth &inflation, uint &saturationCount) const;
+    QList<Fe> generateEventStream(DateRange fromto,  double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount) const;
     QString toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const;
     QJsonObject toJson() const;
     static IrregularFeStreamDef fromJson(const QJsonObject& jsonObject, Util::OperationResult &result);

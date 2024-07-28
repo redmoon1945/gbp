@@ -863,7 +863,9 @@ void MainWindow::updateScenarioDataDisplayed(bool rescaleXaxis, bool resetBaseli
 
         // regenerate all the data from the Scenario (can be expensive)
         uint saturationNo;
-        chartRawData = scenario->generateFinancialEvents(locale, DateRange(fullFromDateX, fullToDateX),saturationNo);
+        chartRawData = scenario->generateFinancialEvents(locale, DateRange(fullFromDateX, fullToDateX),
+            (GbpController::getInstance().getUsePresentValue()==true)?(GbpController::getInstance().getPvDiscountRate()):(0),
+            GbpController::getInstance().getTomorrow(), saturationNo);
 
         // init min/max for later stage
         fullMinY = std::numeric_limits<double>::max();

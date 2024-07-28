@@ -90,6 +90,10 @@ public:
     void setTodayCustomDate(const QDate &newTodayCustomDate);
     bool getAllowDecorationColor() const;
     void setAllowDecorationColor(bool newAllowDecorationColor);
+    bool getUsePresentValue() const;
+    void setUsePresentValue(bool newUsePresentValue);
+    double getPvDiscountRate() const;
+    void setPvDiscountRate(double newPvDiscountRate);
 
 private:
 
@@ -104,9 +108,11 @@ private:
     uint percentageMainChartScaling;        // how much space is given on the chart above X&Y axis min/max, in percentage over 100%
     bool useDefaultSystemFont;
     QString customApplicationFont;
-    bool todayUseSystemDate;                 // If true, today's date if determined by real date-time (this is the default). If false, it is set using the value "todayCustomDate"
+    bool todayUseSystemDate;                // If true, today's date if determined by real date-time (this is the default). If false, it is set using the value "todayCustomDate"
     QDate todayCustomDate;
     bool allowDecorationColor;
+    bool usePresentValue;                   // if true, all calculated FE amounts are converted to present value using the pvDiscountRate
+    double pvDiscountRate;                  // ANNUAL discount rate for PV calculation, in percentage
 
     // *** misc variables ***
     QDate today;                        // Date of "today" in local time, set ONCE, when the settings is loaded

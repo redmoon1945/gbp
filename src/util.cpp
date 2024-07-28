@@ -173,17 +173,25 @@ qint64 Util::quickPow10(uint n)
     return pow10[n];
 }
 
-// growth values are in percentage
+// growth values are in percentage.
 long double Util::monthlyToAnnualGrowth(long double monthly)
 {
        return 100 * (pow(1+(monthly/100),12.0) - 1);
 }
 
 
-// growth values are in percentage
+// growth values are in percentage.
 long double Util::annualToMonthlyGrowth(long double annual)
 {
     return 100 * (pow(1+(annual/100),1/12.0) - 1);
+}
+
+
+// Based on a 365-days year.
+// Growth values are in percentage.
+long double Util::annualToDailyGrowth(long double annual)
+{
+    return 100 * (pow(1+(annual/100),1/365.0) - 1);
 }
 
 
@@ -282,15 +290,30 @@ QDateTime Util::dateToDateTimeLocal(const QDate& date, const QTimeZone& tz)
 }
 
 
-//  Calculate present value of a future value
-//  using P = F / (1 + r)^n
-//  F = future value
-//  r = discount rate, in percentage
-//  n = number of period
-double Util::presentValue(double futureValue, double discountRate, uint period)
+// Calculate present value of a future value using P = F / (1 + r)^n
+// F = future value
+// r = discount rate per period, in percentage
+// n = number of period
+long double Util::presentValue(long double futureValue, double discountRate, int period)
 {
-    discountRate *= .01;
-    return (futureValue / pow((1 + discountRate), period));
+    if (discountRate==0){
+        return futureValue;
+    }
+    return futureValue / powl((1 + 0.01L*discountRate), period);
+}
+
+
+// Calculate conversion factor to transform a future value F into a present value P,
+// that is P = F * factor, where factor = 1 / ((1 + r)^n).
+// Input parameters:
+//   r = discount rate per period, in percentage. Must be >= 0
+//   n = number of period AFTER present period. Can be neative.
+long double Util::presentValueConversionFactor(long double discountRate, int period)
+{
+    if (discountRate<0){
+        throw std::out_of_range("Discount rate must be >= 0");
+    }
+    return 1.0L/powl((1 + (0.01L*discountRate)), period);
 }
 
 
@@ -415,6 +438,27 @@ quint32 Util::bitToggle(quint32 number, quint32 n)
 quint32 Util::bitCheck(quint32 number, quint32 n)
 {
     return (number >> (n-1)) & (quint32)1;
+}
+
+
+// Calculate the difference in months between 2 dates. Dates's year must be > 0.
+// Result is negative if "to" occurs before "from".
+// 2 dates inside the same month produce a result of 0.
+int Util::noOfMonthDifference(QDate from, QDate to)
+{
+    if (from.isValid()==false){
+        throw std::invalid_argument("from is an invalid date");
+    }
+    if (from.year()<0){
+        throw std::invalid_argument("from year must not be < 0");
+    }
+    if (to.isValid()==false){
+        throw std::invalid_argument("to is an invalid date");
+    }
+    if (to.year()<0){
+        throw std::invalid_argument("to year must not be < 0");
+    }
+    return ( (12*to.year())+to.month()) - ( (12*from.year())+from.month()) ;
 }
 
 

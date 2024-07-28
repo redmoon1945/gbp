@@ -71,8 +71,16 @@ IrregularFeStreamDef::~IrregularFeStreamDef()
 }
 
 
-// we dont use inflation : the variable is there because the function is virtual
-QList<Fe> IrregularFeStreamDef::generateEventStream(DateRange fromto, const Growth &inflation, uint &saturationCount) const
+
+// Generate the whole suite of financial events for that Stream Definition.
+// Input params :
+//   DateRange fromTo : interval of time inside which the events should be generated
+//   double pvDiscountRate : ANNUAL discount rate in percentage to apply to transform the amounts to Present Value.
+//                           Value of 0 means do not transform future values into present value
+//   QDate pvPresent : first date (origin) to use for discounting FE amount (usually = tomorrow)
+// Output params:
+//   uint &saturationCount : number of times the FE amount was over the maximum allowed
+QList<Fe> IrregularFeStreamDef::generateEventStream(DateRange fromto,  double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount) const
 {
     QList<Fe> ss;
     saturationCount = 0;
@@ -85,12 +93,26 @@ QList<Fe> IrregularFeStreamDef::generateEventStream(DateRange fromto, const Grow
     if ( amountSet.size()==0 ){
         return ss;
     }
-    // iterate once in the set to generate Fes
+
+    long double monthlyDiscountRate = Util::annualToMonthlyGrowth(pvAnnualDiscountRate);
+
+    // iterate once in the set to generate Fes and convert future values to present values
     foreach (const QDate date, amountSet.keys()) {
         // still in the validity range of this stream def ? Still in the fromto range ?
         if ( fromto.includeDate(date) ){
             qint64 temp = amountSet.value(date).amount;
-            qint64 feAmount = (isIncome?(qint64(temp)):-(qint64(temp)));
+
+            // *** convert to present value (applied on a monthly basis) ***
+            // how many PV periods (months) have already passed before reaching the event date
+            int pvPeriods = Util::noOfMonthDifference(pvPresent, date);
+            // calculate FV to PV factor
+            long double factor = Util::presentValueConversionFactor(monthlyDiscountRate,pvPeriods);
+            // calculate the PV (in integer)
+            qint64 pv = static_cast<qint64>(std::round((static_cast<long double>(temp) * factor)));
+            // *********************************
+
+            // build Fe and insert in the result list
+            qint64 feAmount = (isIncome?(pv):-(pv));
             Fe fe = {.amount=feAmount,.occurence=date, .id=this->id};
             ss.append(fe);
         }

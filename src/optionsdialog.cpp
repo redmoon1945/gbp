@@ -110,6 +110,17 @@ void OptionsDialog::slotPrepareContent()
     } else {
         ui->allowDecorationColorCheckBox->setChecked(false);
     }
+    // use Present Value
+    ui->pvDiscountRateDoubleSpinBox->setValue(GbpController::getInstance().getPvDiscountRate());
+    if (GbpController::getInstance().getUsePresentValue()==true) {
+        ui->usePresentValueCheckBox->setChecked(true);
+        ui->discountRateLabel->setEnabled(true);
+        ui->pvDiscountRateDoubleSpinBox->setEnabled(true);
+    } else {
+        ui->usePresentValueCheckBox->setChecked(false);
+        ui->discountRateLabel->setEnabled(false);
+        ui->pvDiscountRateDoubleSpinBox->setEnabled(false);
+    }
 
 }
 
@@ -119,11 +130,15 @@ void OptionsDialog::on_applyPushButton_clicked()
     qint16 years = ui->scenarioYearsSpinBox->value();
     uint newMainChartScaling = ui->scalingMainChartSpinBox->value();
     bool chartDarkMode = ui->chartDarkModeCheckBox->isChecked();
+    bool usePV = ui->usePresentValueCheckBox->isChecked();
+    double discountrate = ui->pvDiscountRateDoubleSpinBox->value();
 
     OptionsChangesImpact impact = {.chart=CHART_NONE, .decorationColorStreamDef=DECO_NONE}; // init
 
     // determine impact of options changes for the charts : from worst to less worst
-    if ( years !=  GbpController::getInstance().getScenarioMaxYearsSpan()) {
+    if ( (years !=  GbpController::getInstance().getScenarioMaxYearsSpan()) ||
+        (usePV != GbpController::getInstance().getUsePresentValue()) ||
+        ( (usePV) && (discountrate!=GbpController::getInstance().getPvDiscountRate()) )  ) {
         impact.chart = CHART_FULL_RECALCULATION_REQUIRED;    // all data need to be recalculate, rescale and replot also
     } else if (newMainChartScaling != GbpController::getInstance().getPercentageMainChartScaling()  ) {
         impact.chart = CHART_RESCALE_AND_REPLOT;             // data stay the same, but rescale is required
@@ -186,6 +201,8 @@ void OptionsDialog::on_applyPushButton_clicked()
     } else {
         GbpController::getInstance().setTodayCustomDate(QDate());
     }
+    GbpController::getInstance().setPvDiscountRate(ui->pvDiscountRateDoubleSpinBox->value());
+    GbpController::getInstance().setUsePresentValue(ui->usePresentValueCheckBox->isChecked());
 
     GbpController::getInstance().saveSettings();
 
@@ -203,6 +220,8 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CustomTodayDate = %1").arg(
         GbpController::getInstance().getTodayCustomDate().toString(Qt::DateFormat::ISODate)));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    AllowDecorationColor = %1").arg(ui->allowDecorationColorCheckBox->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    UsePresentValue = %1").arg(ui->usePresentValueCheckBox->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    pvDiscountrate = %1").arg(ui->pvDiscountRateDoubleSpinBox->value()));
 
     emit signalOptionsResult(impact);
     this->hide();
@@ -405,5 +424,18 @@ void OptionsDialog::on_todaySystemRadioButton_toggled(bool checked)
     } else {
         ui->todayDateEdit->setEnabled(true);
     }
+}
+
+
+void OptionsDialog::on_usePresentValueCheckBox_toggled(bool checked)
+{
+    if( ui->usePresentValueCheckBox->isChecked()){
+        ui->discountRateLabel->setEnabled(true);
+        ui->pvDiscountRateDoubleSpinBox->setEnabled(true);
+    } else {
+        ui->discountRateLabel->setEnabled(false);
+        ui->pvDiscountRateDoubleSpinBox->setEnabled(false);
+    }
+
 }
 

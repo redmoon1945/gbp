@@ -62,6 +62,7 @@ private slots:
     void on_setCustomFontPushButton_clicked();
     void on_systemFontRadioButton_toggled(bool checked);
     void on_todaySystemRadioButton_toggled(bool checked);
+    void on_usePresentValueCheckBox_toggled(bool checked);
 
 private:
     Ui::OptionsDialog *ui;

@@ -57,3 +57,9 @@
 
 * Adopt AGPL V 3.0 or later as licence
 * Add Codeberg URL in the About box, under a new tab ("Source Code")
+* 
+
+## 1.1.5 to 1.1.6
+
+- Implement the option to have all calculated amount sbrought back to Present Value using a user-defined discout rate
+- Add Config file location on the console at start-up

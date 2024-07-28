@@ -484,10 +484,23 @@ void EditPeriodicDialog::on_showResultPushButton_clicked()
         } else {
             resultStringList.append(tr("Using variable inflation as defined in the scenario."));
         }
-
+    } else if (ui->growthConstantRadioButton->isChecked()) {
+        resultStringList.append(QString(tr("Using custom constant growth of %1 percent.")).arg(ui->growthDoubleSpinBox->value()));
+    } else if (ui->growthVariableRadioButton->isChecked()){
+        resultStringList.append(QString(tr("Using custom variable growth.")));
+    } else {
+        resultStringList.append(QString(tr("No growth of any kind is applied.")));
     }
+    bool usePvConversion = GbpController::getInstance().getUsePresentValue();
+    double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
+    if ((usePvConversion==true)&&(pvAnnualDiscountRate!=0)) {
+        QString s = QString(tr("Converting Future Values to Present Values using an annual discount rate of %1 percent.")).arg(pvAnnualDiscountRate);
+        resultStringList.append(s);
+    }
+
     DateRange dr = result.pStreamDef.getValidityRange();
-    QList<Fe> feList = result.pStreamDef.generateEventStream(dr,scenarioInflation, saturationCount);
+    QList<Fe> feList = result.pStreamDef.generateEventStream(dr, scenarioInflation,
+        (usePvConversion)?(pvAnnualDiscountRate):(0), GbpController::getInstance().getTomorrow(), saturationCount);
     if(saturationCount > 0){
         resultStringList.append(QString(tr("Amount was too big %1 times and have been capped to %2.")).arg(saturationCount).arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)));
     }

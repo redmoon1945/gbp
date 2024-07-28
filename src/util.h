@@ -81,12 +81,14 @@ public:
     static qint64 quickPow10(uint n);
     static long double monthlyToAnnualGrowth(long double monthly);
     static long double annualToMonthlyGrowth(long double annual);
+    static long double annualToDailyGrowth(long double annual);
     static bool areDoublesApproxEqual(double a, double b, double epsilon);
     static qint64 extractQint64FromDoubleWithNoFracPart(double amount, int &result)  ;
     static QString longDoubleToQString(long double value);
     static QList<double> doubleArrayToQlist(double* data, uint noElements);
     static QDateTime dateToDateTimeLocal(const QDate& date, const QTimeZone& tz);
-    static double presentValue(double futureValue, double discountRate, uint period);
+    static long double presentValue(long double futureValue, double discountRate, int period);
+    static long double presentValueConversionFactor(long double discountRate, int period);
     static bool isValidBoolString(const QString& input);
     static uint changeFontSize(bool aggressive, bool decreaseSize, uint originalSize);
     static QString getColorSmartName(QColor color, bool& found);
@@ -95,6 +97,7 @@ public:
     static quint32 bitClear(quint32 number, quint32 n);
     static quint32 bitToggle(quint32 number, quint32 n);
     static quint32 bitCheck(quint32 number, quint32 n);
+    static int noOfMonthDifference(QDate from , QDate to);
 
 private:
 

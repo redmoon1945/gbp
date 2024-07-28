@@ -39,6 +39,8 @@ GbpController::GbpController()
     todayUseSystemDate = true;
     todayCustomDate = QDate();
     allowDecorationColor = true;
+    usePresentValue = false;
+    pvDiscountRate = 0; // disable conversion to present values
 
     QStringList argList = QCoreApplication::arguments();
 
@@ -119,6 +121,8 @@ GbpController::GbpController()
     // One choose INI file structure (favor decentralization, portability and human readability)
     QString settingsFile = QString("%1/%2.ini").arg(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)).arg(QCoreApplication::applicationName());
     settingsPtr = new QSettings(settingsFile, QSettings::IniFormat);
+    QString configFileString = QString("Configuration file is : %1").arg(settingsFile);
+    qInfo().noquote() << configFileString;
 
 }
 
@@ -334,6 +338,39 @@ void GbpController::loadSettings()
         allowDecorationColor = true;
     }
 
+    // use of Present Value conversion for all FE amounts
+    if (settingsPtr->contains("use_present_value")){
+        v = settingsPtr->value("use_present_value");
+        bool ok = Util::isValidBoolString(v.toString());
+        if (ok){
+            usePresentValue = v.toBool();
+
+            // this is the annual discount rate to be used when "use_present_value" is true.
+            if (settingsPtr->contains("pv_discount_rate")){
+                v = settingsPtr->value("pv_discount_rate");
+                bool ok;
+                double aDouble = v.toDouble(&ok);
+                if ( (!ok) || (aDouble<0) || (aDouble>100) )  {
+                    // settings is invalid, revert back to default
+                    pvDiscountRate = 0;
+                } else {
+                    pvDiscountRate = aDouble;
+                }
+            } else{
+                pvDiscountRate = 0; // revert to default
+            }
+
+        } else {
+            usePresentValue = false; // revert to default if data is invalid
+            pvDiscountRate = 0;
+        }
+    } else{
+        usePresentValue = false; // cant find the Use Present Value flag (could be older version of GBP)
+        pvDiscountRate = 0;
+    }
+
+
+
     // loaded is completed and successful
     settingsLoaded = true;
 
@@ -352,6 +389,8 @@ void GbpController::loadSettings()
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    today_use_system_date = %1").arg(todayUseSystemDate));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    today_custom_date = %1").arg(todayCustomDate.toString(Qt::DateFormat::ISODate)));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    allow_decoration_color = %1").arg(allowDecorationColor));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    use_present_value = %1").arg(usePresentValue));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    pv_discount_rate = %1").arg(pvDiscountRate));
 
 }
 
@@ -371,6 +410,8 @@ void GbpController::saveSettings()
     settingsPtr->setValue("today_use_system_date",todayUseSystemDate);
     settingsPtr->setValue("today_specific_date",todayCustomDate.toString(Qt::DateFormat::ISODate));
     settingsPtr->setValue("allow_decoration_color",allowDecorationColor);
+    settingsPtr->setValue("use_present_value",usePresentValue);
+    settingsPtr->setValue("pv_discount_rate",pvDiscountRate);
 }
 
 
@@ -611,6 +652,26 @@ bool GbpController::getAllowDecorationColor() const
 void GbpController::setAllowDecorationColor(bool newAllowDecorationColor)
 {
     allowDecorationColor = newAllowDecorationColor;
+}
+
+bool GbpController::getUsePresentValue() const
+{
+    return usePresentValue;
+}
+
+void GbpController::setUsePresentValue(bool newUsePresentValue)
+{
+    usePresentValue = newUsePresentValue;
+}
+
+double GbpController::getPvDiscountRate() const
+{
+    return pvDiscountRate;
+}
+
+void GbpController::setPvDiscountRate(double newPvDiscountRate)
+{
+    pvDiscountRate = newPvDiscountRate;
 }
 
 

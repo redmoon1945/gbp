@@ -84,7 +84,8 @@ QDate DateHelper::getNextEventDateYearly(QDate date,quint16 multiplier)
 }
 
 
-// multiplier must be greater than 0
+// multiplier must be greater than 0.
+// If date is not aready at end-of-month, next event will be end-of-month for that month
 QDate DateHelper::getNextEndOfMonth(QDate date, quint16 multiplier)
 {
     if (multiplier==0){

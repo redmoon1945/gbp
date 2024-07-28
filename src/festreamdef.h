@@ -57,7 +57,6 @@ public:
     bool operator==(const FeStreamDef& o) const;
 
     // methods
-    virtual QList<Fe> generateEventStream( DateRange fromto, const Growth &inflation, uint &saturationCount) const  =0;
     virtual QString toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const = 0;
     void toJson(QJsonObject &jsonObject) const;
     static void fromJson(const QJsonObject &jsonObject, FeStreamType expectedStreamType, QUuid &id, QString &name, QString &desc,

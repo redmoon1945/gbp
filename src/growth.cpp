@@ -358,16 +358,26 @@ long double Growth::fromDecimalToDouble(qint64 i)
 }
 
 
-// Given a series of occurence in time for a given amount, adjust each amount for each occurence date
-// to take into account the growth pattern defined by this object.
-// If calculated amount goes over the max defined in CurrencyHelper, it is set to these max values and
-// the no of times it occurs is returned as a warning (this is called "saturation").
-// Amount must be >= 0.
-// occurenceDates must be sorted in order of increase date values.
-// Growth is 0 before occurenceDates.first.
-// Growth is never applied for the first date in occurenceDates, which is the reference date for that amount (first occurence).
+// Given a series of occurrences in time for a given initially fixed amount, adjust each amount for each
+// occurrence date to take into account the growth pattern defined by this object. Also convert the amounts
+// to present value if requested.
 //
-QMap<QDate, qint64> Growth::adjustForGrowth(qint64 amount,  QList<QDate> occurenceDates, ApplicationStrategy appStrategy, AdjustForGrowthResult &ok) const
+// If a calculated amount goes over the max defined in CurrencyHelper, it is set to this max value
+// and the no of times it occured is returned as a warning (this is called "saturation").
+// Growth is 0 before occurrenceDates.first. Growth is never applied for the first date in occurrenceDates,
+// which is the reference date for that amount (first occurrence).
+//
+// Input parameters :
+//   amount : the initial fixed amount. Must be >= 0.
+//   occurrenceDates : the list of event occurrence. Must be sorted in order of increase date values.
+//   appStrategy : Specify how growth is applied on the amount.
+//   pvDiscountRate : annual discount rate used in PV calculation (percentage). Must be >=0, updated once a month on the 1st
+//   pvPresent : "present date" used in the Present Value calculation.
+// Output parameters :
+//   QMap<QDate, qint64> : the occurrence dates with the final associated calculated amounts
+//   ok : result of the method, with details if error occured
+QMap<QDate, qint64> Growth::adjustForGrowth(quint64 amount,  QList<QDate> occurrenceDates, ApplicationStrategy appStrategy, double pvDiscountRate,
+                                            QDate pvPresent, AdjustForGrowthResult &ok) const
 {
     QMap<QDate, qint64> result = {};
     ok.success = false;
@@ -376,69 +386,86 @@ QMap<QDate, qint64> Growth::adjustForGrowth(qint64 amount,  QList<QDate> occuren
     ok.errorMessageLog = "";
 
     // arguments validity check
-    if (occurenceDates.size()==0){
+    if (occurrenceDates.size()==0){
         ok.success = true;
-        return result;  // no occurence, so empty set returned
+        return result;  // no occurrence, so empty set returned
     }
-    for (int i = 0; i < (occurenceDates.size() - 1); i++) {
-        if (occurenceDates[i] > occurenceDates[i + 1]) {
-            ok.errorMessageUI = tr("OccurenceDates is not sorted properly");
-            ok.errorMessageLog = "OccurenceDates is not sorted properly";
+    for (int i = 0; i < (occurrenceDates.size() - 1); i++) {
+        if (occurrenceDates[i] > occurrenceDates[i + 1]) {
+            ok.errorMessageUI = tr("%1 : OccurrenceDates are not sorted properly").arg(__func__);
+            ok.errorMessageLog = QString("%1 : OccurrenceDates are not sorted properly").arg(__func__);
             return result;
         }
     }
     if ( (appStrategy.noOfMonths<1) ){
-        ok.errorMessageUI = tr("AppStrategy.noOfMonth is invalid");
-        ok.errorMessageLog = "AppStrategy.noOfMonth is invalid";
+        ok.errorMessageUI = tr("%1 : AppStrategy.noOfMonth is invalid").arg(__func__);
+        ok.errorMessageLog = QString("%1 : AppStrategy.noOfMonth is invalid").arg(__func__);
         return result;
     }
     if ( amount > CurrencyHelper::maxValueAllowedForAmount()){
-        ok.errorMessageUI = tr("Amount is too big ");
-        ok.errorMessageLog = "Amount is too big ";
+        ok.errorMessageUI = tr("%1 : Amount is too big ").arg(__func__);
+        ok.errorMessageLog = QString("%1 : Amount is too big ").arg(__func__);
         return result;
     }
-    if ( amount < 0){
-        ok.errorMessageUI = tr("Amount is smaller than 0");
-        ok.errorMessageLog = "Amount is smaller than 0";
+    if ( pvDiscountRate<0 ){
+        ok.errorMessageUI = tr("%1 : Present Value annual discount rate smaller than 0").arg(__func__);
+        ok.errorMessageLog =QString("%1 : Present Value annual discount rate is smaller than 0").arg(__func__);
         return result;
     }
+    if ( pvPresent.isValid()==false ){
+        ok.errorMessageUI = tr("%1 : PV Present Date is invalid").arg(__func__);
+        ok.errorMessageLog = QString("%1 : PV Present Date is invalid").arg(__func__);
+        return result;
+    }
+    // if ( pvPresent > occurrenceDates.first() ){
+    //     ok.errorMessageUI = tr("%1 : PV Present Date is more recent than first occurrence date").arg(__func__);
+    //     ok.errorMessageLog = QString("%1 : PV Present Date is more recent than first occurrence date").arg(__func__);
+    //     return result;
+    // }
 
-    // do nothing if no growth
-    if(type==NONE){
-        foreach(QDate date, occurenceDates){
-            result.insert(date,amount);
-        }
-        ok.success = true;
-        return result;
-    }
 
-    // prepare
-    qint64 lastAmountInserted = amount;         // last amount inserted in the result
+    // *** preparation for calculation ***
+
     uint noOfMonthsCycle = appStrategy.noOfMonths;
-    uint occurenceCounter = 0;                  // used to know when to apply new growth.
+    uint occurrenceCounter = 0;                  // used to know when to apply the growth.
 
-    // build monthy multiplier vector (cummulative)
-    int noOfMonthCovered = noOfMonthSpanned(occurenceDates.first(), occurenceDates.last()); // No of month spanned in the occurenceVector : 1 to infinity
-    QSharedPointer<long double> multiplierVector = buildMonthlyMultiplierVector(noOfMonthCovered,occurenceDates.first());  // Index 0 is first month of occurence
+    // GROWTH : build monthy cummulative growth multiplier vector.
+    // From first occurrence to last, this will provide a cummulative growth factor
+    // we can use to multiply the originally fix amount to get the growth-adjusted amount
+    int noOfMonthCovered = 1 + Util::noOfMonthDifference(occurrenceDates.first(), occurrenceDates.last()); // No of month spanned in the occurrenceVector : 1 to infinity
+    QSharedPointer<long double> multiplierVector = buildMonthlyMultiplierVector(noOfMonthCovered,occurrenceDates.first());  // Index 0 is first month of occurrence
     long double* data = multiplierVector.data();
 
-    // calculation
-    foreach(QDate date, occurenceDates){
-        occurenceCounter++;
-        if ( ((occurenceCounter-1) % noOfMonthsCycle) == 0 ){
-            int multiplierVectorIndex = noOfMonthSpanned(occurenceDates.first(),date)-1;
+    // PRESENT VALUE : build monthly Present Value multiplier.
+    // Computed from "Present", but applied from first occurrence to last, this will provide a
+    // "future to present value" factor we can use to multiply the originally fix amount
+    int pvNoOfMonthCovered = 1 + Util::noOfMonthDifference(occurrenceDates.first(), occurrenceDates.last());
+    QSharedPointer<long double> pvMultiplierVector = buildPvMonthlyMultiplierVector(pvDiscountRate,pvNoOfMonthCovered, occurrenceDates.first(),pvPresent);  // Index 0 is first month of occurrence
+    long double* dataPv = pvMultiplierVector.data();
 
-            // the calculated amount can be outside the allowed range defined in CurrencyHelper.
-            // If it happens, it is called "saturation". We just cap the value to the min/max and continue processing
-            long double t =  std::round(static_cast<long double>(amount) * data[multiplierVectorIndex]);
-            if ( t > static_cast<long double>(CurrencyHelper::maxValueAllowedForAmount()) ){
-                t = static_cast<long double>(CurrencyHelper::maxValueAllowedForAmount());
-                ok.saturationCount++;
-            }
+    // *** calculation ***
 
-            lastAmountInserted = static_cast<qint64>(t);
+    long double growthMultiplier=1;
+    foreach(QDate date, occurrenceDates){
+        occurrenceCounter++;
+
+        // what month are we ?
+        int multiplierVectorIndex = Util::noOfMonthDifference(occurrenceDates.first(),date);
+
+        // Update growth only every N occurrences
+        if ( ((occurrenceCounter-1) % noOfMonthsCycle) == 0 ){
+            growthMultiplier  =  data[multiplierVectorIndex];
         }
-        result.insert(date,lastAmountInserted);
+
+        // the calculated amount can be outside the allowed range defined in CurrencyHelper.
+        // If it happens, it is called "saturation". We just cap the value to the min/max and continue processing
+        long double t =  std::round(static_cast<long double>(amount) * growthMultiplier * dataPv[multiplierVectorIndex]);
+        if ( t > static_cast<long double>(CurrencyHelper::maxValueAllowedForAmount()) ){
+            t = static_cast<long double>(CurrencyHelper::maxValueAllowedForAmount());
+            ok.saturationCount++;
+        }
+
+        result.insert(date,static_cast<qint64>(t));
     }
 
     ok.success = true;
@@ -472,7 +499,7 @@ void Growth::recalculateMonthlyData()
 // Build a QT-wrapped long double vector containing, for each month in a given date interval, a "multiplier"
 // (the CGF or Cummulative Growth Factor) to be applied against an initial and constant amount in order to give
 // the "cummulative growth adjusted" value for this amount. noOfMonth must be > 0
-// "From" is the date of the first occurence of the amount and is always assigned CGF of "1"
+// "From" is the date of the first occurrence of the amount and is always assigned CGF of "1"
 // (no growth, as it is the reference value).
 QSharedPointer<long double> Growth::buildMonthlyMultiplierVector(uint noOfMonths, QDate from) const {
     if (noOfMonths==0){
@@ -490,7 +517,7 @@ QSharedPointer<long double> Growth::buildMonthlyMultiplierVector(uint noOfMonths
         data[i] = cgf;
     }
 
-    if(noOfMonths==1){
+    if( (type==NONE) || (noOfMonths==1) ){
         return multiplierVector;
     }
 
@@ -540,6 +567,38 @@ QSharedPointer<long double> Growth::buildMonthlyMultiplierVector(uint noOfMonths
             }
         }
 
+    }
+
+    return multiplierVector;
+}
+
+
+// annualDiscountrate : in percentage
+// Be careful : first occurrence date will probably be different from PV present date (before or after).
+// It means we have to find the first value of the PV factor to be assigned to the first value of the vector
+QSharedPointer<long double> Growth::buildPvMonthlyMultiplierVector(double annualDiscountrate, uint noOfMonths, QDate firstOccurrence, QDate pvPresent) const
+{
+    // check inout parameters
+    if (noOfMonths==0){
+        throw std::domain_error("noOfMonth must be > 0");
+    }
+    if (pvPresent.isValid()==false){
+        throw std::domain_error("PV Date is invalid");
+    }
+    if (firstOccurrence.isValid()==false){
+        throw std::domain_error("First occurrence date is invalid");
+    }
+
+    long double monthlyDiscountRate = Util::annualToMonthlyGrowth(annualDiscountrate); // in percentage
+    QSharedPointer<long double> multiplierVector (new long double[noOfMonths] ); // resulting vector
+    long double* data = multiplierVector.data();  // easy alias
+
+    // how many PV periods are already passed before reaching the first occurrence
+    int pvPeriodOffset = Util::noOfMonthDifference(pvPresent, firstOccurrence);
+
+    for(uint i=0; i < noOfMonths; i++){
+        long double temp = Util::presentValueConversionFactor(monthlyDiscountRate,pvPeriodOffset+i);
+        data[i] = temp; // temp is to ease debugging
     }
 
     return multiplierVector;
@@ -599,25 +658,12 @@ long double Growth::calculateNewAmountConstantGrowth(QDate from, QDate to, long 
     if(to<from){
         throw std::invalid_argument("to is before from");
     }
-    uint noOfMonth = noOfMonthSpanned(from, to) - 1;
+    int noOfMonth = Util::noOfMonthDifference(from, to);
     return originalAmount*pow((long double)(1+(monthlyGrowth/100.0)), noOfMonth);
 }
 
 
-// Calculate the no of months covered by [from,to].
-// 2 dates inside the same month produce a result of 1.
-uint Growth::noOfMonthSpanned(QDate from , QDate to) const{
-    if (from.isValid()==false){
-        throw std::invalid_argument("from is an invalid date");
-    }
-    if (to.isValid()==false){
-        throw std::invalid_argument("to is an invalid date");
-    }
-    if(to<from){
-        throw std::invalid_argument("to is before from");
-    }
-    return 1 + ( (12*to.year())+to.month()) - ( (12*from.year())+from.month()) ;
-}
+
 
 
 

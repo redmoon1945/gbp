@@ -53,7 +53,7 @@ public:
     bool operator==(const PeriodicFeStreamDef& o) const;
 
     // methods
-    QList<Fe> generateEventStream(DateRange fromto, const Growth &inflation, uint &saturationCount) const;
+    QList<Fe> generateEventStream(DateRange fromto, const Growth &inflation, double pvDiscountRate, QDate pvPresent, uint &saturationCount) const;
     QString toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const;
     QJsonObject toJson() const;
     static PeriodicFeStreamDef fromJson(const QJsonObject& jsonObject, Util::OperationResult &result);
