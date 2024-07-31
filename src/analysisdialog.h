@@ -54,10 +54,6 @@ private slots:
     void on_exportImageRelativeWeigthPushButton_clicked();
     void on_exportMonthlyReportToTextPushButton_clicked();
     void on_exportYearlyReportToTextPushButton_clicked();
-    void on_yearlyPresentValuesCheckBox_clicked();
-    void on_monthlyPresentValuesCheckBox_clicked();
-    void on_yearlyDiscountRateDoubleSpinBox_valueChanged(double arg1);
-    void on_monthlyDiscountRateDoubleSpinBox_valueChanged(double arg1);
     void on_incomesRelativeWeigthRadioButton_toggled(bool checked);
     void on_monthlyReportChartDurationSpinBox_valueChanged(int arg1);
     void on_monthlyReportChartRightToolButton_clicked();
@@ -117,16 +113,14 @@ private:
     QValueAxis* chartYearlyReportAxisY;
     // Common data
     QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData;      // Raw data
-    QMap<QDate,MonthlyYearlyReport> binsMonthly;                // for Monthly report data, future value. Day=1
-    QMap<QDate,MonthlyYearlyReport> binsMonthlyPresentValues;   // for Monthly report data, future value brought to present value. Day=1
-    QMap<QDate,MonthlyYearlyReport> binsYearly;                 // for Yearly report data, future value. Day=1, month=1
-    QMap<QDate,MonthlyYearlyReport> binsYearlyPresentValues;    // for Yearly report data, future value brought to present value. Day=1, month=1
+    QMap<QDate,MonthlyYearlyReport> binsMonthly;                // for Monthly report data. Day=1
+    QMap<QDate,MonthlyYearlyReport> binsYearly;                 // for Yearly report data. Day=1, month=1
 
     // methods
     bool eventFilter(QObject *object, QEvent *event) override;
     void updateRelativeWeightChart();
-    void recalculate_MonthlyYearlyReportData(ReportType rTypr, double discountRate, QTableWidget* tableWidget);
-    void redisplay_MonthlyYearlyReportTableData(ReportType rTypr, bool usePresentValues, QTableWidget* tableWidget);
+    void recalculate_MonthlyYearlyReportData(ReportType rTypr, QTableWidget* tableWidget);
+    void redisplay_MonthlyYearlyReportTableData(ReportType rTypr, QTableWidget* tableWidget);
     void redisplay_ReportChart(ReportType type, bool usePresentValues);
     uint noOfMonthDifference(const QDate& from, const QDate& to) const ;
     uint noOfYearDifference(const QDate& from, const QDate& to) const ;

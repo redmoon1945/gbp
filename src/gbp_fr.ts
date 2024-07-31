@@ -5,27 +5,22 @@
     <name>AboutDialog</name>
     <message>
         <location filename="aboutdialog.ui" line="14"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="185"/>
         <source>About Graphical Budget Planner</source>
         <translation>Au sujet de graphical-budget-planner</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="31"/>
         <location filename="aboutdialog.ui" line="43"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="186"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="187"/>
         <source>---</source>
         <translation>---</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="73"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="210"/>
         <source>About</source>
         <translation>Au sujet de</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="81"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="188"/>
         <source>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
 
 =&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
@@ -71,13 +66,11 @@ Cette application ne se préoccupe que de l&apos;évolution ***future*** (c&apos
     </message>
     <message>
         <location filename="aboutdialog.ui" line="111"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="216"/>
         <source>Licence</source>
         <translation>Licence</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="119"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="211"/>
         <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It&apos;s Free Software. See https://www.gnu.org/licenses/#AGPL/  for the details of the licence.
 
 graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
@@ -96,13 +89,11 @@ graphical-budget-planner est distribué avec l&apos;espoir qu&apos;il sera utile
     </message>
     <message>
         <location filename="aboutdialog.ui" line="133"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="219"/>
         <source>Source Code</source>
         <translation>Code Source</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="141"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="217"/>
         <source>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
 https://codeberg.org/claude_dumas/gbp</source>
         <oldsource>Source code of graphical-budget-planner can be found on Codeberg at this URL : https://codeberg.org/claude_dumas/gbp</oldsource>
@@ -110,13 +101,11 @@ https://codeberg.org/claude_dumas/gbp</source>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="152"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="230"/>
         <source>Credits</source>
         <translation>Crédits</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="160"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="220"/>
         <source>Special thanks to : 
 
 * Tobias Leupold : code to calculate difference between 2 dates
@@ -233,7 +222,6 @@ Credits :
     </message>
     <message>
         <location filename="aboutdialog.ui" line="213"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_aboutdialog.h" line="231"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
@@ -247,13 +235,11 @@ Credits :
     <name>AnalysisDialog</name>
     <message>
         <location filename="analysisdialog.ui" line="14"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="695"/>
         <source>Data Analysis</source>
         <translation>Analyse de données</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="24"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="706"/>
         <source>Relative Weight</source>
         <translation>Poid relatif</translation>
     </message>
@@ -261,16 +247,12 @@ Credits :
         <location filename="analysisdialog.ui" line="46"/>
         <location filename="analysisdialog.ui" line="333"/>
         <location filename="analysisdialog.ui" line="587"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="696"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="707"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="720"/>
         <source>From :</source>
         <oldsource>From:</oldsource>
         <translation>De :</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="99"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="697"/>
         <source>To :</source>
         <oldsource>To:</oldsource>
         <translation>À :</translation>
@@ -280,13 +262,10 @@ Credits :
         <location filename="analysisdialog.ui" line="443"/>
         <location filename="analysisdialog.ui" line="691"/>
         <location filename="analysisdialog.cpp" line="107"/>
-        <location filename="analysisdialog.cpp" line="118"/>
-        <location filename="analysisdialog.cpp" line="571"/>
-        <location filename="analysisdialog.cpp" line="927"/>
-        <location filename="analysisdialog.cpp" line="1092"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="701"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="712"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="725"/>
+        <location filename="analysisdialog.cpp" line="115"/>
+        <location filename="analysisdialog.cpp" line="522"/>
+        <location filename="analysisdialog.cpp" line="868"/>
+        <location filename="analysisdialog.cpp" line="1033"/>
         <source>Incomes</source>
         <translation>Revenus</translation>
     </message>
@@ -295,26 +274,21 @@ Credits :
         <location filename="analysisdialog.ui" line="453"/>
         <location filename="analysisdialog.ui" line="701"/>
         <location filename="analysisdialog.cpp" line="107"/>
-        <location filename="analysisdialog.cpp" line="118"/>
-        <location filename="analysisdialog.cpp" line="573"/>
-        <location filename="analysisdialog.cpp" line="928"/>
-        <location filename="analysisdialog.cpp" line="1094"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="702"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="713"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="726"/>
+        <location filename="analysisdialog.cpp" line="115"/>
+        <location filename="analysisdialog.cpp" line="524"/>
+        <location filename="analysisdialog.cpp" line="869"/>
+        <location filename="analysisdialog.cpp" line="1035"/>
         <source>Expenses</source>
         <translation>Dépenses</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="208"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="703"/>
         <source>No of most significant elements to show :</source>
         <oldsource>No of most significant elements to show: </oldsource>
         <translation>Nombre d&apos;éléments les plus significatifs à visualiser :</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="261"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="704"/>
         <source>Relative Weight of Incomes</source>
         <translation>Poid relatif des revenus</translation>
     </message>
@@ -322,91 +296,66 @@ Credits :
         <location filename="analysisdialog.ui" line="283"/>
         <location filename="analysisdialog.ui" line="537"/>
         <location filename="analysisdialog.ui" line="785"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="705"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="718"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="731"/>
         <source>Export to Image File...</source>
         <translation>Exporter vers un fichier image...</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="637"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="722"/>
         <source>year(s)</source>
         <translation>année(s)</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="504"/>
         <location filename="analysisdialog.ui" line="752"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="716"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="729"/>
         <source>Selected Bar :</source>
         <oldsource>Selected Bar</oldsource>
         <translation>Sélection barre :</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="810"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="736"/>
         <source>Monthly Report - Table</source>
         <oldsource>Monthly Report</oldsource>
         <translation>Rapport mensuel - Table</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="845"/>
-        <location filename="analysisdialog.ui" line="922"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="733"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="737"/>
+        <location filename="analysisdialog.ui" line="902"/>
         <source>Export to CSV...</source>
         <translation>Exporter en CSV...</translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="865"/>
-        <location filename="analysisdialog.ui" line="942"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="734"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="738"/>
         <source>Convert to Present Values using ANNUAL discount rate of :</source>
-        <translation>Convertir en valeur actualisée en utilisant le taux d’escompte annuel suivant :</translation>
+        <translation type="vanished">Convertir en valeur actualisée en utilisant le taux d’escompte annuel suivant :</translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="872"/>
-        <location filename="analysisdialog.ui" line="949"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="735"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="739"/>
         <source>%</source>
-        <translation>%</translation>
+        <translation type="vanished">%</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="308"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="719"/>
         <source>Monthly Report - Chart</source>
         <translation>Rapport mensuel - Graphique</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="369"/>
         <location filename="analysisdialog.ui" line="620"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="708"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="721"/>
         <source>Duration :</source>
         <translation>Durée :</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="389"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="709"/>
         <source>month(s)</source>
         <translation>mois</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="412"/>
         <location filename="analysisdialog.ui" line="660"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="710"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="723"/>
         <source>&lt;--</source>
         <translation>&lt;--</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="419"/>
         <location filename="analysisdialog.ui" line="667"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="711"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="724"/>
         <source>--&gt;</source>
         <translation>--&gt;</translation>
     </message>
@@ -417,29 +366,23 @@ Credits :
     <message>
         <location filename="analysisdialog.ui" line="463"/>
         <location filename="analysisdialog.ui" line="711"/>
-        <location filename="analysisdialog.cpp" line="1090"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="714"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="727"/>
+        <location filename="analysisdialog.cpp" line="1031"/>
         <source>Incomes and Expenses</source>
         <translation>Revenus et dépenses</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="516"/>
         <location filename="analysisdialog.ui" line="764"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="717"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="730"/>
         <source>---</source>
         <translation>---</translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="890"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="740"/>
+        <location filename="analysisdialog.ui" line="870"/>
         <source>Annual Report - Table</source>
         <translation>Rapport annuel - Table</translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="562"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="732"/>
         <source>Annual Report - Chart</source>
         <translation>Rapport annuel - Graphique</translation>
     </message>
@@ -448,29 +391,28 @@ Credits :
         <translation type="vanished">Rapport annuel</translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1001"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="741"/>
+        <location filename="analysisdialog.ui" line="961"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
         <location filename="analysisdialog.cpp" line="69"/>
-        <location filename="analysisdialog.cpp" line="704"/>
+        <location filename="analysisdialog.cpp" line="655"/>
         <source>Relative Weight of Incomes For That Period</source>
         <translation>Poids relatif des revenus pour cette période</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="575"/>
+        <location filename="analysisdialog.cpp" line="526"/>
         <source>Deltas - Surplus</source>
         <translation>Écarts - Surplus</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="577"/>
+        <location filename="analysisdialog.cpp" line="528"/>
         <source>Deltas - Deficit</source>
         <translation>Écarts - Déficit</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="708"/>
+        <location filename="analysisdialog.cpp" line="659"/>
         <source>No of most significant expenses to use :</source>
         <translation>Nombre de dépenses les plus significatives à visualiser :</translation>
     </message>
@@ -481,77 +423,77 @@ Credits :
     </message>
     <message>
         <location filename="analysisdialog.cpp" line="107"/>
-        <location filename="analysisdialog.cpp" line="118"/>
-        <location filename="analysisdialog.cpp" line="823"/>
+        <location filename="analysisdialog.cpp" line="115"/>
+        <location filename="analysisdialog.cpp" line="764"/>
         <source>Delta</source>
         <translation>Écart</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="118"/>
+        <location filename="analysisdialog.cpp" line="115"/>
         <source>Year</source>
         <translation>Année</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="207"/>
-        <location filename="analysisdialog.cpp" line="210"/>
-        <location filename="analysisdialog.cpp" line="222"/>
+        <location filename="analysisdialog.cpp" line="201"/>
+        <location filename="analysisdialog.cpp" line="204"/>
+        <location filename="analysisdialog.cpp" line="216"/>
         <source>Invalid Dates</source>
         <translation>Date invalide</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="207"/>
+        <location filename="analysisdialog.cpp" line="201"/>
         <source>From Date is invalid</source>
         <translation>La date &quot;de&quot; est invalide</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="210"/>
+        <location filename="analysisdialog.cpp" line="204"/>
         <source>To Date is invalid</source>
         <translation>La date &quot;à&quot; est invalide</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="215"/>
+        <location filename="analysisdialog.cpp" line="209"/>
         <source>&quot;To&quot; Date %1 cannot occur before &quot;From&quot; Date %2</source>
         <translation>La date %1 ne doit pas survenir avant la date %2</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="221"/>
+        <location filename="analysisdialog.cpp" line="215"/>
         <source>&quot;From&quot; Date %1 cannot be smaller than &quot;tomorrow&quot; %2</source>
         <translation>La date &quot;de&quot; (%1) ne doit pas survenir avant &quot;demain&quot; (%2)</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="308"/>
-        <location filename="analysisdialog.cpp" line="309"/>
+        <location filename="analysisdialog.cpp" line="302"/>
+        <location filename="analysisdialog.cpp" line="303"/>
         <source>Others</source>
         <translation>Autres</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="858"/>
+        <location filename="analysisdialog.cpp" line="799"/>
         <source>PNG Files (*.png *.PNG)</source>
         <translation>Fichiers PNG (*.png *.PNG)</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="859"/>
+        <location filename="analysisdialog.cpp" line="800"/>
         <source>Select an Image File</source>
         <translation>Choisir un fichier image</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="869"/>
+        <location filename="analysisdialog.cpp" line="810"/>
         <source>The creation of the image file did not succeed</source>
         <translation>Échec de la création du fichier image</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="923"/>
+        <location filename="analysisdialog.cpp" line="864"/>
         <source>Yearly Incomes and Expenses</source>
         <translation>Revenus et dépenses annuels</translation>
     </message>
     <message>
         <location filename="analysisdialog.cpp" line="70"/>
-        <location filename="analysisdialog.cpp" line="705"/>
+        <location filename="analysisdialog.cpp" line="656"/>
         <source>No of most significant incomes to use :</source>
         <translation>Nombre de revenus les plus significatifs à visualiser :</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="916"/>
+        <location filename="analysisdialog.cpp" line="857"/>
         <source>Monthly Incomes and Expenses</source>
         <translation>Revenus et dépenses mensuels</translation>
     </message>
@@ -562,50 +504,48 @@ Credits :
     <message>
         <location filename="analysisdialog.ui" line="476"/>
         <location filename="analysisdialog.ui" line="724"/>
-        <location filename="analysisdialog.cpp" line="1096"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="715"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_analysisdialog.h" line="728"/>
+        <location filename="analysisdialog.cpp" line="1037"/>
         <source>Deltas</source>
         <translation>Écarts</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="707"/>
+        <location filename="analysisdialog.cpp" line="658"/>
         <source>Relative Weight of Expenses For That Period</source>
         <translation>Poids relatif des dépenses pour cette période</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="783"/>
+        <location filename="analysisdialog.cpp" line="732"/>
         <source>Text Files (*.txt *.TXT *.csv *.CSV)</source>
         <translation>Fichiers texte (*.txt *.TXT *.csv *.CSV)</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="784"/>
+        <location filename="analysisdialog.cpp" line="733"/>
         <source>Select a File</source>
         <translation>Choisir un fichier</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="794"/>
-        <location filename="analysisdialog.cpp" line="869"/>
+        <location filename="analysisdialog.cpp" line="743"/>
+        <location filename="analysisdialog.cpp" line="810"/>
         <source>Export Failed</source>
         <translation>Échec de l&apos;exportation</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="794"/>
+        <location filename="analysisdialog.cpp" line="743"/>
         <source>Cannot open the file for saving</source>
         <translation>Le fichier n&apos;a pas pu être ouvert en mode écriture</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="823"/>
+        <location filename="analysisdialog.cpp" line="764"/>
         <source>Period</source>
         <translation>Période</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="823"/>
+        <location filename="analysisdialog.cpp" line="764"/>
         <source>Total Incomes</source>
         <translation>Total des revenus</translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="823"/>
+        <location filename="analysisdialog.cpp" line="764"/>
         <source>Total Expenses</source>
         <translation>Total des dépenses</translation>
     </message>
@@ -618,19 +558,16 @@ Credits :
     <name>DateIntervalDialog</name>
     <message>
         <location filename="dateintervaldialog.ui" line="14"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_dateintervaldialog.h" line="125"/>
         <source>Set Date Interval</source>
         <translation>Intervalle de date</translation>
     </message>
     <message>
         <location filename="dateintervaldialog.ui" line="38"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_dateintervaldialog.h" line="126"/>
         <source>From :</source>
         <translation>De :</translation>
     </message>
     <message>
         <location filename="dateintervaldialog.ui" line="50"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_dateintervaldialog.h" line="127"/>
         <source>To :</source>
         <oldsource>To : </oldsource>
         <translation>À :</translation>
@@ -638,20 +575,16 @@ Credits :
     <message>
         <location filename="dateintervaldialog.ui" line="63"/>
         <location filename="dateintervaldialog.ui" line="79"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_dateintervaldialog.h" line="128"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_dateintervaldialog.h" line="129"/>
         <source>yyyy-MMM-dd</source>
         <translation>yyyy-MMM-dd</translation>
     </message>
     <message>
         <location filename="dateintervaldialog.ui" line="122"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_dateintervaldialog.h" line="130"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
         <location filename="dateintervaldialog.ui" line="129"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_dateintervaldialog.h" line="131"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
@@ -795,68 +728,57 @@ Détails : %1</translation>
     <name>EditGrowthElementDialog</name>
     <message>
         <location filename="editgrowthelementdialog.ui" line="17"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="177"/>
         <source>Dialog</source>
         <translation>Dialogue</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="32"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="178"/>
         <source>Notes:</source>
         <translation>Notes:</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="47"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="179"/>
         <source>Inflation / Growth is always applied on a monthly basis, on the first of every month. However, for convenience purpose, the value provided by the user is on an annual basis. For exemple, a value of 4% on an annual basis is exactly equivalent to a monthly value of 0.327373978219891 % compounded. The application always uses internally the monthly basis.</source>
         <translation>L&apos;inflation et la croissance sont toujours appliqués sur une base mensuelle, le 1er de chaque mois. Cependant, pour des raisons de commodité, la valeur fournie par l&apos;utilisateur l&apos;est sur une base annuelle. Par example, une valeur de 4% sur une base annuelle est exactement équivalente à une valeur sur base mensuelle de 0.327373978219891 % (composée). Cette application utilise toujours à l&apos;interne la valeur sur une base mensuelle pour faire ses calculs.</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="88"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="180"/>
         <source>Monthly Growth (annual basis) :</source>
         <translation>Croissance sur base annuelle :</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="100"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="181"/>
         <source>Transition Date - Year :</source>
         <translation>Date de transition - année :</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="107"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="182"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="128"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="183"/>
         <source>Transition Date - Month :</source>
         <translation>Date de transition - mois :</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="153"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="184"/>
         <source>Monthy Basis Equivalent :</source>
         <translation>Équivalent en base mensuelle :</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="160"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="185"/>
         <source>---</source>
         <translation>---</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="200"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="186"/>
         <location filename="editgrowthelementdialog.cpp" line="78"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
         <location filename="editgrowthelementdialog.ui" line="207"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editgrowthelementdialog.h" line="187"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
@@ -932,25 +854,21 @@ Détails : %1</translation>
     <name>EditIrregularDialog</name>
     <message>
         <location filename="editirregulardialog.ui" line="14"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="337"/>
         <source>Dialog</source>
         <translation>Dialogue</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="38"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="338"/>
         <source>Name :</source>
         <translation>Nom :</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="53"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="339"/>
         <source>Description :</source>
         <translation>Description :</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="87"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="340"/>
         <source>Full View...</source>
         <translation>Agrandir...</translation>
     </message>
@@ -960,94 +878,79 @@ Détails : %1</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="117"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="341"/>
         <source>Enabled :</source>
         <oldsource>Enabled</oldsource>
         <translation>Activé :</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="126"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="342"/>
         <source>Yes</source>
         <translation>Oui</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="155"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="343"/>
         <source>No</source>
         <translation>Non</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="185"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="344"/>
         <source>Colorize Name :</source>
         <oldsource>Use Decorative Color :</oldsource>
         <translation>Colorer le nom :</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="255"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="347"/>
         <source>---</source>
         <translation>---</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="300"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="348"/>
         <source>List of Occurences</source>
         <translation>List des occurrences</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="338"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="349"/>
         <source>Add...</source>
         <translation>Ajouter...</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="345"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="350"/>
         <source>Edit...</source>
         <translation>Éditer...</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="352"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="351"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="359"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="352"/>
         <source>Select All</source>
         <translation>Tout sélectionner</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="366"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="353"/>
         <source>Unselect All</source>
         <translation>Tout désélectionner</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="411"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="354"/>
         <source>* Elements in gray are past events and will not be taken into consideration</source>
         <translation>* Les éléments en gris sont antérieurs à demain et ne seront pas pris en compte</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="438"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="355"/>
         <source>Load from file...</source>
         <translation>Chargement...</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="458"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="356"/>
         <location filename="editirregulardialog.cpp" line="150"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="465"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregulardialog.h" line="357"/>
         <location filename="editirregulardialog.cpp" line="149"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
@@ -1113,19 +1016,16 @@ Détails : %1</translation>
     <name>EditIrregularElementDialog</name>
     <message>
         <location filename="editirregularelementdialog.ui" line="14"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregularelementdialog.h" line="169"/>
         <source>Dialog</source>
         <translation>Dialogue</translation>
     </message>
     <message>
         <location filename="editirregularelementdialog.ui" line="38"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregularelementdialog.h" line="170"/>
         <source>Date :</source>
         <translation>Date :</translation>
     </message>
     <message>
         <location filename="editirregularelementdialog.ui" line="50"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregularelementdialog.h" line="171"/>
         <source>Amount :</source>
         <translation>Montant :</translation>
     </message>
@@ -1135,26 +1035,22 @@ Détails : %1</translation>
     </message>
     <message>
         <location filename="editirregularelementdialog.ui" line="108"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregularelementdialog.h" line="172"/>
         <source>Notes :</source>
         <translation>Notes :</translation>
     </message>
     <message>
         <location filename="editirregularelementdialog.ui" line="156"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregularelementdialog.h" line="173"/>
         <source>CAD</source>
         <translation>CAD</translation>
     </message>
     <message>
         <location filename="editirregularelementdialog.ui" line="198"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregularelementdialog.h" line="174"/>
         <location filename="editirregularelementdialog.cpp" line="74"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
         <location filename="editirregularelementdialog.ui" line="205"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editirregularelementdialog.h" line="175"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
@@ -1250,27 +1146,23 @@ Détails : %1</translation>
     <name>EditPeriodicDialog</name>
     <message>
         <location filename="editperiodicdialog.ui" line="20"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="631"/>
         <source>Dialog</source>
         <translation>Dialogue</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="56"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="632"/>
         <source>Name :</source>
         <oldsource>Name : </oldsource>
         <translation>Nom :</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="93"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="634"/>
         <source>Description :</source>
         <oldsource>Description : </oldsource>
         <translation>Description :</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="175"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="636"/>
         <source>Amount :</source>
         <oldsource>Amount : </oldsource>
         <translation>Montant :</translation>
@@ -1278,119 +1170,99 @@ Détails : %1</translation>
     <message>
         <location filename="editperiodicdialog.ui" line="222"/>
         <location filename="editperiodicdialog.ui" line="772"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="637"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="663"/>
         <source>---</source>
         <translation>---</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="255"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="639"/>
         <source>Period of time for which this income/expense is repeated (times Period Multiplier)</source>
         <translation>Periode de temps pour laquelle ce revenu/dépense est répété (x Multiplicateur de période)</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="258"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="641"/>
         <source>Period :</source>
         <oldsource>Period : </oldsource>
         <translation>Période :</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="306"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="642"/>
         <source>Period Multiplier :</source>
         <oldsource>Period Multiplier : </oldsource>
         <translation>Multiplicateur de période :</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="357"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="644"/>
         <source>Interval of time inside which this income/expense is allowed to be generated</source>
         <translation>Intervalle de temps à l&apos;intérieur duquel les évènements de revenu/dépense seront générés</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="360"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="646"/>
         <source>Validity Range :</source>
         <translation>Intervalle de validité :</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="375"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="647"/>
         <source>From:  </source>
         <translation>De:  </translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="440"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="648"/>
         <source>To:  </source>
         <translation>À:  </translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="509"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="650"/>
         <source>Yearly increase of the &quot;amount&quot; value (applied on Jan 1). Compounded over the years. Applied BEFORE inflation</source>
         <translation>Croissance du montant</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="512"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="652"/>
         <source>Monthly Growth :</source>
         <translation>Croissance mensuelle :</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="526"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="653"/>
         <source>No growth</source>
         <translation>Aucune croissance</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="543"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="654"/>
         <source>Follow inflation defined at the scenario level</source>
         <translation>Suit l&apos;inflation définie dans le scénario</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="563"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="655"/>
         <source>Custom - Constant</source>
         <translation>Spécifique - constante</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="598"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="656"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="620"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="657"/>
         <source> on annual basis</source>
         <translation> base annuelle</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="650"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="658"/>
         <source>Custom - Variable</source>
         <translation>Spécifique - variable</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="676"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="659"/>
         <source>Edit/view...</source>
         <translation>Éditer / voir...</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="711"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="660"/>
         <source>Colorize Name :</source>
         <oldsource>Use Decorative Color :</oldsource>
         <translation>Colorer le nom :</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="805"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="664"/>
         <source>Growth Application Period :</source>
         <translation>Application de la croissance :</translation>
     </message>
@@ -1404,13 +1276,11 @@ Détails : %1</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="913"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="668"/>
         <source>Yes</source>
         <translation>Oui</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="948"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="669"/>
         <source>No</source>
         <translation>Non</translation>
     </message>
@@ -1420,44 +1290,37 @@ Détails : %1</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="865"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="666"/>
         <source>occurence(s)</source>
         <translation>occurrence(s)</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="139"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="635"/>
         <source>Full View...</source>
         <translation>Agrandir...</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="820"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="665"/>
         <source>Every </source>
         <translation>Chaque </translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="898"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="667"/>
         <source>Enabled :</source>
         <translation>Activé :</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="993"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="670"/>
         <source>See all occurences...</source>
         <translation>Voir les occurrences...</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="1013"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="671"/>
         <location filename="editperiodicdialog.cpp" line="192"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="1020"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editperiodicdialog.h" line="672"/>
         <location filename="editperiodicdialog.cpp" line="132"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
@@ -1470,7 +1333,7 @@ Détails : %1</translation>
     <message>
         <location filename="editperiodicdialog.cpp" line="128"/>
         <source>Editing Income of Category Type &quot;Periodic&quot;</source>
-        <translation>Éditer un revenu de catégorie&quot;périodique&quot;</translation>
+        <translation>Éditer un revenu de catégorie &quot;périodique&quot;</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.cpp" line="130"/>
@@ -1550,22 +1413,22 @@ Détails : %1</translation>
     <message>
         <location filename="editperiodicdialog.cpp" line="488"/>
         <source>Using custom constant growth of %1 percent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilisation d&apos;une croissance constante spécifique de %1 pourcent.</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.cpp" line="490"/>
         <source>Using custom variable growth.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilisation d&apos;une croissance variable spécifique.</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.cpp" line="492"/>
         <source>No growth of any kind is applied.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune croissance appliquée.</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.cpp" line="497"/>
         <source>Converting Future Values to Present Values using an annual discount rate of %1 percent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Conversion vers la valeur actuelle avec un taux de réduction annuel de %1 pourcent.</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.cpp" line="505"/>
@@ -1624,98 +1487,89 @@ Détails : %1</translation>
     <name>EditScenarioDialog</name>
     <message>
         <location filename="editscenariodialog.ui" line="20"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="426"/>
         <source>Dialog</source>
         <translation>Dialogue</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="42"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="427"/>
         <source>Name :</source>
         <oldsource>Name : </oldsource>
         <translation>Nom :</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="61"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="428"/>
         <source>Description :</source>
         <oldsource>Description : </oldsource>
         <translation>Description :</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="73"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="429"/>
         <source>Annual Inflation :</source>
         <oldsource>Annual Inflation : </oldsource>
         <translation>Inflation annuelle :</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="82"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="430"/>
         <source>Constant</source>
         <translation>Constante</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="98"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="431"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="127"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="432"/>
         <source>Variable</source>
         <translation>Variable</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="143"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="433"/>
         <source>View/Edit...</source>
         <translation>Éditer / voir...</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="170"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="434"/>
         <source>Currency :</source>
         <oldsource>Currency : </oldsource>
         <translation>Monnaie :</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="183"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="435"/>
         <source>TextLabel</source>
         <translation>TextLabel</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="217"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="436"/>
         <source>Full View...</source>
         <translation>Agrandir...</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="262"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="437"/>
         <source>Incomes</source>
         <translation>Revenus</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="275"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="438"/>
         <source>Expenses</source>
         <translation>Dépenses</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="307"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="439"/>
         <source>Filters :</source>
         <oldsource>Filters set : none</oldsource>
         <translation>Filtres :</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="378"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="444"/>
         <source>0 items</source>
         <translation>0 items</translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="561"/>
+        <location filename="editscenariodialog.cpp" line="229"/>
+        <source>Hide</source>
+        <translation>Cacher</translation>
     </message>
     <message>
         <source>Show/HIde Periodic items</source>
@@ -1739,98 +1593,81 @@ Détails : %1</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="422"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="445"/>
         <source>New Periodic ...</source>
         <translation>Nouveau périodique...</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="429"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="446"/>
         <source>New Irregular...</source>
         <translation>Nouveau irrégulier...</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="436"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="447"/>
         <source>Edit...</source>
         <translation>Éditer...</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="443"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="448"/>
         <source>Duplicate</source>
         <translation>Dupliquer</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="450"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="449"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="487"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="450"/>
         <source>Enable</source>
         <translation>Activer</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="494"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="451"/>
         <source>Disable</source>
         <translation>Désactiver</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="501"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="452"/>
         <source>Select All</source>
         <translation>Tout sélectionner</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="508"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="453"/>
         <source>Unselect All</source>
         <translation>Tout désélectionner</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="314"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="440"/>
-        <location filename="editscenariodialog.cpp" line="422"/>
+        <location filename="editscenariodialog.cpp" line="438"/>
         <source>Hide Periodics</source>
         <translation>Cacher Périodiques</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="327"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="441"/>
-        <location filename="editscenariodialog.cpp" line="435"/>
+        <location filename="editscenariodialog.cpp" line="451"/>
         <source>Hide Irregulars</source>
         <translation>Cacher Irréguliers</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="340"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="442"/>
-        <location filename="editscenariodialog.cpp" line="448"/>
+        <location filename="editscenariodialog.cpp" line="464"/>
         <source>Hide Enabled</source>
         <oldsource>Hide Active</oldsource>
         <translation>Cacher Activés</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="350"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="443"/>
-        <location filename="editscenariodialog.cpp" line="461"/>
+        <location filename="editscenariodialog.cpp" line="477"/>
         <source>Hide Disabled</source>
         <oldsource>Hide Inactive</oldsource>
         <translation>Cacher Désactivés</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="561"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="454"/>
-        <location filename="editscenariodialog.cpp" line="229"/>
         <source>Close</source>
-        <translation>Fermer</translation>
+        <translation type="vanished">Fermer</translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="574"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editscenariodialog.h" line="455"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
@@ -1898,23 +1735,23 @@ Détails : %1</translation>
         <translation type="vanished">Aucun</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="420"/>
+        <location filename="editscenariodialog.cpp" line="436"/>
         <source>Show Periodics</source>
         <translation>Voir Périodiques</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="433"/>
+        <location filename="editscenariodialog.cpp" line="449"/>
         <source>Show Irregulars</source>
         <translation>Voir Irréguliers</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="446"/>
+        <location filename="editscenariodialog.cpp" line="462"/>
         <source>Show Enabled</source>
         <oldsource>Show Actives</oldsource>
         <translation>Voir Activés</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="459"/>
+        <location filename="editscenariodialog.cpp" line="475"/>
         <source>Show Disabled</source>
         <oldsource>Show Inactives</oldsource>
         <translation>Voir Désactivés</translation>
@@ -1924,12 +1761,12 @@ Détails : %1</translation>
         <translation type="vanished">Cachés</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="471"/>
+        <location filename="editscenariodialog.cpp" line="487"/>
         <source>Edit Description</source>
         <translation>Éditer la description</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="503"/>
+        <location filename="editscenariodialog.cpp" line="519"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
@@ -1938,53 +1775,53 @@ Details : %1</source>
 Détails : %1</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="505"/>
+        <location filename="editscenariodialog.cpp" line="521"/>
         <source>Error modifying an existing scenario</source>
         <translation>Erreur lors de la modification du scénario</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="508"/>
+        <location filename="editscenariodialog.cpp" line="524"/>
         <source>Error creating scenario</source>
         <translation>Erreur lors de la création d&apos;un scénario</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="584"/>
+        <location filename="editscenariodialog.cpp" line="600"/>
         <source>No items</source>
         <translation>Aucun item</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="586"/>
+        <location filename="editscenariodialog.cpp" line="602"/>
         <source>1 item</source>
         <translation>1 item</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="588"/>
+        <location filename="editscenariodialog.cpp" line="604"/>
         <source>%1 items</source>
         <translation>%1 items</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="601"/>
-        <location filename="editscenariodialog.cpp" line="637"/>
-        <location filename="editscenariodialog.cpp" line="661"/>
-        <location filename="editscenariodialog.cpp" line="688"/>
-        <location filename="editscenariodialog.cpp" line="704"/>
+        <location filename="editscenariodialog.cpp" line="617"/>
+        <location filename="editscenariodialog.cpp" line="653"/>
+        <location filename="editscenariodialog.cpp" line="686"/>
+        <location filename="editscenariodialog.cpp" line="713"/>
+        <location filename="editscenariodialog.cpp" line="729"/>
         <source>Invalid Selection</source>
         <translation>Sélection invalide</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="601"/>
+        <location filename="editscenariodialog.cpp" line="617"/>
         <source>Select exactly one row</source>
         <translation>Sélectionner exactement une rangée</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="637"/>
+        <location filename="editscenariodialog.cpp" line="653"/>
         <source>Select at least 1 item</source>
         <translation>Sélectionner au moins un item</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="661"/>
-        <location filename="editscenariodialog.cpp" line="688"/>
-        <location filename="editscenariodialog.cpp" line="704"/>
+        <location filename="editscenariodialog.cpp" line="686"/>
+        <location filename="editscenariodialog.cpp" line="713"/>
+        <location filename="editscenariodialog.cpp" line="729"/>
         <source>Select at least one item</source>
         <translation>Sélectionner au moins un item</translation>
     </message>
@@ -1993,55 +1830,46 @@ Détails : %1</translation>
     <name>EditVariableGrowthDialog</name>
     <message>
         <location filename="editvariablegrowthdialog.ui" line="20"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editvariablegrowthdialog.h" line="157"/>
         <source>Dialog</source>
         <translation>Dialogue</translation>
     </message>
     <message>
         <location filename="editvariablegrowthdialog.ui" line="33"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editvariablegrowthdialog.h" line="158"/>
         <source>Note :  Growth is 0 before the oldest date defined. Also, monthly growth stays the same, until a new date is defined.</source>
         <translation>Note : La croissance est 0 avant la plus ancienne date de transition spécifiée. De plus, la croissance mensuelle demeure la même jusqu&apos;à ce qu&apos;une nouvelle date de transition soit rencontrée.</translation>
     </message>
     <message>
         <location filename="editvariablegrowthdialog.ui" line="93"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editvariablegrowthdialog.h" line="159"/>
         <source>Add...</source>
         <translation>Ajouter...</translation>
     </message>
     <message>
         <location filename="editvariablegrowthdialog.ui" line="100"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editvariablegrowthdialog.h" line="160"/>
         <source>Edit...</source>
         <translation>Éditer...</translation>
     </message>
     <message>
         <location filename="editvariablegrowthdialog.ui" line="107"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editvariablegrowthdialog.h" line="161"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
         <location filename="editvariablegrowthdialog.ui" line="114"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editvariablegrowthdialog.h" line="162"/>
         <source>Select All</source>
         <translation>Tout sélectionner</translation>
     </message>
     <message>
         <location filename="editvariablegrowthdialog.ui" line="121"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editvariablegrowthdialog.h" line="163"/>
         <source>Unselect All</source>
         <translation>Tout désélectionner</translation>
     </message>
     <message>
         <location filename="editvariablegrowthdialog.ui" line="171"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editvariablegrowthdialog.h" line="164"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
         <location filename="editvariablegrowthdialog.ui" line="178"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_editvariablegrowthdialog.h" line="165"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
@@ -2401,27 +2229,27 @@ Détails : %1</translation>
     <message>
         <location filename="growth.cpp" line="395"/>
         <source>%1 : OccurrenceDates are not sorted properly</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 : Les dates d&apos;occurrence ne sont pas triées</translation>
     </message>
     <message>
         <location filename="growth.cpp" line="401"/>
         <source>%1 : AppStrategy.noOfMonth is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 : AppStrategy.noOfMonth est invalide</translation>
     </message>
     <message>
         <location filename="growth.cpp" line="406"/>
         <source>%1 : Amount is too big </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 : Le montant est trop grand </translation>
     </message>
     <message>
         <location filename="growth.cpp" line="411"/>
         <source>%1 : Present Value annual discount rate smaller than 0</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 : Le taux de réduction annuel est plus petit que zéro</translation>
     </message>
     <message>
         <location filename="growth.cpp" line="416"/>
         <source>%1 : PV Present Date is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 : La date &quot;présent&quot; pour la valeur actuelle est invalide</translation>
     </message>
     <message>
         <source>OccurenceDates is not sorted properly</source>
@@ -2568,19 +2396,16 @@ Détails : %1</translation>
     <name>LoadIrregularTextFileDialog</name>
     <message>
         <location filename="loadirregulartextfiledialog.ui" line="14"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_loadirregulartextfiledialog.h" line="142"/>
         <source>Importing Irregular items from text file</source>
         <translation>Importation de données pour un item irrégulier</translation>
     </message>
     <message>
         <location filename="loadirregulartextfiledialog.ui" line="47"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_loadirregulartextfiledialog.h" line="143"/>
         <source>Instructions</source>
         <translation>Instructions</translation>
     </message>
     <message>
         <location filename="loadirregulartextfiledialog.ui" line="62"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_loadirregulartextfiledialog.h" line="144"/>
         <source>This import process is intended to load, from an external file, the list of &quot;incomes/expenses events&quot; associated with the current Irregular definition. This is useful if the events are computed from a complex model that is beyond the scope of this application (e.g. dividends generated by a complex portfolio of stocks) and are in great number.  Entering them manually could be tedious in that case.
 
 The file to be imported must be a UNICODE-ENCODED text file. UTF-8 , UTF-16 and UTF-32 encodings are supported. Each line contains exactly 1 Irregular item (that is an income or an expense). Empty lines are not allowed. Format of each line is :
@@ -2619,26 +2444,22 @@ où :
     </message>
     <message>
         <location filename="loadirregulartextfiledialog.ui" line="109"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_loadirregulartextfiledialog.h" line="163"/>
         <source>File Name :</source>
         <oldsource>File Name : </oldsource>
         <translation>Nom de fichier :</translation>
     </message>
     <message>
         <location filename="loadirregulartextfiledialog.ui" line="135"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_loadirregulartextfiledialog.h" line="164"/>
         <source>Browse...</source>
         <translation>Choisir...</translation>
     </message>
     <message>
         <location filename="loadirregulartextfiledialog.ui" line="177"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_loadirregulartextfiledialog.h" line="165"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
         <location filename="loadirregulartextfiledialog.ui" line="184"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_loadirregulartextfiledialog.h" line="166"/>
         <source>Import</source>
         <translation>Importer</translation>
     </message>
@@ -2730,97 +2551,81 @@ Details : %1</source>
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="20"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="535"/>
         <source>Graphical Budget Planner</source>
         <translation>Graphical Budget Planner</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="60"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="573"/>
         <source>1M</source>
         <translation>1M</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="67"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="574"/>
         <source>3M</source>
         <translation>3M</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="74"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="575"/>
         <source>6M</source>
         <translation>6M</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="81"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="576"/>
         <source>1Y</source>
         <translation>1A</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="88"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="577"/>
         <source>2Y</source>
         <translation>2A</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="95"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="578"/>
         <source>3Y</source>
         <translation>3A</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="102"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="579"/>
         <source>5Y</source>
         <translation>5A</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="109"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="580"/>
         <source>10Y</source>
         <translation>10A</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="116"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="581"/>
         <source>15Y</source>
         <translation>15A</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="123"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="582"/>
         <source>20Y</source>
         <translation>20A</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="130"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="583"/>
         <source>25Y</source>
         <translation>25A</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="137"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="584"/>
         <source>50Y</source>
         <translation>50A</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="144"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="585"/>
         <source>Max</source>
         <translation>Max</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="151"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="586"/>
         <source>Fit</source>
         <translation>Ajuster</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="158"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="587"/>
         <source>Custom</source>
         <translation>Spécifique</translation>
     </message>
@@ -2835,13 +2640,11 @@ Details : %1</source>
     </message>
     <message>
         <location filename="mainwindow.ui" line="256"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="591"/>
         <source>CAD</source>
         <translation>CAD</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="298"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="592"/>
         <source>Show Points</source>
         <translation>Voir les points</translation>
     </message>
@@ -2851,55 +2654,46 @@ Details : %1</source>
     </message>
     <message>
         <location filename="mainwindow.ui" line="348"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="594"/>
         <source>Selected Point Info</source>
         <translation>Point sélectionné</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="394"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="595"/>
         <source>Date :</source>
         <translation>Date :</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="609"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="606"/>
         <source>Delta :</source>
         <translation>Écart :</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="430"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="597"/>
         <source>Amount :</source>
         <translation>Montant :</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="181"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="588"/>
         <source>&lt;--</source>
         <translation>&lt;--</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="188"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="589"/>
         <source>--&gt;</source>
         <translation>--&gt;</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="233"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="590"/>
         <source>---</source>
         <translation>---</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="324"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="593"/>
         <source>CSV Export...</source>
         <translation>Exporter CSV...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="466"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="599"/>
         <source>Change :</source>
         <translation>Changement :</translation>
     </message>
@@ -2907,165 +2701,136 @@ Details : %1</source>
         <location filename="mainwindow.ui" line="412"/>
         <location filename="mainwindow.ui" line="448"/>
         <location filename="mainwindow.ui" line="484"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="596"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="598"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="600"/>
         <source>TextLabel</source>
         <translation>TextLabel</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="528"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="601"/>
         <source>Date Range</source>
         <translation>Interval</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="549"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="602"/>
         <source>From :</source>
         <translation>De :</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="561"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="603"/>
         <source>To :</source>
         <translation>À :</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="655"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="608"/>
         <source>Scenario</source>
         <translation>Scénario</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="659"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="609"/>
         <source>Open Recent</source>
         <translation>Récent</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="678"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="610"/>
         <source>Tools</source>
         <translation>Outils</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="685"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="611"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="701"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="536"/>
         <source>New...</source>
         <translation>Nouveau...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="704"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="538"/>
         <source>Close the current scenario and create a new scenario</source>
         <translation>Fermer le scénario courant et en créer un nouveau</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="707"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="541"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="712"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="543"/>
         <source>Open...</source>
         <translation>Ouvrir...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="715"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="545"/>
         <source>Close the current scenario and open an existing scenario</source>
         <translation>Fermer le scénario courant et en ouvrir un autre</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="718"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="548"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="723"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="550"/>
         <source>Edit...</source>
         <translation>Éditer...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="726"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="552"/>
         <source>Edit the current scenario</source>
         <translation>Éditer le scénario courant</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="729"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="555"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="734"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="557"/>
         <source>Save</source>
         <translation>Sauvegarder</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="737"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="559"/>
         <source>Save the current scenario</source>
         <translation>Sauvegarder le scénario courant</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="740"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="562"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="745"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="564"/>
         <source>Save As...</source>
         <translation>Sauvegarder sous...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="748"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="566"/>
         <source>Save the current scenario under a new file</source>
         <translation>Sauvegarder le scénario courant dans un nouveau fichier</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="753"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="568"/>
         <source>Quit</source>
         <translation>Quitter</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="758"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="569"/>
         <source>About Graphical Budget Planner</source>
         <translation>Au sujet de Graphical Budget Planner</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="763"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="570"/>
         <source>About Qt</source>
         <translation>Au sujet de Qt</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="768"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="571"/>
         <source>Options...</source>
         <translation>Options...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="773"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_mainwindow.h" line="572"/>
         <source>Analysis...</source>
         <translation>Analyse...</translation>
     </message>
@@ -3266,13 +3031,11 @@ Details : %2</source>
     <name>OptionsDialog</name>
     <message>
         <location filename="optionsdialog.ui" line="14"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="537"/>
         <source>Options Editing</source>
         <translation>Édition des options</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="48"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="538"/>
         <source>Scenario - No of years calculated :</source>
         <translation>Scénario - Nombre d&apos;années à calculer :</translation>
     </message>
@@ -3287,8 +3050,6 @@ Details : %2</source>
     <message>
         <location filename="optionsdialog.ui" line="570"/>
         <location filename="optionsdialog.ui" line="635"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="560"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="563"/>
         <source>TextLabel</source>
         <translation>TextLabel</translation>
     </message>
@@ -3315,14 +3076,12 @@ Details : %2</source>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="327"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="549"/>
         <source>Exported text - Amounts are localized :</source>
         <oldsource>Exported Text - Amounts are localized :</oldsource>
         <translation>Texte exporté - Localisation des montants :</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="662"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="564"/>
         <source>Overscaling for main chart :</source>
         <oldsource>Overscaling percentage for main chart :</oldsource>
         <translation>Graphique principal - Surdimensionnement :</translation>
@@ -3330,107 +3089,89 @@ Details : %2</source>
     <message>
         <location filename="optionsdialog.ui" line="430"/>
         <location filename="optionsdialog.ui" line="677"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="554"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="565"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="197"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="543"/>
         <source>Application font :</source>
         <oldsource>Application Font :</oldsource>
         <translation>Police de l&apos;application :</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="24"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="555"/>
         <source>General</source>
         <translation>Général</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="214"/>
         <location filename="optionsdialog.ui" line="237"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="544"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="545"/>
         <source>---</source>
         <translation>---</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="269"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="546"/>
         <source>Choose...</source>
         <translation>Choisir...</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="93"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="539"/>
         <source>How date of &quot;Today&quot; is obtained :</source>
         <oldsource>How Date of &quot;Today&quot; is obtained :</oldsource>
         <translation>Comment la date &quot;d&apos;aujourd&apos;hui&quot; est obtenue :</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="110"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="540"/>
         <source>System&apos;s date at start-up</source>
         <oldsource>System&apos;s Date at start-up</oldsource>
         <translation>Date système au lancement</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="133"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="541"/>
         <source>Specific value</source>
         <oldsource>Specific Value</oldsource>
         <translation>Valeur spécifique</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="165"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="542"/>
         <source>yyyy-MMM-dd</source>
         <translation>yyyy-MMM-dd</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="298"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="547"/>
         <source>Allow colorization of Incomes/Expenses names :</source>
         <oldsource>Allow Colorization of Incomes/Expenses Names :</oldsource>
         <translation>Permettre la coloration des noms de revenus/dépenses :</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="351"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="551"/>
         <source>Use Present Value for all financial events :</source>
         <oldsource>Use Present Value for all calculated financial events :</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser la valeur actuelle pour tous les évènements financiers :</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="398"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="553"/>
         <source>Annual Discount Rate :</source>
         <oldsource>365-days Annual Discount Rate :</oldsource>
-        <translation type="unfinished"></translation>
+        <translation>Taux de réduction annuel :</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="466"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="566"/>
         <source>Charts</source>
         <translation>Graphiques</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="490"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="556"/>
         <source>Use Dark Mode :</source>
         <translation>Utilisation du &quot;Mode sombre&quot; :</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="532"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="558"/>
         <source>Dark Mode curve color :</source>
         <translation>Couleur de la courbe en &quot;Mode sombre&quot; :</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="597"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="561"/>
         <source>Light Mode curve color :</source>
         <translation>Couleur de la courbe en &quot;Mode Clair&quot; :</translation>
     </message>
@@ -3440,13 +3181,11 @@ Details : %2</source>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="744"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="567"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="751"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_optionsdialog.h" line="568"/>
         <source>Save</source>
         <translation>Sauvegarder</translation>
     </message>
@@ -3686,19 +3425,16 @@ Details : %2</source>
     <name>PlainTextEditionDialog</name>
     <message>
         <location filename="plaintexteditiondialog.ui" line="14"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_plaintexteditiondialog.h" line="72"/>
         <source>Text Editor</source>
         <translation>Éditeur de texte</translation>
     </message>
     <message>
         <location filename="plaintexteditiondialog.ui" line="38"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_plaintexteditiondialog.h" line="73"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
         <location filename="plaintexteditiondialog.ui" line="45"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_plaintexteditiondialog.h" line="74"/>
         <source>Apply Changes</source>
         <translation>Appliquer</translation>
     </message>
@@ -3972,39 +3708,33 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
     <name>SelectCountryDialog</name>
     <message>
         <location filename="selectcountrydialog.ui" line="14"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="174"/>
         <source>Select currency</source>
         <translation>Choisir la monnaie</translation>
     </message>
     <message>
         <location filename="selectcountrydialog.ui" line="27"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="175"/>
         <source>Instructions : </source>
         <translation>Instructions : </translation>
     </message>
     <message>
         <location filename="selectcountrydialog.ui" line="34"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="176"/>
         <source>Select a currency for the new scenario to be created. This is actually done by instead selecting a country (the associated currency is displayed just below). Once &quot;Select&quot; button is pressed, the currency cannot be changed for that scenario.</source>
         <translation>Choisir une monnaie pour le scénario à créer. Pour ce faire, c&apos;est en fait un pays qu&apos;il faut choisir (la monnaie associée est affichée dans le bas de l&apos;écran). Une fois le bouton &quot;Choisir&quot; pressé, la monnaie ne peut plus être changée pour ce scénario.</translation>
     </message>
     <message>
         <location filename="selectcountrydialog.ui" line="75"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="177"/>
         <source>Currency Iso Code :</source>
         <oldsource>Currency Iso Code : </oldsource>
         <translation>Code ISO de la monnaie :</translation>
     </message>
     <message>
         <location filename="selectcountrydialog.ui" line="87"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="178"/>
         <source>Currency Symbol :</source>
         <oldsource>Currency Symbol : </oldsource>
         <translation>Symbole de la monnaie :</translation>
     </message>
     <message>
         <location filename="selectcountrydialog.ui" line="99"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="179"/>
         <source>Currency Name :</source>
         <oldsource>Currency Name : </oldsource>
         <translation>Nom de la monnaie :</translation>
@@ -4013,28 +3743,22 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <location filename="selectcountrydialog.ui" line="106"/>
         <location filename="selectcountrydialog.ui" line="113"/>
         <location filename="selectcountrydialog.ui" line="120"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="180"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="181"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="182"/>
         <source>---</source>
         <translation>---</translation>
     </message>
     <message>
         <location filename="selectcountrydialog.ui" line="132"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="183"/>
         <source>Country :</source>
         <oldsource>Country : </oldsource>
         <translation>Pays :</translation>
     </message>
     <message>
         <location filename="selectcountrydialog.ui" line="184"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="184"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
         <location filename="selectcountrydialog.ui" line="191"/>
-        <location filename="build/Desktop_Qt_6_2_4_GCC_64bit-Debug/gbp_autogen/include/ui_selectcountrydialog.h" line="185"/>
         <source>Select</source>
         <translation>Choisir</translation>
     </message>

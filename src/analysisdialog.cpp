@@ -109,9 +109,6 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     ui->monthlyReportTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);   // no edition
     ui->monthlyReportTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);// force equal with of columns
     ui->monthlyReportTableWidget->verticalHeader()->setVisible(true);
-    ui->monthlyPresentValuesCheckBox->setChecked(false);
-    ui->monthlyDiscountRateDoubleSpinBox->setValue(5);
-    ui->monthlyDiscountRateDoubleSpinBox->setEnabled(false);
 
     // *** YEARLY REPORT - TABLE CONTROLS ***
     ui->yearlyReportTableWidget->setColumnCount(4);
@@ -120,9 +117,6 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     ui->yearlyReportTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);   // no edition
     ui->yearlyReportTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);// force equal with of columns
     ui->yearlyReportTableWidget->verticalHeader()->setVisible(true);
-    ui->yearlyPresentValuesCheckBox->setChecked(false);
-    ui->yearlyDiscountRateDoubleSpinBox->setValue(5);
-    ui->yearlyDiscountRateDoubleSpinBox->setEnabled(false);;
 
     ready = true;
 }
@@ -144,11 +138,11 @@ void AnalysisDialog::slotAnalysisPrepareContent(QMap<QDate,CombinedFeStreams::Da
 
     // *** MONTHLY AND YEARLY REPORTS ***
     // calculate data
-    recalculate_MonthlyYearlyReportData(MONTHLY, ui->monthlyDiscountRateDoubleSpinBox->value(), ui->monthlyReportTableWidget);
-    recalculate_MonthlyYearlyReportData(YEARLY, ui->yearlyDiscountRateDoubleSpinBox->value(), ui->yearlyReportTableWidget);
+    recalculate_MonthlyYearlyReportData(MONTHLY, ui->monthlyReportTableWidget);
+    recalculate_MonthlyYearlyReportData(YEARLY, ui->yearlyReportTableWidget);
     // update report tables accordingly
-    redisplay_MonthlyYearlyReportTableData(MONTHLY, ui->monthlyPresentValuesCheckBox->isChecked(), ui->monthlyReportTableWidget);
-    redisplay_MonthlyYearlyReportTableData(YEARLY, ui->yearlyPresentValuesCheckBox->isChecked(), ui->yearlyReportTableWidget);
+    redisplay_MonthlyYearlyReportTableData(MONTHLY, ui->monthlyReportTableWidget);
+    redisplay_MonthlyYearlyReportTableData(YEARLY, ui->yearlyReportTableWidget);
     // update monthly and yearly charts
     redisplay_ReportChart(ReportType::MONTHLY, false);
     redisplay_ReportChart(ReportType::YEARLY, false);
@@ -342,14 +336,12 @@ void AnalysisDialog::updateRelativeWeightChart()
 
 
 // annualDiscountRate is in percentage
-void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr, double annualDiscountRate, QTableWidget* tableWidget)
+void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr, QTableWidget* tableWidget)
 {
     if(rTypr==MONTHLY){
         binsMonthly = {};
-        binsMonthlyPresentValues = {};
     } else {
         binsYearly = {};
-        binsYearlyPresentValues = {};
     }
 
     if (chartRawData.size()==0){
@@ -370,7 +362,7 @@ void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr, doubl
         }
     }
 
-    // fill FUTURE values bins
+    // fill values bins
     MonthlyYearlyReport binData;
     QDate binDate;
     if (rTypr==MONTHLY) {
@@ -411,36 +403,11 @@ void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr, doubl
         }
     }
 
-    // calculate PRESENT value bins
-    QDate tomorrow = GbpController::getInstance().getTomorrow();
-    if (rTypr==MONTHLY) {
-        tomorrow = QDate(tomorrow.year(), tomorrow.month(), 1); // fist bin
-        double monthlyDiscountRate = Util::annualToMonthlyGrowth(annualDiscountRate);
-        foreach(QDate date, binsMonthly.keys()){
-            MonthlyYearlyReport mr = binsMonthly.value(date);
-            uint period = noOfMonthDifference(tomorrow, date);
-            mr.income = Util::presentValue(mr.income, monthlyDiscountRate, period);
-            mr.expense = Util::presentValue(mr.expense, monthlyDiscountRate, period);
-            mr.delta = Util::presentValue(mr.delta, monthlyDiscountRate, period);
-            binsMonthlyPresentValues.insert(date, mr);
-        }
-    } else {
-        tomorrow = QDate(tomorrow.year(), 1, 1); // fist bin
-        foreach(QDate date, binsYearly.keys()){
-            MonthlyYearlyReport mr = binsYearly.value(date);
-            uint period = noOfYearDifference(tomorrow, date);
-            mr.income = Util::presentValue(mr.income, annualDiscountRate, period);
-            mr.expense = Util::presentValue(mr.expense, annualDiscountRate, period);
-            mr.delta = Util::presentValue(mr.delta, annualDiscountRate, period);
-            binsYearlyPresentValues.insert(date, mr);
-        }
-    }
-
-}
+ }
 
 
 // use already calculated bins to update table content
-void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr, bool usePresentValues, QTableWidget* tableWidget)
+void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr, QTableWidget* tableWidget)
 {
     if (chartRawData.size()==0){
         tableWidget->clearContents();
@@ -448,20 +415,12 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr, bo
         return;  // nothing to do after
     }
 
-    // choose the right bins amongst 4 possibilities
+    // choose the right bins
     QMap<QDate,MonthlyYearlyReport>* binsPtr;
     if (rTypr==MONTHLY) {
-        if (usePresentValues) {
-            binsPtr = &binsMonthlyPresentValues;
-        } else {
-            binsPtr = &binsMonthly;
-        }
+        binsPtr = &binsMonthly;
     } else {
-        if (usePresentValues) {
-            binsPtr = &binsYearlyPresentValues;
-        } else {
-            binsPtr = &binsYearly;
-        }
+        binsPtr = &binsYearly;
     }
 
     // fill table
@@ -548,20 +507,12 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
     bool useDeltas;
     findWhichSetsIsToBeUsedReportChart(type, useIncomes, useExpenses, useDeltas);
 
-    // choose the right bins amongst 4 possibilities
+    // choose the right bins
     QMap<QDate,MonthlyYearlyReport>* binsPtr;
     if (type==ReportType::MONTHLY) {
-        if (usePresentValues) {
-            binsPtr = &binsMonthlyPresentValues;
-        } else {
-            binsPtr = &binsMonthly;
-        }
+        binsPtr = &binsMonthly;
     } else {
-        if (usePresentValues) {
-            binsPtr = &binsYearlyPresentValues;
-        } else {
-            binsPtr = &binsYearly;
-        }
+         binsPtr = &binsYearly;
     }
 
     // build new set of chart data (3 sets of QBarSet) and categories
@@ -720,8 +671,6 @@ void AnalysisDialog::on_closePushButton_clicked()
     chartRawData = {};  // it was just a reference
     binsMonthly = {};   // now useless
     binsYearly = {};    // now useless
-    binsMonthlyPresentValues = {};   // now useless
-    binsYearlyPresentValues = {};    // now useless
 
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog closed"));
 }
@@ -800,18 +749,10 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
         QString dateFormat;
         if (rType == MONTHLY) {
             dateFormat = "yyyy-MM";
-            if (ui->monthlyPresentValuesCheckBox->isChecked()==true) {
-                binsPtr = &binsMonthlyPresentValues;
-            } else {
-                binsPtr = &binsMonthly;
-            }
+            binsPtr = &binsMonthly;
         } else {
             dateFormat = "yyyy";
-            if (ui->yearlyPresentValuesCheckBox->isChecked()==true) {
-                binsPtr = &binsYearlyPresentValues;
-            } else {
-                binsPtr = &binsYearly;
-            }
+            binsPtr = &binsYearly;
         }
 
         QString inc ;
@@ -1095,54 +1036,6 @@ void AnalysisDialog::setMonthlyYearlyChartTitle(QChart* chartPtr, bool useIncome
     } else if(useDeltas){
         chartPtr->setTitle(tr("Deltas"));
     }
-}
-
-
-void AnalysisDialog::on_yearlyPresentValuesCheckBox_clicked()
-{
-    if (ui->yearlyPresentValuesCheckBox->isChecked()==true) {
-        ui->yearlyDiscountRateDoubleSpinBox->setEnabled(true);
-    } else {
-        ui->yearlyDiscountRateDoubleSpinBox->setEnabled(false);
-    }
-
-    // update data and redisplay
-    recalculate_MonthlyYearlyReportData(ReportType::YEARLY, ui->yearlyDiscountRateDoubleSpinBox->value(), ui->yearlyReportTableWidget);
-    redisplay_MonthlyYearlyReportTableData(ReportType::YEARLY, ui->yearlyPresentValuesCheckBox->isChecked(), ui->yearlyReportTableWidget);
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("Yearly Discount rate values checkbox changed to %1").arg(ui->yearlyPresentValuesCheckBox->isChecked()));
-}
-
-
-
-void AnalysisDialog::on_monthlyPresentValuesCheckBox_clicked()
-{
-    if (ui->monthlyPresentValuesCheckBox->isChecked()==true) {
-        ui->monthlyDiscountRateDoubleSpinBox->setEnabled(true);
-    } else {
-        ui->monthlyDiscountRateDoubleSpinBox->setEnabled(false);
-    }
-    // update data and redisplay
-    recalculate_MonthlyYearlyReportData(ReportType::MONTHLY, ui->monthlyDiscountRateDoubleSpinBox->value(), ui->monthlyReportTableWidget);
-    redisplay_MonthlyYearlyReportTableData(ReportType::MONTHLY, ui->monthlyPresentValuesCheckBox->isChecked(), ui->monthlyReportTableWidget);
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("Monthly Discount rate values checkbox changed to %1").arg(ui->monthlyPresentValuesCheckBox->isChecked()));
-}
-
-
-void AnalysisDialog::on_yearlyDiscountRateDoubleSpinBox_valueChanged(double arg1)
-{
-    // update data and redisplay
-    recalculate_MonthlyYearlyReportData(ReportType::YEARLY, ui->yearlyDiscountRateDoubleSpinBox->value(), ui->yearlyReportTableWidget);
-    redisplay_MonthlyYearlyReportTableData(ReportType::YEARLY, ui->yearlyPresentValuesCheckBox->isChecked(), ui->yearlyReportTableWidget);
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("Yearly DiscountRate changed to %1").arg(arg1));
-}
-
-
-void AnalysisDialog::on_monthlyDiscountRateDoubleSpinBox_valueChanged(double arg1)
-{
-    // update data and redisplay
-    recalculate_MonthlyYearlyReportData(ReportType::MONTHLY, ui->monthlyDiscountRateDoubleSpinBox->value(), ui->monthlyReportTableWidget);
-    redisplay_MonthlyYearlyReportTableData(ReportType::MONTHLY, ui->monthlyPresentValuesCheckBox->isChecked(), ui->monthlyReportTableWidget);
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("Monthly DiscountRate changed to %1").arg(arg1));
 }
 
 

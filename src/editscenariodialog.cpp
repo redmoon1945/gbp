@@ -226,7 +226,7 @@ void EditScenarioDialog::slotPrepareContent(bool isNewScenario,QString countryCo
 
         // set some buttons and titles
         ui->applyPushButton->setText(tr("Apply Changes"));
-        ui->cancelPushButton->setText(tr("Close"));
+        ui->cancelPushButton->setText(tr("Hide"));
         this->setWindowTitle(tr("Edit Current Scenario"));
     }
 
@@ -265,7 +265,15 @@ void EditScenarioDialog::slotEditPeriodicStreamDefResult(bool isIncome, Periodic
     itemTableModel->addModifyPeriodicItem(psStreamDef);
     QList<QUuid> list = QList<QUuid>();
     list.append(psStreamDef.getId());
+    // select the new/edited item
     selectRowsInTableView(list); // select if displayed
+    // make sure it is visible in the viewport of the table
+    bool found;
+    int row = itemTableModel->getRow(psStreamDef.getId(),found);
+    if (found){
+        QModelIndex index = itemTableModel->index(row,0);
+        ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter); // does not always work...
+    }
     updateNoItemsLabel();
 }
 
@@ -282,7 +290,15 @@ void EditScenarioDialog::slotEditIrregularStreamDefResult(bool isIncome, Irregul
     itemTableModel->addModifyIrregularItem(irStreamDef);
     QList<QUuid> list = QList<QUuid>();
     list.append(irStreamDef.getId());
-    selectRowsInTableView(list);  // select if displayed
+    // select the edited/new item
+    selectRowsInTableView(list);
+    // make sure it is visible in the viewport of the table
+    bool found;
+    int row = itemTableModel->getRow(irStreamDef.getId(),found);
+    if (found){
+        QModelIndex index = itemTableModel->index(row,0);
+        ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);// does not always work...
+    }
     updateNoItemsLabel();
 }
 
@@ -640,15 +656,24 @@ void EditScenarioDialog::on_duplicatePushButton_clicked()
     }
 
     QList<QUuid> list =  QList<QUuid>();
+    QUuid newId ;
     foreach(QUuid id, selectedIdList){
-        QUuid newId = itemTableModel->duplicateItem(id,found);
+        newId = itemTableModel->duplicateItem(id,found);
         if (found==false) {
             // should not happen
             return;
         }
         list.append(newId);
     }
+    // select the new duplicated item
     selectRowsInTableView(list);
+    // make sure it is visible in the viewport of the table
+    int row = itemTableModel->getRow(newId,found);
+    if (found){
+        QModelIndex index = itemTableModel->index(row,0);
+        ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter); // does not always work...
+    }
+
     updateNoItemsLabel();
 }
 
