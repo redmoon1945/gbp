@@ -686,19 +686,28 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
 }
 
 
-// // empty scenario (test only)
-// QSharedPointer<Scenario> Scenario::createNewEmptyScenario()
-// {
-//     Growth inflation = Growth();
-//     QMap<QUuid,PeriodicFeStreamDef> incomesDefPeriodic = {};
-//     QMap<QUuid,IrregularFeStreamDef> incomesDefIrregular = {};
-//     QMap<QUuid,PeriodicFeStreamDef> expensesDefPeriodic = {};
-//     QMap<QUuid,IrregularFeStreamDef> expensesDefIrregular = {};
+int Scenario::getNoOfPeriodicIncomes()
+{
+    return incomesDefPeriodic.size();
+}
 
-//     QSharedPointer<Scenario> scenario = QSharedPointer<Scenario>(new Scenario(
-//         LatestVersion, tr("Unnamed","Scenario"), "", inflation,  "CA", incomesDefPeriodic, incomesDefIrregular, expensesDefPeriodic, expensesDefIrregular));
-//     return scenario;
-// }
+
+int Scenario::getNoOfIrregularIncomes()
+{
+    return incomesDefIrregular.size();
+}
+
+
+int Scenario::getNoOfPeriodicExpenses()
+{
+    return expensesDefPeriodic.size();
+}
+
+
+int Scenario::getNoOfIrregularExpenses()
+{
+    return expensesDefIrregular.size();
+}
 
 
 

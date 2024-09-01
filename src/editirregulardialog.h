@@ -47,31 +47,30 @@ signals:
     // For client of EditIrregularDialog : send result and edition completion notification
     void signalEditIrregularStreamDefResult(bool isIncome, IrregularFeStreamDef irStreamDef); // result of the edition
     void signalEditIrregularStreamDefCompleted();
-
     // For irregular element edition : Prepare dialog before edition
     void signalEditElementPrepareContent(bool isIncome, bool newEditMode, CurrencyInfo cInfo, QList<QDate> newExistingDates, QDate aDate, double amount, QString notes);
-
     // For irregular import : Prepare dialog before edition
     void signalImportPrepareContent(CurrencyInfo cInfo);
-
     // edition of description : prepare Dialog before edition
     void signalPlainTextDialogPrepareContent(QString title, QString content, bool readOnly);
+    // show result : prepare Dialog before edition
+    void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
 
 public slots:
     // From client of EditPeriodicDialog : Prepare edition
     void slotPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef psStreamDef, CurrencyInfo newCurrInfo);  // call this before show()
-
     // PlainTextEdition child Dialog : receive result and edition completion notification
     void slotPlainTextEditionResult(QString result);
     void slotPlainTextEditionCompleted();
-
     // For irregular element edition : getting result and completion notification
     void slotEditElementResult(bool isEdition, QDate oldDate, QDate newDate, double editedAmount, QString editedNotes);// Edit element result
     void slotEditElementCompleted();    // Edit Element process is completed
-
     // For irregular import : getting result and completion notification
     void slotImportResult(QMap<QDate,IrregularFeStreamDef::AmountInfo> amountSet);
     void slotImportCompleted();
+    // Show Result child Dialog : receive result and edition completion notification
+    void slotShowResultResult(QString result);
+    void slotShowResultCompleted();
 
 
 private slots:
@@ -89,6 +88,8 @@ private slots:
     void on_decorationColorPushButton_clicked();
     void on_decorationColorCheckBox_clicked();
 
+    void on_showResultPushButton_clicked();
+
 private:
 
     QLocale locale;
@@ -103,6 +104,7 @@ private:
     PlainTextEditionDialog* editDescriptionDialog;
     EditIrregularElementDialog* eie;
     LoadIrregularTextFileDialog* importDlg;
+    PlainTextEditionDialog* showResultDialog;
 
     // table model
     EditIrregularModel* tableModel;

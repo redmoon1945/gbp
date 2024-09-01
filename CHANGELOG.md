@@ -1,4 +1,17 @@
 # Change logs
+## 1.2.0 to 1.3.0
+### New Features
+- In menu "Help", it is now possible to consult the full User Manual in PDF format, using the new menu item "User Manual"
+- In menu "Help", it is now possible to consult the a Quick Tutorial in PDF format, using the new menu item "Quick Tutorial"
+- In menu "Help", add to the "About" tab the full name of Config file and current Log file
+- Update User Manual
+- In Edit Irregular Dialog, if "Convert to Present Value" is enabled, add a label mentioning that all the amounts specified are "future values". 
+- In Edit Irregular Dialog, add an option to "See all the occurrences". This is useful if the option "Convert to Present Values" is activated in the Options Dialog, in which case the amounts will be different than what is specified in the table.
+- Add tooltips for most fields in windows 
+- In Main Window, add a menu item in the "Scenario" named "Open Example". This will load a sample scenario provided by GBP. The file is actually copied to System Temp directory and opened from there. 
+- For all MessageBoxes asking a question, set a default button
+- Add a Scenario Properties Dialog in the Main Window, that provides some useful info like the file name, full path, format version, etc.
+
 ## 1.1.5 to 1.2.0
 ### New features
 - Implement the option to have all calculated amounts converted to Present Values using a user-defined discount rate set in Options Dialog

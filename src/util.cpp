@@ -18,6 +18,8 @@
 
 #include "util.h"
 #include "float.h"
+#include <QRandomGenerator64>
+
 
 
 
@@ -460,6 +462,8 @@ int Util::noOfMonthDifference(QDate from, QDate to)
     }
     return ( (12*to.year())+to.month()) - ( (12*from.year())+from.month()) ;
 }
+
+
 
 
 

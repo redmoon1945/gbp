@@ -55,6 +55,8 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     analysisDlg->setModal(true);
     dateIntervalDlg = new DateIntervalDialog(this);
     dateIntervalDlg->setModal(true);
+    scenarioPropertiesDlg = new ScenarioPropertiesDialog(locale,this);
+    scenarioPropertiesDlg->setModal(true);
 
     // rebuild "recent files" submenu (settings must have been loaded before)
     recentFilesMenuInit();
@@ -204,6 +206,11 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     QObject::connect(this, &MainWindow::signalDateIntervalPrepareContent, dateIntervalDlg, &DateIntervalDialog::slotPrepareContent);
     QObject::connect(dateIntervalDlg, &DateIntervalDialog::signalDateIntervalResult, this, &MainWindow::slotDateIntervalResult );
     QObject::connect(dateIntervalDlg, &DateIntervalDialog::signalDateIntervalCompleted, this, &MainWindow::slotDateIntervalCompleted );
+    // connect MainWindow and Scenario Properties dialog
+    QObject::connect(this, &MainWindow::signalScenarioPropertiesPrepareContent, scenarioPropertiesDlg, &ScenarioPropertiesDialog::slotPrepareContent);
+    QObject::connect(scenarioPropertiesDlg, &ScenarioPropertiesDialog::signalScenarioPropertiesCompleted, this, &MainWindow::slotDateIntervalCompleted );
+    // connect MainWindow and About Dialog
+    QObject::connect(this, &MainWindow::signalAboutDialogPrepareContent, aboutDlg, &AboutDialog::slotAboutDialogPrepareContent);
 }
 
 
@@ -473,8 +480,7 @@ void MainWindow::updateBaselineWidgets(CurrencyInfo currInfo)
 
 
 // Compared current scenario in memory with its counterpart on disk. If an error (i.e. mismatch)
-// occured, true is returned in "match".
-// If no scenario loaded, match = true
+// occurred, true is returned in "match". If no scenario loaded, match = true
 void MainWindow::checkIfCurrentScenarioMatchesDiskVersion(bool &match) const {
     match = true;
     // anything loaded ?
@@ -482,7 +488,7 @@ void MainWindow::checkIfCurrentScenarioMatchesDiskVersion(bool &match) const {
         match = true;
         return; // no scenario load matches with "empty" disk file
     }
-    // current scenario is a new scenario, so it is a mismatched by default
+    // current scenario is a new scenario (not saved yet), so it is a mismatched by default
     if ( GbpController::getInstance().getFullFileName()== "" ){
         match = false;
         return;
@@ -504,6 +510,30 @@ void MainWindow::checkIfCurrentScenarioMatchesDiskVersion(bool &match) const {
 }
 
 
+// to be called before current scenario must be closed following an action (e.g. new scenario, open a scenario, close app)
+// Return true if user wants to proceed, false otherwise (Cancel pressed)
+bool MainWindow::checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding()
+{
+    // check first if the current scenario needs to be saved
+    bool match;
+    checkIfCurrentScenarioMatchesDiskVersion(match);
+    if (match==false){
+        QMessageBox::StandardButtons answer;
+        answer = QMessageBox::question(this,tr("Modifications not saved"),
+                                       tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?"),
+                                       QMessageBox::StandardButtons(QMessageBox::StandardButton::Yes|QMessageBox::StandardButton::No|QMessageBox::StandardButton::Cancel),
+                                       QMessageBox::StandardButton::Cancel);
+        if (answer == QMessageBox::StandardButton::Yes ){
+            on_actionSave_triggered();  // save current scenario and proceed. If new scenario, user has to choose a file name
+        } else if (answer == QMessageBox::StandardButton::Cancel){
+            return false; // Cancel or ESC pressed
+        }
+    }
+
+    return true;
+}
+
+
 // this generate a "close-event"
 void MainWindow::on_actionQuit_triggered()
 {
@@ -514,19 +544,19 @@ void MainWindow::on_actionQuit_triggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     // check first if the current scenario needs to be saved
-    bool match;
-    checkIfCurrentScenarioMatchesDiskVersion(match);
-    if (match==false){
-        if ( QMessageBox::StandardButton::Yes == QMessageBox::question(this,tr("Modifications not saved"),
-                tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?")) ){
-            on_actionSave_triggered();  // save current scenario
-        }
-    } else {
-        if ( QMessageBox::StandardButton::Yes != QMessageBox::question(this,tr("About to quit"),
-                tr("Do you really want to quit the application ?")) ){
-            event->ignore();
-            return;
-        }
+    if(false == checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding()){
+        event->ignore();
+        return;
+    }
+
+    QMessageBox::StandardButton answer;
+    answer = QMessageBox::question(this,tr("About to quit"),
+                tr("Do you really want to quit the application ?"),
+                QMessageBox::StandardButtons(QMessageBox::StandardButton::Yes|QMessageBox::StandardButton::No),
+                QMessageBox::StandardButton::No);
+    if ( answer==QMessageBox::StandardButton::No ) {
+        event->ignore();
+        return;
     }
 
     // proceed with quitting the application
@@ -537,6 +567,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::on_actionAbout_triggered()
 {
+    emit signalAboutDialogPrepareContent();
     aboutDlg->show();
 }
 
@@ -549,14 +580,10 @@ void MainWindow::on_actionAbout_Qt_triggered()
 
 void MainWindow::on_actionOpen_triggered()
 {
+
     // check first if the current scenario needs to be saved
-    bool match;
-    checkIfCurrentScenarioMatchesDiskVersion(match);
-    if (match==false){
-        if ( QMessageBox::StandardButton::Yes == QMessageBox::question(this,tr("Modifications not saved"),
-                tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?")) ){
-            on_actionSave_triggered();  // save current scenario
-        }
+    if(false == checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding()){
+        return;
     }
 
     QSharedPointer<Scenario> scenario;
@@ -570,6 +597,41 @@ void MainWindow::on_actionOpen_triggered()
             GbpController::getInstance().recentFilenamesAdd(fileName, maxRecentFiles);
             recentFilesMenuUpdate();
         }
+    }
+}
+
+
+void MainWindow::on_actionOpen_Example_triggered()
+{
+    // check first if the current scenario needs to be saved
+    if(false == checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding()){
+        return;
+    }
+
+    // first, copy the json file included in the resource to a tmp directory
+    // user may tamper with it, so lets add a unique ID.
+    QString baseFileName = QString("/gbp_Budget_Example-%1.pdf").arg(QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces));
+    QString tempFile = QDir::tempPath().append(baseFileName);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Opening Budget example : Ready to copy in tmp directory : %1").arg(tempFile));
+    QFile scenarioFile(":/Samples/resources/budget-example.json");
+    if (scenarioFile.exists() == false ){
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Opening Budget example : Cannot find the budget example file in the internal resource : %1").arg(scenarioFile.fileName()));
+        return;
+    }
+    bool success = scenarioFile.copy(tempFile);
+    if (success==true) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Opening Budget example : Copy succeeded"));
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Opening Budget example : Copy failed"));
+        return;
+    }
+
+    // then, just open the file
+    bool result = loadScenarioFile(tempFile);
+    if (result==true){
+        // update recent file opened list
+        GbpController::getInstance().recentFilenamesAdd(tempFile, maxRecentFiles);
+        recentFilesMenuUpdate();
     }
 }
 
@@ -797,14 +859,11 @@ void MainWindow::on_actionEdit_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
+
     // check first if the current scenario needs to be saved
-    bool match;
-    checkIfCurrentScenarioMatchesDiskVersion(match);
-    if (match==false){
-        if ( QMessageBox::StandardButton::Yes == QMessageBox::question(this,tr("Modifications not saved"),
-                tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?")) ){
-            on_actionSave_triggered();  // save current scenario
-        }
+    // check first if the current scenario needs to be saved
+    if(false == checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding()){
+        return;
     }
 
     // First, select a currency : see slot "slotCountryHasBeenSelected" for the follow up
@@ -1019,6 +1078,7 @@ void MainWindow::slotOptionsResult(OptionsDialog::OptionsChangesImpact impact)
             selectionChangedByUser();   // update the daily info now
         }
     }
+
 }
 
 
@@ -1045,6 +1105,12 @@ void MainWindow::slotDateIntervalResult(QDate from, QDate to)
 
 
 void MainWindow::slotDateIntervalCompleted()
+{
+
+}
+
+
+void MainWindow::slotScenarioPropertiesCompleted()
 {
 
 }
@@ -1173,13 +1239,8 @@ void MainWindow::on_actionRecentFile_triggered(){
     if (action){
 
         // check first if the current scenario needs to be saved
-        bool match;
-        checkIfCurrentScenarioMatchesDiskVersion(match);
-        if (match==false){
-            if ( QMessageBox::StandardButton::Yes == QMessageBox::question(this,tr("Modifications not saved"),
-                    tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?")) ){
-                on_actionSave_triggered();  // save current scenario
-            }
+        if(false == checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding()){
+            return;
         }
 
         // switch scenario
@@ -1439,4 +1500,103 @@ void MainWindow::on_customToolButton_clicked()
     emit signalDateIntervalPrepareContent();
     dateIntervalDlg->show();
 }
+
+
+void MainWindow::on_actionUser_Manual_triggered()
+{
+    // first, copy the user manual included in the resource to a tmp directory
+    // Name of the file in temp dir is dependant on the version !
+    QString baseFileName = QString("/gbp_User_Manual-%1.pdf").arg(QCoreApplication::applicationVersion());
+    QString tempFileFullName = QDir::tempPath().append(baseFileName);
+    QFile tempFile(tempFileFullName);
+
+    // build resource name and check if it exists (it should)
+    QFile userManualFile(QString(":/Doc/resources/Graphical Budget Planner - User Manual.pdf"));
+    if(userManualFile.exists()==false){
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing User Manual : User Manual %1 does not exist in the resource file").arg(userManualFile.fileName()));
+        return;
+    }
+
+    //  check if the temp file exist. Copy only if non existent
+    bool success;
+    if (tempFile.exists()==true) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Viewing User Manual : Already exists in temp directory, not copied");
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing User Manual : Ready to copy User Manual in tmp directory : %1").arg(tempFileFullName));
+        success = userManualFile.copy(tempFileFullName);
+        if (success==true) {
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing User Manual : Copy succeeded"));
+
+        } else {
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing User Manual : Copy failed"));
+            return;
+        }
+    }
+
+    // then, use the system defaut application to read the file
+    success = QDesktopServices::openUrl(QUrl::fromLocalFile(tempFileFullName));
+    if (success==true) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing User Manual : PDF Viewer Launch succeeded"));
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing User Manual : PDF Viewer Launch failed"));
+    }
+
+}
+
+
+void MainWindow::on_actionQuick_Tutorial_triggered()
+{
+    // first, copy the quick tutorial included in the resource to a tmp directory
+    // Name of the file in temp dir is dependant on the version !
+    QString baseFileName = QString("/gbp_Quick-Tutorial-%1.pdf").arg(QCoreApplication::applicationVersion());
+    QString tempFileFullName = QDir::tempPath().append(baseFileName);
+    QFile tempFile(tempFileFullName);
+
+    // build resource name and check if it exists (it should)
+    QFile quickTutorialFile(QString(":/Doc/resources/Graphical Budget Planner - Quick Tutorial.pdf"));
+    if(quickTutorialFile.exists()==false){
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing Quick Tutorial : Quick Tutorial %1 does not exist in the resource file").arg(quickTutorialFile.fileName()));
+        return;
+    }
+
+    //  check if the temp file exist. Copy only if non existent
+    bool success;
+    if (tempFile.exists()==true) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Viewing Quick Tutorial : Already exists in temp directory, not copied");
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Quick Tutorial : Ready to copy Quick Tutorial in tmp directory : %1").arg(tempFileFullName));
+        success = quickTutorialFile.copy(tempFileFullName);
+        if (success==true) {
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Quick Tutorial : Copy succeeded"));
+
+        } else {
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing Quick Tutorial : Copy failed"));
+            return;
+        }
+    }
+
+    // then, use the system defaut application to read the file
+    success = QDesktopServices::openUrl(QUrl::fromLocalFile(tempFileFullName));
+    if (success==true) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Quick Tutorial : PDF Viewer Launch succeeded"));
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing Quick Tutorial : PDF Viewer Launch failed"));
+    }
+}
+
+
+
+void MainWindow::on_actionProperties_triggered()
+{
+    if ( !(GbpController::getInstance().isScenarioLoaded()) ){
+        QMessageBox::critical(nullptr,tr("Scenario Properties Failed"),tr("No scenario loaded"));
+        return;
+    }
+
+    // from this point , scenario can be also new but unsaved...
+    emit signalScenarioPropertiesPrepareContent();
+    scenarioPropertiesDlg->show();
+    scenarioPropertiesDlg->activateWindow();
+}
+
 

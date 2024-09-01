@@ -20,7 +20,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="81"/>
+        <location filename="aboutdialog.ui" line="124"/>
         <source>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
 
 =&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
@@ -45,12 +45,28 @@ GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="111"/>
+        <location filename="aboutdialog.ui" line="86"/>
+        <source>Config file :</source>
+        <oldsource>Config file : </oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="100"/>
+        <source>Log file :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="114"/>
+        <source>What it is :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="156"/>
         <source>Licence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="119"/>
+        <location filename="aboutdialog.ui" line="164"/>
         <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It&apos;s Free Software. See https://www.gnu.org/licenses/#AGPL/  for the details of the licence.
 
 graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
@@ -64,24 +80,24 @@ graphical-budget-planner is distributed in the hope that it will be useful, but 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="133"/>
+        <location filename="aboutdialog.ui" line="178"/>
         <source>Source Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="141"/>
+        <location filename="aboutdialog.ui" line="186"/>
         <source>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
 https://codeberg.org/claude_dumas/gbp</source>
         <oldsource>Source code of graphical-budget-planner can be found on Codeberg at this URL : https://codeberg.org/claude_dumas/gbp</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="152"/>
+        <location filename="aboutdialog.ui" line="197"/>
         <source>Credits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="160"/>
+        <location filename="aboutdialog.ui" line="205"/>
         <source>Special thanks to : 
 
 * Tobias Leupold : code to calculate difference between 2 dates
@@ -105,12 +121,12 @@ https://codeberg.org/claude_dumas/gbp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="213"/>
+        <location filename="aboutdialog.ui" line="258"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="aboutdialog.cpp" line="29"/>
+        <location filename="aboutdialog.cpp" line="30"/>
         <source>Built on : %1 %2</source>
         <translation></translation>
     </message>
@@ -129,8 +145,8 @@ https://codeberg.org/claude_dumas/gbp</source>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="46"/>
-        <location filename="analysisdialog.ui" line="333"/>
-        <location filename="analysisdialog.ui" line="587"/>
+        <location filename="analysisdialog.ui" line="342"/>
+        <location filename="analysisdialog.ui" line="608"/>
         <source>From :</source>
         <oldsource>From:</oldsource>
         <translation type="unfinished"></translation>
@@ -143,8 +159,14 @@ https://codeberg.org/claude_dumas/gbp</source>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="165"/>
-        <location filename="analysisdialog.ui" line="443"/>
-        <location filename="analysisdialog.ui" line="691"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the incomes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only shows the incomes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.ui" line="168"/>
+        <location filename="analysisdialog.ui" line="455"/>
+        <location filename="analysisdialog.ui" line="715"/>
         <location filename="analysisdialog.cpp" line="107"/>
         <location filename="analysisdialog.cpp" line="115"/>
         <location filename="analysisdialog.cpp" line="522"/>
@@ -154,9 +176,15 @@ https://codeberg.org/claude_dumas/gbp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="178"/>
-        <location filename="analysisdialog.ui" line="453"/>
-        <location filename="analysisdialog.ui" line="701"/>
+        <location filename="analysisdialog.ui" line="181"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only shows the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.ui" line="184"/>
+        <location filename="analysisdialog.ui" line="468"/>
+        <location filename="analysisdialog.ui" line="728"/>
         <location filename="analysisdialog.cpp" line="107"/>
         <location filename="analysisdialog.cpp" line="115"/>
         <location filename="analysisdialog.cpp" line="524"/>
@@ -166,100 +194,140 @@ https://codeberg.org/claude_dumas/gbp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="208"/>
+        <location filename="analysisdialog.ui" line="214"/>
         <source>No of most significant elements to show :</source>
         <oldsource>No of most significant elements to show: </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="261"/>
+        <location filename="analysisdialog.ui" line="221"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Specify how many slices the pie chart will have. If this number is greater or equal to the total number of incomes (or expenses), then it is the latter that is used. Otherwise, there will be 1 more slice than this number, dedicated to all the “other” incomes (or expenses) taken all together (named “Others” on the chart). &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Specifies how many slices the pie chart will have. If this number is greater or equal to the total number of incomes (or expenses), then it is the latter that is used. Otherwise, there will be 1 more slice than this number, dedicated to all the “other” incomes (or expenses) taken all together (named “Others” on the chart). &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.ui" line="270"/>
         <source>Relative Weight of Incomes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="283"/>
-        <location filename="analysisdialog.ui" line="537"/>
-        <location filename="analysisdialog.ui" line="785"/>
+        <location filename="analysisdialog.ui" line="292"/>
+        <location filename="analysisdialog.ui" line="558"/>
+        <location filename="analysisdialog.ui" line="818"/>
         <source>Export to Image File...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="637"/>
+        <location filename="analysisdialog.ui" line="452"/>
+        <location filename="analysisdialog.ui" line="712"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display only the incomes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.ui" line="465"/>
+        <location filename="analysisdialog.ui" line="725"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display only the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.ui" line="478"/>
+        <location filename="analysisdialog.ui" line="738"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the incomes and the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.ui" line="494"/>
+        <location filename="analysisdialog.ui" line="754"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the deltas between incomes and expences.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.ui" line="658"/>
         <source>year(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="504"/>
-        <location filename="analysisdialog.ui" line="752"/>
+        <location filename="analysisdialog.ui" line="525"/>
+        <location filename="analysisdialog.ui" line="785"/>
         <source>Selected Bar :</source>
         <oldsource>Selected Bar</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="810"/>
+        <location filename="analysisdialog.ui" line="843"/>
         <source>Monthly Report - Table</source>
         <oldsource>Monthly Report</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="845"/>
-        <location filename="analysisdialog.ui" line="902"/>
+        <location filename="analysisdialog.ui" line="881"/>
+        <location filename="analysisdialog.ui" line="941"/>
         <source>Export to CSV...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="308"/>
+        <location filename="analysisdialog.ui" line="317"/>
         <source>Monthly Report - Chart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="369"/>
-        <location filename="analysisdialog.ui" line="620"/>
+        <location filename="analysisdialog.ui" line="378"/>
+        <location filename="analysisdialog.ui" line="641"/>
         <source>Duration :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="389"/>
+        <location filename="analysisdialog.ui" line="398"/>
         <source>month(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="412"/>
-        <location filename="analysisdialog.ui" line="660"/>
+        <location filename="analysisdialog.ui" line="421"/>
+        <location filename="analysisdialog.ui" line="681"/>
         <source>&lt;--</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="419"/>
-        <location filename="analysisdialog.ui" line="667"/>
+        <location filename="analysisdialog.ui" line="428"/>
+        <location filename="analysisdialog.ui" line="688"/>
         <source>--&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="463"/>
-        <location filename="analysisdialog.ui" line="711"/>
+        <location filename="analysisdialog.ui" line="481"/>
+        <location filename="analysisdialog.ui" line="741"/>
         <location filename="analysisdialog.cpp" line="1031"/>
         <source>Incomes and Expenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="516"/>
-        <location filename="analysisdialog.ui" line="764"/>
+        <location filename="analysisdialog.ui" line="537"/>
+        <location filename="analysisdialog.ui" line="797"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="870"/>
+        <location filename="analysisdialog.ui" line="878"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export in a CSV file the monthly report.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.ui" line="906"/>
         <source>Annual Report - Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="562"/>
+        <location filename="analysisdialog.ui" line="583"/>
         <source>Annual Report - Chart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="961"/>
+        <location filename="analysisdialog.ui" line="938"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export in a CSV file the yearly report.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="analysisdialog.ui" line="1000"/>
         <source>Close</source>
         <translation></translation>
     </message>
@@ -396,8 +464,8 @@ https://codeberg.org/claude_dumas/gbp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="476"/>
-        <location filename="analysisdialog.ui" line="724"/>
+        <location filename="analysisdialog.ui" line="497"/>
+        <location filename="analysisdialog.ui" line="757"/>
         <location filename="analysisdialog.cpp" line="1037"/>
         <source>Deltas</source>
         <translation type="unfinished"></translation>
@@ -721,148 +789,271 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="53"/>
+        <location filename="editirregulardialog.ui" line="45"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="57"/>
         <source>Description :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="87"/>
+        <location filename="editirregulardialog.ui" line="71"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 4000 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="94"/>
         <source>Full View...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="117"/>
+        <location filename="editirregulardialog.ui" line="124"/>
         <source>Enabled :</source>
         <oldsource>Enabled</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="126"/>
+        <location filename="editirregulardialog.ui" line="133"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do&lt;/span&gt; use this Financial Stream Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="165"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do&lt;span style=&quot; font-weight:700;&quot;&gt; not&lt;/span&gt; use this Financial Stream Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="213"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Assign a custom color to the name of this Irregular Financial Stream Definition.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : Use system default for the name&apos;s color.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="245"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click on this button to set a custom color for the name of this Financial Stream Definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="319"/>
+        <source>List of Financial Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="357"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a new financial event (date and amount).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="481"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Display in a dedicated window all the financial events that will be generated for this Financial Stream Definition, taking into account the optional conversion to Present Value if set accordingly in Options Dialog.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="491"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Get all the financial event definitions from a CSV file. Current defined ones are deleted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="136"/>
         <source>Yes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="155"/>
+        <location filename="editirregulardialog.ui" line="168"/>
         <source>No</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="185"/>
+        <location filename="editirregulardialog.ui" line="198"/>
         <source>Colorize Name :</source>
         <oldsource>Use Decorative Color :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="255"/>
+        <location filename="editirregulardialog.ui" line="274"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="300"/>
-        <source>List of Occurences</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="editirregulardialog.ui" line="338"/>
+        <location filename="editirregulardialog.ui" line="360"/>
         <source>Add...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="345"/>
+        <location filename="editirregulardialog.ui" line="367"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the selected financial event (date and amount).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="370"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="352"/>
+        <location filename="editirregulardialog.ui" line="377"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete the selected financial events.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete the selected financial event.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="380"/>
         <source>Delete</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="359"/>
+        <location filename="editirregulardialog.ui" line="387"/>
         <source>Select All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="366"/>
+        <location filename="editirregulardialog.ui" line="394"/>
         <source>Unselect All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="411"/>
+        <location filename="editirregulardialog.ui" line="439"/>
         <source>* Elements in gray are past events and will not be taken into consideration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="438"/>
+        <location filename="editirregulardialog.ui" line="453"/>
+        <source>* All the amounts specified are always &quot;future values&quot;. They are converted to &quot;present values&quot; in the charts if specified so in the Options Dialog. Press the &quot;See all occurrences...&quot; button to see the real final amounts.</source>
+        <oldsource>* All the amounts specified are always &quot;future values&quot;. They are converted to &quot;present values&quot; in the charts if specified so in the Options Dialog</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="484"/>
+        <source>See all occurrences...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="494"/>
         <source>Load from file...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="458"/>
-        <location filename="editirregulardialog.cpp" line="150"/>
+        <location filename="editirregulardialog.ui" line="514"/>
+        <location filename="editirregulardialog.cpp" line="176"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="465"/>
-        <location filename="editirregulardialog.cpp" line="149"/>
+        <location filename="editirregulardialog.ui" line="521"/>
+        <location filename="editirregulardialog.cpp" line="175"/>
         <source>Apply</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="145"/>
+        <location filename="editirregulardialog.cpp" line="171"/>
         <source>Editing Income of Category Type &quot;Irregular&quot;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="147"/>
+        <location filename="editirregulardialog.cpp" line="173"/>
         <source>Editing Expense of Category Type &quot;Irregular&quot;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="169"/>
+        <location filename="editirregulardialog.cpp" line="195"/>
         <source>Creating Irregular Income</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="171"/>
+        <location filename="editirregulardialog.cpp" line="197"/>
         <source>Creating Irregular Expense</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="173"/>
+        <location filename="editirregulardialog.cpp" line="199"/>
         <source>Create</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="174"/>
+        <location filename="editirregulardialog.cpp" line="200"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="299"/>
-        <location filename="editirregulardialog.cpp" line="322"/>
+        <location filename="editirregulardialog.cpp" line="337"/>
+        <location filename="editirregulardialog.cpp" line="360"/>
         <source>Invalid Selection</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="299"/>
+        <location filename="editirregulardialog.cpp" line="337"/>
         <source>Select exactly one row</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="322"/>
+        <location filename="editirregulardialog.cpp" line="360"/>
         <source>Select at least one row</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="343"/>
+        <location filename="editirregulardialog.cpp" line="381"/>
         <source>Edit Description</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="411"/>
+        <location filename="editirregulardialog.cpp" line="449"/>
         <source>Color Chooser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="487"/>
+        <source>Dates are in ISO 8601 format (YYYY-MM-DD).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="491"/>
+        <source>Converting Future Values to Present Values using an annual discount rate of %1 percent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="501"/>
+        <source>Amount was too big %1 times and have been capped to %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="503"/>
+        <source>%1 %2 event(s) have been generated.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="503"/>
+        <source>income</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="503"/>
+        <source>expense</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="509"/>
+        <source>Amount is bigger than the maximum allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="513"/>
+        <source>Error during amount conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="518"/>
+        <source>%1 : %2 (cummul=%3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="521"/>
+        <source>  *** PAST -&gt; discarded ***</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.cpp" line="530"/>
+        <source>Results for the Irregular item</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1006,159 +1197,262 @@ Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="93"/>
+        <location filename="editperiodicdialog.ui" line="69"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="96"/>
         <source>Description :</source>
         <oldsource>Description : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="175"/>
+        <location filename="editperiodicdialog.ui" line="116"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 4000 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="181"/>
         <source>Amount :</source>
         <oldsource>Amount : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="222"/>
-        <location filename="editperiodicdialog.ui" line="772"/>
+        <location filename="editperiodicdialog.ui" line="196"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The amount to be repeated periodically, before any inflation, growth or &amp;quot;Conversion to Present Value&amp;quot; is applied.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="231"/>
+        <location filename="editperiodicdialog.ui" line="817"/>
         <source>---</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="255"/>
+        <location filename="editperiodicdialog.ui" line="264"/>
         <source>Period of time for which this income/expense is repeated (times Period Multiplier)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="258"/>
+        <location filename="editperiodicdialog.ui" line="267"/>
         <source>Period :</source>
         <oldsource>Period : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="306"/>
+        <location filename="editperiodicdialog.ui" line="282"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The period &amp;quot;unit&amp;quot; used in the definition of the repetition interval. End-of-month means that all generated financial events will occur on the very end of a month.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The period unit. End-of-month means that all occurrences will happen on the very end of  a month.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="318"/>
         <source>Period Multiplier :</source>
         <oldsource>Period Multiplier : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="357"/>
+        <location filename="editperiodicdialog.ui" line="333"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of &amp;quot;Period&amp;quot; unit(s) in the repetition interval.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of &amp;quot;Period&amp;quot; units in the repetition interval.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="372"/>
         <source>Interval of time inside which this income/expense is allowed to be generated</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="360"/>
+        <location filename="editperiodicdialog.ui" line="375"/>
         <source>Validity Range :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="375"/>
+        <location filename="editperiodicdialog.ui" line="390"/>
         <source>From:  </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="440"/>
+        <location filename="editperiodicdialog.ui" line="406"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Date of the first financial event that will be generated for this Financial Stream Definition.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Date of the first financial event that will be generated.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="458"/>
         <source>To:  </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="509"/>
+        <location filename="editperiodicdialog.ui" line="474"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;No financial event for this Financial Stream Definition will be generated past this date.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;No event will be generated past this date.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="530"/>
         <source>Yearly increase of the &quot;amount&quot; value (applied on Jan 1). Compounded over the years. Applied BEFORE inflation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="512"/>
+        <location filename="editperiodicdialog.ui" line="533"/>
         <source>Monthly Growth :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="526"/>
+        <location filename="editperiodicdialog.ui" line="961"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do&lt;/span&gt; use this Financial Stream Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="1047"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Display in a dedicated window all the financial events that will be generated for this Financial Stream Definition, taking into account any kind of growth defined and the optional conversion to Present Value if set accordingly in Options Dialog.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="550"/>
         <source>No growth</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="543"/>
+        <location filename="editperiodicdialog.ui" line="567"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The inflation defined at the scenario level is applied to the amount.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="570"/>
         <source>Follow inflation defined at the scenario level</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="563"/>
+        <location filename="editperiodicdialog.ui" line="593"/>
         <source>Custom - Constant</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="598"/>
+        <location filename="editperiodicdialog.ui" line="628"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Annual&lt;/span&gt; constant growth rate to be applied to the amount, in percentage. In practice, however, it is the &lt;span style=&quot; text-decoration: underline;&quot;&gt;equivalent monthly growth&lt;/span&gt; that is applied, on the 1st of each month.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="631"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="620"/>
+        <location filename="editperiodicdialog.ui" line="653"/>
         <source> on annual basis</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="650"/>
+        <location filename="editperiodicdialog.ui" line="686"/>
         <source>Custom - Variable</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="676"/>
+        <location filename="editperiodicdialog.ui" line="712"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit or View the variable growth pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="715"/>
         <source>Edit/view...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="711"/>
+        <location filename="editperiodicdialog.ui" line="750"/>
         <source>Colorize Name :</source>
         <oldsource>Use Decorative Color :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="805"/>
+        <location filename="editperiodicdialog.ui" line="759"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : User-defined color is assigned to the name.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : System default is used for the name&apos;s color&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked : Assign a custom color to the name of this Periodic Financial Stream Definition.&lt;/p&gt;&lt;p&gt;Unchecked : Use system default.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="850"/>
         <source>Growth Application Period :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="820"/>
+        <location filename="editperiodicdialog.ui" line="865"/>
         <source>Every </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="913"/>
+        <location filename="editperiodicdialog.ui" line="878"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;How often the “cumulative” growth is applied. A value of &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; specifies that, for every &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; financial events, the amount will be adjusted by the cummulative growth reached at this moment.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;How often the “cumulative” growth is applied. A value of &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; specifies that, at every &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; occurrences, the amount will be adjusted by the cummulative growth reached at this moment.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="964"/>
         <source>Yes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="948"/>
+        <location filename="editperiodicdialog.ui" line="999"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do not&lt;/span&gt; use this Financial Stream Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do not&lt;/span&gt; use this Financial Strean Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="1002"/>
         <source>No</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="865"/>
-        <source>occurence(s)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="editperiodicdialog.ui" line="139"/>
+        <location filename="editperiodicdialog.ui" line="145"/>
         <source>Full View...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="898"/>
+        <location filename="editperiodicdialog.ui" line="547"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The amount will stay the same each time it is repeated (unless &amp;quot;Convert to Present Value&amp;quot; is activated in Options Dialog).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The amount will stay the same each time it is repeated (unless &amp;quot;Convert to Present Value&amp;quot; is activated in Optiond Dialog).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="590"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply a constant growth pattern to the amount.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="683"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Apply a variable growth pattern to the amount.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="785"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click on this button to set a custom color for the name of this Financial Stream Definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="913"/>
+        <source>financial events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="946"/>
         <source>Enabled :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="993"/>
+        <location filename="editperiodicdialog.ui" line="1050"/>
         <source>See all occurences...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1013"/>
+        <location filename="editperiodicdialog.ui" line="1070"/>
         <location filename="editperiodicdialog.cpp" line="192"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1020"/>
+        <location filename="editperiodicdialog.ui" line="1077"/>
         <location filename="editperiodicdialog.cpp" line="132"/>
         <source>Apply</source>
         <translation></translation>
@@ -1332,153 +1626,232 @@ Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="61"/>
+        <location filename="editscenariodialog.ui" line="64"/>
         <source>Description :</source>
         <oldsource>Description : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="73"/>
+        <location filename="editscenariodialog.ui" line="76"/>
         <source>Annual Inflation :</source>
         <oldsource>Annual Inflation : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="82"/>
+        <location filename="editscenariodialog.ui" line="88"/>
         <source>Constant</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="98"/>
+        <location filename="editscenariodialog.ui" line="101"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Annual&lt;/span&gt; constant inflation rate, in percentage. In practice, however, it is the &lt;span style=&quot; text-decoration: underline;&quot;&gt;equivalent monthly inflation&lt;/span&gt; that is applied, on the 1st of each month.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="107"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="127"/>
+        <location filename="editscenariodialog.ui" line="139"/>
         <source>Variable</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="143"/>
+        <location filename="editscenariodialog.ui" line="155"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit or View the variable inflation growth pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="158"/>
         <source>View/Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="170"/>
+        <location filename="editscenariodialog.ui" line="185"/>
         <source>Currency :</source>
         <oldsource>Currency : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="183"/>
+        <location filename="editscenariodialog.ui" line="198"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="217"/>
+        <location filename="editscenariodialog.ui" line="212"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 4000 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="235"/>
         <source>Full View...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="262"/>
+        <location filename="editscenariodialog.ui" line="280"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show only the incomes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="283"/>
         <source>Incomes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="275"/>
+        <location filename="editscenariodialog.ui" line="296"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show only the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="299"/>
         <source>Expenses</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="307"/>
+        <location filename="editscenariodialog.ui" line="331"/>
         <source>Filters :</source>
         <oldsource>Filters set : none</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="378"/>
+        <location filename="editscenariodialog.ui" line="402"/>
         <source>0 items</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="422"/>
+        <location filename="editscenariodialog.ui" line="446"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new &lt;span style=&quot; font-weight:700;&quot;&gt;Periodic&lt;/span&gt; Financial Stream Definition, which is an income or expense that &lt;span style=&quot; font-weight:700;&quot;&gt;repeats itself through time&lt;/span&gt; on a periodic basis. This will be an &lt;span style=&quot; text-decoration: underline;&quot;&gt;income&lt;/span&gt; if the &lt;span style=&quot; font-style:italic;&quot;&gt;Incomes&lt;/span&gt; radio button above is selected, an &lt;span style=&quot; text-decoration: underline;&quot;&gt;expense&lt;/span&gt; otherwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="449"/>
         <source>New Periodic ...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="429"/>
+        <location filename="editscenariodialog.ui" line="456"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new &lt;span style=&quot; font-weight:700;&quot;&gt;Irregular&lt;/span&gt; Financial Stream Definition, which defines a set of incomes/expenses that &lt;span style=&quot; font-weight:700;&quot;&gt;occur only at very specific dates, &lt;/span&gt;as defined by the user. They will all be &lt;span style=&quot; text-decoration: underline;&quot;&gt;incomes&lt;/span&gt; if the &lt;span style=&quot; font-style:italic;&quot;&gt;Incomes&lt;/span&gt; radio button above is selected, &lt;span style=&quot; text-decoration: underline;&quot;&gt;expenses&lt;/span&gt; otherwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="459"/>
         <source>New Irregular...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="436"/>
+        <location filename="editscenariodialog.ui" line="466"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modify the selected income/expense.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="469"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="443"/>
+        <location filename="editscenariodialog.ui" line="476"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate each of the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate each of the selected income/expense.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="479"/>
         <source>Duplicate</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="450"/>
+        <location filename="editscenariodialog.ui" line="489"/>
         <source>Delete</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="487"/>
+        <location filename="editscenariodialog.ui" line="526"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected incomes/expenses are activated, meaning they &lt;span style=&quot; font-weight:700;&quot;&gt;will&lt;/span&gt; all be taken into account in the calculation of the scenario data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="529"/>
         <source>Enable</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="494"/>
+        <location filename="editscenariodialog.ui" line="536"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected incomes/expenses are de-activated, meaning they will&lt;span style=&quot; font-weight:700;&quot;&gt; NOT &lt;/span&gt;be taken into account in the calculation of the scenario data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="539"/>
         <source>Disable</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="501"/>
+        <location filename="editscenariodialog.ui" line="546"/>
         <source>Select All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="508"/>
+        <location filename="editscenariodialog.ui" line="553"/>
         <source>Unselect All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="561"/>
+        <location filename="editscenariodialog.ui" line="606"/>
         <location filename="editscenariodialog.cpp" line="229"/>
         <source>Hide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="314"/>
+        <location filename="editscenariodialog.ui" line="338"/>
         <location filename="editscenariodialog.cpp" line="438"/>
         <source>Hide Periodics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="327"/>
+        <location filename="editscenariodialog.ui" line="49"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="85"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Define a constant annual inflation, available to be optionally used by any Financial Stream Definition of this scenario.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Defines a constant annual inflation, available to be used by any Financial Stream Definition of this scenario.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="136"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Defines a variable inflation, available to be optionally used by any Financial Stream Definition of this scenario.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Defines a variable inflation, available to be used by any Financial Stream Definition of this scenario.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="351"/>
         <location filename="editscenariodialog.cpp" line="451"/>
         <source>Hide Irregulars</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="340"/>
+        <location filename="editscenariodialog.ui" line="364"/>
         <location filename="editscenariodialog.cpp" line="464"/>
         <source>Hide Enabled</source>
         <oldsource>Hide Active</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="350"/>
+        <location filename="editscenariodialog.ui" line="374"/>
         <location filename="editscenariodialog.cpp" line="477"/>
         <source>Hide Disabled</source>
         <oldsource>Hide Inactive</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="574"/>
+        <location filename="editscenariodialog.ui" line="486"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deletes the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="619"/>
         <source>Apply</source>
         <translation></translation>
     </message>
@@ -2290,392 +2663,459 @@ Details : %1</source>
     </message>
     <message>
         <location filename="mainwindow.ui" line="144"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Rescale the chart so that the X axis range is &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;“tomorrow”&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; to “&lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;last allowed date for the calculated data&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;”. Y axis is rescaled to include the min and max values.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Rescales the chart so that the X axis range is  &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;“tomorrow”&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; to “&lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;last allowed date for the calculated data&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;”. Y axis is rescaled to include the min and max values.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="147"/>
         <source>Max</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="151"/>
+        <location filename="mainwindow.ui" line="157"/>
         <source>Fit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="158"/>
+        <location filename="mainwindow.ui" line="164"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Manually specify the X axis date range.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Manually specification of the X axis date range.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="167"/>
         <source>Custom</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="256"/>
+        <location filename="mainwindow.ui" line="190"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scroll the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;left&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span than the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scrolls the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;left&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span than the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="200"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scroll the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;right&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span than the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scrolls the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;right&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span than the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="261"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Baseline amount from which starts the cash balance curve. As the curve always begins from &lt;span style=&quot; font-weight:700;&quot;&gt;tomorrow&lt;/span&gt;, the baseline amount is the total cash balance you determine by yourself, as of &lt;span style=&quot; font-weight:700;&quot;&gt;today&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="274"/>
         <source>CAD</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="298"/>
+        <location filename="mainwindow.ui" line="316"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt;, &amp;quot;localization disk&amp;quot; for each data point in the cash balance curve are shown.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt;, they are hidden.&lt;/p&gt;&lt;p&gt;Localization disks help to better localize data points on the chart.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show or hide &amp;quot;localization disk&amp;quot; for each data point in the cash balance curve. Localization disks help to better localize data points on the chart.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="319"/>
         <source>Show Points</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="348"/>
+        <location filename="mainwindow.ui" line="345"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all the data points of the cash balance curve (not just those displayed) into a CSV file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exports all the data points of the cash balance curve (not just those displayed) in a CSV file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="372"/>
         <source>Selected Point Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="394"/>
+        <location filename="mainwindow.ui" line="418"/>
         <source>Date :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="609"/>
+        <location filename="mainwindow.ui" line="633"/>
         <source>Delta :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="430"/>
+        <location filename="mainwindow.ui" line="454"/>
         <source>Amount :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="181"/>
+        <location filename="mainwindow.ui" line="193"/>
         <source>&lt;--</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="188"/>
+        <location filename="mainwindow.ui" line="203"/>
         <source>--&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="233"/>
+        <location filename="mainwindow.ui" line="248"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="324"/>
+        <location filename="mainwindow.ui" line="348"/>
         <source>CSV Export...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="466"/>
+        <location filename="mainwindow.ui" line="490"/>
         <source>Change :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="412"/>
-        <location filename="mainwindow.ui" line="448"/>
-        <location filename="mainwindow.ui" line="484"/>
+        <location filename="mainwindow.ui" line="436"/>
+        <location filename="mainwindow.ui" line="472"/>
+        <location filename="mainwindow.ui" line="508"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="528"/>
+        <location filename="mainwindow.ui" line="154"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Rescale the chart so that the X axis range covers exactly the date range of the Scenario&apos;s calculated data (min to max date values). Y axis is rescaled to include the min and max values.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Rescales the chart so that the X axis range covers exactly the date range of the Scenario&apos;s calculated data (min to max date values). Y axis is rescaled to include the min and max values.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="552"/>
         <source>Date Range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="549"/>
+        <location filename="mainwindow.ui" line="573"/>
         <source>From :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="561"/>
+        <location filename="mainwindow.ui" line="585"/>
         <source>To :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="655"/>
+        <location filename="mainwindow.ui" line="679"/>
         <source>Scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="659"/>
+        <location filename="mainwindow.ui" line="683"/>
         <source>Open Recent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="678"/>
+        <location filename="mainwindow.ui" line="705"/>
         <source>Tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="685"/>
+        <location filename="mainwindow.ui" line="712"/>
         <source>Help</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="701"/>
+        <location filename="mainwindow.ui" line="731"/>
         <source>New...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="704"/>
+        <location filename="mainwindow.ui" line="734"/>
         <source>Close the current scenario and create a new scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="707"/>
+        <location filename="mainwindow.ui" line="737"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="712"/>
+        <location filename="mainwindow.ui" line="742"/>
         <source>Open...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="715"/>
+        <location filename="mainwindow.ui" line="745"/>
         <source>Close the current scenario and open an existing scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="718"/>
+        <location filename="mainwindow.ui" line="748"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="723"/>
+        <location filename="mainwindow.ui" line="753"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="726"/>
+        <location filename="mainwindow.ui" line="756"/>
         <source>Edit the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="729"/>
+        <location filename="mainwindow.ui" line="759"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="734"/>
+        <location filename="mainwindow.ui" line="764"/>
         <source>Save</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="737"/>
+        <location filename="mainwindow.ui" line="767"/>
         <source>Save the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="740"/>
+        <location filename="mainwindow.ui" line="770"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="745"/>
+        <location filename="mainwindow.ui" line="775"/>
         <source>Save As...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="748"/>
+        <location filename="mainwindow.ui" line="778"/>
         <source>Save the current scenario under a new file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="753"/>
+        <location filename="mainwindow.ui" line="783"/>
         <source>Quit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="758"/>
+        <location filename="mainwindow.ui" line="788"/>
         <source>About Graphical Budget Planner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="763"/>
+        <location filename="mainwindow.ui" line="793"/>
         <source>About Qt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="768"/>
+        <location filename="mainwindow.ui" line="798"/>
         <source>Options...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="773"/>
+        <location filename="mainwindow.ui" line="803"/>
         <source>Analysis...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="76"/>
+        <location filename="mainwindow.ui" line="808"/>
+        <source>User Manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="813"/>
+        <source>Open Example</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="818"/>
+        <source>Properties...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="823"/>
+        <source>Quick Tutorial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="78"/>
         <source>Start Amount for Today %1 :</source>
         <oldsource>Start Amount Today %1 :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="165"/>
+        <location filename="mainwindow.cpp" line="167"/>
         <source>No Scenario Loaded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="520"/>
-        <location filename="mainwindow.cpp" line="556"/>
-        <location filename="mainwindow.cpp" line="804"/>
-        <location filename="mainwindow.cpp" line="1179"/>
+        <location filename="mainwindow.cpp" line="522"/>
         <source>Modifications not saved</source>
         <oldsource>Modificatoins not saved</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="521"/>
-        <location filename="mainwindow.cpp" line="557"/>
-        <location filename="mainwindow.cpp" line="805"/>
-        <location filename="mainwindow.cpp" line="1180"/>
+        <location filename="mainwindow.cpp" line="523"/>
         <source>Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="525"/>
+        <location filename="mainwindow.cpp" line="553"/>
         <source>About to quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="526"/>
+        <location filename="mainwindow.cpp" line="554"/>
         <source>Do you really want to quit the application ?</source>
         <oldsource>Do you really want to terminate the application ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="564"/>
+        <location filename="mainwindow.cpp" line="591"/>
         <source>Open an Existing Scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="581"/>
-        <location filename="mainwindow.cpp" line="625"/>
-        <location filename="mainwindow.cpp" line="756"/>
+        <location filename="mainwindow.cpp" line="643"/>
+        <location filename="mainwindow.cpp" line="687"/>
+        <location filename="mainwindow.cpp" line="818"/>
         <source>Saving Scenario Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="581"/>
+        <location filename="mainwindow.cpp" line="643"/>
         <source>No scenario loaded yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="589"/>
+        <location filename="mainwindow.cpp" line="651"/>
         <source>Choose Scenario Filename</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="607"/>
-        <location filename="mainwindow.cpp" line="636"/>
+        <location filename="mainwindow.cpp" line="669"/>
+        <location filename="mainwindow.cpp" line="698"/>
         <source>Scenario saved successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="625"/>
-        <location filename="mainwindow.cpp" line="1349"/>
+        <location filename="mainwindow.cpp" line="687"/>
+        <location filename="mainwindow.cpp" line="1410"/>
         <source>No scenario loaded yet : nothing to save</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="666"/>
+        <location filename="mainwindow.cpp" line="728"/>
         <source>Error found in the file content.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="674"/>
+        <location filename="mainwindow.cpp" line="736"/>
         <source>Loading Scenario Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="680"/>
-        <location filename="mainwindow.cpp" line="762"/>
+        <location filename="mainwindow.cpp" line="742"/>
+        <location filename="mainwindow.cpp" line="824"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="697"/>
+        <location filename="mainwindow.cpp" line="759"/>
         <source>Scenario opened successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="748"/>
-        <location filename="mainwindow.cpp" line="752"/>
+        <location filename="mainwindow.cpp" line="810"/>
+        <location filename="mainwindow.cpp" line="814"/>
         <source>Error no %1 has occured.
 
 Details : %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="781"/>
+        <location filename="mainwindow.cpp" line="843"/>
         <source>Edit Scenario Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="781"/>
+        <location filename="mainwindow.cpp" line="843"/>
+        <location filename="mainwindow.cpp" line="1592"/>
         <source>No scenario loaded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1095"/>
+        <location filename="mainwindow.cpp" line="1161"/>
         <source>y</source>
         <translation>y</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1096"/>
+        <location filename="mainwindow.cpp" line="1162"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1097"/>
+        <location filename="mainwindow.cpp" line="1163"/>
         <source>d</source>
         <translation>d</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1132"/>
+        <location filename="mainwindow.cpp" line="1198"/>
         <source>Clear List</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1349"/>
-        <location filename="mainwindow.cpp" line="1372"/>
+        <location filename="mainwindow.cpp" line="1410"/>
+        <location filename="mainwindow.cpp" line="1433"/>
         <source>Export Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1357"/>
+        <location filename="mainwindow.cpp" line="1418"/>
         <source>Text Files (*.txt *.TXT *.csv *.CSV)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1358"/>
+        <location filename="mainwindow.cpp" line="1419"/>
         <source>Select a File</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1372"/>
+        <location filename="mainwindow.cpp" line="1433"/>
         <source>Cannot open the file for writing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1399"/>
+        <location filename="mainwindow.cpp" line="1460"/>
         <source>Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1399"/>
+        <location filename="mainwindow.cpp" line="1460"/>
         <source>Total Daily Incomes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1399"/>
+        <location filename="mainwindow.cpp" line="1460"/>
         <source>Total Daily Expenses</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1399"/>
+        <location filename="mainwindow.cpp" line="1460"/>
         <source>Total Delta</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1399"/>
+        <location filename="mainwindow.cpp" line="1460"/>
         <source>Cumulative Total</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="1592"/>
+        <source>Scenario Properties Failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2692,31 +3132,41 @@ Details : %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="570"/>
-        <location filename="optionsdialog.ui" line="635"/>
+        <location filename="optionsdialog.ui" line="325"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : Prevent custom colorization of any Financial Stream Definition name.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Allow it. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="357"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Any amount value (whatever the currency) used in any CSV export process is localized, that is the &amp;quot;thousands separator&amp;quot; and &amp;quot;decimal separator&amp;quot; are set according to the default language used on the computer. &lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : &amp;quot;thousands separator&amp;quot; is not used and &amp;quot;decimal separator&amp;quot; is &amp;quot;.&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="600"/>
+        <location filename="optionsdialog.ui" line="668"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="327"/>
+        <location filename="optionsdialog.ui" line="342"/>
         <source>Exported text - Amounts are localized :</source>
         <oldsource>Exported Text - Amounts are localized :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="662"/>
+        <location filename="optionsdialog.ui" line="695"/>
         <source>Overscaling for main chart :</source>
         <oldsource>Overscaling percentage for main chart :</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="430"/>
-        <location filename="optionsdialog.ui" line="677"/>
+        <location filename="optionsdialog.ui" line="454"/>
+        <location filename="optionsdialog.ui" line="713"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="197"/>
+        <location filename="optionsdialog.ui" line="209"/>
         <source>Application font :</source>
         <oldsource>Application Font :</oldsource>
         <translation type="unfinished"></translation>
@@ -2727,84 +3177,136 @@ Details : %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="214"/>
-        <location filename="optionsdialog.ui" line="237"/>
+        <location filename="optionsdialog.ui" line="226"/>
+        <location filename="optionsdialog.ui" line="249"/>
         <source>---</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="269"/>
+        <location filename="optionsdialog.ui" line="281"/>
         <source>Choose...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="93"/>
+        <location filename="optionsdialog.ui" line="96"/>
         <source>How date of &quot;Today&quot; is obtained :</source>
         <oldsource>How Date of &quot;Today&quot; is obtained :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="110"/>
+        <location filename="optionsdialog.ui" line="63"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Define how long in time financial events will be generated for the scenario. Generation starts from “tomorrow” and will terminate &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;no later than “x” years later&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;, where “x” is the number specified here.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Define how long financial events will be generated for the scenario. Generation starts from “tomorrow” and will terminate &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;no later than  “x” years later&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;, where “x” is the number specified here.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="113"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;quot;Today&amp;quot; is set from the computer&apos;s system date. Generated financial events will start not before the day after (&amp;quot;Tomorrow&amp;quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="116"/>
         <source>System&apos;s date at start-up</source>
         <oldsource>System&apos;s Date at start-up</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="133"/>
+        <location filename="optionsdialog.ui" line="139"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;quot;Today&amp;quot; is set manually by the user. Generated financial events will start not before the day after (&amp;quot;Tomorrow&amp;quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="142"/>
         <source>Specific value</source>
         <oldsource>Specific Value</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="165"/>
+        <location filename="optionsdialog.ui" line="174"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;User-defined value of &amp;quot;today&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="177"/>
         <source>yyyy-MMM-dd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="298"/>
+        <location filename="optionsdialog.ui" line="310"/>
         <source>Allow colorization of Incomes/Expenses names :</source>
         <oldsource>Allow Colorization of Incomes/Expenses Names :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="351"/>
+        <location filename="optionsdialog.ui" line="369"/>
         <source>Use Present Value for all financial events :</source>
         <oldsource>Use Present Value for all calculated financial events :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="398"/>
+        <location filename="optionsdialog.ui" line="384"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : &lt;span style=&quot; background-color:transparent;&quot;&gt;Convert all Financial Event amounts  from future values (default) to present values, using the annual discount rate selected to the right.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : Do not change the &lt;span style=&quot; background-color:transparent;&quot;&gt;Financial Event amounts.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="419"/>
         <source>Annual Discount Rate :</source>
         <oldsource>365-days Annual Discount Rate :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="466"/>
-        <source>Charts</source>
+        <location filename="optionsdialog.ui" line="451"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annual discount rate to apply, in percentage. Internally, the conversion is rather calculated on a &lt;span style=&quot; font-weight:700;&quot;&gt;monthly basis&lt;/span&gt;, using the &lt;span style=&quot; text-decoration: underline;&quot;&gt;equivalent monthly rate&lt;/span&gt;. It means that for a given amount, the day of the month where it occurs does not change the present value calculated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annual discount rate to apply, in percentage. Internally, the conversion is rather calculated on a &lt;span style=&quot; font-weight:700;&quot;&gt;monthly basis&lt;/span&gt;, using the &lt;span style=&quot; text-decoration: underline;&quot;&gt;equivalent monthly rate&lt;/span&gt;. It means that for an given amount, the month date where it occurs does not change the present value calculated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="490"/>
+        <source>Charts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="514"/>
         <source>Use Dark Mode :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="532"/>
+        <location filename="optionsdialog.ui" line="529"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : For all charts, use a theme that fits a dark mode, that is dark background and light font colors.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : For all charts, use a theme that fits a light mode, that is light background and dark font colors.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="559"/>
         <source>Dark Mode curve color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="597"/>
+        <location filename="optionsdialog.ui" line="574"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve to be used when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="627"/>
         <source>Light Mode curve color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="744"/>
+        <location filename="optionsdialog.ui" line="642"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve to be used when Charts Dark Mode is disabled (hence &amp;quot;Light Mode&amp;quot; in On).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="710"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the level of &amp;quot;overscaling” to be applied on the Cash Balance chart X and Y axis. Overscaling helps to see data points located at the extreme corners. 0% means no overscaling,&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="780"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="751"/>
+        <location filename="optionsdialog.ui" line="787"/>
         <source>Save</source>
         <translation></translation>
     </message>
@@ -3320,6 +3822,126 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
     </message>
 </context>
 <context>
+    <name>ScenarioPropertiesDialog</name>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="43"/>
+        <source>Name :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="61"/>
+        <source>File Name :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="79"/>
+        <source>Path :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="97"/>
+        <source>File Creation Date :</source>
+        <oldsource>File Creation Date : </oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="106"/>
+        <location filename="scenariopropertiesdialog.ui" line="124"/>
+        <location filename="scenariopropertiesdialog.ui" line="214"/>
+        <location filename="scenariopropertiesdialog.ui" line="232"/>
+        <location filename="scenariopropertiesdialog.ui" line="243"/>
+        <source>---</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="115"/>
+        <source>File Last Modification Date :</source>
+        <oldsource>File Last Modification Date : </oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="133"/>
+        <source>No of Periodic Incomes :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="151"/>
+        <source>No of Irregular Incomes :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="169"/>
+        <source>No of Periodic Expenses :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="187"/>
+        <source>No of Irregular Expenses :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="142"/>
+        <location filename="scenariopropertiesdialog.ui" line="160"/>
+        <location filename="scenariopropertiesdialog.ui" line="178"/>
+        <location filename="scenariopropertiesdialog.ui" line="196"/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="14"/>
+        <source>Scenario Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="36"/>
+        <source>Format Version :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="205"/>
+        <source>Currency :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="223"/>
+        <source>Inflation :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="285"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.cpp" line="52"/>
+        <location filename="scenariopropertiesdialog.cpp" line="53"/>
+        <source>Not set yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.cpp" line="65"/>
+        <location filename="scenariopropertiesdialog.cpp" line="72"/>
+        <source>Info not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.cpp" line="86"/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.cpp" line="92"/>
+        <source>Constant annual inflation of %1 percent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.cpp" line="94"/>
+        <source>Variable inflation</source>
+        <oldsource>Variable Inflation</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SelectCountryDialog</name>
     <message>
         <location filename="selectcountrydialog.ui" line="14"/>
@@ -3382,107 +4004,107 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
 <context>
     <name>Util</name>
     <message>
-        <location filename="util.cpp" line="58"/>
+        <location filename="util.cpp" line="60"/>
         <source>Day</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="59"/>
+        <location filename="util.cpp" line="61"/>
         <source>Week</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="60"/>
+        <location filename="util.cpp" line="62"/>
         <source>Month</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="61"/>
+        <location filename="util.cpp" line="63"/>
         <source>End-of-Month</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="62"/>
+        <location filename="util.cpp" line="64"/>
         <source>Year</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="63"/>
+        <location filename="util.cpp" line="65"/>
         <source>Days</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="64"/>
+        <location filename="util.cpp" line="66"/>
         <source>Weeks</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="65"/>
+        <location filename="util.cpp" line="67"/>
         <source>Months</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="66"/>
+        <location filename="util.cpp" line="68"/>
         <source>Ends-of-Month</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="67"/>
+        <location filename="util.cpp" line="69"/>
         <source>Years</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="69"/>
+        <location filename="util.cpp" line="71"/>
         <source>day</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="70"/>
+        <location filename="util.cpp" line="72"/>
         <source>week</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="71"/>
+        <location filename="util.cpp" line="73"/>
         <source>month</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="72"/>
+        <location filename="util.cpp" line="74"/>
         <source>end-of-month</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="73"/>
+        <location filename="util.cpp" line="75"/>
         <source>year</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="74"/>
+        <location filename="util.cpp" line="76"/>
         <source>days</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="75"/>
+        <location filename="util.cpp" line="77"/>
         <source>weeks</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="76"/>
+        <location filename="util.cpp" line="78"/>
         <source>months</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="77"/>
+        <location filename="util.cpp" line="79"/>
         <source>ends-of-month</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="78"/>
+        <location filename="util.cpp" line="80"/>
         <source>years</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="406"/>
+        <location filename="util.cpp" line="408"/>
         <source>Red:%1  Green:%2  Blue:%3</source>
         <translation type="unfinished"></translation>
     </message>

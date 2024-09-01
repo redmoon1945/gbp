@@ -94,6 +94,8 @@ public:
     void setUsePresentValue(bool newUsePresentValue);
     double getPvDiscountRate() const;
     void setPvDiscountRate(double newPvDiscountRate);
+    QString getSettingsFullFileName() const;
+    QString getLogFullFileName() const;
 
 private:
 
@@ -124,9 +126,11 @@ private:
     QString logFolder;
     bool loggingEnabled=false;
     QFile logFile;
+    QString logFullFileName;
     LogLevel logLevel;
     QString initialSystemApplicationFont;   // font upon app starts, before anything changed
     // Settings
+    QString settingsFullFileName;   // full file name for the config file
     QSettings* settingsPtr=nullptr; // cant find a way to use QSharedPointer...
     bool settingsLoaded=false;  // to prevent more than 1 loading
 

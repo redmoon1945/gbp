@@ -45,6 +45,9 @@
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="scenarioNameLineEdit">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="maxLength">
         <number>100</number>
        </property>
@@ -78,6 +81,9 @@
       <layout class="QHBoxLayout" name="horizontalLayout_8">
        <item>
         <widget class="QRadioButton" name="inflationConstantRadioButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Define a constant annual inflation, available to be optionally used by any Financial Stream Definition of this scenario.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Constant</string>
          </property>
@@ -91,6 +97,9 @@
        </item>
        <item>
         <widget class="QDoubleSpinBox" name="inflationConstantDoubleSpinBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Annual&lt;/span&gt; constant inflation rate, in percentage. In practice, however, it is the &lt;span style=&quot; text-decoration: underline;&quot;&gt;equivalent monthly inflation&lt;/span&gt; that is applied, on the 1st of each month.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="showGroupSeparator" stdset="0">
           <bool>true</bool>
          </property>
@@ -123,6 +132,9 @@
        </item>
        <item>
         <widget class="QRadioButton" name="inflationVariableRadioButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Defines a variable inflation, available to be optionally used by any Financial Stream Definition of this scenario.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Variable</string>
          </property>
@@ -138,6 +150,9 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit or View the variable inflation growth pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>View/Edit...</string>
@@ -192,6 +207,9 @@
           <font>
            <italic>true</italic>
           </font>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 4000 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -258,6 +276,9 @@
      </item>
      <item>
       <widget class="QRadioButton" name="incomesRadioButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show only the incomes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Incomes</string>
        </property>
@@ -271,6 +292,9 @@
      </item>
      <item>
       <widget class="QRadioButton" name="expensesRadioButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show only the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Expenses</string>
        </property>
@@ -418,6 +442,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="addPeriodicPushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new &lt;span style=&quot; font-weight:700;&quot;&gt;Periodic&lt;/span&gt; Financial Stream Definition, which is an income or expense that &lt;span style=&quot; font-weight:700;&quot;&gt;repeats itself through time&lt;/span&gt; on a periodic basis. This will be an &lt;span style=&quot; text-decoration: underline;&quot;&gt;income&lt;/span&gt; if the &lt;span style=&quot; font-style:italic;&quot;&gt;Incomes&lt;/span&gt; radio button above is selected, an &lt;span style=&quot; text-decoration: underline;&quot;&gt;expense&lt;/span&gt; otherwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>New Periodic ...</string>
        </property>
@@ -425,6 +452,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="addIrregularPushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new &lt;span style=&quot; font-weight:700;&quot;&gt;Irregular&lt;/span&gt; Financial Stream Definition, which defines a set of incomes/expenses that &lt;span style=&quot; font-weight:700;&quot;&gt;occur only at very specific dates, &lt;/span&gt;as defined by the user. They will all be &lt;span style=&quot; text-decoration: underline;&quot;&gt;incomes&lt;/span&gt; if the &lt;span style=&quot; font-style:italic;&quot;&gt;Incomes&lt;/span&gt; radio button above is selected, &lt;span style=&quot; text-decoration: underline;&quot;&gt;expenses&lt;/span&gt; otherwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>New Irregular...</string>
        </property>
@@ -432,6 +462,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="editPushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modify the selected income/expense.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Edit...</string>
        </property>
@@ -439,6 +472,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="duplicatePushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate each of the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Duplicate</string>
        </property>
@@ -446,6 +482,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="deletePushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Delete</string>
        </property>
@@ -483,6 +522,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="enablePushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected incomes/expenses are activated, meaning they &lt;span style=&quot; font-weight:700;&quot;&gt;will&lt;/span&gt; all be taken into account in the calculation of the scenario data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Enable</string>
        </property>
@@ -490,6 +532,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="disablePushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected incomes/expenses are de-activated, meaning they will&lt;span style=&quot; font-weight:700;&quot;&gt; NOT &lt;/span&gt;be taken into account in the calculation of the scenario data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Disable</string>
        </property>
@@ -582,7 +627,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

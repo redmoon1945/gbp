@@ -52,6 +52,14 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     warninglabelFont.setPointSize(newFontSize);
     ui->warningLabel->setFont(warninglabelFont);
 
+    // use smaller font for the "future" Label
+    QFont futurLabelFont = ui->futurLabel->font();
+    oldFontSize = futurLabelFont.pointSize();
+    newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Irregular Dialog - Future Label - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    futurLabelFont.setPointSize(newFontSize);
+    ui->futurLabel->setFont(futurLabelFont);
+
     // set the model (no internal data for now)
     tableModel = new EditIrregularModel(aLocale);
     ui->itemsTableView->setModel(tableModel);
@@ -78,6 +86,10 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     importDlg = new LoadIrregularTextFileDialog(aLocale,this);        // auto-destroyed by Qt
     importDlg->setModal(true);
 
+    // Show Result Dialog
+    showResultDialog = new PlainTextEditionDialog(this);     // auto-destroyed by Qt because it is a child
+    showResultDialog->setModal(true);
+
     // connect emitters & receivers for Dialogs : Description Edition
     QObject::connect(this, &EditIrregularDialog::signalPlainTextDialogPrepareContent, editDescriptionDialog, &PlainTextEditionDialog::slotPrepareContent);
     QObject::connect(editDescriptionDialog, &PlainTextEditionDialog::signalPlainTextEditionResult, this, &EditIrregularDialog::slotPlainTextEditionResult);
@@ -93,6 +105,10 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     QObject::connect(importDlg, &LoadIrregularTextFileDialog::signalImportResult, this, &EditIrregularDialog::slotImportResult);
     QObject::connect(importDlg, &LoadIrregularTextFileDialog::signalImportCompleted, this, &EditIrregularDialog::slotImportCompleted);
 
+    // connect emitters & receivers for Dialogs : Show Result
+    QObject::connect(this, &EditIrregularDialog::signalShowResultPrepareContent, showResultDialog, &PlainTextEditionDialog::slotPrepareContent);
+    QObject::connect(showResultDialog, &PlainTextEditionDialog::signalPlainTextEditionResult, this, &EditIrregularDialog::slotShowResultResult);
+    QObject::connect(showResultDialog, &PlainTextEditionDialog::signalPlainTextEditionCompleted, this, &EditIrregularDialog::slotShowResultCompleted);
 }
 
 
@@ -134,6 +150,16 @@ void EditIrregularDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
         ui->decorationColorPushButton->setVisible(true);
     }
     setDecorationColorInfo();
+
+    // Show the futurlabel only if "Convert to present values" is enabled in the Options Dialog.
+    // This way, we dont confuse the user if he does not know about this option (or dont care)
+    bool usePvConversion = GbpController::getInstance().getUsePresentValue();
+    double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
+    if ( (usePvConversion==true)&&(pvAnnualDiscountRate!=0) ){
+        ui->futurLabel->setVisible(true);
+    } else {
+        ui->futurLabel->setVisible(false);
+    }
 
     if(editingExistingStreamDef){
         // *** EXISTING ***
@@ -236,6 +262,18 @@ void EditIrregularDialog::slotImportResult(QMap<QDate, IrregularFeStreamDef::Amo
 
 
 void EditIrregularDialog::slotImportCompleted()
+{
+
+}
+
+
+void EditIrregularDialog::slotShowResultResult(QString result)
+{
+
+}
+
+
+void EditIrregularDialog::slotShowResultCompleted()
 {
 
 }
@@ -434,5 +472,62 @@ void EditIrregularDialog::on_decorationColorCheckBox_clicked()
         decorationColor = QColor();
         setDecorationColorInfo();
     }
+}
+
+
+// Show the real occurence (corrected to Present Values if enabled in Options)
+void EditIrregularDialog::on_showResultPushButton_clicked()
+{
+    QString amountString;
+
+    // Build headers
+    QStringList resultStringList;
+    int ok;
+    uint saturationCount;
+    resultStringList.append(tr("Dates are in ISO 8601 format (YYYY-MM-DD)."));
+    bool usePvConversion = GbpController::getInstance().getUsePresentValue();
+    double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
+    if ((usePvConversion==true)&&(pvAnnualDiscountRate!=0)) {
+        QString s = QString(tr("Converting Future Values to Present Values using an annual discount rate of %1 percent.")).arg(pvAnnualDiscountRate);
+        resultStringList.append(s);
+    }
+
+    // Get data entered
+    QMap<QDate, IrregularFeStreamDef::AmountInfo> items = tableModel->getItems();
+    IrregularFeStreamDef irStreamDef(items, initialId, ui->nameLineEdit->text(), ui->descPlainTextEdit->toPlainText(),
+                                     ui->activeYesRadioButton->isChecked(), isIncome, decorationColor);
+    QList<Fe> feList = irStreamDef.generateEventStream(DateRange::INFINITE, (usePvConversion)?(pvAnnualDiscountRate):(0), GbpController::getInstance().getTomorrow(), saturationCount);
+    if(saturationCount > 0){
+        resultStringList.append(QString(tr("Amount was too big %1 times and have been capped to %2.")).arg(saturationCount).arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)));
+    }
+    resultStringList.append(QString(tr("%1 %2 event(s) have been generated.\n")).arg(items.count()).arg((isIncome)?(tr("income")):(tr("expense"))));
+
+    // transform into text log
+    long double cummul = 0;
+    foreach(Fe fe, feList){
+        if (abs(fe.amount) > CurrencyHelper::maxValueAllowedForAmount() ){ // should never happen because of saturation
+            resultStringList.append(QString("%1 : %2").arg(fe.occurence.toString(Qt::ISODate)).arg(tr("Amount is bigger than the maximum allowed")));
+        } else {
+            double amountDouble = CurrencyHelper::amountQint64ToDouble(abs(fe.amount), currInfo.noOfDecimal, ok);
+            if (ok != 0){
+                resultStringList.append(QString("%1 : %2").arg(fe.occurence.toString(Qt::ISODate)).arg(tr("Error during amount conversion")));
+            } else {
+                amountString = CurrencyHelper::formatAmount(amountDouble, currInfo, locale, true);
+                cummul += amountDouble;
+                QString cummulString = CurrencyHelper::formatAmount(static_cast<double>(cummul), currInfo, locale, true);
+                QString s = QString(tr("%1 : %2 (cummul=%3)")).arg(fe.occurence.toString(Qt::ISODate)).arg(amountString).arg(cummulString);
+                if (fe.occurence<GbpController::getInstance().getTomorrow()){
+                    // if event is in the past, mention it
+                    s = s.append(tr("  *** PAST -> discarded ***"));
+                }
+                resultStringList.append(s);
+            }
+        }
+    }
+
+    // send for display
+    QString r = resultStringList.join("\n");
+    emit signalShowResultPrepareContent(tr("Results for the Irregular item"), r, true);
+    showResultDialog->show();
 }
 

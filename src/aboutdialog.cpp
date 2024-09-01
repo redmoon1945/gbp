@@ -18,6 +18,7 @@
 
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
+#include "gbpcontroller.h"
 
 
 AboutDialog::AboutDialog(QWidget *parent)
@@ -28,12 +29,23 @@ AboutDialog::AboutDialog(QWidget *parent)
     ui->appLabel->setText(QCoreApplication::applicationName() + "  " + QCoreApplication::applicationVersion());
     QString builtOn = QString(tr("Built on : %1 %2")).arg(__DATE__).arg(__TIME__);
     ui->buildOnLabel->setText(builtOn);
+
+    QFontMetrics fm(ui->configFilePlainTextEdit->font());
+    ui->configFilePlainTextEdit->setFixedHeight(fm.height()*3); // 2 lines min
+    ui->logFilePlainTextEdit->setFixedHeight(fm.height()*3); // 2 lines min
 }
 
 
 AboutDialog::~AboutDialog()
 {
     delete ui;
+}
+
+
+void AboutDialog::slotAboutDialogPrepareContent()
+{
+    ui->configFilePlainTextEdit->setPlainText(GbpController::getInstance().getSettingsFullFileName());
+    ui->logFilePlainTextEdit->setPlainText(GbpController::getInstance().getLogFullFileName());
 }
 
 

@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="relativeWeightTab">
       <attribute name="title">
@@ -161,6 +161,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="incomesRelativeWeigthRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the incomes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Incomes</string>
              </property>
@@ -174,6 +177,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="expensesRelativeWeigthRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Expenses</string>
              </property>
@@ -211,6 +217,9 @@
            </item>
            <item>
             <widget class="QSpinBox" name="noElementsSpinBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Specify how many slices the pie chart will have. If this number is greater or equal to the total number of incomes (or expenses), then it is the latter that is used. Otherwise, there will be 1 more slice than this number, dedicated to all the “other” incomes (or expenses) taken all together (named “Others” on the chart). &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="minimum">
               <number>1</number>
              </property>
@@ -439,6 +448,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_9">
            <item>
             <widget class="QRadioButton" name="monthlyReportChartIncomesRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display only the incomes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Incomes</string>
              </property>
@@ -449,6 +461,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="monthlyReportChartExpensesRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display only the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Expenses</string>
              </property>
@@ -459,6 +474,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="monthlyReportChartIncomesExpensesRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the incomes and the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Incomes and Expenses</string>
              </property>
@@ -472,6 +490,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="monthlyReportChartDeltasRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the deltas between incomes and expences.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Deltas</string>
              </property>
@@ -687,6 +708,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
             <widget class="QRadioButton" name="yearlyReportChartIncomesRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display only the incomes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Incomes</string>
              </property>
@@ -697,6 +721,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="yearlyReportChartExpensesRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display only the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Expenses</string>
              </property>
@@ -707,6 +734,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="yearlyReportChartIncomesExpensesRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the incomes and the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Incomes and Expenses</string>
              </property>
@@ -720,6 +750,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="yearlyReportChartDeltasRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the deltas between incomes and expences.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Deltas</string>
              </property>
@@ -841,6 +874,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
             <widget class="QPushButton" name="exportMonthlyReportToTextPushButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export in a CSV file the monthly report.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Export to CSV...</string>
              </property>
@@ -898,6 +934,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
             <widget class="QPushButton" name="exportYearlyReportToTextPushButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export in a CSV file the yearly report.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Export to CSV...</string>
              </property>
@@ -969,8 +1008,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

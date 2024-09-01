@@ -87,6 +87,9 @@ set(PROJECT_SOURCES
     scenario.h
     scenariofetablemodel.cpp
     scenariofetablemodel.h
+    scenariopropertiesdialog.h
+    scenariopropertiesdialog.cpp
+    scenariopropertiesdialog.ui
     selectcountrydialog.cpp
     selectcountrydialog.h
     selectcountrydialog.ui
@@ -117,6 +120,7 @@ qt6_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 
 qt6_add_executable(gbp MANUAL_FINALIZATION ${PROJECT_SOURCES} ${QM_FILES}
+    gbp_resources.qrc
 )
 
 

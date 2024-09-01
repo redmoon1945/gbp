@@ -71,7 +71,10 @@ public:
     void getStreamDefNameAndColorFromId(QUuid id,  QString& name, QColor& color, bool& found) const;
     FileResult saveToFile(QString fullFileName) const;
     static FileResult loadFromFile(QString fullFileName);
-    // static QSharedPointer<Scenario> createNewEmptyScenario();
+    int getNoOfPeriodicIncomes();
+    int getNoOfIrregularIncomes();
+    int getNoOfPeriodicExpenses();
+    int getNoOfIrregularExpenses();
 
     // Getters and setters
     QString getVersion() const;

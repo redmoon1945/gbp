@@ -124,7 +124,7 @@ For development, some stuff must be installed on Ubuntu before trying to install
 
 ### Step 3
 
-Download, install and run the online Qt installer. Install Qt 6.2.4 (with all “additional libraries”) and QtCreator 13 in default directory ($HOME). No need for Android and WebAssembly stuff. Test QtCreator by creating dummy widget app and verify that everything works.
+Download, install and run the online Qt installer. Install Qt 6.2.4 (with all “additional libraries”) and QtCreator 14 in default directory ($HOME). No need for Android and WebAssembly stuff. Test QtCreator by creating dummy widget app and verify that everything works.
 
 When launching QtCreator for the first time, you should have the following error : 
 `Could not load the Qt platform plugin "xcb" in "" even though it was found.
@@ -135,7 +135,10 @@ To fix the problem, do :
 
 ### Step 4
 
-Modify ~/.profile to include qmake path (for linuxdeployqt), that is , that is ~/Qt/6.2.4/gcc_64/bin. Reboot
+Modify ~/.bashrc to include qmake path (for linuxdeployqt), so add the following line at the end of the file and then reboot :
+
+`PATH="$HOME/Qt/6.2.4/gcc_64/bin:$PATH"`
+
 
 ### Step 5
 

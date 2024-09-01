@@ -33,6 +33,10 @@ public:
     explicit AboutDialog(QWidget *parent = nullptr);
     ~AboutDialog();
 
+public slots:
+    // For client of AboutDialog : prepare Dialog before edition
+    void slotAboutDialogPrepareContent();
+
 private slots:
     void on_AboutDialog_rejected();
     void on_closePushButton_clicked();

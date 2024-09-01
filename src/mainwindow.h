@@ -20,6 +20,7 @@
 #define MAINWINDOW_H
 
 #include "editscenariodialog.h"
+#include "scenariopropertiesdialog.h"
 #include "selectcountrydialog.h"
 #include "optionsdialog.h"
 #include "aboutdialog.h"
@@ -60,6 +61,10 @@ signals:
     void signalDateIntervalPrepareContent();
     //
     void signalSelectCountryPrepareContent();
+    // For Scenario Properties display : prepare content before edition
+    void signalScenarioPropertiesPrepareContent();
+    // For About Dialog : prepare content before edition
+    void signalAboutDialogPrepareContent();
 
 public slots:
     // From SelectCountry Dialog : receive result and notification of edition completion
@@ -74,6 +79,8 @@ public slots:
     // From DateInterval Edit : result and edition completion notification
     void slotDateIntervalResult(QDate from, QDate to);
     void slotDateIntervalCompleted();
+    // From ScenarioProperties : completion notification
+    void slotScenarioPropertiesCompleted();
     // to catch point selection signal
     void selectionChangedByUser();
     // to catch scale change in an axis
@@ -90,9 +97,11 @@ private slots:
     void on_actionAbout_triggered();
     void on_actionAbout_Qt_triggered();
     void on_actionOpen_triggered();
+    void on_actionOpen_Example_triggered();
     void on_actionSave_As_triggered();
     void on_actionSave_triggered();
     void on_actionEdit_triggered();
+    void on_actionProperties_triggered();
     void on_actionNew_triggered();
     void on_actionClear_List_triggered();
     void on_actionRecentFile_triggered();
@@ -118,6 +127,8 @@ private slots:
     void on_exportTextFilePushButton_clicked();
     void on_baselineDoubleSpinBox_editingFinished();
     void on_customToolButton_clicked();
+    void on_actionUser_Manual_triggered();
+    void on_actionQuick_Tutorial_triggered();
 
 private:
 
@@ -130,6 +141,7 @@ private:
     AboutDialog* aboutDlg;
     AnalysisDialog* analysisDlg;
     DateIntervalDialog* dateIntervalDlg;
+    ScenarioPropertiesDialog* scenarioPropertiesDlg;
 
     // variables
     int maxRecentFiles = 10;
@@ -167,6 +179,7 @@ private:
     void emptyDailyInfoSection();
     void updateBaselineWidgets(CurrencyInfo currInfo);
     void checkIfCurrentScenarioMatchesDiskVersion(bool& match) const;
+    bool checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding();
 
 
 };

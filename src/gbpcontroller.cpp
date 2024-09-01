@@ -68,7 +68,7 @@ GbpController::GbpController()
         }
     }
 
-    // Initi the value of "today".
+    // Init the value of "today".
     // Set ONCE the date corresponding to "today" and "tomorrow". There are 3 reasons why we dont want the app to call everywhere "QDate::currentDate()"
     // 1) the app could have been started near midnight and the transition to another day while running could mess up things (for log for example)
     // 2) we want to offer the option of setting the "today" date as configuration parameter (in the "options")
@@ -100,8 +100,8 @@ GbpController::GbpController()
     }
 
     // open log file and create out stream
-    QString logFileName = QString("%1/%2__%3.txt").arg(logFolder).arg(today.toString("yyyy-MM-dd")).arg(QTime::currentTime().toString("hh_mm_ss"));
-    logFile.setFileName(logFileName);
+    logFullFileName = QString("%1/%2__%3.txt").arg(logFolder).arg(today.toString("yyyy-MM-dd")).arg(QTime::currentTime().toString("hh_mm_ss"));
+    logFile.setFileName(logFullFileName);
     success = logFile.open(QIODevice::Append | QIODevice::WriteOnly | QIODevice::Text);
     if (success == false){
         loggingEnabled = false;
@@ -109,7 +109,7 @@ GbpController::GbpController()
         qWarning().noquote() << errorString;
     } else {
         loggingEnabled = true;
-        QString successString = QString("Log file created : %1, log level=%2").arg(logFileName).arg(logLevel);
+        QString successString = QString("Log file created : %1, log level=%2").arg(logFullFileName).arg(logLevel);
         qInfo().noquote() << successString;
     }
     logOutStream.setDevice(&logFile);
@@ -119,9 +119,9 @@ GbpController::GbpController()
 
     // define default path for settings before creating GbpController (we dont want OrganizationName be part of the path)
     // One choose INI file structure (favor decentralization, portability and human readability)
-    QString settingsFile = QString("%1/%2.ini").arg(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)).arg(QCoreApplication::applicationName());
-    settingsPtr = new QSettings(settingsFile, QSettings::IniFormat);
-    QString configFileString = QString("Configuration file is : %1").arg(settingsFile);
+    settingsFullFileName = QString("%1/%2.ini").arg(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)).arg(QCoreApplication::applicationName());
+    settingsPtr = new QSettings(settingsFullFileName, QSettings::IniFormat);
+    QString configFileString = QString("Configuration file is : %1").arg(settingsFullFileName);
     qInfo().noquote() << configFileString;
 
 }
@@ -673,6 +673,17 @@ void GbpController::setPvDiscountRate(double newPvDiscountRate)
 {
     pvDiscountRate = newPvDiscountRate;
 }
+
+QString GbpController::getSettingsFullFileName() const
+{
+    return settingsFullFileName;
+}
+
+QString GbpController::getLogFullFileName() const
+{
+    return logFullFileName;
+}
+
 
 
 
