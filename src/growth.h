@@ -122,9 +122,11 @@ public:
     // Methods
     QMap<QDate,qint64> adjustForGrowth(quint64 amount, QList<QDate> occurrenceDates, ApplicationStrategy appStrategy, double pvDiscountRate, QDate pvCalculationReferenceDate, AdjustForGrowthResult &ok) const;
     QJsonObject toJson() const;
+    void changeByFactor(double factor, bool& capped);
     static Growth fromJson(const QJsonObject& jsonObject, Util::OperationResult &result);
     static qint64 fromDoubleToDecimal(long double d);
     static long double fromDecimalToDouble(qint64 i);
+
 
     // getters / setters (no setters)
     Type getType() const;
@@ -148,7 +150,7 @@ private:
     // *** Transient data for internal calculation : MONTHLY GROWTH ***
     // *** This is just an APPROXIMATION of persistent data ***
     // for constant type
-    long double monthlyConstantGrowth ;                 // percentage on MONTHLY basis
+    long double monthlyConstantGrowth ;                 // percentage on MONTHLY basis, expressed as double
     // for variable type
     QMap<QDate,long double> monthlyVariableGrowth;      // Like annualVariableGrowth, but value iss MONTHLY growth in percentage and in double
 

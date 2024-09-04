@@ -1,4 +1,9 @@
 # Change logs
+## 1.3.0 to 1.4.0
+### New Features
+- For Periodic Financial Stream Definition, when Scenario's inflation is selected for the growth, introduce an additional adjustment factor that allows the final growth to be inflation * a_factor. 
+- For Edit Periodic and Irregular Financial Stream Definition Dialogs, completely rework the See Occurrence Dialog so that a chart for the events is also displayed
+
 ## 1.2.0 to 1.3.0
 ### New Features
 - In menu "Help", it is now possible to consult the full User Manual in PDF format, using the new menu item "User Manual"

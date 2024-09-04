@@ -1063,149 +1063,141 @@ Détails : %1</translation>
         <translation>* Tous les montants spécifiés sont toujours des &quot;valeurs futures&quot;. Ils sont convertis en &quot;valeurs actuelles&quot; dans les diagrammes si indiqué dans les Options. Cliquer sur &quot;Voir les occurrences...&quot; pour voir les montants finaux.</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="481"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Display in a dedicated window all the financial events that will be generated for this Financial Stream Definition, taking into account the optional conversion to Present Value if set accordingly in Options Dialog.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Affiche tous les évènements financiers qui seront générés pour cet item, en considérant la conversion optionnelle à la valeur actualisée tel que spécifié dans les Options.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Affiche tous les évènements financiers qui seront générés pour cet item, en considérant la conversion optionnelle à la valeur actualisée tel que spécifié dans les Options.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="491"/>
+        <location filename="editirregulardialog.ui" line="481"/>
+        <source>Visualize Occurrences...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editirregulardialog.ui" line="488"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Get all the financial event definitions from a CSV file. Current defined ones are deleted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Charger les évènements financiers à partir d&apos;un fichier CSV.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="484"/>
         <source>See all occurrences...</source>
-        <translation>Afficher les occurrences...</translation>
+        <translation type="vanished">Afficher les occurrences...</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="494"/>
+        <location filename="editirregulardialog.ui" line="491"/>
         <source>Load from file...</source>
         <translation>Chargement...</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="514"/>
-        <location filename="editirregulardialog.cpp" line="176"/>
+        <location filename="editirregulardialog.ui" line="511"/>
+        <location filename="editirregulardialog.cpp" line="178"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.ui" line="521"/>
-        <location filename="editirregulardialog.cpp" line="175"/>
+        <location filename="editirregulardialog.ui" line="518"/>
+        <location filename="editirregulardialog.cpp" line="177"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="171"/>
+        <location filename="editirregulardialog.cpp" line="173"/>
         <source>Editing Income of Category Type &quot;Irregular&quot;</source>
         <translation>Éditer un revenu de catégorie &quot;Irrégulier&quot;</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="173"/>
+        <location filename="editirregulardialog.cpp" line="175"/>
         <source>Editing Expense of Category Type &quot;Irregular&quot;</source>
         <translation>Éditer une dépense de catégorie &quot;Irrégulier&quot;</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="195"/>
+        <location filename="editirregulardialog.cpp" line="197"/>
         <source>Creating Irregular Income</source>
         <translation>Créer un revenu de catégorie &quot;Irrégulier&quot;</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="197"/>
+        <location filename="editirregulardialog.cpp" line="199"/>
         <source>Creating Irregular Expense</source>
         <translation>Créer une dépense de catégorie &quot;Irrégulier&quot;</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="199"/>
+        <location filename="editirregulardialog.cpp" line="201"/>
         <source>Create</source>
         <translation>Créer</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="200"/>
+        <location filename="editirregulardialog.cpp" line="202"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="337"/>
-        <location filename="editirregulardialog.cpp" line="360"/>
+        <location filename="editirregulardialog.cpp" line="344"/>
+        <location filename="editirregulardialog.cpp" line="367"/>
         <source>Invalid Selection</source>
         <translation>Sélection invalide</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="337"/>
+        <location filename="editirregulardialog.cpp" line="344"/>
         <source>Select exactly one row</source>
         <translation>Sélectionner exactement une rangée</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="360"/>
+        <location filename="editirregulardialog.cpp" line="367"/>
         <source>Select at least one row</source>
         <translation>Sélectionner au moins une rangée</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="381"/>
+        <location filename="editirregulardialog.cpp" line="388"/>
         <source>Edit Description</source>
         <translation>Édition de la description</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="449"/>
+        <location filename="editirregulardialog.cpp" line="456"/>
         <source>Color Chooser</source>
         <translation>Sélection de couleur</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="487"/>
         <source>Dates are in ISO 8601 format (YYYY-MM-DD).</source>
-        <translation>Les dates sont en format ISO 8601 (YYYY-MM-DD).</translation>
+        <translation type="vanished">Les dates sont en format ISO 8601 (YYYY-MM-DD).</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="491"/>
         <source>Converting Future Values to Present Values using an annual discount rate of %1 percent.</source>
-        <translation>Conversion vers la valeur actuelle avec un taux de réduction annuel de %1 pour cent.</translation>
+        <translation type="vanished">Conversion vers la valeur actuelle avec un taux de réduction annuel de %1 pour cent.</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="501"/>
         <source>Amount was too big %1 times and have been capped to %2.</source>
-        <translation>Le montant a dépassé %1 fois le maximum permis et a été chaque fois plafonné à %2.</translation>
+        <translation type="vanished">Le montant a dépassé %1 fois le maximum permis et a été chaque fois plafonné à %2.</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="503"/>
         <source>%1 %2 event(s) have been generated.
 </source>
-        <translation>%1 %2 évènements ont été générés.
+        <translation type="vanished">%1 %2 évènements ont été générés.
 </translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="503"/>
         <source>income</source>
-        <translation>revenu</translation>
+        <translation type="vanished">revenu</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="503"/>
         <source>expense</source>
-        <translation>dépense</translation>
+        <translation type="vanished">dépense</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="509"/>
         <source>Amount is bigger than the maximum allowed</source>
-        <translation>Le montant est supérieur au maximum autorisé</translation>
+        <translation type="vanished">Le montant est supérieur au maximum autorisé</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="513"/>
         <source>Error during amount conversion</source>
-        <translation>Une erreur est survenue lors de la conversion du montant</translation>
+        <translation type="vanished">Une erreur est survenue lors de la conversion du montant</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="518"/>
         <source>%1 : %2 (cummul=%3)</source>
-        <translation>%1 : %2 (cummul=%3)</translation>
+        <translation type="vanished">%1 : %2 (cummul=%3)</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="521"/>
         <source>  *** PAST -&gt; discarded ***</source>
-        <translation>  *** Passé -&gt; Non retenu ***</translation>
+        <translation type="vanished">  *** Passé -&gt; Non retenu ***</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="530"/>
         <source>Results for the Irregular item</source>
-        <translation>Résultats pour l&apos;item irrégulier</translation>
+        <translation type="vanished">Résultats pour l&apos;item irrégulier</translation>
     </message>
 </context>
 <context>
@@ -1380,7 +1372,7 @@ Détails : %1</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="231"/>
-        <location filename="editperiodicdialog.ui" line="817"/>
+        <location filename="editperiodicdialog.ui" line="882"/>
         <source>---</source>
         <translation>---</translation>
     </message>
@@ -1456,14 +1448,29 @@ Détails : %1</translation>
         <translation>Croissance mensuelle :</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="961"/>
+        <location filename="editperiodicdialog.ui" line="570"/>
+        <source>Scenario&apos;s inflation</source>
+        <translation>Inflation du scénario</translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="596"/>
+        <source>-&gt; multiplied by :</source>
+        <oldsource>-&gt; Multiplied by :</oldsource>
+        <translation>-&gt; multiplié par :</translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="1026"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do&lt;/span&gt; use this Financial Stream Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Utiliser&lt;/span&gt; cet item dans les calculs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1047"/>
+        <location filename="editperiodicdialog.ui" line="1112"/>
+        <source>Visualize occurences...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Display in a dedicated window all the financial events that will be generated for this Financial Stream Definition, taking into account any kind of growth defined and the optional conversion to Present Value if set accordingly in Options Dialog.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Afficher tous les évènements financiers qui seront générés pour cet item, en considérant tous les types de croissances définis et la conversion optionnelle à des valeurs actualisées tel que défini dans les Options.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Afficher tous les évènements financiers qui seront générés pour cet item, en considérant tous les types de croissances définis et la conversion optionnelle à des valeurs actualisées tel que défini dans les Options.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="550"/>
@@ -1476,59 +1483,58 @@ Détails : %1</translation>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;L&apos;inflation définie au niveau du scénario est appliquée à ce montant.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="570"/>
         <source>Follow inflation defined at the scenario level</source>
-        <translation>Suit l&apos;inflation définie dans le scénario</translation>
+        <translation type="vanished">Suit l&apos;inflation définie dans le scénario</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="593"/>
+        <location filename="editperiodicdialog.ui" line="658"/>
         <source>Custom - Constant</source>
         <translation>Spécifique - constante</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="628"/>
+        <location filename="editperiodicdialog.ui" line="693"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Annual&lt;/span&gt; constant growth rate to be applied to the amount, in percentage. In practice, however, it is the &lt;span style=&quot; text-decoration: underline;&quot;&gt;equivalent monthly growth&lt;/span&gt; that is applied, on the 1st of each month.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Taux de croissance &lt;span style=&quot; font-weight:700;&quot;&gt;annuelle&lt;/span&gt; à appliquer au montant, en pourcentage. À l&apos;interne, c&apos;est la &lt;span style=&quot; text-decoration: underline;&quot;&gt;croissance mensuelle équivalente&lt;/span&gt; qui est utilisée et appliquée le 1er de chaque mois.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="631"/>
+        <location filename="editperiodicdialog.ui" line="696"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="653"/>
+        <location filename="editperiodicdialog.ui" line="718"/>
         <source> on annual basis</source>
         <translation> base annuelle</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="686"/>
+        <location filename="editperiodicdialog.ui" line="751"/>
         <source>Custom - Variable</source>
         <translation>Spécifique - variable</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="712"/>
+        <location filename="editperiodicdialog.ui" line="777"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit or View the variable growth pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Editer ou consulter le patron de croissance variable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="715"/>
+        <location filename="editperiodicdialog.ui" line="780"/>
         <source>Edit/view...</source>
         <translation>Éditer / voir...</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="750"/>
+        <location filename="editperiodicdialog.ui" line="815"/>
         <source>Colorize Name :</source>
         <oldsource>Use Decorative Color :</oldsource>
         <translation>Colorer le nom :</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="759"/>
+        <location filename="editperiodicdialog.ui" line="824"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : User-defined color is assigned to the name.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : System default is used for the name&apos;s color&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked : Assign a custom color to the name of this Periodic Financial Stream Definition.&lt;/p&gt;&lt;p&gt;Unchecked : Use system default.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Si &lt;span style=&quot; font-weight:700;&quot;&gt;coché&lt;/span&gt; : Une couleur spécifique est associée au nom de cet item.&lt;/p&gt;&lt;p&gt;Si &lt;span style=&quot; font-weight:700;&quot;&gt;non coché&lt;/span&gt; : Le défaut système est utilisé pour la couleur du nom de cet item&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="850"/>
+        <location filename="editperiodicdialog.ui" line="915"/>
         <source>Growth Application Period :</source>
         <translation>Application de la croissance :</translation>
     </message>
@@ -1541,12 +1547,12 @@ Détails : %1</translation>
         <translation type="vanished">Actif : </translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="964"/>
+        <location filename="editperiodicdialog.ui" line="1029"/>
         <source>Yes</source>
         <translation>Oui</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1002"/>
+        <location filename="editperiodicdialog.ui" line="1067"/>
         <source>No</source>
         <translation>Non</translation>
     </message>
@@ -1570,61 +1576,60 @@ Détails : %1</translation>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le montant reste identique à chaque répétition (sauf si est activé dans les Options la &amp;quot;Conversion à la valeur actuelle&amp;quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="590"/>
+        <location filename="editperiodicdialog.ui" line="655"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply a constant growth pattern to the amount.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Application d&apos;une croissance constante au montant.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="683"/>
+        <location filename="editperiodicdialog.ui" line="748"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Apply a variable growth pattern to the amount.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Appliquer un patron de croissance variable au montant.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="785"/>
+        <location filename="editperiodicdialog.ui" line="850"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click on this button to set a custom color for the name of this Financial Stream Definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cliquer sur ce bouton pour définir la couleur du nom de cet item.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="865"/>
+        <location filename="editperiodicdialog.ui" line="930"/>
         <source>Every </source>
         <translation>Chaque </translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="878"/>
+        <location filename="editperiodicdialog.ui" line="943"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;How often the “cumulative” growth is applied. A value of &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; specifies that, for every &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; financial events, the amount will be adjusted by the cummulative growth reached at this moment.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;How often the “cumulative” growth is applied. A value of &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; specifies that, at every &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; occurrences, the amount will be adjusted by the cummulative growth reached at this moment.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;À quelle fréquence est appliquée la croissance cummulée. Une valeur de &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; spécifie que, à chaque &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; évènements financiers, le montant sera ajusté avec la croisance cummulée atteinte à ce moment.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="913"/>
+        <location filename="editperiodicdialog.ui" line="978"/>
         <source>financial events</source>
         <translation>évènements financiers</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="946"/>
+        <location filename="editperiodicdialog.ui" line="1011"/>
         <source>Enabled :</source>
         <translation>Activé :</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="999"/>
+        <location filename="editperiodicdialog.ui" line="1064"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do not&lt;/span&gt; use this Financial Stream Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do not&lt;/span&gt; use this Financial Strean Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Ne pas&lt;/span&gt; utiliser cet item dans les calculs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1050"/>
         <source>See all occurences...</source>
-        <translation>Voir les occurrences...</translation>
+        <translation type="vanished">Voir les occurrences...</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1070"/>
-        <location filename="editperiodicdialog.cpp" line="192"/>
+        <location filename="editperiodicdialog.ui" line="1132"/>
+        <location filename="editperiodicdialog.cpp" line="201"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1077"/>
-        <location filename="editperiodicdialog.cpp" line="132"/>
+        <location filename="editperiodicdialog.ui" line="1139"/>
+        <location filename="editperiodicdialog.cpp" line="138"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
@@ -1634,58 +1639,58 @@ Détails : %1</translation>
         <translation>Croissance</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="128"/>
+        <location filename="editperiodicdialog.cpp" line="134"/>
         <source>Editing Income of Category Type &quot;Periodic&quot;</source>
         <translation>Éditer un revenu de catégorie &quot;périodique&quot;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="130"/>
+        <location filename="editperiodicdialog.cpp" line="136"/>
         <source>Editing Expense of Category Type &quot;Periodic&quot;</source>
         <translation>Éditer une dépense de catégorie &quot;périodique&quot;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="133"/>
+        <location filename="editperiodicdialog.cpp" line="139"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="186"/>
+        <location filename="editperiodicdialog.cpp" line="195"/>
         <source>Creating Periodic Income</source>
         <translation>Créer un revenu de catégorie &quot;périodique&quot;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="188"/>
+        <location filename="editperiodicdialog.cpp" line="197"/>
         <source>Creating Periodic Expense</source>
         <translation>Créer une dépense de catégorie &quot;périodique&quot;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="191"/>
+        <location filename="editperiodicdialog.cpp" line="200"/>
         <source>Create</source>
         <translation>Créer</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="246"/>
-        <location filename="editperiodicdialog.cpp" line="472"/>
+        <location filename="editperiodicdialog.cpp" line="260"/>
+        <location filename="editperiodicdialog.cpp" line="533"/>
         <source>Invalid Data Entered</source>
         <translation>Donnée invalide</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="317"/>
+        <location filename="editperiodicdialog.cpp" line="340"/>
         <source>For Validity Range, the &quot;to&quot; date must not occur before the &quot;from&quot; date</source>
         <translation>Pour l&apos;intervalle de validité, la date &quot;À&quot; ne doit pas survenir avant la date &quot;De&quot;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="328"/>
+        <location filename="editperiodicdialog.cpp" line="351"/>
         <source>The amount cannot be bigger than %1</source>
         <translation>Le montant ne doit pas être supérieur à %1</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="333"/>
+        <location filename="editperiodicdialog.cpp" line="356"/>
         <source>An error occured while processing the amount : code=%1</source>
         <translation>Erreur lors du traitement du montant : code = %1</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="365"/>
+        <location filename="editperiodicdialog.cpp" line="391"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
@@ -1694,94 +1699,79 @@ Details : %1</source>
 Détails : %1</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="459"/>
+        <location filename="editperiodicdialog.cpp" line="485"/>
         <source>Edit Description</source>
         <translation>Édition de la description</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="479"/>
         <source>Dates are in ISO 8601 format (YYYY-MM-DD).</source>
-        <translation>Les dates sont en format ISO 8601 format (YYYY-MM-DD).</translation>
+        <translation type="vanished">Les dates sont en format ISO 8601 format (YYYY-MM-DD).</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="483"/>
-        <source>Using constant annual inflation of %1 as defined in the scenario.</source>
-        <translation>Inflation constante de %1 (base annuelle) telle que définie dans le scénario.</translation>
+        <source>Using constant adjusted annual inflation of %1 as defined in the scenario.</source>
+        <oldsource>Using constant adjused annual inflation of %1 as defined in the scenario.</oldsource>
+        <translation type="vanished">Inflation constante ajustée de %1 (base annuelle) telle que définie dans le scénario.</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="485"/>
         <source>Using variable inflation as defined in the scenario.</source>
-        <translation>Inflation variable telle que définie dans le scénario.</translation>
+        <translation type="vanished">Inflation variable telle que définie dans le scénario.</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="488"/>
         <source>Using custom constant growth of %1 percent.</source>
-        <translation>Utilisation d&apos;une croissance constante spécifique de %1 pourcent.</translation>
+        <translation type="vanished">Utilisation d&apos;une croissance constante spécifique de %1 pourcent.</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="490"/>
         <source>Using custom variable growth.</source>
-        <translation>Utilisation d&apos;une croissance variable spécifique.</translation>
+        <translation type="vanished">Utilisation d&apos;une croissance variable spécifique.</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="492"/>
         <source>No growth of any kind is applied.</source>
-        <translation>Aucune croissance appliquée.</translation>
+        <translation type="vanished">Aucune croissance appliquée.</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="497"/>
         <source>Converting Future Values to Present Values using an annual discount rate of %1 percent.</source>
-        <translation>Conversion vers la valeur actuelle avec un taux de réduction annuel de %1 pourcent.</translation>
+        <translation type="vanished">Conversion vers la valeur actuelle avec un taux de réduction annuel de %1 pourcent.</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="505"/>
         <source>Amount was too big %1 times and have been capped to %2.</source>
-        <translation>Le montant a dépassé %1 fois le maximum permis et a été chaque fois plafonné à %2.</translation>
+        <translation type="vanished">Le montant a dépassé %1 fois le maximum permis et a été chaque fois plafonné à %2.</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="507"/>
         <source>%1 %2 event(s) have been generated for the whole Validity Range.
 </source>
-        <translation>%1 évènement(s) de type %2 a (ont) été généré(s) à l&apos;intérieur de l&apos;intervalle de validité.
+        <translation type="vanished">%1 évènement(s) de type %2 a (ont) été généré(s) à l&apos;intérieur de l&apos;intervalle de validité.
 </translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="507"/>
         <source>income</source>
-        <translation>revenu</translation>
+        <translation type="vanished">revenu</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="507"/>
         <source>expense</source>
-        <translation>dépense</translation>
+        <translation type="vanished">dépense</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="513"/>
         <source>Amount is bigger than the maximum allowed</source>
-        <translation>Le montant est supérieur au maximum autorisé</translation>
+        <translation type="vanished">Le montant est supérieur au maximum autorisé</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="517"/>
         <source>Error during amount conversion</source>
-        <translation>Une erreur est survenue lors de la conversion du montant</translation>
+        <translation type="vanished">Une erreur est survenue lors de la conversion du montant</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="522"/>
         <source>%1 : %2 (cummul=%3)</source>
-        <translation>%1 : %2 (cummul=%3)</translation>
+        <translation type="vanished">%1 : %2 (cummul=%3)</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="525"/>
         <source>  *** PAST -&gt; discarded ***</source>
-        <translation>  *** Passé -&gt; Non retenu ***</translation>
+        <translation type="vanished">  *** Passé -&gt; Non retenu ***</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="534"/>
         <source>Results for the Perodic item</source>
-        <translation>Résultats</translation>
+        <translation type="vanished">Résultats</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="543"/>
+        <location filename="editperiodicdialog.cpp" line="496"/>
         <source>Color Chooser</source>
         <translation>Sélection de couleur</translation>
     </message>
@@ -2484,152 +2474,152 @@ Détails : %1</translation>
 <context>
     <name>Growth</name>
     <message>
-        <location filename="growth.cpp" line="177"/>
+        <location filename="growth.cpp" line="221"/>
         <source>Cannot find NoOfDecimals tag</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="182"/>
+        <location filename="growth.cpp" line="226"/>
         <source>No of decimals value is not a number</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; a une valeur qui n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="189"/>
+        <location filename="growth.cpp" line="233"/>
         <source>No of decimals value %1 is not an integer</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; a une valeur %1 qui n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="194"/>
+        <location filename="growth.cpp" line="238"/>
         <source>No of decimals value %1 is invalid</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; a une valeur %1 qui est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="199"/>
+        <location filename="growth.cpp" line="243"/>
         <source>No of decimals value %1 is incompatible with expected value %2</source>
         <translation>L&apos;étiquette &quot;NoOfDecimals&quot; a une valeur %1 qui est incompatible avec la valeur attendue %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="206"/>
+        <location filename="growth.cpp" line="250"/>
         <source>Cannot find AnnualConstantGrowth tag</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="211"/>
+        <location filename="growth.cpp" line="255"/>
         <source>AnnualConstantGrowth value is not a number</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur qui n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="218"/>
+        <location filename="growth.cpp" line="262"/>
         <source>AnnualConstantGrowth value %1 is not an integer</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur %1 qui n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="223"/>
+        <location filename="growth.cpp" line="267"/>
         <source>AnnualConstantGrowth value %1 is invalid for unknow reason</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur %1 qui est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="228"/>
+        <location filename="growth.cpp" line="272"/>
         <source>AnnualConstantGrowth value %1 is larger than the maximum allowed of %2</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur %1 qui est supérieure au maximum permis de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="233"/>
+        <location filename="growth.cpp" line="277"/>
         <source>AnnualConstantGrowth value %1 is smaller than the minimum value allowed of %2</source>
         <translation>L&apos;étiquette &quot;AnnualConstantGrowth&quot; a une valeur %1 qui est plus petite que le minimum permis de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="240"/>
+        <location filename="growth.cpp" line="284"/>
         <source>Cannot find AnnualVariableGrowth tag</source>
         <translation>L&apos;étiquette &quot;AnnualVariableGrowth&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="245"/>
+        <location filename="growth.cpp" line="289"/>
         <source>AnnualVariableGrowth tag is not an Object</source>
         <translation>L&apos;étiquette &quot;AnnualVariableGrowth&quot; a une valeur qui n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="255"/>
+        <location filename="growth.cpp" line="299"/>
         <source>Entry key %1 in AnnualVariableGrowth table is not a valid ISO Date</source>
         <translation>La clé %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; n&apos;est pas une date ISO valide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="260"/>
+        <location filename="growth.cpp" line="304"/>
         <source>Entry key %1 in AnnualVariableGrowth table has Day not set to 1</source>
         <translation>La clé%1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; est assignée à la valeur illégale &quot;1&quot;</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="267"/>
+        <location filename="growth.cpp" line="311"/>
         <source>Value %1 in AnnualVariableGrowth table is not a number</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="274"/>
+        <location filename="growth.cpp" line="318"/>
         <source>AnnualVariableGrowth value %1 is not an integer</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="279"/>
+        <location filename="growth.cpp" line="323"/>
         <source>Value %1 in AnnualVariableGrowth table is invalid for unknown reason</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="284"/>
+        <location filename="growth.cpp" line="328"/>
         <source>Value %1 in AnnualVariableGrowth table is bigger than the maximum allowed of %2</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; est supérieure au maximum autorisée de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="289"/>
+        <location filename="growth.cpp" line="333"/>
         <source>Value %1 in AnnualVariableGrowth table is smaller than the minimum value of %2</source>
         <translation>La valeur %1 dans la table en valeur de l&apos;étiquette &quot;AnnualVariableGrowth&quot; est inférieure au minimum autorisée de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="299"/>
+        <location filename="growth.cpp" line="343"/>
         <source>Cannot find Type tag</source>
         <translation>L&apos;étiquette &quot;Type&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="304"/>
+        <location filename="growth.cpp" line="348"/>
         <source>Type tag %1 is not a number</source>
         <translation>L&apos;étiquette &quot;Type&quot; a une valeur %1 qui n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="311"/>
+        <location filename="growth.cpp" line="355"/>
         <source>Type tag %1 is not an integer</source>
         <translation>L&apos;étiquette &quot;Type&quot; a une valeur %1 qui n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="316"/>
+        <location filename="growth.cpp" line="360"/>
         <source>Type tag %1 is far too big</source>
         <translation>L&apos;étiquette &quot;Type&quot; a une valeur %1 qui est trop élevée</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="331"/>
+        <location filename="growth.cpp" line="375"/>
         <source>Type tag %1 value is unknown</source>
         <translation>L&apos;étiquette &quot;Type&quot; a une valeur %1 qui est inconnue</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="395"/>
+        <location filename="growth.cpp" line="439"/>
         <source>%1 : OccurrenceDates are not sorted properly</source>
         <translation>%1 : Les dates d&apos;occurrence ne sont pas triées</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="401"/>
+        <location filename="growth.cpp" line="445"/>
         <source>%1 : AppStrategy.noOfMonth is invalid</source>
         <translation>%1 : AppStrategy.noOfMonth est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="406"/>
+        <location filename="growth.cpp" line="450"/>
         <source>%1 : Amount is too big </source>
         <translation>%1 : Le montant est trop grand </translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="411"/>
+        <location filename="growth.cpp" line="455"/>
         <source>%1 : Present Value annual discount rate smaller than 0</source>
         <translation>%1 : Le taux de réduction annuel est plus petit que zéro</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="416"/>
+        <location filename="growth.cpp" line="460"/>
         <source>%1 : PV Present Date is invalid</source>
         <translation>%1 : La date &quot;présent&quot; pour la valeur actuelle est invalide</translation>
     </message>
@@ -2650,22 +2640,22 @@ Détails : %1</translation>
         <translation type="vanished">La valeur du montant est inférieure à 0</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="617"/>
+        <location filename="growth.cpp" line="661"/>
         <source>Date %1 is invalid</source>
         <translation>La date %1 est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="622"/>
+        <location filename="growth.cpp" line="666"/>
         <source>Date %1 is invalid because Day is not set to 1</source>
         <translation>La date %1 est invalide, pcq le jour n&apos;est pas égale à 1</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="630"/>
+        <location filename="growth.cpp" line="674"/>
         <source>Growth %1 is smaller than the minimum allowed of %2</source>
         <translation>La valeur de la croissance %1 est inférieure au minimum permis de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="635"/>
+        <location filename="growth.cpp" line="679"/>
         <source>Growth %1 is bigger than the maximum allowed of %2</source>
         <translation>La valeur de la croissance %1 est supérieure au maximum permis de %2</translation>
     </message>
@@ -3288,6 +3278,11 @@ Details : %1</source>
         <translation>Tutoriel rapide (anglais)</translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="828"/>
+        <source>Duplicate...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="mainwindow.cpp" line="78"/>
         <source>Start Amount for Today %1 :</source>
         <oldsource>Start Amount Today %1 :</oldsource>
@@ -3774,164 +3769,174 @@ Details : %2</source>
 <context>
     <name>PeriodicFeStreamDef</name>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="253"/>
-        <location filename="periodicfestreamdef.cpp" line="372"/>
-        <location filename="periodicfestreamdef.cpp" line="460"/>
+        <location filename="periodicfestreamdef.cpp" line="279"/>
+        <location filename="periodicfestreamdef.cpp" line="398"/>
+        <location filename="periodicfestreamdef.cpp" line="486"/>
         <source>PeriodicFeStreamDef - </source>
         <translation>PeriodicFeStreamDef - </translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="262"/>
+        <location filename="periodicfestreamdef.cpp" line="288"/>
         <source>PeriodicFeStreamDef - Cannot find PeriodType tag</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;PeriodType&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="267"/>
+        <location filename="periodicfestreamdef.cpp" line="293"/>
         <source>PeriodicFeStreamDef - PeriodType tag is not a number</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;PeriodType&quot; a une valeur qui n&apos;est pas un nombre valide</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="274"/>
+        <location filename="periodicfestreamdef.cpp" line="300"/>
         <source>PeriodicFeStreamDef - PeriodType value %1 is not an integer</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;PeriodType&quot; a une valeur %1 qui n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="279"/>
+        <location filename="periodicfestreamdef.cpp" line="305"/>
         <source>PeriodicFeStreamDef - PeriodType value %1 is either too small or too big</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;PeriodType&quot; a une valeur %1 qui est soit trop grande ou trop petite</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="301"/>
+        <location filename="periodicfestreamdef.cpp" line="327"/>
         <source>PeriodicFeStreamDef - Unknown Period Type %1</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;PeriodType&quot; possède une valeur %1 qui est inconnue</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="309"/>
+        <location filename="periodicfestreamdef.cpp" line="335"/>
         <source>PeriodicFeStreamDef - Cannot find PeriodMultiplier tag</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;PeriodMultiplier&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="314"/>
+        <location filename="periodicfestreamdef.cpp" line="340"/>
         <source>PeriodicFeStreamDef - PeriodMultiplier tag is not a number</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;PeriodMultiplier&quot; a une valeur qui n&apos;est pas un nombre valide</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="321"/>
+        <location filename="periodicfestreamdef.cpp" line="347"/>
         <source>PeriodicFeStreamDef - PeriodMultiplier value %1 is not an integer</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;PeriodMultiplier&quot; a une valeur %1 qui n&apos;est pas un entier valide</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="326"/>
+        <location filename="periodicfestreamdef.cpp" line="352"/>
         <source>PeriodicFeStreamDef - PeriodMultiplier value %1 is either too small or too big</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;PeriodMultiplier&quot; a une valeur %1 qui est soit trop grande ou trop petite</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="335"/>
+        <location filename="periodicfestreamdef.cpp" line="361"/>
         <source>PeriodicFeStreamDef - Cannot find Amount tag</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;Amount&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="340"/>
+        <location filename="periodicfestreamdef.cpp" line="366"/>
         <source>PeriodicFeStreamDef - Amount tag is not a number</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;Amount&quot; a une valeur qui n&apos;est pas un nombre valide</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="347"/>
+        <location filename="periodicfestreamdef.cpp" line="373"/>
         <source>PeriodicFeStreamDef - Amount value %1 is not an integer</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;Amount&quot; a une valeur %1 qui n&apos;est pas un entier valide</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="352"/>
+        <location filename="periodicfestreamdef.cpp" line="378"/>
         <source>PeriodicFeStreamDef - Amount value %1 is either smaller than 0 or too big</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;Amount&quot; a une valeur %1 qui est soit trop grande ou plus petite que 0</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="360"/>
+        <location filename="periodicfestreamdef.cpp" line="386"/>
         <source>PeriodicFeStreamDef - Cannot find Growth tag</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;Growth&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="365"/>
+        <location filename="periodicfestreamdef.cpp" line="391"/>
         <source>PeriodicFeStreamDef - Growth tag is not an object</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;Growth&quot; a une valeur qui n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="381"/>
+        <location filename="periodicfestreamdef.cpp" line="407"/>
         <source>PeriodicFeStreamDef - Cannot find GrowthStrategy tag</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;GrowthStrategy&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="386"/>
+        <location filename="periodicfestreamdef.cpp" line="412"/>
         <source>PeriodicFeStreamDef - GrowthStrategy tag %1 is not a number</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;GrowthStrategy&quot; a une valeur %1 qui n&apos;est pas un nombre valide</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="393"/>
+        <location filename="periodicfestreamdef.cpp" line="419"/>
         <source>PeriodicFeStreamDef - GrowthStrategy value %1 is not an integer</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;GrowthStrategy&quot; a une valeur %1 qui n&apos;edt pas un entier valide</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="398"/>
+        <location filename="periodicfestreamdef.cpp" line="424"/>
         <source>PeriodicFeStreamDef - GrowthStrategy value %1 is either too small or too big</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;GrowthStrategy&quot; a une valeur %1 qui est soit trop grande ou trop petite</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="414"/>
+        <location filename="periodicfestreamdef.cpp" line="440"/>
         <source>PeriodicFeStreamDef - Unknown Growth Strategy value %1</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;GrowthStrategy&quot; a une valeur %1 qui est inconnue</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="422"/>
+        <location filename="periodicfestreamdef.cpp" line="448"/>
         <source>PeriodicFeStreamDef - Cannot find GrowthApplicationPeriod tag</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;GrowthApplicationPeriod&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="427"/>
+        <location filename="periodicfestreamdef.cpp" line="453"/>
         <source>PeriodicFeStreamDef - GrowthApplicationPeriod tag %1 is not a number</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;GrowthApplicationPeriod&quot; a une valeur %1 qui n&apos;est pas un nombre valide</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="434"/>
+        <location filename="periodicfestreamdef.cpp" line="460"/>
         <source>PeriodicFeStreamDef - GrowthApplicationPeriod value %1 is not an integer</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;GrowthApplicationPeriod&quot; a une valeur %1 qui n&apos;est pas un entier valide</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="439"/>
+        <location filename="periodicfestreamdef.cpp" line="465"/>
         <source>PeriodicFeStreamDef - GrowthApplicationPeriod value %1 is either too small or too big</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;GrowthApplicationPeriod&quot; a une valeur %1 qui est soit trop grande ou trop petite</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="448"/>
+        <location filename="periodicfestreamdef.cpp" line="474"/>
         <source>PeriodicFeStreamDef - Cannot find ValidityRange tag</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;ValidityRange&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="453"/>
+        <location filename="periodicfestreamdef.cpp" line="479"/>
         <source>PeriodicFeStreamDef - ValidityRange tag is not an object</source>
         <translation>PeriodicFeStreamDef - L&apos;étiquette &quot;ValidityRange&quot;  a une valeur qui n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="475"/>
+        <location filename="periodicfestreamdef.cpp" line="497"/>
+        <source>PeriodicFeStreamDef - InflationAdjustmentFactor tag is not a number</source>
+        <translation>PeriodicFeStreamDef - L&apos;étiquette InflationAdjustmentFactor n&apos;est pas un nombre</translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="503"/>
+        <source>PeriodicFeStreamDef - InflationAdjustmentFactor value %1 is either smaller than 0 or too big</source>
+        <translation>PeriodicFeStreamDef - La valeur de InflationAdjustmentFactor %1 est soit plus petite que 0 ou trop grande</translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="520"/>
         <source>Copy of</source>
         <translation>Copie de</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="495"/>
+        <location filename="periodicfestreamdef.cpp" line="540"/>
         <source>Every %1 %2 in %3</source>
         <translation>Chaque %1 %2 dans %3</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="498"/>
+        <location filename="periodicfestreamdef.cpp" line="543"/>
         <source>Growth: None</source>
         <translation>Croissance: Aucune</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="501"/>
+        <location filename="periodicfestreamdef.cpp" line="546"/>
         <source>Growth: Inflation</source>
         <translation>Croissance: Inflation</translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="504"/>
+        <location filename="periodicfestreamdef.cpp" line="549"/>
         <source>Growth: Custom</source>
         <translation>Croissance: Spécifique</translation>
     </message>
@@ -4187,34 +4192,34 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
 <context>
     <name>ScenarioFeTableModel</name>
     <message>
-        <location filename="scenariofetablemodel.cpp" line="59"/>
+        <location filename="scenariofetablemodel.cpp" line="60"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="scenariofetablemodel.cpp" line="61"/>
+        <location filename="scenariofetablemodel.cpp" line="62"/>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="scenariofetablemodel.cpp" line="63"/>
+        <location filename="scenariofetablemodel.cpp" line="64"/>
         <source>Amount</source>
         <translation>Montant</translation>
     </message>
     <message>
-        <location filename="scenariofetablemodel.cpp" line="65"/>
+        <location filename="scenariofetablemodel.cpp" line="66"/>
         <source>Info</source>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="scenariofetablemodel.cpp" line="425"/>
-        <location filename="scenariofetablemodel.cpp" line="466"/>
+        <location filename="scenariofetablemodel.cpp" line="426"/>
+        <location filename="scenariofetablemodel.cpp" line="467"/>
         <source>Periodic</source>
         <translation>Périodique</translation>
     </message>
     <message>
-        <location filename="scenariofetablemodel.cpp" line="446"/>
-        <location filename="scenariofetablemodel.cpp" line="487"/>
+        <location filename="scenariofetablemodel.cpp" line="447"/>
+        <location filename="scenariofetablemodel.cpp" line="488"/>
         <source>Irregular</source>
         <translation>Irrégulier</translation>
     </message>
@@ -4509,6 +4514,180 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <source>Red:%1 Green:%2 Blue:%3</source>
         <oldsource>R:%1 G:%2 B:%3</oldsource>
         <translation type="vanished">Rouge:%1 Vert:%2 Bleu:%3</translation>
+    </message>
+</context>
+<context>
+    <name>VisualizeOccurencesDialog</name>
+    <message>
+        <source>Export to CSV...</source>
+        <translation type="obsolete">Exporter en CSV...</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="obsolete">Fermer</translation>
+    </message>
+    <message>
+        <source>Using custom constant growth of %1 percent.</source>
+        <translation type="obsolete">Utilisation d&apos;une croissance constante spécifique de %1 pourcent.</translation>
+    </message>
+    <message>
+        <source>Using custom variable growth.</source>
+        <translation type="obsolete">Utilisation d&apos;une croissance variable spécifique.</translation>
+    </message>
+    <message>
+        <source>No growth of any kind is applied.</source>
+        <translation type="obsolete">Aucune croissance appliquée.</translation>
+    </message>
+    <message>
+        <source>Amount was too big %1 times and have been capped to %2.</source>
+        <translation type="obsolete">Le montant a dépassé %1 fois le maximum permis et a été chaque fois plafonné à %2.</translation>
+    </message>
+    <message>
+        <source>%1 %2 event(s) have been generated for the whole Validity Range.
+</source>
+        <translation type="obsolete">%1 évènement(s) de type %2 a (ont) été généré(s) à l&apos;intérieur de l&apos;intervalle de validité.
+</translation>
+    </message>
+    <message>
+        <source>income</source>
+        <translation type="obsolete">revenu</translation>
+    </message>
+    <message>
+        <source>expense</source>
+        <translation type="obsolete">dépense</translation>
+    </message>
+    <message>
+        <source>Amount is bigger than the maximum allowed</source>
+        <translation type="obsolete">Le montant est supérieur au maximum autorisé</translation>
+    </message>
+    <message>
+        <source>Error during amount conversion</source>
+        <translation type="obsolete">Une erreur est survenue lors de la conversion du montant</translation>
+    </message>
+    <message>
+        <source>%1 : %2 (cummul=%3)</source>
+        <translation type="obsolete">%1 : %2 (cummul=%3)</translation>
+    </message>
+    <message>
+        <source>  *** PAST -&gt; discarded ***</source>
+        <translation type="obsolete">  *** Passé -&gt; Non retenu ***</translation>
+    </message>
+</context>
+<context>
+    <name>VisualizeOccurrencesDialog</name>
+    <message>
+        <location filename="visualizeoccurrencesdialog.ui" line="14"/>
+        <source>Visualize Occurences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.ui" line="64"/>
+        <source>Close</source>
+        <translation type="unfinished">Fermer</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="60"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="140"/>
+        <source>Dates are in ISO 8601 format (YYYY-MM-DD).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="69"/>
+        <source>Using constant adjusted annual inflation of %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="71"/>
+        <source>Using variable inflation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="77"/>
+        <source>Using custom constant growth of %1 percent.</source>
+        <translation type="unfinished">Utilisation d&apos;une croissance constante spécifique de %1 pourcent.</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="80"/>
+        <source>Using custom variable growth.</source>
+        <translation type="unfinished">Utilisation d&apos;une croissance variable spécifique.</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="85"/>
+        <source>No growth of any kind is applied.</source>
+        <translation type="unfinished">Aucune croissance appliquée.</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="90"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="144"/>
+        <source>Converting Future Values to Present Values using an annual discount rate of %1 percent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="99"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="152"/>
+        <source>Amount was too big %1 times and have been capped to %2.</source>
+        <translation type="unfinished">Le montant a dépassé %1 fois le maximum permis et a été chaque fois plafonné à %2.</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="101"/>
+        <source>%1 %2 event(s) have been generated for the whole Validity Range.
+</source>
+        <translation type="unfinished">%1 évènement(s) de type %2 a (ont) été généré(s) à l&apos;intérieur de l&apos;intervalle de validité.
+</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="102"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="154"/>
+        <source>income</source>
+        <translation type="unfinished">revenu</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="102"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="154"/>
+        <source>expense</source>
+        <translation type="unfinished">dépense</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="109"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="162"/>
+        <source>Amount is bigger than the maximum allowed</source>
+        <translation type="unfinished">Le montant est supérieur au maximum autorisé</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="113"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="167"/>
+        <source>Error during amount conversion</source>
+        <translation type="unfinished">Une erreur est survenue lors de la conversion du montant</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="118"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="172"/>
+        <source>%1 : %2 (cummul=%3)</source>
+        <translation type="unfinished">%1 : %2 (cummul=%3)</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="121"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="175"/>
+        <source>  *** PAST -&gt; discarded ***</source>
+        <translation type="unfinished">  *** Passé -&gt; Non retenu ***</translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="154"/>
+        <source>%1 %2 event(s) have been generated.
+</source>
+        <translation type="unfinished">%1 %2 évènements ont été générés.
+</translation>
+    </message>
+</context>
+<context>
+    <name>visualizeOccurencesDialog</name>
+    <message>
+        <source>Export to CSV...</source>
+        <translation type="obsolete">Exporter en CSV...</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="obsolete">Fermer</translation>
     </message>
 </context>
 </TS>

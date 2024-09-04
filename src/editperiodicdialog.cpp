@@ -61,6 +61,9 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     // Stream Def variable growth edit dialog
     editVariableGrowthDlg = new EditVariableGrowthDialog(tr("Growth"),locale,this);                // auto-destroyed by Qt because it is a child
     editVariableGrowthDlg->setModal(true);
+    // Visualize occurrences  Dialog
+    visualizeoccurrencesDialog = new VisualizeOccurrencesDialog(locale,this);     // auto-destroyed by Qt because it is a child
+    visualizeoccurrencesDialog->setModal(true);
     // Plain Text Edition Dialog
     editDescriptionDialog = new PlainTextEditionDialog(this);     // auto-destroyed by Qt because it is a child
     editDescriptionDialog->setModal(true);
@@ -79,6 +82,9 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     QObject::connect(this, &EditPeriodicDialog::signalShowResultPrepareContent, showResultDialog, &PlainTextEditionDialog::slotPrepareContent);
     QObject::connect(showResultDialog, &PlainTextEditionDialog::signalPlainTextEditionResult, this, &EditPeriodicDialog::slotShowResultResult);
     QObject::connect(showResultDialog, &PlainTextEditionDialog::signalPlainTextEditionCompleted, this, &EditPeriodicDialog::slotShowResultCompleted);
+    // connect emitters & receivers for Dialogs : Visualize occurrences
+    QObject::connect(this, &EditPeriodicDialog::signalVisualizeOccurrencesPrepareContent, visualizeoccurrencesDialog, &VisualizeOccurrencesDialog::slotPrepareContent);
+    QObject::connect(visualizeoccurrencesDialog, &VisualizeOccurrencesDialog::signalCompleted, this, &EditPeriodicDialog::slotVisualizeOccurrencesCompleted);
 }
 
 EditPeriodicDialog::~EditPeriodicDialog()
@@ -173,8 +179,11 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, 
                 ui->growthDoubleSpinBox->setValue(0);
             }
         }
-        updateAuxCustomGrowthWidgetAccessibility();
 
+        // inflation adjustment factor
+        ui->inflationAdjustmentFactorDoubleSpinBox->setValue(psStreamDef.getInflationAdjustmentFactor());
+
+        updateAuxCustomGrowthWidgetAccessibility();
 
     } else{
 
@@ -232,6 +241,11 @@ void EditPeriodicDialog::slotShowResultCompleted()
 }
 
 
+void EditPeriodicDialog::slotVisualizeOccurrencesCompleted()
+{
+}
+
+
 void EditPeriodicDialog::on_applyPushButton_clicked()
 {
     if(editingExistingStreamDef){
@@ -279,6 +293,7 @@ void EditPeriodicDialog::prepareDataToCreateANewStreamDef()
     ui->activeYesRadioButton->setChecked(true);
     ui->gapSpinBox->setValue(1);
     ui->periodMultiplierSpinBox->setValue(1);
+    ui->inflationAdjustmentFactorDoubleSpinBox->setValue(1);
     // growth is constant & 0 by default
     ui->noGrowthRadioButton->setChecked(true);
     ui->growthDoubleSpinBox->setValue(0);
@@ -289,15 +304,23 @@ void EditPeriodicDialog::prepareDataToCreateANewStreamDef()
     on_decorationColorCheckBox_clicked();
 }
 
+
 void EditPeriodicDialog::updateAuxCustomGrowthWidgetAccessibility()
 {
-    if (ui->noGrowthRadioButton->isChecked() || ui->inflationRadioButton->isChecked() ){
+    if (ui->noGrowthRadioButton->isChecked() ){
+        ui->inflationAdjustmentFactorDoubleSpinBox->setEnabled(false);
+        ui->growthDoubleSpinBox->setEnabled(false);
+        ui->growthVariablePushButton->setEnabled(false);
+    } else if (ui->inflationRadioButton->isChecked() ){
+        ui->inflationAdjustmentFactorDoubleSpinBox->setEnabled(true);
         ui->growthDoubleSpinBox->setEnabled(false);
         ui->growthVariablePushButton->setEnabled(false);
     } else if (ui->growthConstantRadioButton->isChecked()){
+        ui->inflationAdjustmentFactorDoubleSpinBox->setEnabled(false);
         ui->growthDoubleSpinBox->setEnabled(true);
         ui->growthVariablePushButton->setEnabled(false);
     } else if(ui->growthVariableRadioButton->isChecked()){
+        ui->inflationAdjustmentFactorDoubleSpinBox->setEnabled(false);
         ui->growthDoubleSpinBox->setEnabled(false);
         ui->growthVariablePushButton->setEnabled(true);
     }
@@ -354,11 +377,14 @@ void EditPeriodicDialog::buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataR
     qint16 periodMultiplier = static_cast<quint16>(ui->periodMultiplierSpinBox->value());
     quint16 gap = static_cast<quint16>(ui->gapSpinBox->value());
 
+    // inflationModifFactor
+    double inflationModifFactor = ui->inflationAdjustmentFactorDoubleSpinBox->value();
+
     // build item
     try {
         result.pStreamDef = PeriodicFeStreamDef(periodicType, periodMultiplier, amount, growth, gs,
                                                 gap, initialId, ui->nameLineEdit->text(), ui->descPlainTextEdit->toPlainText(),
-                                                ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, validityRange);
+                                                ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, validityRange, inflationModifFactor);
     } catch (...) {
         // unexpected error, should never happen
         std::exception_ptr p = std::current_exception();
@@ -461,79 +487,6 @@ void EditPeriodicDialog::on_pushButton_clicked()
 }
 
 
-void EditPeriodicDialog::on_showResultPushButton_clicked()
-{
-    QString amountString;
-
-    // build the Stream Def
-    BuildFromFormDataResult result;
-    buidlPeriodicFeStreamDefFromFormData(result);
-    if (result.success==false){
-        QMessageBox::critical(nullptr,tr("Invalid Data Entered"),result.errorMessageUI);
-        return;
-    }
-    // Build result
-    QStringList resultStringList;
-    int ok;
-    uint saturationCount;
-    resultStringList.append(tr("Dates are in ISO 8601 format (YYYY-MM-DD)."));
-    if (ui->inflationRadioButton->isChecked()){
-        if (Growth::CONSTANT == scenarioInflation.getType()) {
-            QString infString = QString("%1%").arg(static_cast<double>(Growth::fromDecimalToDouble(scenarioInflation.getAnnualConstantGrowth())));
-            resultStringList.append(QString(tr("Using constant annual inflation of %1 as defined in the scenario.")).arg(infString));
-        } else {
-            resultStringList.append(tr("Using variable inflation as defined in the scenario."));
-        }
-    } else if (ui->growthConstantRadioButton->isChecked()) {
-        resultStringList.append(QString(tr("Using custom constant growth of %1 percent.")).arg(ui->growthDoubleSpinBox->value()));
-    } else if (ui->growthVariableRadioButton->isChecked()){
-        resultStringList.append(QString(tr("Using custom variable growth.")));
-    } else {
-        resultStringList.append(QString(tr("No growth of any kind is applied.")));
-    }
-    bool usePvConversion = GbpController::getInstance().getUsePresentValue();
-    double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
-    if ((usePvConversion==true)&&(pvAnnualDiscountRate!=0)) {
-        QString s = QString(tr("Converting Future Values to Present Values using an annual discount rate of %1 percent.")).arg(pvAnnualDiscountRate);
-        resultStringList.append(s);
-    }
-
-    DateRange dr = result.pStreamDef.getValidityRange();
-    QList<Fe> feList = result.pStreamDef.generateEventStream(dr, scenarioInflation,
-        (usePvConversion)?(pvAnnualDiscountRate):(0), GbpController::getInstance().getTomorrow(), saturationCount);
-    if(saturationCount > 0){
-        resultStringList.append(QString(tr("Amount was too big %1 times and have been capped to %2.")).arg(saturationCount).arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)));
-    }
-    resultStringList.append(QString(tr("%1 %2 event(s) have been generated for the whole Validity Range.\n")).arg(feList.count()).arg((isIncome)?(tr("income")):(tr("expense"))));
-
-    // transform into text log
-    long double cummul = 0;
-    foreach(Fe fe, feList){
-        if (abs(fe.amount) > CurrencyHelper::maxValueAllowedForAmount() ){ // should never happen because of saturation
-            resultStringList.append(QString("%1 : %2").arg(fe.occurence.toString(Qt::ISODate)).arg(tr("Amount is bigger than the maximum allowed")));
-        } else {
-            double amountDouble = CurrencyHelper::amountQint64ToDouble(abs(fe.amount), currInfo.noOfDecimal, ok);
-            if (ok != 0){
-                resultStringList.append(QString("%1 : %2").arg(fe.occurence.toString(Qt::ISODate)).arg(tr("Error during amount conversion")));
-            } else {
-                amountString = CurrencyHelper::formatAmount(amountDouble, currInfo, locale, true);
-                cummul += amountDouble;
-                QString cummulString = CurrencyHelper::formatAmount(static_cast<double>(cummul), currInfo, locale, true);
-                QString s = QString(tr("%1 : %2 (cummul=%3)")).arg(fe.occurence.toString(Qt::ISODate)).arg(amountString).arg(cummulString);
-                if (fe.occurence<GbpController::getInstance().getTomorrow()){
-                    // if event is in the past, mention it
-                    s = s.append(tr("  *** PAST -> discarded ***"));
-                }
-                resultStringList.append(s);
-            }
-        }
-    }
-
-    // send for display
-    QString r = resultStringList.join("\n");
-    emit signalShowResultPrepareContent(tr("Results for the Perodic item"), r, true);
-    showResultDialog->show();
-}
 
 
 void EditPeriodicDialog::on_decorationColorPushButton_clicked()
@@ -566,5 +519,23 @@ void EditPeriodicDialog::on_decorationColorCheckBox_clicked()
         decorationColor = QColor();
         setDecorationColorInfo();
     }
+}
+
+
+void EditPeriodicDialog::on_visualizeOccurrencesPushButton_clicked()
+{
+    QString amountString;
+
+    // build the Stream Def from the data entered in the form (can be valid or not)
+    BuildFromFormDataResult result;
+    buidlPeriodicFeStreamDefFromFormData(result);
+    if (result.success==false){
+        QMessageBox::critical(nullptr,tr("Invalid Data Entered"),result.errorMessageUI);
+        return;
+    }
+
+    // send for display
+    emit signalVisualizeOccurrencesPrepareContent(currInfo, scenarioInflation, &(result.pStreamDef));
+    visualizeoccurrencesDialog->show();
 }
 

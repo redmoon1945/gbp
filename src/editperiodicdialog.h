@@ -25,6 +25,7 @@
 #include "currencyhelper.h"
 #include "editvariablegrowthdialog.h"
 #include "plaintexteditiondialog.h"
+#include "visualizeoccurrencesdialog.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -51,6 +52,8 @@ signals:
     void signalPlainTextDialogPrepareContent(QString title, QString content, bool readOnly);
     // show result : prepare Dialog before edition
     void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
+    // Visualize occurrences : prepare Dialog before edition
+    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation, FeStreamDef *streamDef);
 
 public slots:
     // From client of EditPeriodicDialog : Prepare edition
@@ -64,6 +67,8 @@ public slots:
     // Show Result child Dialog : receive result and edition completion notification
     void slotShowResultResult(QString result);
     void slotShowResultCompleted();
+    // Visualize occurrences child Dialog : receive completion notification
+    void slotVisualizeOccurrencesCompleted();
 
 private slots:
     void on_applyPushButton_clicked();
@@ -75,9 +80,9 @@ private slots:
     void on_growthConstantRadioButton_clicked();
     void on_growthVariableRadioButton_clicked();
     void on_pushButton_clicked();
-    void on_showResultPushButton_clicked();
     void on_decorationColorPushButton_clicked();
     void on_decorationColorCheckBox_clicked();
+    void on_visualizeOccurrencesPushButton_clicked();
 
 private:
     Ui::EditPeriodicDialog *ui;
@@ -96,6 +101,7 @@ private:
     EditVariableGrowthDialog* editVariableGrowthDlg;
     PlainTextEditionDialog* editDescriptionDialog;
     PlainTextEditionDialog* showResultDialog;
+    VisualizeOccurrencesDialog* visualizeoccurrencesDialog;
 
     struct BuildFromFormDataResult{
         bool success;

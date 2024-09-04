@@ -160,6 +160,50 @@ QJsonObject Growth::toJson() const
 }
 
 
+// adjust all the growth values by multiplying by the factor, which must not be negative.
+// Resulting growth value(s) are capped to the max allowed (MAX_GROWTH_DECIMAL) and
+// if this happens at least once, capped is set to true.
+void Growth::changeByFactor(double factor, bool& capped)
+{
+    if (factor < 0){
+        throw std::domain_error("Factor cannot be negative");
+    }
+
+    long double ld;
+    capped = false;
+    switch (type) {
+        case Type::NONE:
+            // nothing to do
+            break;
+        case Type::CONSTANT:
+            ld = std::round(annualConstantGrowth * factor);
+            if( ld > MAX_GROWTH_DECIMAL){
+                ld = MAX_GROWTH_DECIMAL;
+                capped = true;
+            }
+            annualConstantGrowth = static_cast<qint64>(ld);
+            break;
+        case Type::VARIABLE:
+            foreach(QDate date, annualVariableGrowth.keys()){
+                qint64 value = annualVariableGrowth.value(date);
+                ld = std::round(value * factor);
+                if( ld > MAX_GROWTH_DECIMAL){
+                    ld = MAX_GROWTH_DECIMAL;
+                    capped = true;
+                }
+                value = static_cast<qint64>(ld);
+                annualVariableGrowth.insert(date, value);
+            }
+            break;
+        default:
+            throw std::domain_error("Unknown type");
+            break;
+    }
+
+    recalculateMonthlyData();
+}
+
+
 Growth Growth::fromJson(const QJsonObject &jsonObject, Util::OperationResult &result)
 {
     QJsonValue jsonValue;

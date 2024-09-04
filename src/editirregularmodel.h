@@ -26,7 +26,7 @@
 #include <QUuid>
 #include "irregularfestreamdef.h"
 #include "currencyhelper.h"
-
+#include "visualizeoccurrencesdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class EditIrregularModel; }
@@ -61,7 +61,6 @@ public:
     void setDefaultTableFont(const QFont &newDefaultTableFont);
     QFont getMonoTableFont() const;
     void setMonoTableFont(const QFont &newMonoTableFont);
-
 
 private:
     // Model Data - key order corresponds to display order

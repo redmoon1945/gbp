@@ -21,7 +21,7 @@
 
 bool Fe::operator==(const Fe& o) const {
     if( (amount != o.amount) ||
-        (occurence != o.occurence) ||
+        (occurrence != o.occurrence) ||
         (id != o.id) ){
         return false;
     }
@@ -31,14 +31,14 @@ bool Fe::operator==(const Fe& o) const {
 Fe &Fe::operator=(const Fe &o)
 {
     this->amount = o.amount;
-    this->occurence = o.occurence;
+    this->occurrence = o.occurrence;
     this->id = o.id;
     return *this;
 }
 
 
 QString Fe::toString() const {
-    return QString("(%1,%2)").arg(amount).arg(occurence.toString());
+    return QString("(%1,%2)").arg(amount).arg(occurrence.toString());
 }
 
 

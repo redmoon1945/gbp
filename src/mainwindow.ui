@@ -823,6 +823,11 @@
     <string>Quick Tutorial</string>
    </property>
   </action>
+  <action name="actionDuplicate">
+   <property name="text">
+    <string>Duplicate...</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

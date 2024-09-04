@@ -113,7 +113,7 @@ QList<Fe> IrregularFeStreamDef::generateEventStream(DateRange fromto,  double pv
 
             // build Fe and insert in the result list
             qint64 feAmount = (isIncome?(pv):-(pv));
-            Fe fe = {.amount=feAmount,.occurence=date, .id=this->id};
+            Fe fe = {.amount=feAmount,.occurrence=date, .id=this->id};
             ss.append(fe);
         }
     }

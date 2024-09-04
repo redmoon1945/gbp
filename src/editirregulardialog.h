@@ -55,6 +55,8 @@ signals:
     void signalPlainTextDialogPrepareContent(QString title, QString content, bool readOnly);
     // show result : prepare Dialog before edition
     void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
+    // Visualize occurrences : prepare Dialog before edition
+    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation, FeStreamDef *streamDef);
 
 public slots:
     // From client of EditPeriodicDialog : Prepare edition
@@ -71,7 +73,8 @@ public slots:
     // Show Result child Dialog : receive result and edition completion notification
     void slotShowResultResult(QString result);
     void slotShowResultCompleted();
-
+    // Visualize occurrences child Dialog : receive completion notification
+    void slotVisualizeOccurrencesCompleted();
 
 private slots:
     void on_loadPushButton_clicked();
@@ -87,8 +90,7 @@ private slots:
     void on_unselectAllPushButton_clicked();
     void on_decorationColorPushButton_clicked();
     void on_decorationColorCheckBox_clicked();
-
-    void on_showResultPushButton_clicked();
+    void on_visualizeOccurrencesPushButton_clicked();
 
 private:
 
@@ -99,12 +101,13 @@ private:
     QUuid initialId;
     QColor decorationColor;
 
-    // dialogs
+    // children dialogs
     Ui::EditIrregularDialog *ui;
     PlainTextEditionDialog* editDescriptionDialog;
     EditIrregularElementDialog* eie;
     LoadIrregularTextFileDialog* importDlg;
     PlainTextEditionDialog* showResultDialog;
+    VisualizeOccurrencesDialog* visualizeOccurrencesDialog;
 
     // table model
     EditIrregularModel* tableModel;

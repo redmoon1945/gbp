@@ -28,7 +28,7 @@
 // It is generated through a FE Stream Definition. Amount is an int in the smaller currency unit (e.g. cents for US dollar).
 struct Fe{
     qint64 amount;          // NEGATIVE number for expense
-    QDate occurence;        // Date when the financial event occured
+    QDate occurrence;        // Date when the financial event occured
     QUuid id;               // Reference to the StreamDefinition having generated this Fe.
 
     bool operator==(const Fe &o) const;

@@ -17,6 +17,7 @@
  */
 
 #include "scenariofetablemodel.h"
+#include <qbrush.h>
 
 
 ScenarioFeTableModel::ScenarioFeTableModel(QLocale aLocale, QFont activeTableFont, QFont inactiveTableFont, QFont amountActiveTableFont,

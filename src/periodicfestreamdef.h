@@ -35,17 +35,19 @@ public:
 
     enum PeriodType {DAILY=0, WEEKLY=1,MONTHLY=2,END_OF_MONTHLY=3,YEARLY=4};
     enum GrowthStrategy {NONE=0, INFLATION=1, CUSTOM=2};
-    static const int PERIOD_MULTIPLIER_MAX = 365*100;   // 100 years of daily occurences
-    static const int PERIOD_MULTIPLIER_MIN = 1;
-    static const int GROWTH_APP_PERIOD_MAX = 100*12;    // once every 100 years
-    static const int GROWTH_APP_PERIOD_MIN = 1;
+    static const int PERIOD_MULTIPLIER_MAX;
+    static const int PERIOD_MULTIPLIER_MIN;
+    static const int GROWTH_APP_PERIOD_MAX;
+    static const int GROWTH_APP_PERIOD_MIN;
+    static const double MAX_INFLATION_ADJUSTMENT_FACTOR;
+
 
     // constructors and destructor
     PeriodicFeStreamDef();    // required for qmap.value default
     PeriodicFeStreamDef(const PeriodicFeStreamDef& o);
     PeriodicFeStreamDef(PeriodType periodicType, quint16 periodMultiplier, qint64 amount, const Growth &growth, const GrowthStrategy &growthStrategy,
                         quint16 growthApplicationPeriod, const QUuid &id, const QString &name, const QString &desc, bool active,
-                        bool isIncome, const QColor& decorationColor, const DateRange &validityRange);
+                        bool isIncome, const QColor& decorationColor, const DateRange &validityRange, double inflationAdjustmentFactor);
     virtual ~PeriodicFeStreamDef();
 
     // operators
@@ -67,6 +69,7 @@ public:
     GrowthStrategy getGrowthStrategy() const;
     quint16 getGrowthApplicationPeriod() const;
     DateRange getValidityRange() const;
+    double getInflationAdjustmentFactor() const;
 
 private:
 
@@ -78,6 +81,8 @@ private:
     GrowthStrategy growthStrategy;
     quint16 growthApplicationPeriod;    // apply growth every "growthApplicationPeriod" occurence of amount. Value must be in [GROWTH_APP_PERIOD_MIN,GROWTH_APP_PERIOD_MAX ]
     DateRange validityRange;
+    double inflationAdjustmentFactor;   // if not 1, change the value of scenario inflation applied as a growth to this element
+                                        // (each growth value is multiplied by this factor). Cannot be negative. Max = MAX_INFLATION_ADJUSTMENT_FACTOR
 
     // methods
     QDate getNextEventDate(QDate date) const;

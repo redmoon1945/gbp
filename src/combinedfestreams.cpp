@@ -64,7 +64,7 @@ void CombinedFeStreams::addStream(const QList<Fe> theStream, CurrencyInfo currIn
         return;
     }
     foreach(Fe fe, theStream){
-        auto it = combinedStreams.find(fe.occurence);   // find an existing entry for that date, if any
+        auto it = combinedStreams.find(fe.occurrence);   // find an existing entry for that date, if any
         CombinedFeStreams::DailyInfo di;
         if(it != combinedStreams.end()){    // there is already something for that date : add to it
             di = it.value();
@@ -94,7 +94,7 @@ void CombinedFeStreams::addStream(const QList<Fe> theStream, CurrencyInfo currIn
             di.totalIncomes += amount;
         }
         di.totalDelta += amount;
-        combinedStreams[fe.occurence] = di;     // replacement if already exist
+        combinedStreams[fe.occurrence] = di;     // replacement if already exist
     }
 }
 

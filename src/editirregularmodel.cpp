@@ -114,7 +114,7 @@ QVariant EditIrregularModel::data(const QModelIndex &index, int role) const
         QList<QDate> listKeys = items.keys();
         QDate key = listKeys.at(row) ;
         if (key < GbpController::getInstance().getTomorrow()) {
-            // this is past
+            // this is past event
             return QBrush(QColor(128,128,128));
         }
 

@@ -603,7 +603,7 @@ void EditScenarioDialog::updateNoItemsLabel()
     } else {
         s = QString(tr("%1 items")).arg(noItems);
     }
-    ui->noItemsLlabel->setText(s);
+    ui->noItemsLabel->setText(s);
 }
 
 

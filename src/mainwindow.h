@@ -130,6 +130,7 @@ private slots:
     void on_actionUser_Manual_triggered();
     void on_actionQuick_Tutorial_triggered();
 
+
 private:
 
     Ui::MainWindow *ui;

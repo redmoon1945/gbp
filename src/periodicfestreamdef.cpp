@@ -22,6 +22,12 @@
 #include "gbpcontroller.h"
 #include <QUuid>
 
+const int PeriodicFeStreamDef::PERIOD_MULTIPLIER_MAX = 365*100; // 100 years of daily occurrences
+const int PeriodicFeStreamDef::PERIOD_MULTIPLIER_MIN = 1;
+const int PeriodicFeStreamDef::GROWTH_APP_PERIOD_MAX = 100*12;  // once every 100 years
+const int PeriodicFeStreamDef::GROWTH_APP_PERIOD_MIN = 1;
+const double PeriodicFeStreamDef::MAX_INFLATION_ADJUSTMENT_FACTOR = 100;   // 100x inflation maximum
+
 
 // not used explicitely in Gbp
 PeriodicFeStreamDef::PeriodicFeStreamDef() : FeStreamDef()
@@ -33,6 +39,7 @@ PeriodicFeStreamDef::PeriodicFeStreamDef() : FeStreamDef()
     this->growthStrategy = GrowthStrategy::NONE;
     this->growthApplicationPeriod = 1;
     this->validityRange = DateRange(DateRange::EMPTY);
+    this->inflationAdjustmentFactor = 1;
 }
 
 
@@ -46,12 +53,14 @@ PeriodicFeStreamDef::PeriodicFeStreamDef(const PeriodicFeStreamDef &o) :
     this->growthStrategy = o.growthStrategy;
     this->growthApplicationPeriod = o.growthApplicationPeriod;
     this->validityRange = o.validityRange;
+    this->inflationAdjustmentFactor = o.inflationAdjustmentFactor;
 }
 
 
-PeriodicFeStreamDef::PeriodicFeStreamDef( PeriodicFeStreamDef::PeriodType periodicType,  quint16 periodMultiplier,  qint64 amount,
-                                          const Growth &growth, const GrowthStrategy &growthStrategy,  quint16 growthApplicationPeriod, const QUuid &id,
-                                          const QString &name, const QString &desc, bool active, bool isIncome, const QColor& decorationColor, const DateRange &validityRange)
+PeriodicFeStreamDef::PeriodicFeStreamDef(PeriodicFeStreamDef::PeriodType periodicType,  quint16 periodMultiplier,  qint64 amount,
+                                         const Growth &growth, const GrowthStrategy &growthStrategy,  quint16 growthApplicationPeriod, const QUuid &id,
+                                         const QString &name, const QString &desc, bool active, bool isIncome, const QColor& decorationColor, const DateRange &validityRange,
+                                         double inflationAdjustmentFactor)
     : FeStreamDef(id, name,desc,FeStreamType::PERIODIC,active,isIncome, decorationColor)
 {
     if (amount<0){
@@ -72,6 +81,12 @@ PeriodicFeStreamDef::PeriodicFeStreamDef( PeriodicFeStreamDef::PeriodType period
     if (periodMultiplier>PERIOD_MULTIPLIER_MAX){
         throw std::invalid_argument("periodMultiplier too big");
     }
+    if (inflationAdjustmentFactor<0){
+        throw std::invalid_argument("inflationAdjustmentFactor must not be negative");
+    }
+    if (inflationAdjustmentFactor>MAX_INFLATION_ADJUSTMENT_FACTOR){
+        throw std::invalid_argument("inflationAdjustmentFactor is too big");
+    }
     this->period = periodicType;
     this->periodMultiplier = periodMultiplier;
     this->amount = amount;
@@ -79,6 +94,7 @@ PeriodicFeStreamDef::PeriodicFeStreamDef( PeriodicFeStreamDef::PeriodType period
     this->growthStrategy = growthStrategy;
     this->growthApplicationPeriod = growthApplicationPeriod;
     this->validityRange = validityRange;
+    this->inflationAdjustmentFactor = inflationAdjustmentFactor;
 }
 
 PeriodicFeStreamDef &PeriodicFeStreamDef::operator=(const PeriodicFeStreamDef &o)
@@ -91,6 +107,7 @@ PeriodicFeStreamDef &PeriodicFeStreamDef::operator=(const PeriodicFeStreamDef &o
     this->growthStrategy = o.growthStrategy;
     this->growthApplicationPeriod = o.growthApplicationPeriod;
     this->validityRange = o.validityRange;
+    this->inflationAdjustmentFactor = o.inflationAdjustmentFactor;
     return *this;
 }
 
@@ -103,7 +120,8 @@ bool PeriodicFeStreamDef::operator==(const PeriodicFeStreamDef& o) const
         !(this->growth == o.growth) ||
         !(this->growthStrategy == o.growthStrategy) ||
         !(this->growthApplicationPeriod == o.growthApplicationPeriod) ||
-        !(this->validityRange == o.validityRange) ) {
+        !(this->validityRange == o.validityRange) ||
+        !(this->inflationAdjustmentFactor == o.inflationAdjustmentFactor) ) {
         return false;
     } else {
         return true;
@@ -120,11 +138,11 @@ PeriodicFeStreamDef::~PeriodicFeStreamDef()
 // Generate the whole suite of financial events for that Stream Definition.
 // Input params :
 //   DateRange fromTo : interval of time inside which the events should be generated
-//   Inflation : growth to apply to the events
+//   Inflation : scenario's inflation to apply to the events. Internally corrected with the Inflation Adjustment Factor.
 //   double pvDiscountRate : ANNUAL discount rate in percentage to apply to transform the amounts to Present Value.
 //                           Value of 0 means do not transform future values into present value
 //   QDate pvPresent : Define what is the "present" as far as PV conversation is concerned.
-//                     Note that this date can be afer the first occurence of events.
+//                     Note that this date can be afer the first occurrence of events.
 // Output params:
 //   uint &saturationCount : number of times the FE amount was over the maximum allowed
 QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto, const Growth &inflation, double pvDiscountRate, QDate pvPresent,
@@ -144,9 +162,9 @@ QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto, const Growt
 
     // ** STEP 1 : Generate the flow of dates ***
     //    So starting from ValidityRange.Start, advance till fromto.End or validityrange.End is met.
-    //    As soon as we enter fromto range, start generating occurence dates
-    //    At this stage, we need all the occurences from validity.start in order to calculate Growth later
-    QList<QDate> occurenceDates;
+    //    As soon as we enter fromto range, start generating occurrence dates
+    //    At this stage, we need all the occurrences from validity.start in order to calculate Growth later
+    QList<QDate> occurrenceDates;
     QDate aDate = this->validityRange.getStart();
     while(true){
         if (!validityRange.includeDate(aDate) ){     // check if still in the validity range
@@ -155,12 +173,12 @@ QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto, const Growt
         if (aDate > fromto.getEnd()){                // check if we have gone over the fromTo End
             break;
         }
-        occurenceDates.append(aDate);
+        occurrenceDates.append(aDate);
         aDate = getNextEventDate(aDate);              // advance to the next event
     }
 
     // ** Step 2 : Correct for growth or inflation (not both) ***
-    //    We need occurence from start of validation, to calculate growth, even if it is before fromto.start
+    //    We need occurrence from start of validation, to calculate growth, even if it is before fromto.start
     //    For now, Keep amount positive even if this is an expense.
     //    Also transform future values into present values, if requested (pvDiscountRate > 0)
     qint64 am = this->amount;
@@ -168,23 +186,30 @@ QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto, const Growt
     Growth::ApplicationStrategy appStrategy = {.noOfMonths=growthApplicationPeriod};
     Growth::AdjustForGrowthResult afgResult;
     Growth noGrowth = Growth();
-    switch (growthStrategy) {
+    Growth adjustedInflation = inflation;
+        switch (growthStrategy) {
         case GrowthStrategy::NONE:
-            adjustedAmounts = noGrowth.adjustForGrowth(am, occurenceDates, appStrategy, pvDiscountRate, pvPresent, afgResult);
+            adjustedAmounts = noGrowth.adjustForGrowth(am, occurrenceDates, appStrategy, pvDiscountRate, pvPresent, afgResult);
             saturationCount = afgResult.saturationCount;
             if(afgResult.success==false){   // should not happen
                 return ss;
             }
             break;
         case GrowthStrategy::INFLATION:
-            adjustedAmounts = inflation.adjustForGrowth(am, occurenceDates, appStrategy, pvDiscountRate, pvPresent,afgResult);
+            // adjust inflation value
+            bool capped;
+            if(inflationAdjustmentFactor != 1){
+                adjustedInflation.changeByFactor(inflationAdjustmentFactor,capped);
+            }
+            // calculate
+            adjustedAmounts = adjustedInflation.adjustForGrowth(am, occurrenceDates, appStrategy, pvDiscountRate, pvPresent,afgResult);
             saturationCount = afgResult.saturationCount;
             if(afgResult.success==false){   // should not happen
                 return ss;
             }
             break;
         case GrowthStrategy::CUSTOM:
-            adjustedAmounts = growth.adjustForGrowth(am, occurenceDates, appStrategy, pvDiscountRate, pvPresent,afgResult);
+            adjustedAmounts = growth.adjustForGrowth(am, occurrenceDates, appStrategy, pvDiscountRate, pvPresent,afgResult);
             saturationCount = afgResult.saturationCount;
             if(afgResult.success==false){   // should not happen
                 return ss;
@@ -200,7 +225,7 @@ QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto, const Growt
     foreach(QDate aDate, adjustedAmounts.keys()){
         if( aDate >= fromto.getStart() ){
             qint64 am = (isIncome?(adjustedAmounts.value(aDate)):-(adjustedAmounts.value(aDate)));
-            Fe fe = {.amount=am, .occurence=aDate,.id=this->getId()};
+            Fe fe = {.amount=am, .occurrence=aDate,.id=this->getId()};
             ss.append(fe);
         }
     }
@@ -223,6 +248,7 @@ QJsonObject PeriodicFeStreamDef::toJson() const
     jobject["GrowthStrategy"] = growthStrategy;
     jobject["GrowthApplicationPeriod"] = growthApplicationPeriod;
     jobject["ValidityRange"] = validityRange.toJson();
+    jobject["InflationAdjustmentFactor"] = inflationAdjustmentFactor;
     // return result
     return jobject;
 }
@@ -462,10 +488,29 @@ PeriodicFeStreamDef PeriodicFeStreamDef::fromJson(const QJsonObject &jsonObject,
         return ps;
     }
 
+    // Inflation Adjustment Factor : to keep compatibility with older version of config file,
+    // if not found, set to 1
+    double infAdjFactor = 1;
+    jsonValue = jsonObject.value("InflationAdjustmentFactor");
+    if (jsonValue != QJsonValue::Undefined){
+        if (jsonValue.isDouble()==false){
+            result.errorStringUI = tr("PeriodicFeStreamDef - InflationAdjustmentFactor tag is not a number");
+            result.errorStringLog = "PeriodicFeStreamDef - InflationAdjustmentFactor tag is not a number";
+            return ps;
+        }
+        infAdjFactor = jsonValue.toDouble();
+        if ( (infAdjFactor>PeriodicFeStreamDef::MAX_INFLATION_ADJUSTMENT_FACTOR) || (infAdjFactor<0) ){
+            result.errorStringUI = tr("PeriodicFeStreamDef - InflationAdjustmentFactor value %1 is either smaller than 0 or too big").arg(d);
+            result.errorStringLog = QString("PeriodicFeStreamDef - InflationAdjustmentFactor value %1 is either smaller than 0 or too big").arg(d);
+            return ps;
+        }
+    }
+
+
     // *** build and return ***
     result.success = true;
     return PeriodicFeStreamDef(
-        periodType, periodMultiplier, amount, growth, gs, gap,id, name, desc,active, isIncome, decoColor, validity);
+        periodType, periodMultiplier, amount, growth, gs, gap,id, name, desc,active, isIncome, decoColor, validity, infAdjFactor);
 }
 
 
@@ -599,6 +644,11 @@ quint16 PeriodicFeStreamDef::getGrowthApplicationPeriod() const
 DateRange PeriodicFeStreamDef::getValidityRange() const
 {
     return validityRange;
+}
+
+double PeriodicFeStreamDef::getInflationAdjustmentFactor() const
+{
+    return inflationAdjustmentFactor;
 }
 
 
