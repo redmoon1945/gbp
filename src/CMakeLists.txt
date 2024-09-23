@@ -98,9 +98,6 @@ set(PROJECT_SOURCES
     visualizeoccurrencesdialog.h
     visualizeoccurrencesdialog.cpp
     visualizeoccurrencesdialog.ui
-    welcomedialog.h
-    welcomedialog.cpp
-    welcomedialog.ui
     ${TS_FILES}
 )
 
