@@ -1,8 +1,25 @@
 # Change logs
 ## 1.3.0 to 1.4.0
 ### New Features
-- For Periodic Financial Stream Definition, when Scenario's inflation is selected for the growth, introduce an additional adjustment factor that allows the final growth to be inflation * a_factor. 
-- For Edit Periodic and Irregular Financial Stream Definition Dialogs, completely rework the See Occurrence Dialog so that a chart for the events is also displayed
+- The scenario file format has changed and gone from version 1.0.0 to 2.0.0.
+- If no ini file (configuration file) is found at start-up, a welcome screen is shown.
+- For Periodic Financial Stream Definition, when Scenario's inflation is selected to define the growth, offer an additional adjustment factor that allows the final growth to be proportional to inflation instead of exactly equal as before (e.g. inflation times a factor). 
+- For Edit Periodic and Irregular Financial Stream Definition Dialogs, completely rework the See Occurrence Dialog so that a chart for the generated events is also displayed (useful to see the general trend, not the details)
+- In Options, remove the max no of years for which financial events are generated and transfer it to the scenario data.
+- In Periodic Creation/Edition, add an option to set the end of validation data to the maximum allowed by the scenario, instead of specify it directly. This is activated by default when creating a new Periodic Stream Definition. 
+- In Scenario Properties Dialog, add file extension to the file name
+- In Scenario Properties Dialog, add the max duration of the Financial Events
+- In Edit Scenario Dialog, turn all disabled elements to gray (keep strikeout font though)
+- In Help menu, add a new option to see the Change Log for all versions of GBP since 1.0.0
+- In About Dialog, add the name of the Locale used by GBP
+
+
+### Impacts on compatibility with older versions
+- Concerning the scenario file format change, gbp 1.4 and later will read without any problem the old format (1.0.0) and update transparently the file format to 2.0.0 when opening it. No data is lost or altered. However, older gbp 1.3 and previous versions wont be able to read scenario files created with gbp 1.4 and above, which are of version 2.0.0
+
+### Fixes
+- For a Period Stream Definition of type "END-OF-MONTHLY", if the start date was not on an end of month, it was still part of the generated stream (which is wrong). It is now removed. 
+
 
 ## 1.2.0 to 1.3.0
 ### New Features

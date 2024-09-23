@@ -49,8 +49,9 @@ public:
 
 
     // methods
-    void newScenario(CurrencyInfo cInfo, QMap<QUuid,PeriodicFeStreamDef> newIncomesDefPeriodic, QMap<QUuid,IrregularFeStreamDef> newIncomesDefIrregular,
-                     QMap<QUuid,PeriodicFeStreamDef> newExpensesDefPeriodic, QMap<QUuid,IrregularFeStreamDef> newExpensesDefIrregular);
+    void newScenario(CurrencyInfo cInfo, QMap<QUuid,PeriodicFeStreamDef> newIncomesDefPeriodic,
+                     QMap<QUuid,IrregularFeStreamDef> newIncomesDefIrregular, QMap<QUuid,PeriodicFeStreamDef> newExpensesDefPeriodic,
+                     QMap<QUuid,IrregularFeStreamDef> newExpensesDefIrregular);
     void addModifyPeriodicItem(PeriodicFeStreamDef p);
     void addModifyIrregularItem(IrregularFeStreamDef p);
     void removeItems(QList<QUuid> toRemove);

@@ -125,6 +125,7 @@
             "Amount": 10311,
             "DecorationColor": "#b5835a",
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -135,22 +136,21 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "0add5000-fc30-49e3-a5d9-94a18680f9cd",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Appartment - Internet",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-02-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-02-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "1cf870cb-a13d-4c23-a106-6346108c3ee6": {
             "Active": true,
             "Amount": 120000,
             "DecorationColor": "#5555ff",
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -161,22 +161,21 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "1cf870cb-a13d-4c23-a106-6346108c3ee6",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Car - Tires",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2028-02-07",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2028-02-07",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "227d4831-6b70-4465-86c9-825bbea4b35e": {
             "Active": true,
             "Amount": 33300,
             "DecorationColor": "#804c58",
             "Description": "",
+            "EndDate": "2064-06-25",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -187,22 +186,21 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 0,
             "Id": "227d4831-6b70-4465-86c9-825bbea4b35e",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "This is a very long expense name and it will not fit well in the info region of the main window",
             "PeriodMultiplier": 1,
             "PeriodType": 1,
+            "StartDate": "2024-06-25",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2064-06-25",
-                "Start": "2024-06-25",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "238c37b4-739b-4705-bbe3-d0bd35033661": {
             "Active": true,
             "Amount": 20000,
             "DecorationColor": "#5555ff",
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -213,21 +211,20 @@
             "GrowthApplicationPeriod": 3,
             "GrowthStrategy": 1,
             "Id": "238c37b4-739b-4705-bbe3-d0bd35033661",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Car - Maintenance",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-06-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-06-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "33c5d876-b02b-4643-8eda-2f96b91b9040": {
             "Active": true,
             "Amount": 15000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -238,22 +235,21 @@
             "GrowthApplicationPeriod": 3,
             "GrowthStrategy": 1,
             "Id": "33c5d876-b02b-4643-8eda-2f96b91b9040",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Anne - Nails and hairs",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-02-15",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-02-15",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "3f32bc1c-d99a-48df-8de2-035834f2a71a": {
             "Active": true,
             "Amount": 13579,
             "DecorationColor": "#b5835a",
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -264,21 +260,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "3f32bc1c-d99a-48df-8de2-035834f2a71a",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Appartment - Insurance",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2024-08-28",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-08-28",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "49a2b412-cd8e-42b9-9d54-d470a8e293c8": {
             "Active": true,
             "Amount": 17500,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -289,21 +284,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "49a2b412-cd8e-42b9-9d54-d470a8e293c8",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Wine",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-06",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-06",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "4e5f7cd0-7b34-4deb-abf3-68f46f53239b": {
             "Active": true,
             "Amount": 140000,
             "Description": "Expenses growth with age",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 700000,
                 "AnnualVariableGrowth": {
@@ -314,21 +308,20 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 2,
             "Id": "4e5f7cd0-7b34-4deb-abf3-68f46f53239b",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Health care fees",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-15",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-15",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "5a7388bd-dd3c-40dc-8247-7778d45ce8e2": {
             "Active": true,
             "Amount": 90000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -339,22 +332,21 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "5a7388bd-dd3c-40dc-8247-7778d45ce8e2",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Insurance - Medication - Others",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2029-04-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2029-04-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "6767b32d-165b-46a1-bc01-565a0d3afad9": {
             "Active": true,
             "Amount": 10000,
             "DecorationColor": "#235880",
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -365,21 +357,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "6767b32d-165b-46a1-bc01-565a0d3afad9",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Cinema",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-03",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-03",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "79384a30-8124-4fbe-927e-1d974aebba59": {
             "Active": true,
             "Amount": 875000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -390,22 +381,21 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "79384a30-8124-4fbe-927e-1d974aebba59",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Winter trip",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2025-01-02",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2025-01-02",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "806dfc80-1f26-49c3-90a8-853e70a99bf9": {
             "Active": true,
             "Amount": 210000,
             "DecorationColor": "#b5835a",
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -416,21 +406,20 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "806dfc80-1f26-49c3-90a8-853e70a99bf9",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Appartment - Rent",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "8fe98b50-b73e-4ec0-ad1c-0c60ad496762": {
             "Active": true,
             "Amount": 12300,
             "Description": "Cadeaux de toute sorte aux arrières-grand-mères",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -441,22 +430,21 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "8fe98b50-b73e-4ec0-ad1c-0c60ad496762",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Gift - Extended family",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2024-12-20",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-12-20",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "96ec0bab-48b4-4fa1-b31d-abe681157c8b": {
             "Active": true,
             "Amount": 37600,
             "DecorationColor": "#338060",
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -467,21 +455,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "96ec0bab-48b4-4fa1-b31d-abe681157c8b",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Grocery",
             "PeriodMultiplier": 1,
             "PeriodType": 1,
+            "StartDate": "2024-01-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "991ab206-b654-4fc4-b3e2-9d309f47aa5f": {
             "Active": true,
             "Amount": 35000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -492,21 +479,20 @@
             "GrowthApplicationPeriod": 3,
             "GrowthStrategy": 1,
             "Id": "991ab206-b654-4fc4-b3e2-9d309f47aa5f",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Clothing",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-15",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-15",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "a237fe47-e91d-44c5-b0f0-d75b280f1e17": {
             "Active": true,
             "Amount": 1200,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -517,21 +503,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "a237fe47-e91d-44c5-b0f0-d75b280f1e17",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Gift - Person A",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2024-11-06",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-11-06",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "a30a3701-a7b7-4a20-b679-ea918cec7267": {
             "Active": true,
             "Amount": 80000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -542,21 +527,20 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "a30a3701-a7b7-4a20-b679-ea918cec7267",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Church",
             "PeriodMultiplier": 1,
             "PeriodType": 3,
+            "StartDate": "2024-01-31",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-31",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "a3571547-fc69-411a-8c9e-d38f908fc93c": {
             "Active": true,
             "Amount": 25000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -567,21 +551,20 @@
             "GrowthApplicationPeriod": 6,
             "GrowthStrategy": 1,
             "Id": "a3571547-fc69-411a-8c9e-d38f908fc93c",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Trips in the surrounding",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-10",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-10",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "a6a0e88b-cfce-45a5-a644-83465b8e7dc6": {
             "Active": true,
             "Amount": 15000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -592,21 +575,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "a6a0e88b-cfce-45a5-a644-83465b8e7dc6",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Traveling locally",
             "PeriodMultiplier": 1,
             "PeriodType": 1,
+            "StartDate": "2024-01-04",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-04",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "b0079057-6a42-4270-9341-e381fd41aee1": {
             "Active": true,
             "Amount": 225000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -617,22 +599,21 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "b0079057-6a42-4270-9341-e381fd41aee1",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Winter trip - pre-payment",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2024-07-31",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-07-31",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "b308dd93-f421-4d0e-b141-db9a6054015c": {
             "Active": true,
             "Amount": 150000,
             "DecorationColor": "#5555ff",
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -643,21 +624,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "b308dd93-f421-4d0e-b141-db9a6054015c",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Car - Insurance",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2024-08-29",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-08-29",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "b9f299eb-e0c6-4c91-944e-eb6815dce547": {
             "Active": true,
             "Amount": 16666,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -668,21 +648,20 @@
             "GrowthApplicationPeriod": 4,
             "GrowthStrategy": 1,
             "Id": "b9f299eb-e0c6-4c91-944e-eb6815dce547",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Restos",
             "PeriodMultiplier": 1,
             "PeriodType": 1,
+            "StartDate": "2024-01-03",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-03",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "bdd7afed-c7d3-4536-917f-47669492b73b": {
             "Active": true,
             "Amount": 197500,
             "Description": "",
+            "EndDate": "2028-03-02",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -693,21 +672,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "bdd7afed-c7d3-4536-917f-47669492b73b",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Insurance - Medication - Company A",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2024-03-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2028-03-02",
-                "Start": "2024-03-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": false
         },
         "ca42dac6-c5c5-492a-a140-54e4061dceff": {
             "Active": true,
             "Amount": 150000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -718,22 +696,21 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "ca42dac6-c5c5-492a-a140-54e4061dceff",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Renovation works",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2023-12-20",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2023-12-20",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "de34a4fd-f95d-4fe9-99bb-e696191e8d73": {
             "Active": true,
             "Amount": 15500,
             "DecorationColor": "#5555ff",
             "Description": "30000 km per year, 9 L/100 km, 1.5$ per liter",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -744,21 +721,20 @@
             "GrowthApplicationPeriod": 13,
             "GrowthStrategy": 1,
             "Id": "de34a4fd-f95d-4fe9-99bb-e696191e8d73",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Car - Gaz",
             "PeriodMultiplier": 1,
             "PeriodType": 1,
+            "StartDate": "2024-02-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-02-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "e26bdb7d-9f84-4d40-a421-a927b0778ff6": {
             "Active": true,
             "Amount": 3400,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -769,21 +745,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "e26bdb7d-9f84-4d40-a421-a927b0778ff6",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Gift - Person B",
             "PeriodMultiplier": 1,
             "PeriodType": 4,
+            "StartDate": "2024-03-04",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-03-04",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "e71f64b0-d37a-4e09-bbd8-1a7de75d07d9": {
             "Active": true,
             "Amount": 10000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -794,22 +769,21 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "e71f64b0-d37a-4e09-bbd8-1a7de75d07d9",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Misc",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-03",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-03",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "ed8be49c-db99-4d47-9e28-4044ea286fa7": {
             "Active": true,
             "Amount": 16789,
             "DecorationColor": "#b5835a",
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -820,21 +794,20 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "ed8be49c-db99-4d47-9e28-4044ea286fa7",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Appartment - Electricity",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "edba0999-444e-4d39-bcf1-e990cd8d80fc": {
             "Active": true,
             "Amount": 7500,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -845,21 +818,20 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "edba0999-444e-4d39-bcf1-e990cd8d80fc",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Mobile phone",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-02-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-02-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "ffea2684-5404-4966-886d-8f0760bbd0ad": {
             "Active": true,
             "Amount": 10000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -870,18 +842,17 @@
             "GrowthApplicationPeriod": 26,
             "GrowthStrategy": 1,
             "Id": "ffea2684-5404-4966-886d-8f0760bbd0ad",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": false,
             "Name": "Tango Milonga",
             "PeriodMultiplier": 1,
             "PeriodType": 1,
+            "StartDate": "2024-01-06",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-01-06",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         }
     },
+    "FeGenerationDuration": 50,
     "IncomesIrregular": {
         "24fb0a3a-c6cf-47db-9f12-2db989a4b38e": {
             "Active": true,
@@ -8926,6 +8897,7 @@
             "Amount": 234500,
             "DecorationColor": "#6f6880",
             "Description": "Pension from city of Calgary",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -8936,22 +8908,21 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "1f15b1a4-6be6-4d71-8069-5498def29653",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": true,
             "Name": "Alejandra - Pension Calgary -  65 y. and more",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2028-03-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2028-03-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "26e065e6-9e6d-4b2f-82af-9c942efabe46": {
             "Active": true,
             "Amount": 92500,
             "DecorationColor": "#e66100",
             "Description": "Pension from Government of Canada",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -8962,22 +8933,21 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "26e065e6-9e6d-4b2f-82af-9c942efabe46",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": true,
             "Name": "Anne - Federal Pension",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2028-05-31",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2028-05-31",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "4d6ac8b3-f9e1-42f4-ac03-87b49a3a3362": {
             "Active": true,
             "Amount": 310000,
             "DecorationColor": "#57e389",
             "Description": "From real-estate investments, will be sold in 2028",
+            "EndDate": "2028-02-28",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -8988,22 +8958,21 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "4d6ac8b3-f9e1-42f4-ac03-87b49a3a3362",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": true,
             "Name": "Anne - Rent income",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-01",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2028-02-28",
-                "Start": "2024-01-01",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": false
         },
         "77bbfd93-7665-4bf8-ac06-6ea77e3a9022": {
             "Active": true,
             "Amount": 65000,
             "DecorationColor": "#80163b",
             "Description": "",
+            "EndDate": "2030-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -9014,21 +8983,20 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "77bbfd93-7665-4bf8-ac06-6ea77e3a9022",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": true,
             "Name": "Anne - Salary from part time job at local food store",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-01-31",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2030-12-31",
-                "Start": "2024-01-31",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": false
         },
         "a71584ed-e47e-448d-bbae-780fa2918262": {
             "Active": false,
             "Amount": 100000,
             "Description": "Desactivated because not sure if it will work as expected. have to reassess this opportunity...",
+            "EndDate": "2049-02-20",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -9039,21 +9007,20 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 1,
             "Id": "a71584ed-e47e-448d-bbae-780fa2918262",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": true,
             "Name": "Anne - selling furnitures as a sideline",
             "PeriodMultiplier": 1,
             "PeriodType": 3,
+            "StartDate": "2024-02-20",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2049-02-20",
-                "Start": "2024-02-20",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": false
         },
         "c2d23a04-9c97-42a2-810f-f80b96a55891": {
             "Active": true,
             "Amount": 134557,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -9064,21 +9031,20 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 1,
             "Id": "c2d23a04-9c97-42a2-810f-f80b96a55891",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": true,
             "Name": "John - Federal Pension",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2028-05-31",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2028-05-31",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "d38036e2-7be4-406c-8fbc-bac8a18ea01d": {
             "Active": true,
             "Amount": 170000,
             "Description": "",
+            "EndDate": "2099-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 400000,
                 "AnnualVariableGrowth": {
@@ -9089,22 +9055,21 @@
             "GrowthApplicationPeriod": 1,
             "GrowthStrategy": 2,
             "Id": "d38036e2-7be4-406c-8fbc-bac8a18ea01d",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": true,
             "Name": "John - Pension from company ABC",
             "PeriodMultiplier": 1,
             "PeriodType": 2,
+            "StartDate": "2024-12-31",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2099-12-31",
-                "Start": "2024-12-31",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": true
         },
         "fc55569c-d1c4-40a1-bc3b-9edc44a3ee3e": {
             "Active": true,
             "Amount": 182399,
             "DecorationColor": "#a51d2d",
             "Description": "",
+            "EndDate": "2035-12-31",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -9116,16 +9081,14 @@
             "GrowthApplicationPeriod": 12,
             "GrowthStrategy": 2,
             "Id": "fc55569c-d1c4-40a1-bc3b-9edc44a3ee3e",
+            "InflationAdjustmentFactor": 1,
             "IsIncome": true,
             "Name": "John - Salary",
             "PeriodMultiplier": 1,
             "PeriodType": 3,
+            "StartDate": "2024-01-31",
             "StreamType": 0,
-            "ValidityRange": {
-                "End": "2035-12-31",
-                "Start": "2024-01-31",
-                "Type": 1
-            }
+            "UseScenarioForEndDate": false
         }
     },
     "Inflation": {
@@ -9135,6 +9098,6 @@
         "NoOfDecimals": 5,
         "Type": 0
     },
-    "Name": "Budget example",
-    "Version": "1.0.0"
+    "Name": "Budget Example",
+    "Version": "2.0.0"
 }

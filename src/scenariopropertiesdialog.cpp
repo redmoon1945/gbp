@@ -35,6 +35,7 @@ void ScenarioPropertiesDialog::slotPrepareContent()
     ui->noIrregularIncomesLabel->clear();
     ui->noPeriodicExpensesLabel->clear();
     ui->noIrregularExpensesLabel->clear();
+    ui->feGenerationDurationLabel->clear();
     ui->currencyLabel->clear();
     ui->inflationLabel->clear();
 
@@ -53,9 +54,9 @@ void ScenarioPropertiesDialog::slotPrepareContent()
             ui->pathPlainTextEdit->setPlainText(tr("Not set yet"));
         } else {
             QFileInfo fileInfo(fullName);
-            QString baseFileName = fileInfo.baseName();
+            QString fileName = fileInfo.fileName();
             QString filePath = fileInfo.absolutePath();
-            ui->filenamePlainTextEdit->setPlainText(baseFileName);
+            ui->filenamePlainTextEdit->setPlainText(fileName);
             ui->pathPlainTextEdit->setPlainText(filePath);
             QDateTime dt = fileInfo.birthTime();
             if (dt.isValid()){
@@ -93,6 +94,8 @@ void ScenarioPropertiesDialog::slotPrepareContent()
         } else{
             ui->inflationLabel->setText(tr("Variable inflation"));
         }
+
+        ui->feGenerationDurationLabel->setText(QString::number(theScenario->getFeGenerationDuration()));
 
     }
 }

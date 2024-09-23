@@ -116,11 +116,16 @@ QVariant ScenarioFeTableModel::data(const QModelIndex &index, int role) const
             return int(Qt::AlignHCenter| Qt::AlignVCenter);
         }
     } else if (role == Qt::ForegroundRole){
-        if ( (allowDecorationColor==true) && (col==1) && (info.decorationColor.isValid()) ) {
-            return QVariant(info.decorationColor);
+        if (info.isActive) {
+            if ( (allowDecorationColor==true) && (col==1) && (info.decorationColor.isValid()) ) {
+                return QVariant(info.decorationColor);
+            } else {
+                return QVariant();
+            }
         } else {
-            return QVariant();
+            return QVariant(QColor(128,128,128));
         }
+
     } else if (role==Qt::FontRole){
         if (info.isActive){
             if (col==2) {
@@ -149,7 +154,9 @@ QVariant ScenarioFeTableModel::data(const QModelIndex &index, int role) const
 
 // Everytime scenario changes, this must be called (including first time set)
 // Filters are untouched.
-void ScenarioFeTableModel::newScenario(CurrencyInfo cInfo, QMap<QUuid, PeriodicFeStreamDef> newIncomesDefPeriodic, QMap<QUuid, IrregularFeStreamDef> newIncomesDefIrregular, QMap<QUuid, PeriodicFeStreamDef> newExpensesDefPeriodic, QMap<QUuid, IrregularFeStreamDef> newExpensesDefIrregular)
+void ScenarioFeTableModel::newScenario(CurrencyInfo cInfo, QMap<QUuid, PeriodicFeStreamDef> newIncomesDefPeriodic,
+                                       QMap<QUuid, IrregularFeStreamDef> newIncomesDefIrregular, QMap<QUuid, PeriodicFeStreamDef> newExpensesDefPeriodic,
+                                       QMap<QUuid, IrregularFeStreamDef> newExpensesDefIrregular)
 {
     currInfo = cInfo;
     incomesDefPeriodic = newIncomesDefPeriodic;
@@ -553,7 +560,6 @@ void ScenarioFeTableModel::setAllowDecorationColor(bool newAllowDecorationColor)
     allowDecorationColor = newAllowDecorationColor;
     emit endResetModel();
 }
-
 
 
 

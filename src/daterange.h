@@ -27,7 +27,8 @@
 // Date interval. It has a "type" that indicates its nature, that is :
 // * BOUNDED : start and end are finite value and are always inclusive. Start always <= end
 // * INFINITE : start is at -infinity and end is at +infinity
-// * EMPTY : no start not end
+// * INFINITE_END : start is a defined date, but end is at +infinity
+// * EMPTY : no start nor end
 // Interval is set to not be greater than 1000 years (does not make any sense to go over that in the context of gbp)
 class DateRange
 {
@@ -35,14 +36,15 @@ class DateRange
 
 public:
 
-    enum Type { EMPTY,BOUNDED,INFINITE};
+    enum Type { EMPTY=0, BOUNDED=1, INFINITE=2, BOUNDED_START_INFINITE_END=3}; // keep these int values for compatibility with future versions
     static const long MAX_YEARS = 1000; // max size of a DateRange
 
     // Constructors and destructor
-    DateRange( const QDate from, const QDate to );   // always generates a DateRange of type BOUNDED
-    DateRange();                                    // always generates a DateRange of type EMPTY
+    DateRange();                                  // to create a DateRange of type EMPTY
+    DateRange(const QDate from);                  // to create a DateRange of type BOUNDED_START_INFINITE_END
+    DateRange(const QDate from, const QDate to);  // to create a DateRange of type BOUNDED
+    static DateRange getInfiniteRange();          // to create a DateRange of type INFINITE
     DateRange(const DateRange & o);
-    DateRange(Type r);
     virtual ~DateRange();
 
     // operators
@@ -55,7 +57,7 @@ public:
     DateRange intersection(const DateRange o) const;
     bool includeDate(const QDate o) const;
     QList<QDate> getDateList() const;   // get all the dates in the range
-    QString toString() const;
+    QString toString(QString stringForEndSideIfInfinite="") const;
     QJsonObject toJson() const;
     static DateRange fromJson(const QJsonObject& o, Util::OperationResult &result);
 

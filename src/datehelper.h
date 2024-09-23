@@ -35,6 +35,7 @@ public:
     static QDate getNextEventDateEndOfMonth(QDate date,quint16 multiplier)  ;
     static QDate getNextEventDateYearly(QDate date,quint16 multiplier)  ;
     static QDate getNextEndOfMonth(QDate date, quint16 multiplier) ;
+    static bool isEndOfMonth(QDate date);
 
 };
 

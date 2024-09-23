@@ -50,6 +50,10 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     displayLocale = locale;
     tempVariableInflation = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>());
 
+    // set constraints for end date calculation
+    ui->maxDurationSpinBox->setMaximum(Scenario::MAX_DURATION_FE_GENERATION);
+    ui->maxDurationSpinBox->setMinimum(Scenario::MIN_DURATION_FE_GENERATION);
+
     // tweak Item Table fonts
     uint oldFontSize;
     uint newFontSize;
@@ -167,7 +171,7 @@ void EditScenarioDialog::allowDecorationColor(bool value)
 
 // We are about to start a new editing session of the current existing scenario or create a new one.
 // if isNewScenario==true, it indicates we are going to edit a new scenario even if there could be one already loaded
-void EditScenarioDialog::slotPrepareContent(bool isNewScenario,QString countryCode, CurrencyInfo newCurrInfo)
+void EditScenarioDialog::slotPrepareContent(bool isNewScenario, QString countryCode, CurrencyInfo newCurrInfo)
 {
     // remember some variables
     this->countryCode = countryCode;
@@ -183,12 +187,14 @@ void EditScenarioDialog::slotPrepareContent(bool isNewScenario,QString countryCo
         // *** NEW SCENARIO ***
 
         // init ListView model
+        QDate maxDate = GbpController::getInstance().getToday().addYears(Scenario::DEFAULT_DURATION_FE_GENERATION);
         itemTableModel->newScenario(currInfo, QMap<QUuid,PeriodicFeStreamDef>(),QMap<QUuid,IrregularFeStreamDef>(),
                                    QMap<QUuid,PeriodicFeStreamDef>(),QMap<QUuid,IrregularFeStreamDef>());
 
         // fill fields with empty stuff
         ui->scenarioNameLineEdit->setText(tr("Unnamed"));
         ui->DescPlainTextEdit->setPlainText("");
+        ui->maxDurationSpinBox->setValue(Scenario::DEFAULT_DURATION_FE_GENERATION);
 
         ui->inflationConstantRadioButton->setChecked(true);
         ui->inflationConstantDoubleSpinBox->setValue(0);
@@ -205,6 +211,8 @@ void EditScenarioDialog::slotPrepareContent(bool isNewScenario,QString countryCo
         QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario() ;
         ui->scenarioNameLineEdit->setText(scenario->getName());
         ui->DescPlainTextEdit->setPlainText(scenario->getDescription());
+        ui->maxDurationSpinBox->setValue(scenario->getFeGenerationDuration());
+
         // manage scenario inflation
         if (scenario->getInflation().getType()==Growth::CONSTANT){
             ui->inflationConstantRadioButton->setChecked(true);
@@ -221,6 +229,7 @@ void EditScenarioDialog::slotPrepareContent(bool isNewScenario,QString countryCo
             ui->editGrowthPushButton->setEnabled(true);
         }
         // init ListView model
+        QDate maxDate = GbpController::getInstance().getToday().addYears(scenario->getFeGenerationDuration());
         itemTableModel->newScenario(currInfo, scenario->getIncomesDefPeriodic(), scenario->getIncomesDefIrregular(),
                                     scenario->getExpensesDefPeriodic(), scenario->getExpensesDefIrregular());
 
@@ -326,7 +335,8 @@ void EditScenarioDialog::on_addPeriodicPushButton_clicked()
 {
     bool isIncome = ui->incomesRadioButton->isChecked();
     PeriodicFeStreamDef psStreamDef;  // useless
-    emit signalEditPeriodicStreamDefPrepareContent(true, isIncome, psStreamDef, currInfo, getInflationCurrentlyDefined());
+    QDate maxDate = GbpController::getInstance().getToday().addYears(ui->maxDurationSpinBox->value());
+    emit signalEditPeriodicStreamDefPrepareContent(true, isIncome, psStreamDef, currInfo, getInflationCurrentlyDefined(), maxDate);
     psStreamDefDialog->show();
 }
 
@@ -335,17 +345,10 @@ void EditScenarioDialog::on_addIrregularPushButton_clicked()
 {
     bool isIncome = ui->incomesRadioButton->isChecked();
     IrregularFeStreamDef irStreamDef;  // useless
-    emit signalEditIrregularStreamDefPrepareContent(true, isIncome, irStreamDef, currInfo);
+    QDate maxDate = GbpController::getInstance().getToday().addYears(ui->maxDurationSpinBox->value());
+    emit signalEditIrregularStreamDefPrepareContent(true, isIncome, irStreamDef, currInfo, maxDate);
     irStreamDefDialog->show();
 }
-
-
-// void EditScenarioDialog::on_applyPushButton_clicked()
-// {
-
-
-
-// }
 
 
 void EditScenarioDialog::on_cancelPushButton_clicked()
@@ -353,7 +356,6 @@ void EditScenarioDialog::on_cancelPushButton_clicked()
     this->hide();
     emit signalEditScenarioCompleted();
 }
-
 
 
 void EditScenarioDialog::on_inflationVariableRadioButton_clicked()
@@ -496,6 +498,7 @@ void EditScenarioDialog::on_applyPushButton_clicked()
 
     QString name = ui->scenarioNameLineEdit->text();
     QString desc = ui->DescPlainTextEdit->toPlainText();
+    quint16 maxDuration = ui->maxDurationSpinBox->value();
     // inflation
     Growth inflation;
     if (ui->inflationConstantRadioButton->isChecked()){
@@ -512,7 +515,7 @@ void EditScenarioDialog::on_applyPushButton_clicked()
     QSharedPointer<Scenario> scenario;
     try {
         scenario = QSharedPointer<Scenario>(new Scenario(
-            Scenario::LatestVersion, name, desc, inflation, countryCode, incomesDefPeriodic, incomesDefIrregular, expensesDefPeriodic, expensesDefIrregular));
+            Scenario::LATEST_VERSION, name, desc, maxDuration, inflation, countryCode, incomesDefPeriodic, incomesDefIrregular, expensesDefPeriodic, expensesDefIrregular));
     } catch (...) {
         // we should not get any exception...but plan for the worst
         std::exception_ptr p = std::current_exception();
@@ -528,13 +531,25 @@ void EditScenarioDialog::on_applyPushButton_clicked()
         return;
     }
 
-    // switch current scenario to this one
+    // update scenario data displayed.If FeDurationGeneratio duration has changed, notify the caller
+    bool rescaleXaxis = false;
+    if(GbpController::getInstance().isScenarioLoaded()==true){
+        quint16 previousFeGenerationDuration = GbpController::getInstance().getScenario()->getFeGenerationDuration();
+        if (previousFeGenerationDuration != maxDuration) {
+            rescaleXaxis = true; // X axis will change, need to rescale
+        }
+    }
+
+    // switch to the new/editted scenario
     GbpController::getInstance().setScenario(scenario);
+
+    // log the changes
     if (currentlyEditingExistingScenario){
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Modifications to the existing scenario have been applied (but not saved yet"));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Name = %1").arg(scenario->getName()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Country ISO code = %1").arg(scenario->getCountryCode()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Version = %1").arg(scenario->getVersion()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Fe Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic().size()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular().size()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic().size()));
@@ -544,14 +559,14 @@ void EditScenarioDialog::on_applyPushButton_clicked()
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Name = %1").arg(scenario->getName()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Country ISO code = %1").arg(scenario->getCountryCode()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Version = %1").arg(scenario->getVersion()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    F Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic().size()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular().size()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic().size()));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular().size()));
     }
 
-    // update scenario data displayed
-    emit signalEditScenarioResult(!currentlyEditingExistingScenario);
+    emit signalEditScenarioResult(!currentlyEditingExistingScenario,rescaleXaxis);
 
     // If it was a new scenario that we were editing, close the window.
     // For existing scenario being edited, keep the window opened for convenience.
@@ -624,19 +639,20 @@ void EditScenarioDialog::on_editPushButton_clicked()
             // should not happen
             return;
         }
+        QDate maxDate = GbpController::getInstance().getToday().addYears(ui->maxDurationSpinBox->value());
         if (type == FeStreamDef::PERIODIC){
             PeriodicFeStreamDef ps = itemTableModel->getPeriodicFeStreamDef(selectedIdList.at(0),found) ;
             if (found==false) {
                 return;  // should never happen
             }
-            emit signalEditPeriodicStreamDefPrepareContent(false, ui->incomesRadioButton->isChecked(), ps, currInfo, getInflationCurrentlyDefined());
+            emit signalEditPeriodicStreamDefPrepareContent(false, ui->incomesRadioButton->isChecked(), ps, currInfo, getInflationCurrentlyDefined(), maxDate);
             psStreamDefDialog->show();
         } else {
             IrregularFeStreamDef is = itemTableModel->getIrregularFeStreamDef(selectedIdList.at(0),found) ;
             if (found==false) {
                 return;  // should never happen
             }
-            emit signalEditIrregularStreamDefPrepareContent(false, ui->incomesRadioButton->isChecked(), is, currInfo);
+            emit signalEditIrregularStreamDefPrepareContent(false, ui->incomesRadioButton->isChecked(), is, currInfo, maxDate);
             irStreamDefDialog->show();
         }
 
@@ -751,4 +767,9 @@ void EditScenarioDialog::on_itemsTableView_doubleClicked(const QModelIndex &inde
     on_editPushButton_clicked();
 }
 
+
+
+void EditScenarioDialog::on_maxDurationSpinBox_valueChanged(int arg1)
+{
+}
 

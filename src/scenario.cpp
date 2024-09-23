@@ -19,21 +19,34 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QFile>
+#include <qfileinfo.h>
 #include "scenario.h"
 #include "currencyhelper.h"
 
+// stay independant of "gbpcontroller.h"
 
-QString Scenario::LatestVersion = "1.0.0";
+// File format version of a scenario on disk. Format released up to now are :
+// 1.0.0 : gbp 1.0 to and including 1.3
+// 2.0.0 : gbp 1.4
+// Format 2.0.0 cannot be read by gbp 1.3 ou before.
+// but format 1.0.0 can be read by gbp 1.4+ (will be converted on the fly to 2.0.0)
+QString Scenario::LATEST_VERSION = "2.0.0";
+QString Scenario::VERSION_1 = "1.0.0";
+
 int Scenario::NAME_MAX_LEN = 100;
 int Scenario::DESC_MAX_LEN = 4000;
 int Scenario::VERSION_MAX_LEN = 20;
 int Scenario::MAX_NO_STREAM_DEF = 200;
+quint16 Scenario::MIN_DURATION_FE_GENERATION = 1;   // we mandate at least 1 year of data
+quint16 Scenario::MAX_DURATION_FE_GENERATION = 200;   // completely arbitrary limit (idea is to limit memory used)
+quint16 Scenario::DEFAULT_DURATION_FE_GENERATION = 75; // cover life span of most people
 
 
 Scenario::Scenario(const Scenario &o){
     this->version = o.version;
     this->name = o.name.left(NAME_MAX_LEN); // truncate if required
     this->description = o.description;
+    this->feGenerationDuration = o.feGenerationDuration;
     this->inflation = o.inflation;
     this->countryCode = o.countryCode;
     this->incomesDefPeriodic = o.incomesDefPeriodic;
@@ -48,7 +61,7 @@ Scenario::~Scenario()
 }
 
 
-Scenario::Scenario(const QString version, const QString name, const QString description, const Growth inflation, QString countryCode,
+Scenario::Scenario(const QString version, const QString name, const QString description, const quint16 feGenerationDuration, const Growth inflation, QString countryCode,
                    const QMap<QUuid, PeriodicFeStreamDef> incomesDefPeriodicSet,
                    const QMap<QUuid, IrregularFeStreamDef> incomesDefIrregularSet,
                    const QMap<QUuid, PeriodicFeStreamDef> expensesDefPeriodicSet,
@@ -56,6 +69,7 @@ Scenario::Scenario(const QString version, const QString name, const QString desc
     version(version.left(VERSION_MAX_LEN)),
     name(name.left(NAME_MAX_LEN)),
     description(description.left(DESC_MAX_LEN)),
+    feGenerationDuration(feGenerationDuration),
     inflation(inflation),
     countryCode(countryCode),
     incomesDefPeriodic(incomesDefPeriodicSet),
@@ -70,6 +84,7 @@ Scenario &Scenario::operator=(const Scenario &o)
     this->version = o.version.left(VERSION_MAX_LEN);
     this->name = o.name.left(NAME_MAX_LEN);
     this->description = o.description.left(DESC_MAX_LEN);
+    this->feGenerationDuration = o.feGenerationDuration;
     this->inflation = o.inflation;
     this->countryCode = o.countryCode;
     this->incomesDefPeriodic = o.incomesDefPeriodic;
@@ -85,6 +100,7 @@ bool Scenario::operator==(const Scenario &o) const
     if ( !(this->version==o.version) ||
         !(this->name==o.name) ||
         !(this->description==o.description) ||
+        !(this->feGenerationDuration==o.feGenerationDuration) ||
         !(this->inflation==o.inflation) ||
         !(this->countryCode==o.countryCode) ){
         return false;
@@ -105,7 +121,7 @@ bool Scenario::operator==(const Scenario &o) const
 }
 
 
-// Save the scenario in an JSON file. If the file exists, it is overwritten
+// Save the scenario in an JSON file. If the file exists, it is overwritten.
 Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
 {
     QJsonObject jobject;
@@ -116,6 +132,7 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
     jobject["Version"] = version;
     jobject["Name"] = name;
     jobject["Description"] = description;
+    jobject["FeGenerationDuration"] = feGenerationDuration;
     jobject["Inflation"] = inflation.toJson();
     jobject["CountryCode"] = countryCode;
 
@@ -187,8 +204,8 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
     if (false==file.open(QFile::WriteOnly)){
         if (fileAlreadyExist){
             result.code = SAVE_ERROR_OPENING_FILE_FOR_WRITING;
-            result.errorStringUI = tr("Cannot open the already existing file in write-only mode");
-            result.errorStringLog = "Cannot open the already existing file in write-only mode";
+            result.errorStringUI = tr("Cannot open the file in write-only mode");
+            result.errorStringLog = "Cannot open the file in write-only mode";
         } else {
             result.code = SAVE_ERROR_CREATING_FILE_FOR_WRITING;
             result.errorStringUI = tr("Cannot create the file in write-only mode");
@@ -215,20 +232,23 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
 
 // Generate the whole suite of financial events for that scenario
 // Input params :
+//   today : today as defined by gbp
 //   systemLocale : Locale used for amount formatting
-//   fromTo : interval of time inside which the events should be generated
-//   pvAnnualDiscountRate : annual discount rate in percentage, to transform future into present value.
-//       0 means keep future values. Cannot be negative.
-//   pvPresent : date considered the "present" for convertion to PV purpose
+//   fromTo : interval of time inside which the events should be generated. Must be of type BOUNDED.
+//   pvAnnualDiscountRate : annual discount rate in percentage, to transform future into present
+//                          value. 0 means keep future values. Cannot be negative.
+//   pvPresent : date considered to be the "present" for convertion to PV purpose. Usually,
+//               "tomorrow" is what is required
 // Output params:
 //   saturationCount : number of times the FE amount was over the maximum allowed
-QMap<QDate, CombinedFeStreams::DailyInfo> Scenario::generateFinancialEvents(QLocale systemLocale, DateRange fromto,
-                                                                            double pvAnnualDiscountRate, QDate pvPresent,
-                                                                            uint &saturationCount) const
+QMap<QDate, CombinedFeStreams::DailyInfo> Scenario::generateFinancialEvents(QDate today,
+    QLocale systemLocale, DateRange fromto, double pvAnnualDiscountRate, QDate pvPresent,
+    uint &saturationCount) const
 {
     CombinedFeStreams comb;
     uint saturationNo;
     saturationCount = 0;
+    FeMinMaxInfo minMaxInfo; // we wont use it
     bool found;
 
     // check input parameters
@@ -238,30 +258,44 @@ QMap<QDate, CombinedFeStreams::DailyInfo> Scenario::generateFinancialEvents(QLoc
     if (pvPresent.isValid()==false) {
         throw std::invalid_argument("PV present date is invalid");
     }
+    if (today.isValid()==false) {
+        throw std::invalid_argument("Today date is invalid");
+    }
+    if (fromto.getType() != DateRange::BOUNDED) {
+        throw std::invalid_argument("fromtoInitial is not of type BOUNDED");
+    }
 
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(systemLocale, countryCode, found);
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(systemLocale,
+        countryCode, found);
     if (!found){
         // should never happen
         return comb.getCombinedStreams();
     }
 
+    // compute max date for FeGeneration
+    QDate maxDate = today.addYears(feGenerationDuration);
+
     foreach(PeriodicFeStreamDef item,incomesDefPeriodic){
-        QList<Fe> stream = item.generateEventStream(fromto, inflation, pvAnnualDiscountRate, pvPresent, saturationNo);
+        QList<Fe> stream = item.generateEventStream(fromto, maxDate, inflation,
+            pvAnnualDiscountRate, pvPresent, saturationNo, minMaxInfo);
         comb.addStream(stream,currInfo);
         saturationCount += saturationNo;
     }
     foreach(PeriodicFeStreamDef item,expensesDefPeriodic){
-        QList<Fe> stream = item.generateEventStream(fromto, inflation, pvAnnualDiscountRate, pvPresent, saturationNo);
+        QList<Fe> stream = item.generateEventStream(fromto, maxDate, inflation,
+            pvAnnualDiscountRate, pvPresent, saturationNo, minMaxInfo);
         comb.addStream(stream,currInfo);
         saturationCount += saturationNo;
     }
     foreach(IrregularFeStreamDef item,incomesDefIrregular){
-        QList<Fe> stream = item.generateEventStream(fromto, pvAnnualDiscountRate, pvPresent, saturationNo);
+        QList<Fe> stream = item.generateEventStream(fromto, maxDate, pvAnnualDiscountRate,
+            pvPresent, saturationNo, minMaxInfo);
         comb.addStream(stream,currInfo);
         saturationCount += saturationNo;
     }
     foreach(IrregularFeStreamDef item,expensesDefIrregular){
-        QList<Fe> stream = item.generateEventStream(fromto, pvAnnualDiscountRate, pvPresent, saturationNo);
+        QList<Fe> stream = item.generateEventStream(fromto, maxDate, pvAnnualDiscountRate,
+            pvPresent, saturationNo, minMaxInfo);
         comb.addStream(stream,currInfo);
         saturationCount += saturationNo;
     }
@@ -309,12 +343,14 @@ void Scenario::getStreamDefNameAndColorFromId(QUuid id, QString& name, QColor& c
 }
 
 
-// create a new Scenario from content of a JSON file
+// create a new Scenario object in memory from the content of a JSON file on disk
+// If an old file format version is found, it is automatically converted to the latest format,
+// but not saved on disk : so the version on disk is still at the old file format version.
 Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
 {
     QJsonValue buf;
     bool ok;
-    Scenario::FileResult result = {.code=ERROR_OTHER, .errorStringUI="", .errorStringLog=""};
+    Scenario::FileResult result = {.code=ERROR_OTHER, .errorStringUI="", .errorStringLog="", .version1found=false};
 
 
     // open the file
@@ -346,7 +382,8 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     // read all the bits and pieces of Scenario from the Json
     QJsonObject root = doc.object();
 
-    // version
+    // version : first thing to read, in order to check version
+    // If version 1 found, convert to version 2 on the fly
     buf = root.value("Version");
     if (buf == QJsonValue::Undefined){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
@@ -367,11 +404,18 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
         result.errorStringLog = QString("Version tag has a length %1, which is longer than max allowed of %2").arg(version.length()).arg(VERSION_MAX_LEN);
         return result;
     }
-    if( version != Scenario::LatestVersion ){
-        result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI  = tr("File %1 is of version %2, which is incompatible with current version %3 (Scenario)").arg(fullFileName).arg(version).arg(Scenario::LatestVersion);
-        result.errorStringLog  = QString("File %1 is of version %2, which is incompatible with current version %3 (Scenario)").arg(fullFileName).arg(version).arg(Scenario::LatestVersion);
-        return result;
+    if( version != Scenario::LATEST_VERSION ){
+        if (version == Scenario::VERSION_1) {
+            result.version1found = true;    // notify that we have auto-converted from V1
+            version = LATEST_VERSION;       // since it is auto-converted when loaded
+        } else {
+            // appears to be a future version greater that 2.
+            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            QFileInfo fileInfo(fullFileName);
+            result.errorStringUI  = tr("Scenario file %1 is of version %2, which is incompatible with version %3 used by this version of the application").arg(fileInfo.fileName()).arg(version).arg(Scenario::LATEST_VERSION);
+            result.errorStringLog  = QString("Scenario file %1 is of version %2, which is incompatible with  version %3 used by this version of the application").arg(fileInfo.fileName()).arg(version).arg(Scenario::LATEST_VERSION);
+            return result;
+        }
     }
 
     // name
@@ -416,6 +460,34 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
         result.errorStringUI = tr("Description tag has a length of %1, which is greater than the maximum allowed of %2").arg(desc.length()).arg(DESC_MAX_LEN);
         result.errorStringLog = QString("Description tag has a length of %1, which is greater than the maximum allowed of %2").arg(desc.length()).arg(DESC_MAX_LEN);
         return result;
+    }
+
+    // feGenerationDuration
+    buf = root.value("FeGenerationDuration");
+    quint16 feGenDuration;
+    if (buf == QJsonValue::Undefined){
+        // Older versions may not have this field : give it default value
+        feGenDuration = Scenario::DEFAULT_DURATION_FE_GENERATION;
+    } else {
+        if (buf.isDouble()==false){
+            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            result.errorStringUI = tr("FeGeneration tag is not a number");
+            result.errorStringLog = "FeGeneration tag is not a number";
+            return result;
+        }
+        int ok;
+        double d = buf.toDouble();
+        feGenDuration = Util::extractQuint16FromDoubleWithNoFracPart(d,Scenario::MAX_DURATION_FE_GENERATION, ok);
+        if ( ok==-1 ){
+            result.errorStringUI = tr("FeGenerationDuration - Value %1 is not an integer").arg(d);
+            result.errorStringLog = QString("FeGenerationDuration - Value %1 is not an integer").arg(d);
+            return result;
+        }
+        if ( ok==-2 ){
+            result.errorStringUI = tr("FeGenerationDuration - Value %1 is too big").arg(d);
+            result.errorStringLog = QString("FeGenerationDuration - Value %1 is too big").arg(d);
+            return result;
+        }
     }
 
     // country code
@@ -680,7 +752,7 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
 
     // build and return a new Scenario
     result.code = FileResultCode::SUCCESS;
-    QSharedPointer<Scenario> ptr(new Scenario(version, name, desc, inflation, countryCode, incPsMap, incIrMap, expPsMap, expIrMap));
+    QSharedPointer<Scenario> ptr(new Scenario(version, name, desc, feGenDuration, inflation, countryCode, incPsMap, incIrMap, expPsMap, expIrMap));
     result.scenarioPtr = ptr;
     return result;
 }
@@ -802,6 +874,16 @@ QMap<QUuid, IrregularFeStreamDef> Scenario::getExpensesDefIrregular() const
 void Scenario::setExpensesDefIrregular(const QMap<QUuid, IrregularFeStreamDef> &newExpensesDefIrregular)
 {
     expensesDefIrregular = newExpensesDefIrregular;
+}
+
+quint16 Scenario::getFeGenerationDuration() const
+{
+    return feGenerationDuration;
+}
+
+void Scenario::setFeGenerationDuration(quint16 newFeGenerationDuration)
+{
+    feGenerationDuration = newFeGenerationDuration;
 }
 
 

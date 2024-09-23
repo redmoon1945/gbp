@@ -49,6 +49,12 @@ struct FeDisplay{
     QString toString(QString streamDefName, const CurrencyInfo& currInfo, const QLocale& locale) const;
 };
 
+// structure to hold absolute y values min/max of a QList<Fe>
+struct FeMinMaxInfo{
+    qint64 yMin;    // 0 or positive
+    qint64 yMax;    // 0 or positive
+};
+
 
 
 #endif // FE_H

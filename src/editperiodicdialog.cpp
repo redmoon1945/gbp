@@ -48,10 +48,16 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     descFont.setPointSize(newFontSize);
     ui->descPlainTextEdit->setFont(descFont);
 
-    // make DateWidget widget wide enough
+    // make DateWidgets widget wide enough
     QFontMetrics fm = ui->fromDateEdit->fontMetrics();
     ui->fromDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
     ui->toDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
+
+    // set "from" / "to" date default
+    ui->toScenarioRadioButton->setChecked(true);
+    ui->toDateEdit->setEnabled(false);
+    ui->fromDateEdit->setDate(GbpController::getInstance().getTomorrow());
+    ui->toDateEdit->setDate(GbpController::getInstance().getToday().addYears(Scenario::DEFAULT_DURATION_FE_GENERATION));
 
     // adjust parameters of growth edit box
     ui->growthDoubleSpinBox->setMinimum(Growth::MIN_GROWTH_DOUBLE);
@@ -67,9 +73,6 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     // Plain Text Edition Dialog
     editDescriptionDialog = new PlainTextEditionDialog(this);     // auto-destroyed by Qt because it is a child
     editDescriptionDialog->setModal(true);
-    // Show Result Dialog
-    showResultDialog = new PlainTextEditionDialog(this);     // auto-destroyed by Qt because it is a child
-    showResultDialog->setModal(true);
     // connect emitters & receivers for Dialogs : Variable Growth Edition
     QObject::connect(this, &EditPeriodicDialog::signalEditVariableGrowthPrepareContent, editVariableGrowthDlg, &EditVariableGrowthDialog::slotPrepareContent);
     QObject::connect(editVariableGrowthDlg, &EditVariableGrowthDialog::signalEditVariableGrowthResult, this, &EditPeriodicDialog::slotEditVariableGrowthResult);
@@ -78,10 +81,6 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     QObject::connect(this, &EditPeriodicDialog::signalPlainTextDialogPrepareContent, editDescriptionDialog, &PlainTextEditionDialog::slotPrepareContent);
     QObject::connect(editDescriptionDialog, &PlainTextEditionDialog::signalPlainTextEditionResult, this, &EditPeriodicDialog::slotPlainTextEditionResult);
     QObject::connect(editDescriptionDialog, &PlainTextEditionDialog::signalPlainTextEditionCompleted, this, &EditPeriodicDialog::slotPlainTextEditionCompleted);
-    // connect emitters & receivers for Dialogs : Show Result
-    QObject::connect(this, &EditPeriodicDialog::signalShowResultPrepareContent, showResultDialog, &PlainTextEditionDialog::slotPrepareContent);
-    QObject::connect(showResultDialog, &PlainTextEditionDialog::signalPlainTextEditionResult, this, &EditPeriodicDialog::slotShowResultResult);
-    QObject::connect(showResultDialog, &PlainTextEditionDialog::signalPlainTextEditionCompleted, this, &EditPeriodicDialog::slotShowResultCompleted);
     // connect emitters & receivers for Dialogs : Visualize occurrences
     QObject::connect(this, &EditPeriodicDialog::signalVisualizeOccurrencesPrepareContent, visualizeoccurrencesDialog, &VisualizeOccurrencesDialog::slotPrepareContent);
     QObject::connect(visualizeoccurrencesDialog, &VisualizeOccurrencesDialog::signalCompleted, this, &EditPeriodicDialog::slotVisualizeOccurrencesCompleted);
@@ -93,17 +92,32 @@ EditPeriodicDialog::~EditPeriodicDialog()
 }
 
 
-void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, PeriodicFeStreamDef psStreamDef, CurrencyInfo newCurrInfo, Growth inflation)
+// Prepare for creating a new Periodic Stream or editing an existing one, before showing the Dialog
+void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, PeriodicFeStreamDef psStreamDef,
+                                            CurrencyInfo newCurrInfo, Growth inflation, QDate theMaxDateFeGeneration)
 {
+    // check input values
+    if ( theMaxDateFeGeneration.isValid()==false ) {
+        throw std::invalid_argument("Invalid max date for FeGenerationDuration");
+    }
+    if ( (isNewStreamDef==false) && ((psStreamDef.getStartDate().isValid()==false) ||
+        psStreamDef.getEndDate().isValid()==false)) {
+        throw std::invalid_argument("Invalid ValidityRange value for this existing Periodic Strem Def");
+    }
+
     // remember some variables
     this->editingExistingStreamDef = !isNewStreamDef;
     this->currInfo = newCurrInfo;
     this->isIncome = isIncome;
-    this->scenarioInflation = inflation;    // used only in the "show result" window
+    this->scenarioInflation = inflation;    // used only in the "Visualize occurrences" window
+    maxDateFeGeneration = theMaxDateFeGeneration;
 
-    // common settings
+    // some more settings
     ui->amountDoubleSpinBox->setDecimals(currInfo.noOfDecimal);
     ui->currencyIsoCodeLabel->setText(currInfo.isoCode);
+
+    // set name of Label for end date for Scenario case
+    ui->toScenarioRadioButton->setText(tr("Date defined at the scenario level (currently = %1)").arg(maxDateFeGeneration.toString(Qt::ISODate)));
 
     // Name colorization
     if (isNewStreamDef) {
@@ -125,11 +139,11 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, 
     setDecorationColorInfo();
 
     if(editingExistingStreamDef){
-        // editing an existing PeriodicFeStreamDef
+        // *** editing an existing PeriodicFeStreamDef ***
 
         // remember the id
         initialId = psStreamDef.getId();
-        // set some UI elements
+
         if(isIncome){
             this->setWindowTitle(tr("Editing Income of Category Type \"Periodic\""));
         } else {
@@ -146,8 +160,20 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, 
             amountDouble = 0;
         }
         ui->amountDoubleSpinBox->setValue(amountDouble);
-        ui->fromDateEdit->setDate(psStreamDef.getValidityRange().getStart());
-        ui->toDateEdit->setDate(psStreamDef.getValidityRange().getEnd());
+        ui->fromDateEdit->setDate(psStreamDef.getStartDate());
+
+        // set "to" date : do not clear value (handy)
+        if (psStreamDef.getUseScenarioForEndDate()==true) {
+            // used scenario value for end date
+            ui->toScenarioRadioButton->setChecked(true);
+            ui->toDateEdit->setEnabled(false);
+        } else {
+            // use custom value for end date
+            ui->toDateEdit->setDate(psStreamDef.getEndDate());
+            ui->toCustomRadioButton->setChecked(true);
+            ui->toDateEdit->setEnabled(true);
+        }
+
         if (psStreamDef.getActive()){
             ui->activeYesRadioButton->setChecked(true);
         } else {
@@ -187,7 +213,7 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, 
 
     } else{
 
-        // creating a new PeriodicFeStreamDef (value of psStreamDef then does not matter)
+        // *** creating a new PeriodicFeStreamDef (value of psStreamDef then does not matter) ***
 
         initialId = QUuid::createUuid();
         // set some UI elements
@@ -215,7 +241,6 @@ void EditPeriodicDialog::slotEditVariableGrowthResult(Growth growthOut)
 
 void EditPeriodicDialog::slotEditVariableGrowthCompleted()
 {
-
 }
 
 
@@ -281,15 +306,21 @@ void EditPeriodicDialog::on_applyPushButton_clicked()
     }
 }
 
-
+// Set form's widgets contents for cretion of a new Stream Def
 void EditPeriodicDialog::prepareDataToCreateANewStreamDef()
 {
     initialId = QUuid::createUuid();
     ui->nameLineEdit->setText("");
     ui->descPlainTextEdit->setPlainText("");
     ui->amountDoubleSpinBox->setValue(0);
+
+    // set from date
     ui->fromDateEdit->setDate(GbpController::getInstance().getTomorrow());
-    ui->toDateEdit->setDate(GbpController::getInstance().getTomorrow().addYears(GbpController::getInstance().getScenarioMaxYearsSpan()));
+
+    // set "to" Date : do not touch the to date
+    ui->toScenarioRadioButton->setChecked(true);
+    ui->toDateEdit->setEnabled(false);
+
     ui->activeYesRadioButton->setChecked(true);
     ui->gapSpinBox->setValue(1);
     ui->periodMultiplierSpinBox->setValue(1);
@@ -333,14 +364,39 @@ void EditPeriodicDialog::buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataR
     result.errorMessageUI = "";
     result.errorMessageLog = "";
 
-    // check if Validity ranges are valid
+    // check if Validity range data is valid, then build it
     QDate from = ui->fromDateEdit->date();
-    QDate to = ui->toDateEdit->date();
-    if (to<from){
-        result.errorMessageUI = tr("For Validity Range, the \"to\" date must not occur before the \"from\" date");
-        result.errorMessageLog = "For Validity Range, the \"to\" date must not occur before the \"from\" date";
+    if( !from.isValid()){
+        result.errorMessageUI = tr("Start Date is invalid");
+        result.errorMessageLog = "Start Date is invalid";
         return;
     }
+    if (ui->toScenarioRadioButton->isChecked()==true) {
+        if(maxDateFeGeneration<from){
+            result.errorMessageUI = tr("End date as defined at the scenario level must not occur before the Start date");
+            result.errorMessageLog = "End date as defined at the scenario level must not occur before the Start date";
+            return;
+        }
+    }
+    QDate to = ui->toDateEdit->date(); // to date is allowed to go over maxDate from the scenario
+    if ( ui->toCustomRadioButton->isChecked()==true){
+        if( !to.isValid()){
+            result.errorMessageUI = tr("End Date is invalid");
+            result.errorMessageLog = "End Date is invalid";
+            return;
+        }
+        if(to<from){
+            result.errorMessageUI = tr("End date must not occur before the Start date");
+            result.errorMessageLog = "End date must not occur before the Start date";
+            return;
+        }
+    } else{
+        // just make sure the unused to date is still valid
+        if( !to.isValid()){
+            to = from;
+        }
+    }
+
     // gather and transform data to create a Periodic Stream Def
     QVariant selectedData = ui->periodComboBox->itemData(ui->periodComboBox->currentIndex());
     PeriodicFeStreamDef::PeriodType periodicType = static_cast<PeriodicFeStreamDef::PeriodType>(selectedData.toInt());
@@ -373,7 +429,6 @@ void EditPeriodicDialog::buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataR
     } else if (ui->growthVariableRadioButton->isChecked()){
         growth = tempVariableGrowth;
     }
-    DateRange validityRange(ui->fromDateEdit->date(), ui->toDateEdit->date());
     qint16 periodMultiplier = static_cast<quint16>(ui->periodMultiplierSpinBox->value());
     quint16 gap = static_cast<quint16>(ui->gapSpinBox->value());
 
@@ -384,7 +439,8 @@ void EditPeriodicDialog::buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataR
     try {
         result.pStreamDef = PeriodicFeStreamDef(periodicType, periodMultiplier, amount, growth, gs,
                                                 gap, initialId, ui->nameLineEdit->text(), ui->descPlainTextEdit->toPlainText(),
-                                                ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, validityRange, inflationModifFactor);
+                                                ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, from, to, ui->toScenarioRadioButton->isChecked(),
+                                                inflationModifFactor);
     } catch (...) {
         // unexpected error, should never happen
         std::exception_ptr p = std::current_exception();
@@ -535,7 +591,27 @@ void EditPeriodicDialog::on_visualizeOccurrencesPushButton_clicked()
     }
 
     // send for display
-    emit signalVisualizeOccurrencesPrepareContent(currInfo, scenarioInflation, &(result.pStreamDef));
+    emit signalVisualizeOccurrencesPrepareContent(currInfo, scenarioInflation, maxDateFeGeneration,  &(result.pStreamDef));
     visualizeoccurrencesDialog->show();
+}
+
+
+void EditPeriodicDialog::on_toCustomRadioButton_toggled(bool checked)
+{
+    if (ui->toCustomRadioButton->isChecked()==true) {
+        ui->toDateEdit->setEnabled(true);
+    } else {
+        ui->toDateEdit->setEnabled(false);
+    }
+}
+
+
+void EditPeriodicDialog::on_toScenarioRadioButton_toggled(bool checked)
+{
+    if (ui->toCustomRadioButton->isChecked()==true) {
+        ui->toDateEdit->setEnabled(true);
+    } else {
+        ui->toDateEdit->setEnabled(false);
+    }
 }
 

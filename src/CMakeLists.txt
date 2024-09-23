@@ -98,7 +98,9 @@ set(PROJECT_SOURCES
     visualizeoccurrencesdialog.h
     visualizeoccurrencesdialog.cpp
     visualizeoccurrencesdialog.ui
-
+    welcomedialog.h
+    welcomedialog.cpp
+    welcomedialog.ui
     ${TS_FILES}
 )
 
@@ -124,7 +126,6 @@ qt6_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 qt6_add_executable(gbp MANUAL_FINALIZATION ${PROJECT_SOURCES} ${QM_FILES}
     gbp_resources.qrc
-
 )
 
 

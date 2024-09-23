@@ -20,6 +20,7 @@
 #define ABOUTDIALOG_H
 
 #include <QDialog>
+#include <QLocale>
 
 namespace Ui {
 class AboutDialog;
@@ -35,7 +36,7 @@ public:
 
 public slots:
     // For client of AboutDialog : prepare Dialog before edition
-    void slotAboutDialogPrepareContent();
+    void slotAboutDialogPrepareContent(QLocale theLocale);
 
 private slots:
     void on_AboutDialog_rejected();

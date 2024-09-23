@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>950</width>
-    <height>531</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -38,54 +38,6 @@
             <number>10</number>
            </property>
            <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="font">
-              <font>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Scenario - No of years calculated :</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout_9">
-             <item>
-              <widget class="QSpinBox" name="scenarioYearsSpinBox">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Define how long in time financial events will be generated for the scenario. Generation starts from “tomorrow” and will terminate &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;no later than “x” years later&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;, where “x” is the number specified here.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="minimum">
-                <number>1</number>
-               </property>
-               <property name="maximum">
-                <number>100</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_8">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item row="1" column="0">
             <widget class="QLabel" name="label_10">
              <property name="font">
               <font>
@@ -97,7 +49,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="0" column="1">
             <layout class="QVBoxLayout" name="verticalLayout_12">
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_21">
@@ -198,7 +150,7 @@
              </item>
             </layout>
            </item>
-           <item row="2" column="0">
+           <item row="1" column="0">
             <widget class="QLabel" name="label_9">
              <property name="font">
               <font>
@@ -210,7 +162,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="1" column="1">
             <layout class="QVBoxLayout" name="verticalLayout_11">
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_18">
@@ -299,7 +251,7 @@
              </item>
             </layout>
            </item>
-           <item row="3" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="label_11">
              <property name="font">
               <font>
@@ -311,7 +263,7 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="2" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_23">
              <item>
               <widget class="QCheckBox" name="allowDecorationColorCheckBox">
@@ -331,7 +283,7 @@
              </item>
             </layout>
            </item>
-           <item row="4" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="label_7">
              <property name="font">
               <font>
@@ -343,7 +295,7 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
+           <item row="3" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_24">
              <item>
               <widget class="QCheckBox" name="exportTextAmountLocalizedCheckBox">
@@ -363,14 +315,14 @@
              </item>
             </layout>
            </item>
-           <item row="5" column="0">
+           <item row="4" column="0">
             <widget class="QLabel" name="label_5">
              <property name="text">
               <string>Use Present Value for all financial events :</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
+           <item row="4" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <widget class="QCheckBox" name="usePresentValueCheckBox">
@@ -795,7 +747,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

@@ -28,12 +28,14 @@
 #include "dateintervaldialog.h"
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QLocale>
 #include <QChart>
 #include <QChartView>
 #include <QDateTimeAxis>
 #include <QValueAxis>
 #include "combinedfestreams.h"
 #include "qcustomplot.h"
+#include "scenario.h"
 #include <QUuid>
 
 QT_BEGIN_NAMESPACE
@@ -64,14 +66,14 @@ signals:
     // For Scenario Properties display : prepare content before edition
     void signalScenarioPropertiesPrepareContent();
     // For About Dialog : prepare content before edition
-    void signalAboutDialogPrepareContent();
+    void signalAboutDialogPrepareContent(QLocale theLocale);
 
 public slots:
     // From SelectCountry Dialog : receive result and notification of edition completion
     void slotSelectCountryResult(QString countryCode, CurrencyInfo currInfo);
     void slotSelectCountryCompleted();
     // From Edit Scenario : result and edition completion notification
-    void slotEditScenarioResult(bool currentlyEditingNewScenario);
+    void slotEditScenarioResult(bool currentlyEditingNewScenario, bool rescaleXaxis);
     void slotEditScenarioCompleted();
     // From Options Edit : result and edition completion notification
     void slotOptionsResult(OptionsDialog::OptionsChangesImpact impact);
@@ -129,7 +131,7 @@ private slots:
     void on_customToolButton_clicked();
     void on_actionUser_Manual_triggered();
     void on_actionQuick_Tutorial_triggered();
-
+    void on_actionChange_Log_triggered();
 
 private:
 
@@ -166,20 +168,19 @@ private:
     // methods
     void updateScenarioDataDisplayed(bool rescaleXaxis, bool resetBaselineValue);
     bool loadScenarioFile(QString fileName);
-    bool saveScenario(QString fileName);
+    Scenario::FileResult saveScenario(QString fileName);
     void msgStatusbar(QString msg);
     void recentFilesMenuInit();
     void recentFilesMenuUpdate();
     bool eventFilter(QObject *object, QEvent *event) override;
     void setChartTitle(QString theTitle);
-    void setVisibilityZoomButtons();
     void rescaleYaxis(uint noOfMonths);
     void shiftGraph(bool toTheRight);
     void setChartColors();
     void fillDailyInfoSection(const QDate& date, double amount, const CombinedFeStreams::DailyInfo& di);
     void emptyDailyInfoSection();
     void updateBaselineWidgets(CurrencyInfo currInfo);
-    void checkIfCurrentScenarioMatchesDiskVersion(bool& match) const;
+    void checkIfCurrentScenarioMatchesDiskVersion(bool& match, bool &oldVersion) const;
     bool checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding();
 
 

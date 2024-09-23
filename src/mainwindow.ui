@@ -713,6 +713,7 @@
     </property>
     <addaction name="actionQuick_Tutorial"/>
     <addaction name="actionUser_Manual"/>
+    <addaction name="actionChange_Log"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
     <addaction name="separator"/>
@@ -826,6 +827,11 @@
   <action name="actionDuplicate">
    <property name="text">
     <string>Duplicate...</string>
+   </property>
+  </action>
+  <action name="actionChange_Log">
+   <property name="text">
+    <string>Change Log</string>
    </property>
   </action>
  </widget>

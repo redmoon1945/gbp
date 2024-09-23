@@ -238,17 +238,37 @@ bool Util::areDoublesApproxEqual(double a, double b, double epsilon=DBL_EPSILON)
 // 0 : success
 // -1 : fail, double has a fractional part and so does not contain an int
 // -2 : fail : double is out of range of qint64
-qint64 Util::extractQint64FromDoubleWithNoFracPart(double d, int &result)
+qint64 Util::extractQint64FromDoubleWithNoFracPart(double amount, int &result)
 {
-    long double ld = d; // must use a long double to compare to min/max of qint64
+    long double ld = amount; // must use a long double to compare to min/max of qint64
     if ( (ld > std::numeric_limits<qint64>::max()) ||
         (ld < std::numeric_limits<qint64>::min()) ){
         result = -2;
         return 0;
     }
-//    if ( floor(d) != ceil(d) ){
-    qint64 r = static_cast<qint64>(d);
-    if ( d != r ){
+    qint64 r = static_cast<qint64>(amount);
+    if ( amount != r ){
+        result = -1;
+        return 0;
+    }
+    result = 0;
+    return r;
+}
+
+
+// Convert into a quint16 a double that contains no fractional part
+// Result :
+// 0 : success
+// -1 : fail, double has a fractional part and so does not contain an int
+// -2 : fail : double is bigger than maxValue
+quint16 Util::extractQuint16FromDoubleWithNoFracPart(double amount, quint16 maxValue, int &result)
+{
+    if ( amount > maxValue ){
+        result = -2;
+        return 0;
+    }
+    quint16 r = static_cast<quint16>(amount);
+    if ( amount != r ){
         result = -1;
         return 0;
     }
@@ -463,7 +483,42 @@ int Util::noOfMonthDifference(QDate from, QDate to)
     return ( (12*to.year())+to.month()) - ( (12*from.year())+from.month()) ;
 }
 
+// Return the Locale to use in the application, taking into account system locale override by an
+// argument passed to the application. Must be called once by main.cpp as early as possible.
+// Argument format must be : -locale=<L>-<T> where <L> is a 2 or 3 char string representing ISO 639
+// code and <T> is a 2 or 3 char string representing ISO 3166 code. E.g. : en-US, fr-CA
+// Return values :
+//   systemLocale : false if argument has been passed and is all valid
+//   QLocale :the final QLocale to use
+QLocale Util::getLocale(QStringList arguments, bool& systemLocale){
+    // get the system Locale, which will be used in case of any error or if no argument is passed
+    QLocale sysLocale = QLocale::system();
+    systemLocale = true;
 
+    for (int i = 0; i < arguments.size(); ++i) {
+        QString arg = arguments.at(i);
+        int index = arg.indexOf("-locale");
+        if ( (0==index) && ((arg.length()==13)||(arg.length()==14)||(arg.length()==15)) ) {
+            QString sub = arg.right(arg.length()-8);
+            QStringList subList = sub.split('-');
+            if (subList.length()!=2) {
+                break;
+            }
+            QLocale::Language lang = QLocale::codeToLanguage(subList.at(0));
+            if (lang==QLocale::AnyLanguage) {
+                break; // unknown
+            }
+            QLocale::Territory territory = QLocale::codeToTerritory(subList.at(1));
+            if (territory==QLocale::AnyTerritory) {
+                break; // unknown
+            }
+            systemLocale = false;
+            return QLocale(lang,territory);
+        }
+    }
+
+    return sysLocale;
+}
 
 
 

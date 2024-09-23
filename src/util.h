@@ -84,6 +84,7 @@ public:
     static long double annualToDailyGrowth(long double annual);
     static bool areDoublesApproxEqual(double a, double b, double epsilon);
     static qint64 extractQint64FromDoubleWithNoFracPart(double amount, int &result)  ;
+    static quint16 extractQuint16FromDoubleWithNoFracPart(double amount, quint16 maxValue, int &result)  ;
     static QString longDoubleToQString(long double value);
     static QList<double> doubleArrayToQlist(double* data, uint noElements);
     static QDateTime dateToDateTimeLocal(const QDate& date, const QTimeZone& tz);
@@ -98,6 +99,7 @@ public:
     static quint32 bitToggle(quint32 number, quint32 n);
     static quint32 bitCheck(quint32 number, quint32 n);
     static int noOfMonthDifference(QDate from , QDate to);
+    static QLocale getLocale(QStringList arguments, bool& systemLocale);
 
 private:
 

@@ -22,13 +22,7 @@
 #include <QUuid>
 #include <QJsonObject>
 #include <QCoreApplication>
-#include "daterange.h"
-#include "growth.h"
-#include "fe.h"
 #include "util.h"
-#include "currencyhelper.h"
-
-
 
 
 
@@ -57,7 +51,6 @@ public:
     bool operator==(const FeStreamDef& o) const;
 
     // methods
-    virtual QString toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const = 0;
     void toJson(QJsonObject &jsonObject) const;
     static void fromJson(const QJsonObject &jsonObject, FeStreamType expectedStreamType, QUuid &id, QString &name, QString &desc,
                          bool &active, bool &isIncome, QColor& decorationColor, Util::OperationResult &result); // we cant build a base class, so we return instead the components

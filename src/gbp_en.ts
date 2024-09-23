@@ -23,7 +23,7 @@
         <location filename="aboutdialog.ui" line="124"/>
         <source>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
 
-=&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
+=&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 1 to 200 years !
 
 =&gt; Easy zooming : use middle mouse button or dedicated UI buttons 
 
@@ -42,6 +42,27 @@
 GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want to know how and when your money has been spent in the past (that is &quot;before today&quot;).
 
 </source>
+        <oldsource>Graphical Budget Planner (GBP) is a Qt desktop application intended to ease significantly the process of creating and maintaining a personal budget. It allows to :
+
+=&gt; See graphically the evolution of your cash balance through time, at any given moment in a period covering the next 100 years !
+
+=&gt; Easy zooming : use middle mouse button or dedicated UI buttons 
+
+=&gt; Easy panning : just left-click &amp; hold, then move mouse
+
+=&gt; Specify painlessly all your forecasted income/expense budget items, with flexibility to define periodic or irregular flows of incomes/expenses.
+
+=&gt; Optionaly define inflation, either as a constant value or a complex series of changing values.
+
+=&gt; Optionaly define a custom monthly growth pattern for any income/expense specification , expressed either as a constant value or a complex series of changing values.
+
+=&gt; Perform automatically different types of analysis on your data, like relative weight of incomes/expenses over custom period, monthly and yearly reports.
+
+=&gt; Your data is not locked in : all scenarios are formatted as JSON file, and resulting/analysis data are exportable in CSV format.
+
+GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take into consideration the FUTURE incomes/expenses expected. Consequently, this is not the right tool if you want to know how and when your money has been spent in the past (that is &quot;before today&quot;).
+
+</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -61,12 +82,18 @@ GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="156"/>
+        <location filename="aboutdialog.ui" line="151"/>
+        <source>Locale used by GBP:</source>
+        <oldsource>Locale :</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="174"/>
         <source>Licence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="164"/>
+        <location filename="aboutdialog.ui" line="182"/>
         <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It&apos;s Free Software. See https://www.gnu.org/licenses/#AGPL/  for the details of the licence.
 
 graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
@@ -80,24 +107,24 @@ graphical-budget-planner is distributed in the hope that it will be useful, but 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="178"/>
+        <location filename="aboutdialog.ui" line="196"/>
         <source>Source Code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="186"/>
+        <location filename="aboutdialog.ui" line="204"/>
         <source>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
 https://codeberg.org/claude_dumas/gbp</source>
         <oldsource>Source code of graphical-budget-planner can be found on Codeberg at this URL : https://codeberg.org/claude_dumas/gbp</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="197"/>
+        <location filename="aboutdialog.ui" line="215"/>
         <source>Credits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="205"/>
+        <location filename="aboutdialog.ui" line="223"/>
         <source>Special thanks to : 
 
 * Tobias Leupold : code to calculate difference between 2 dates
@@ -121,7 +148,7 @@ https://codeberg.org/claude_dumas/gbp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="258"/>
+        <location filename="aboutdialog.ui" line="276"/>
         <source>Close</source>
         <translation></translation>
     </message>
@@ -530,77 +557,78 @@ https://codeberg.org/claude_dumas/gbp</source>
 <context>
     <name>DateRange</name>
     <message>
-        <location filename="daterange.cpp" line="162"/>
+        <location filename="daterange.cpp" line="265"/>
         <source>Empty</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="164"/>
+        <location filename="daterange.cpp" line="267"/>
+        <location filename="daterange.cpp" line="272"/>
         <source>Infinite</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="195"/>
+        <location filename="daterange.cpp" line="334"/>
         <source>DateRange - Cannot find Start tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="200"/>
+        <location filename="daterange.cpp" line="339"/>
         <source>DateRange - Start tag is not a string</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="206"/>
+        <location filename="daterange.cpp" line="345"/>
         <source>DateRange - Start Date value %1 is not a valid ISO Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="213"/>
+        <location filename="daterange.cpp" line="352"/>
         <source>DateRange - Cannot find End tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="218"/>
+        <location filename="daterange.cpp" line="357"/>
         <source>DateRange - End tag is not a string</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="224"/>
+        <location filename="daterange.cpp" line="363"/>
         <source>DateRange - End Date value %1 is not a valid ISO Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="232"/>
+        <location filename="daterange.cpp" line="370"/>
         <source>DateRange - End Date value %1 is smaller than start date %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="240"/>
+        <location filename="daterange.cpp" line="309"/>
         <source>DateRange - Cannot find Type tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="245"/>
+        <location filename="daterange.cpp" line="314"/>
         <source>DateRange - Type tag is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="253"/>
+        <location filename="daterange.cpp" line="321"/>
         <source>DateRange - Type tag %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="258"/>
+        <location filename="daterange.cpp" line="326"/>
         <source>DateRange - Type tag %1 is far too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="276"/>
+        <location filename="daterange.cpp" line="392"/>
         <source>DateRange - Type tag %1 is unkown</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="282"/>
+        <location filename="daterange.cpp" line="398"/>
         <source>DateRange - An unexpected error has occured.
 
 Details : %1</source>
@@ -929,69 +957,69 @@ Details : %1</source>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="511"/>
-        <location filename="editirregulardialog.cpp" line="178"/>
+        <location filename="editirregulardialog.cpp" line="172"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="518"/>
-        <location filename="editirregulardialog.cpp" line="177"/>
+        <location filename="editirregulardialog.cpp" line="171"/>
         <source>Apply</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="173"/>
+        <location filename="editirregulardialog.cpp" line="167"/>
         <source>Editing Income of Category Type &quot;Irregular&quot;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="175"/>
+        <location filename="editirregulardialog.cpp" line="169"/>
         <source>Editing Expense of Category Type &quot;Irregular&quot;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="197"/>
+        <location filename="editirregulardialog.cpp" line="191"/>
         <source>Creating Irregular Income</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="199"/>
+        <location filename="editirregulardialog.cpp" line="193"/>
         <source>Creating Irregular Expense</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="201"/>
+        <location filename="editirregulardialog.cpp" line="195"/>
         <source>Create</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="202"/>
+        <location filename="editirregulardialog.cpp" line="196"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="344"/>
-        <location filename="editirregulardialog.cpp" line="367"/>
+        <location filename="editirregulardialog.cpp" line="326"/>
+        <location filename="editirregulardialog.cpp" line="349"/>
         <source>Invalid Selection</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="344"/>
+        <location filename="editirregulardialog.cpp" line="326"/>
         <source>Select exactly one row</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="367"/>
+        <location filename="editirregulardialog.cpp" line="349"/>
         <source>Select at least one row</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="388"/>
+        <location filename="editirregulardialog.cpp" line="370"/>
         <source>Edit Description</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="456"/>
+        <location filename="editirregulardialog.cpp" line="438"/>
         <source>Color Chooser</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1164,7 +1192,7 @@ Details : %1</source>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="231"/>
-        <location filename="editperiodicdialog.ui" line="882"/>
+        <location filename="editperiodicdialog.ui" line="804"/>
         <source>---</source>
         <translation></translation>
     </message>
@@ -1203,149 +1231,128 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="375"/>
-        <source>Validity Range :</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="editperiodicdialog.ui" line="390"/>
-        <source>From:  </source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="editperiodicdialog.ui" line="406"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Date of the first financial event that will be generated for this Financial Stream Definition.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Date of the first financial event that will be generated.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Date of the first financial event. Growth is calculated from this date. Note that all events occurring before &lt;/span&gt;&lt;span style=&quot; font-style:italic; background-color:transparent;&quot;&gt;tomorrow&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; will be discarded.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Date of the first financial event, even though all events before &lt;/span&gt;&lt;span style=&quot; font-style:italic; background-color:transparent;&quot;&gt;tomorrow&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; won&apos;t occur. Growth is calculated from this date.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="458"/>
-        <source>To:  </source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="editperiodicdialog.ui" line="474"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;No financial event for this Financial Stream Definition will be generated past this date.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;No event will be generated past this date.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="editperiodicdialog.ui" line="530"/>
+        <location filename="editperiodicdialog.ui" line="446"/>
         <source>Yearly increase of the &quot;amount&quot; value (applied on Jan 1). Compounded over the years. Applied BEFORE inflation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="533"/>
+        <location filename="editperiodicdialog.ui" line="449"/>
         <source>Monthly Growth :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="570"/>
+        <location filename="editperiodicdialog.ui" line="486"/>
         <source>Scenario&apos;s inflation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="596"/>
+        <location filename="editperiodicdialog.ui" line="518"/>
         <source>-&gt; multiplied by :</source>
         <oldsource>-&gt; Multiplied by :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1026"/>
+        <location filename="editperiodicdialog.ui" line="948"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do&lt;/span&gt; use this Financial Stream Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1112"/>
+        <location filename="editperiodicdialog.ui" line="1144"/>
         <source>Visualize occurences...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="550"/>
+        <location filename="editperiodicdialog.ui" line="466"/>
         <source>No growth</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="567"/>
+        <location filename="editperiodicdialog.ui" line="483"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The inflation defined at the scenario level is applied to the amount.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="658"/>
+        <location filename="editperiodicdialog.ui" line="580"/>
         <source>Custom - Constant</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="693"/>
+        <location filename="editperiodicdialog.ui" line="615"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Annual&lt;/span&gt; constant growth rate to be applied to the amount, in percentage. In practice, however, it is the &lt;span style=&quot; text-decoration: underline;&quot;&gt;equivalent monthly growth&lt;/span&gt; that is applied, on the 1st of each month.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="696"/>
+        <location filename="editperiodicdialog.ui" line="618"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="718"/>
+        <location filename="editperiodicdialog.ui" line="640"/>
         <source> on annual basis</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="751"/>
+        <location filename="editperiodicdialog.ui" line="673"/>
         <source>Custom - Variable</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="777"/>
+        <location filename="editperiodicdialog.ui" line="699"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit or View the variable growth pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="780"/>
+        <location filename="editperiodicdialog.ui" line="702"/>
         <source>Edit/view...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="815"/>
+        <location filename="editperiodicdialog.ui" line="737"/>
         <source>Colorize Name :</source>
         <oldsource>Use Decorative Color :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="824"/>
+        <location filename="editperiodicdialog.ui" line="746"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : User-defined color is assigned to the name.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : System default is used for the name&apos;s color&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked : Assign a custom color to the name of this Periodic Financial Stream Definition.&lt;/p&gt;&lt;p&gt;Unchecked : Use system default.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="915"/>
+        <location filename="editperiodicdialog.ui" line="837"/>
         <source>Growth Application Period :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="930"/>
+        <location filename="editperiodicdialog.ui" line="852"/>
         <source>Every </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="943"/>
+        <location filename="editperiodicdialog.ui" line="865"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;How often the “cumulative” growth is applied. A value of &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; specifies that, for every &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; financial events, the amount will be adjusted by the cummulative growth reached at this moment.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;How often the “cumulative” growth is applied. A value of &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; specifies that, at every &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;N&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; occurrences, the amount will be adjusted by the cummulative growth reached at this moment.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1029"/>
+        <location filename="editperiodicdialog.ui" line="951"/>
         <source>Yes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1064"/>
+        <location filename="editperiodicdialog.ui" line="986"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do not&lt;/span&gt; use this Financial Stream Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Do not&lt;/span&gt; use this Financial Strean Definition in the calculation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1067"/>
+        <location filename="editperiodicdialog.ui" line="989"/>
         <source>No</source>
         <translation></translation>
     </message>
@@ -1355,118 +1362,168 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="547"/>
+        <location filename="editperiodicdialog.ui" line="375"/>
+        <source>Starts on :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="463"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The amount will stay the same each time it is repeated (unless &amp;quot;Convert to Present Value&amp;quot; is activated in Options Dialog).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The amount will stay the same each time it is repeated (unless &amp;quot;Convert to Present Value&amp;quot; is activated in Optiond Dialog).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="655"/>
+        <location filename="editperiodicdialog.ui" line="577"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply a constant growth pattern to the amount.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="748"/>
+        <location filename="editperiodicdialog.ui" line="670"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Apply a variable growth pattern to the amount.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="850"/>
+        <location filename="editperiodicdialog.ui" line="772"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click on this button to set a custom color for the name of this Financial Stream Definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="978"/>
+        <location filename="editperiodicdialog.ui" line="900"/>
         <source>financial events</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1011"/>
+        <location filename="editperiodicdialog.ui" line="933"/>
         <source>Enabled :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1132"/>
-        <location filename="editperiodicdialog.cpp" line="201"/>
+        <location filename="editperiodicdialog.ui" line="1014"/>
+        <source>Ends no later than :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="1025"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;No financial events will be generated past this date, specified at the scenario level. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="1028"/>
+        <source>Date defined in the scenario</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="1058"/>
+        <source>Custom :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="1077"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;No financial event for this Financial Stream Definition will be generated past this custom date, which is applicable only to this specific Periodic Financial Stream Definition.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.ui" line="1164"/>
+        <location filename="editperiodicdialog.cpp" line="227"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.ui" line="1139"/>
-        <location filename="editperiodicdialog.cpp" line="138"/>
+        <location filename="editperiodicdialog.ui" line="1171"/>
+        <location filename="editperiodicdialog.cpp" line="152"/>
         <source>Apply</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="62"/>
+        <location filename="editperiodicdialog.cpp" line="68"/>
         <source>Growth</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="134"/>
+        <location filename="editperiodicdialog.cpp" line="120"/>
+        <source>Date defined at the scenario level (currently = %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.cpp" line="148"/>
         <source>Editing Income of Category Type &quot;Periodic&quot;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="136"/>
+        <location filename="editperiodicdialog.cpp" line="150"/>
         <source>Editing Expense of Category Type &quot;Periodic&quot;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="139"/>
+        <location filename="editperiodicdialog.cpp" line="153"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="195"/>
+        <location filename="editperiodicdialog.cpp" line="221"/>
         <source>Creating Periodic Income</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="197"/>
+        <location filename="editperiodicdialog.cpp" line="223"/>
         <source>Creating Periodic Expense</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="200"/>
+        <location filename="editperiodicdialog.cpp" line="226"/>
         <source>Create</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="260"/>
-        <location filename="editperiodicdialog.cpp" line="533"/>
+        <location filename="editperiodicdialog.cpp" line="285"/>
+        <location filename="editperiodicdialog.cpp" line="589"/>
         <source>Invalid Data Entered</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="340"/>
-        <source>For Validity Range, the &quot;to&quot; date must not occur before the &quot;from&quot; date</source>
-        <translation></translation>
+        <location filename="editperiodicdialog.cpp" line="370"/>
+        <source>Start Date is invalid</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="351"/>
+        <location filename="editperiodicdialog.cpp" line="376"/>
+        <source>End date as defined at the scenario level must not occur before the Start date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.cpp" line="384"/>
+        <source>End Date is invalid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.cpp" line="389"/>
+        <source>End date must not occur before the Start date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editperiodicdialog.cpp" line="407"/>
         <source>The amount cannot be bigger than %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="356"/>
+        <location filename="editperiodicdialog.cpp" line="412"/>
         <source>An error occured while processing the amount : code=%1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="391"/>
+        <location filename="editperiodicdialog.cpp" line="447"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="485"/>
+        <location filename="editperiodicdialog.cpp" line="541"/>
         <source>Edit Description</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="496"/>
+        <location filename="editperiodicdialog.cpp" line="552"/>
         <source>Color Chooser</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1548,121 +1605,137 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="280"/>
+        <location filename="editscenariodialog.ui" line="244"/>
+        <source>Duration of calculation :</source>
+        <oldsource>End Date for Calculation :</oldsource>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="253"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All incomes/expenses are allowed to generate financial events up to a &lt;span style=&quot; font-weight:700;&quot;&gt;maximum date&lt;/span&gt; defined as (today + &amp;quot;no_years&amp;quot;), where &amp;quot;no_years&amp;quot; is this value.  This limit helps to conserve memory and speed up the calculation. Default value is appropriate for most uses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="282"/>
+        <source> year(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="editscenariodialog.ui" line="340"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show only the incomes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="283"/>
+        <location filename="editscenariodialog.ui" line="343"/>
         <source>Incomes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="296"/>
+        <location filename="editscenariodialog.ui" line="356"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show only the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="299"/>
+        <location filename="editscenariodialog.ui" line="359"/>
         <source>Expenses</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="331"/>
+        <location filename="editscenariodialog.ui" line="391"/>
         <source>Filters :</source>
         <oldsource>Filters set : none</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="402"/>
+        <location filename="editscenariodialog.ui" line="462"/>
         <source>0 items</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="446"/>
+        <location filename="editscenariodialog.ui" line="506"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new &lt;span style=&quot; font-weight:700;&quot;&gt;Periodic&lt;/span&gt; Financial Stream Definition, which is an income or expense that &lt;span style=&quot; font-weight:700;&quot;&gt;repeats itself through time&lt;/span&gt; on a periodic basis. This will be an &lt;span style=&quot; text-decoration: underline;&quot;&gt;income&lt;/span&gt; if the &lt;span style=&quot; font-style:italic;&quot;&gt;Incomes&lt;/span&gt; radio button above is selected, an &lt;span style=&quot; text-decoration: underline;&quot;&gt;expense&lt;/span&gt; otherwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="449"/>
+        <location filename="editscenariodialog.ui" line="509"/>
         <source>New Periodic ...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="456"/>
+        <location filename="editscenariodialog.ui" line="516"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new &lt;span style=&quot; font-weight:700;&quot;&gt;Irregular&lt;/span&gt; Financial Stream Definition, which defines a set of incomes/expenses that &lt;span style=&quot; font-weight:700;&quot;&gt;occur only at very specific dates, &lt;/span&gt;as defined by the user. They will all be &lt;span style=&quot; text-decoration: underline;&quot;&gt;incomes&lt;/span&gt; if the &lt;span style=&quot; font-style:italic;&quot;&gt;Incomes&lt;/span&gt; radio button above is selected, &lt;span style=&quot; text-decoration: underline;&quot;&gt;expenses&lt;/span&gt; otherwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="459"/>
+        <location filename="editscenariodialog.ui" line="519"/>
         <source>New Irregular...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="466"/>
+        <location filename="editscenariodialog.ui" line="526"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modify the selected income/expense.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="469"/>
+        <location filename="editscenariodialog.ui" line="529"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="476"/>
+        <location filename="editscenariodialog.ui" line="536"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate each of the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate each of the selected income/expense.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="479"/>
+        <location filename="editscenariodialog.ui" line="539"/>
         <source>Duplicate</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="489"/>
+        <location filename="editscenariodialog.ui" line="549"/>
         <source>Delete</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="526"/>
+        <location filename="editscenariodialog.ui" line="586"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected incomes/expenses are activated, meaning they &lt;span style=&quot; font-weight:700;&quot;&gt;will&lt;/span&gt; all be taken into account in the calculation of the scenario data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="529"/>
+        <location filename="editscenariodialog.ui" line="589"/>
         <source>Enable</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="536"/>
+        <location filename="editscenariodialog.ui" line="596"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected incomes/expenses are de-activated, meaning they will&lt;span style=&quot; font-weight:700;&quot;&gt; NOT &lt;/span&gt;be taken into account in the calculation of the scenario data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="539"/>
+        <location filename="editscenariodialog.ui" line="599"/>
         <source>Disable</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="546"/>
+        <location filename="editscenariodialog.ui" line="606"/>
         <source>Select All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="553"/>
+        <location filename="editscenariodialog.ui" line="613"/>
         <source>Unselect All</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="606"/>
-        <location filename="editscenariodialog.cpp" line="229"/>
+        <location filename="editscenariodialog.ui" line="666"/>
+        <location filename="editscenariodialog.cpp" line="238"/>
         <source>Hide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="338"/>
-        <location filename="editscenariodialog.cpp" line="438"/>
+        <location filename="editscenariodialog.ui" line="398"/>
+        <location filename="editscenariodialog.cpp" line="440"/>
         <source>Hide Periodics</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1684,153 +1757,153 @@ Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="351"/>
-        <location filename="editscenariodialog.cpp" line="451"/>
+        <location filename="editscenariodialog.ui" line="411"/>
+        <location filename="editscenariodialog.cpp" line="453"/>
         <source>Hide Irregulars</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="364"/>
-        <location filename="editscenariodialog.cpp" line="464"/>
+        <location filename="editscenariodialog.ui" line="424"/>
+        <location filename="editscenariodialog.cpp" line="466"/>
         <source>Hide Enabled</source>
         <oldsource>Hide Active</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="374"/>
-        <location filename="editscenariodialog.cpp" line="477"/>
+        <location filename="editscenariodialog.ui" line="434"/>
+        <location filename="editscenariodialog.cpp" line="479"/>
         <source>Hide Disabled</source>
         <oldsource>Hide Inactive</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="486"/>
+        <location filename="editscenariodialog.ui" line="546"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Deletes the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.ui" line="619"/>
+        <location filename="editscenariodialog.ui" line="679"/>
         <source>Apply</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="122"/>
+        <location filename="editscenariodialog.cpp" line="126"/>
         <source>Inflation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="190"/>
+        <location filename="editscenariodialog.cpp" line="195"/>
         <source>Unnamed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="197"/>
+        <location filename="editscenariodialog.cpp" line="203"/>
         <source>Create Scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="198"/>
+        <location filename="editscenariodialog.cpp" line="204"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="200"/>
+        <location filename="editscenariodialog.cpp" line="206"/>
         <source>Create a new Scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="228"/>
+        <location filename="editscenariodialog.cpp" line="237"/>
         <source>Apply Changes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="230"/>
+        <location filename="editscenariodialog.cpp" line="239"/>
         <source>Edit Current Scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="436"/>
+        <location filename="editscenariodialog.cpp" line="438"/>
         <source>Show Periodics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="449"/>
+        <location filename="editscenariodialog.cpp" line="451"/>
         <source>Show Irregulars</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="462"/>
+        <location filename="editscenariodialog.cpp" line="464"/>
         <source>Show Enabled</source>
         <oldsource>Show Actives</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="475"/>
+        <location filename="editscenariodialog.cpp" line="477"/>
         <source>Show Disabled</source>
         <oldsource>Show Inactives</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="487"/>
+        <location filename="editscenariodialog.cpp" line="489"/>
         <source>Edit Description</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="519"/>
+        <location filename="editscenariodialog.cpp" line="522"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="521"/>
+        <location filename="editscenariodialog.cpp" line="524"/>
         <source>Error modifying an existing scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="524"/>
+        <location filename="editscenariodialog.cpp" line="527"/>
         <source>Error creating scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="600"/>
+        <location filename="editscenariodialog.cpp" line="615"/>
         <source>No items</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="602"/>
+        <location filename="editscenariodialog.cpp" line="617"/>
         <source>1 item</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="604"/>
+        <location filename="editscenariodialog.cpp" line="619"/>
         <source>%1 items</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="617"/>
-        <location filename="editscenariodialog.cpp" line="653"/>
-        <location filename="editscenariodialog.cpp" line="686"/>
-        <location filename="editscenariodialog.cpp" line="713"/>
+        <location filename="editscenariodialog.cpp" line="632"/>
+        <location filename="editscenariodialog.cpp" line="669"/>
+        <location filename="editscenariodialog.cpp" line="702"/>
         <location filename="editscenariodialog.cpp" line="729"/>
+        <location filename="editscenariodialog.cpp" line="745"/>
         <source>Invalid Selection</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="617"/>
+        <location filename="editscenariodialog.cpp" line="632"/>
         <source>Select exactly one row</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="653"/>
+        <location filename="editscenariodialog.cpp" line="669"/>
         <source>Select at least 1 item</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="686"/>
-        <location filename="editscenariodialog.cpp" line="713"/>
+        <location filename="editscenariodialog.cpp" line="702"/>
         <location filename="editscenariodialog.cpp" line="729"/>
+        <location filename="editscenariodialog.cpp" line="745"/>
         <source>Select at least one item</source>
         <translation></translation>
     </message>
@@ -1961,78 +2034,78 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="165"/>
+        <location filename="festreamdef.cpp" line="164"/>
         <source>Name is too long (max length is %1)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="172"/>
+        <location filename="festreamdef.cpp" line="171"/>
         <source>Cannot find Description tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="177"/>
+        <location filename="festreamdef.cpp" line="176"/>
         <source>Description tag is not a string</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="183"/>
+        <location filename="festreamdef.cpp" line="182"/>
         <source>Description is too long (max length is %1)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="190"/>
+        <location filename="festreamdef.cpp" line="189"/>
         <source>Cannot find StreamType tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="195"/>
+        <location filename="festreamdef.cpp" line="194"/>
         <source>StreamType tag is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="202"/>
+        <location filename="festreamdef.cpp" line="201"/>
         <source>StreamType tag %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="207"/>
+        <location filename="festreamdef.cpp" line="206"/>
         <source>StreamType tag %1 is far too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="215"/>
-        <location filename="festreamdef.cpp" line="223"/>
+        <location filename="festreamdef.cpp" line="214"/>
+        <location filename="festreamdef.cpp" line="222"/>
         <source>Incorrect Stream, should be type=%1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="229"/>
+        <location filename="festreamdef.cpp" line="228"/>
         <source>Unknown Stream Type %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="236"/>
+        <location filename="festreamdef.cpp" line="235"/>
         <source>Cannot find Active tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="241"/>
+        <location filename="festreamdef.cpp" line="240"/>
         <source>Active tag is not a boolean</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="249"/>
+        <location filename="festreamdef.cpp" line="248"/>
         <source>Cannot find IsIncome tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="254"/>
+        <location filename="festreamdef.cpp" line="253"/>
         <source>IsIncome tag is not a boolean</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="festreamdef.cpp" line="266"/>
+        <location filename="festreamdef.cpp" line="265"/>
         <source>DecorationColor tag is not a string</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2213,103 +2286,103 @@ Details : %1</source>
 <context>
     <name>IrregularFeStreamDef</name>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="131"/>
+        <location filename="irregularfestreamdef.cpp" line="146"/>
         <source>No event defined</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="144"/>
+        <location filename="irregularfestreamdef.cpp" line="159"/>
         <source>%1 on %2 and %3 more...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="146"/>
+        <location filename="irregularfestreamdef.cpp" line="161"/>
         <source>%1 on %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="192"/>
+        <location filename="irregularfestreamdef.cpp" line="207"/>
         <source>IrregularFeStreamDef - </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="201"/>
+        <location filename="irregularfestreamdef.cpp" line="216"/>
         <source>IrregularFeStreamDef - Cannot find AmountSet tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="206"/>
+        <location filename="irregularfestreamdef.cpp" line="221"/>
         <source>IrregularFeStreamDef - AmountSet tag is not an object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="216"/>
+        <location filename="irregularfestreamdef.cpp" line="231"/>
         <source>IrregularFeStreamDef - Key %1 is not a valid ISO Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="221"/>
+        <location filename="irregularfestreamdef.cpp" line="236"/>
         <source>IrregularFeStreamDef - Value for Key %1 is not an object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="237"/>
+        <location filename="irregularfestreamdef.cpp" line="252"/>
         <source>IrregularFeStreamDef - Map is invalid -&gt; %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="251"/>
+        <location filename="irregularfestreamdef.cpp" line="266"/>
         <source>Copy of</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="265"/>
+        <location filename="irregularfestreamdef.cpp" line="280"/>
         <source>Date %1 is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="272"/>
+        <location filename="irregularfestreamdef.cpp" line="287"/>
         <source>Amount %1 for date %2 cannot be negative (set isIncome to false instead)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="277"/>
+        <location filename="irregularfestreamdef.cpp" line="292"/>
         <source>Amount %1 for date %2 is too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="320"/>
+        <location filename="irregularfestreamdef.cpp" line="335"/>
         <source>Cannot find Amount tag</source>
         <comment>IrregularFeStreamDef</comment>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="325"/>
+        <location filename="irregularfestreamdef.cpp" line="340"/>
         <source>Amount tag is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="332"/>
+        <location filename="irregularfestreamdef.cpp" line="347"/>
         <source>Amount value %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="337"/>
+        <location filename="irregularfestreamdef.cpp" line="352"/>
         <source>Amount value %1 is either too small or too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="345"/>
+        <location filename="irregularfestreamdef.cpp" line="360"/>
         <source>Cannot find Notes tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="350"/>
+        <location filename="irregularfestreamdef.cpp" line="365"/>
         <source>Notes tag is not a string</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="irregularfestreamdef.cpp" line="356"/>
+        <location filename="irregularfestreamdef.cpp" line="371"/>
         <source>Notes length is %1, which is bigger than maximum allowed of %2</source>
         <translation></translation>
     </message>
@@ -2680,123 +2753,128 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="731"/>
+        <location filename="mainwindow.ui" line="732"/>
         <source>New...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="734"/>
+        <location filename="mainwindow.ui" line="735"/>
         <source>Close the current scenario and create a new scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="737"/>
+        <location filename="mainwindow.ui" line="738"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="742"/>
+        <location filename="mainwindow.ui" line="743"/>
         <source>Open...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="745"/>
+        <location filename="mainwindow.ui" line="746"/>
         <source>Close the current scenario and open an existing scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="748"/>
+        <location filename="mainwindow.ui" line="749"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="753"/>
+        <location filename="mainwindow.ui" line="754"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="756"/>
+        <location filename="mainwindow.ui" line="757"/>
         <source>Edit the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="759"/>
+        <location filename="mainwindow.ui" line="760"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="764"/>
+        <location filename="mainwindow.ui" line="765"/>
         <source>Save</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="767"/>
+        <location filename="mainwindow.ui" line="768"/>
         <source>Save the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="770"/>
+        <location filename="mainwindow.ui" line="771"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="775"/>
+        <location filename="mainwindow.ui" line="776"/>
         <source>Save As...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="778"/>
+        <location filename="mainwindow.ui" line="779"/>
         <source>Save the current scenario under a new file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="783"/>
+        <location filename="mainwindow.ui" line="784"/>
         <source>Quit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="788"/>
+        <location filename="mainwindow.ui" line="789"/>
         <source>About Graphical Budget Planner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="793"/>
+        <location filename="mainwindow.ui" line="794"/>
         <source>About Qt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="798"/>
+        <location filename="mainwindow.ui" line="799"/>
         <source>Options...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="803"/>
+        <location filename="mainwindow.ui" line="804"/>
         <source>Analysis...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="808"/>
+        <location filename="mainwindow.ui" line="809"/>
         <source>User Manual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="813"/>
+        <location filename="mainwindow.ui" line="814"/>
         <source>Open Example</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="818"/>
+        <location filename="mainwindow.ui" line="819"/>
         <source>Properties...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="823"/>
+        <location filename="mainwindow.ui" line="824"/>
         <source>Quick Tutorial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="828"/>
+        <location filename="mainwindow.ui" line="829"/>
         <source>Duplicate...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="834"/>
+        <source>Change Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2811,173 +2889,180 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="522"/>
+        <location filename="mainwindow.cpp" line="486"/>
         <source>Modifications not saved</source>
         <oldsource>Modificatoins not saved</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="523"/>
-        <source>Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?</source>
+        <location filename="mainwindow.cpp" line="487"/>
+        <source>Current scenario has been modified, but it is not saved yet on disk. Do you want to SAVE THE CHANGES before going forward ?</source>
+        <oldsource>The scenario file on disk is of an older file format. Current scenario could also have been modified. Do you want to SAVE THE CHANGES and update to the latest file format before going forward ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="553"/>
+        <location filename="mainwindow.cpp" line="518"/>
         <source>About to quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="554"/>
+        <location filename="mainwindow.cpp" line="519"/>
         <source>Do you really want to quit the application ?</source>
         <oldsource>Do you really want to terminate the application ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="591"/>
+        <location filename="mainwindow.cpp" line="556"/>
         <source>Open an Existing Scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="643"/>
-        <location filename="mainwindow.cpp" line="687"/>
-        <location filename="mainwindow.cpp" line="818"/>
+        <location filename="mainwindow.cpp" line="608"/>
+        <location filename="mainwindow.cpp" line="649"/>
         <source>Saving Scenario Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="643"/>
+        <location filename="mainwindow.cpp" line="608"/>
         <source>No scenario loaded yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="651"/>
+        <location filename="mainwindow.cpp" line="616"/>
         <source>Choose Scenario Filename</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="669"/>
-        <location filename="mainwindow.cpp" line="698"/>
+        <location filename="mainwindow.cpp" line="632"/>
+        <location filename="mainwindow.cpp" line="661"/>
         <source>Scenario saved successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="687"/>
-        <location filename="mainwindow.cpp" line="1410"/>
+        <location filename="mainwindow.cpp" line="649"/>
+        <location filename="mainwindow.cpp" line="1396"/>
         <source>No scenario loaded yet : nothing to save</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="728"/>
+        <location filename="mainwindow.cpp" line="696"/>
         <source>Error found in the file content.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="736"/>
+        <location filename="mainwindow.cpp" line="706"/>
+        <location filename="mainwindow.cpp" line="716"/>
         <source>Loading Scenario Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="742"/>
-        <location filename="mainwindow.cpp" line="824"/>
+        <location filename="mainwindow.cpp" line="714"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="759"/>
+        <location filename="mainwindow.cpp" line="740"/>
+        <source>Error updating file on disk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="740"/>
+        <source>Upgrading the file format of this scenario file from v1 to v2 failed. This could indicates a write permission issue with the file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="747"/>
         <source>Scenario opened successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="810"/>
-        <location filename="mainwindow.cpp" line="814"/>
-        <source>Error no %1 has occured.
-
-Details : %2</source>
-        <translation></translation>
+        <location filename="mainwindow.cpp" line="749"/>
+        <source>Scenario opened successfully (converted from version 1 to 2)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="843"/>
+        <location filename="mainwindow.cpp" line="820"/>
         <source>Edit Scenario Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="843"/>
-        <location filename="mainwindow.cpp" line="1592"/>
+        <location filename="mainwindow.cpp" line="820"/>
+        <location filename="mainwindow.cpp" line="1578"/>
         <source>No scenario loaded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1161"/>
+        <location filename="mainwindow.cpp" line="1147"/>
         <source>y</source>
         <translation>y</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1162"/>
+        <location filename="mainwindow.cpp" line="1148"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1163"/>
+        <location filename="mainwindow.cpp" line="1149"/>
         <source>d</source>
         <translation>d</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1198"/>
+        <location filename="mainwindow.cpp" line="1184"/>
         <source>Clear List</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1410"/>
-        <location filename="mainwindow.cpp" line="1433"/>
+        <location filename="mainwindow.cpp" line="1396"/>
+        <location filename="mainwindow.cpp" line="1419"/>
         <source>Export Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1418"/>
+        <location filename="mainwindow.cpp" line="1404"/>
         <source>Text Files (*.txt *.TXT *.csv *.CSV)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1419"/>
+        <location filename="mainwindow.cpp" line="1405"/>
         <source>Select a File</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1433"/>
+        <location filename="mainwindow.cpp" line="1419"/>
         <source>Cannot open the file for writing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1460"/>
+        <location filename="mainwindow.cpp" line="1446"/>
         <source>Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1460"/>
+        <location filename="mainwindow.cpp" line="1446"/>
         <source>Total Daily Incomes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1460"/>
+        <location filename="mainwindow.cpp" line="1446"/>
         <source>Total Daily Expenses</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1460"/>
+        <location filename="mainwindow.cpp" line="1446"/>
         <source>Total Delta</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1460"/>
+        <location filename="mainwindow.cpp" line="1446"/>
         <source>Cumulative Total</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1592"/>
+        <location filename="mainwindow.cpp" line="1578"/>
         <source>Scenario Properties Failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2990,47 +3075,41 @@ Details : %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="48"/>
-        <source>Scenario - No of years calculated :</source>
-        <oldsource>Scenario - no of years calculated :</oldsource>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="optionsdialog.ui" line="325"/>
+        <location filename="optionsdialog.ui" line="277"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : Prevent custom colorization of any Financial Stream Definition name.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Allow it. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="357"/>
+        <location filename="optionsdialog.ui" line="309"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Any amount value (whatever the currency) used in any CSV export process is localized, that is the &amp;quot;thousands separator&amp;quot; and &amp;quot;decimal separator&amp;quot; are set according to the default language used on the computer. &lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : &amp;quot;thousands separator&amp;quot; is not used and &amp;quot;decimal separator&amp;quot; is &amp;quot;.&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="600"/>
-        <location filename="optionsdialog.ui" line="668"/>
+        <location filename="optionsdialog.ui" line="552"/>
+        <location filename="optionsdialog.ui" line="620"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="342"/>
+        <location filename="optionsdialog.ui" line="294"/>
         <source>Exported text - Amounts are localized :</source>
         <oldsource>Exported Text - Amounts are localized :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="695"/>
+        <location filename="optionsdialog.ui" line="647"/>
         <source>Overscaling for main chart :</source>
         <oldsource>Overscaling percentage for main chart :</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="454"/>
-        <location filename="optionsdialog.ui" line="713"/>
+        <location filename="optionsdialog.ui" line="406"/>
+        <location filename="optionsdialog.ui" line="665"/>
         <source>%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="209"/>
+        <location filename="optionsdialog.ui" line="161"/>
         <source>Application font :</source>
         <oldsource>Application Font :</oldsource>
         <translation type="unfinished"></translation>
@@ -3041,136 +3120,130 @@ Details : %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="226"/>
-        <location filename="optionsdialog.ui" line="249"/>
+        <location filename="optionsdialog.ui" line="178"/>
+        <location filename="optionsdialog.ui" line="201"/>
         <source>---</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="281"/>
+        <location filename="optionsdialog.ui" line="233"/>
         <source>Choose...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="96"/>
+        <location filename="optionsdialog.ui" line="48"/>
         <source>How date of &quot;Today&quot; is obtained :</source>
         <oldsource>How Date of &quot;Today&quot; is obtained :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="63"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Define how long in time financial events will be generated for the scenario. Generation starts from “tomorrow” and will terminate &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;no later than “x” years later&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;, where “x” is the number specified here.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Define how long financial events will be generated for the scenario. Generation starts from “tomorrow” and will terminate &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;no later than  “x” years later&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;, where “x” is the number specified here.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="optionsdialog.ui" line="113"/>
+        <location filename="optionsdialog.ui" line="65"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;quot;Today&amp;quot; is set from the computer&apos;s system date. Generated financial events will start not before the day after (&amp;quot;Tomorrow&amp;quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="116"/>
+        <location filename="optionsdialog.ui" line="68"/>
         <source>System&apos;s date at start-up</source>
         <oldsource>System&apos;s Date at start-up</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="139"/>
+        <location filename="optionsdialog.ui" line="91"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;quot;Today&amp;quot; is set manually by the user. Generated financial events will start not before the day after (&amp;quot;Tomorrow&amp;quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="142"/>
+        <location filename="optionsdialog.ui" line="94"/>
         <source>Specific value</source>
         <oldsource>Specific Value</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="174"/>
+        <location filename="optionsdialog.ui" line="126"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;User-defined value of &amp;quot;today&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="177"/>
+        <location filename="optionsdialog.ui" line="129"/>
         <source>yyyy-MMM-dd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="310"/>
+        <location filename="optionsdialog.ui" line="262"/>
         <source>Allow colorization of Incomes/Expenses names :</source>
         <oldsource>Allow Colorization of Incomes/Expenses Names :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="369"/>
+        <location filename="optionsdialog.ui" line="321"/>
         <source>Use Present Value for all financial events :</source>
         <oldsource>Use Present Value for all calculated financial events :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="384"/>
+        <location filename="optionsdialog.ui" line="336"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : &lt;span style=&quot; background-color:transparent;&quot;&gt;Convert all Financial Event amounts  from future values (default) to present values, using the annual discount rate selected to the right.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : Do not change the &lt;span style=&quot; background-color:transparent;&quot;&gt;Financial Event amounts.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="419"/>
+        <location filename="optionsdialog.ui" line="371"/>
         <source>Annual Discount Rate :</source>
         <oldsource>365-days Annual Discount Rate :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="451"/>
+        <location filename="optionsdialog.ui" line="403"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annual discount rate to apply, in percentage. Internally, the conversion is rather calculated on a &lt;span style=&quot; font-weight:700;&quot;&gt;monthly basis&lt;/span&gt;, using the &lt;span style=&quot; text-decoration: underline;&quot;&gt;equivalent monthly rate&lt;/span&gt;. It means that for a given amount, the day of the month where it occurs does not change the present value calculated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annual discount rate to apply, in percentage. Internally, the conversion is rather calculated on a &lt;span style=&quot; font-weight:700;&quot;&gt;monthly basis&lt;/span&gt;, using the &lt;span style=&quot; text-decoration: underline;&quot;&gt;equivalent monthly rate&lt;/span&gt;. It means that for an given amount, the month date where it occurs does not change the present value calculated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="490"/>
+        <location filename="optionsdialog.ui" line="442"/>
         <source>Charts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="514"/>
+        <location filename="optionsdialog.ui" line="466"/>
         <source>Use Dark Mode :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="529"/>
+        <location filename="optionsdialog.ui" line="481"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : For all charts, use a theme that fits a dark mode, that is dark background and light font colors.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : For all charts, use a theme that fits a light mode, that is light background and dark font colors.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="559"/>
+        <location filename="optionsdialog.ui" line="511"/>
         <source>Dark Mode curve color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="574"/>
+        <location filename="optionsdialog.ui" line="526"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve to be used when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="627"/>
+        <location filename="optionsdialog.ui" line="579"/>
         <source>Light Mode curve color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="642"/>
+        <location filename="optionsdialog.ui" line="594"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve to be used when Charts Dark Mode is disabled (hence &amp;quot;Light Mode&amp;quot; in On).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="710"/>
+        <location filename="optionsdialog.ui" line="662"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the level of &amp;quot;overscaling” to be applied on the Cash Balance chart X and Y axis. Overscaling helps to see data points located at the extreme corners. 0% means no overscaling,&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="780"/>
+        <location filename="optionsdialog.ui" line="732"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="787"/>
+        <location filename="optionsdialog.ui" line="739"/>
         <source>Save</source>
         <translation></translation>
     </message>
@@ -3181,58 +3254,58 @@ Details : %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="81"/>
+        <location filename="optionsdialog.cpp" line="79"/>
         <source>None defined</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="160"/>
+        <location filename="optionsdialog.cpp" line="156"/>
         <source>Font Unselected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="160"/>
+        <location filename="optionsdialog.cpp" line="156"/>
         <source>You must choose a custom font if you don&apos;t use the default system font</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="168"/>
+        <location filename="optionsdialog.cpp" line="164"/>
         <source>Font Changed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="168"/>
+        <location filename="optionsdialog.cpp" line="164"/>
         <source>Application must be restarted for font changes to take effect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="176"/>
+        <location filename="optionsdialog.cpp" line="172"/>
         <source>Today&apos;s Determination Changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="177"/>
+        <location filename="optionsdialog.cpp" line="173"/>
         <source>Today&apos;s date determination mechanism changed. Application must be restarted for changes to take effect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="182"/>
+        <location filename="optionsdialog.cpp" line="178"/>
         <source>Today&apos;s Custom Date Changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="183"/>
+        <location filename="optionsdialog.cpp" line="179"/>
         <source>Today&apos;s replacement date has changed from %1 to %2. Application must be restarted for changes to take effect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="345"/>
+        <location filename="optionsdialog.cpp" line="339"/>
         <source>Custom : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="353"/>
-        <location filename="optionsdialog.cpp" line="366"/>
+        <location filename="optionsdialog.cpp" line="347"/>
+        <location filename="optionsdialog.cpp" line="360"/>
         <source>Color Chooser</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3240,174 +3313,220 @@ Details : %2</source>
 <context>
     <name>PeriodicFeStreamDef</name>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="279"/>
-        <location filename="periodicfestreamdef.cpp" line="398"/>
-        <location filename="periodicfestreamdef.cpp" line="486"/>
+        <location filename="periodicfestreamdef.cpp" line="360"/>
+        <location filename="periodicfestreamdef.cpp" line="480"/>
+        <location filename="periodicfestreamdef.cpp" line="574"/>
         <source>PeriodicFeStreamDef - </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="288"/>
+        <location filename="periodicfestreamdef.cpp" line="369"/>
         <source>PeriodicFeStreamDef - Cannot find PeriodType tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="293"/>
+        <location filename="periodicfestreamdef.cpp" line="374"/>
         <source>PeriodicFeStreamDef - PeriodType tag is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="300"/>
+        <location filename="periodicfestreamdef.cpp" line="381"/>
         <source>PeriodicFeStreamDef - PeriodType value %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="305"/>
+        <location filename="periodicfestreamdef.cpp" line="387"/>
         <source>PeriodicFeStreamDef - PeriodType value %1 is either too small or too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="327"/>
+        <location filename="periodicfestreamdef.cpp" line="409"/>
         <source>PeriodicFeStreamDef - Unknown Period Type %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="335"/>
+        <location filename="periodicfestreamdef.cpp" line="417"/>
         <source>PeriodicFeStreamDef - Cannot find PeriodMultiplier tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="340"/>
+        <location filename="periodicfestreamdef.cpp" line="422"/>
         <source>PeriodicFeStreamDef - PeriodMultiplier tag is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="347"/>
+        <location filename="periodicfestreamdef.cpp" line="429"/>
         <source>PeriodicFeStreamDef - PeriodMultiplier value %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="352"/>
+        <location filename="periodicfestreamdef.cpp" line="434"/>
         <source>PeriodicFeStreamDef - PeriodMultiplier value %1 is either too small or too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="361"/>
+        <location filename="periodicfestreamdef.cpp" line="443"/>
         <source>PeriodicFeStreamDef - Cannot find Amount tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="366"/>
+        <location filename="periodicfestreamdef.cpp" line="448"/>
         <source>PeriodicFeStreamDef - Amount tag is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="373"/>
+        <location filename="periodicfestreamdef.cpp" line="455"/>
         <source>PeriodicFeStreamDef - Amount value %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="378"/>
+        <location filename="periodicfestreamdef.cpp" line="460"/>
         <source>PeriodicFeStreamDef - Amount value %1 is either smaller than 0 or too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="386"/>
+        <location filename="periodicfestreamdef.cpp" line="468"/>
         <source>PeriodicFeStreamDef - Cannot find Growth tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="391"/>
+        <location filename="periodicfestreamdef.cpp" line="473"/>
         <source>PeriodicFeStreamDef - Growth tag is not an object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="407"/>
+        <location filename="periodicfestreamdef.cpp" line="489"/>
         <source>PeriodicFeStreamDef - Cannot find GrowthStrategy tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="412"/>
+        <location filename="periodicfestreamdef.cpp" line="494"/>
         <source>PeriodicFeStreamDef - GrowthStrategy tag %1 is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="419"/>
+        <location filename="periodicfestreamdef.cpp" line="501"/>
         <source>PeriodicFeStreamDef - GrowthStrategy value %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="424"/>
+        <location filename="periodicfestreamdef.cpp" line="506"/>
         <source>PeriodicFeStreamDef - GrowthStrategy value %1 is either too small or too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="440"/>
+        <location filename="periodicfestreamdef.cpp" line="522"/>
         <source>PeriodicFeStreamDef - Unknown Growth Strategy value %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="448"/>
+        <location filename="periodicfestreamdef.cpp" line="530"/>
         <source>PeriodicFeStreamDef - Cannot find GrowthApplicationPeriod tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="453"/>
+        <location filename="periodicfestreamdef.cpp" line="535"/>
         <source>PeriodicFeStreamDef - GrowthApplicationPeriod tag %1 is not a number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="460"/>
+        <location filename="periodicfestreamdef.cpp" line="542"/>
         <source>PeriodicFeStreamDef - GrowthApplicationPeriod value %1 is not an integer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="465"/>
+        <location filename="periodicfestreamdef.cpp" line="547"/>
         <source>PeriodicFeStreamDef - GrowthApplicationPeriod value %1 is either too small or too big</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="474"/>
-        <source>PeriodicFeStreamDef - Cannot find ValidityRange tag</source>
-        <translation></translation>
+        <location filename="periodicfestreamdef.cpp" line="562"/>
+        <source>PeriodicFeStreamDef - Validity Range : Cannot find tag for V1 or V2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="479"/>
+        <location filename="periodicfestreamdef.cpp" line="688"/>
+        <source>Scenario Defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="689"/>
+        <location filename="periodicfestreamdef.cpp" line="691"/>
+        <source>Every %1 %2 in [%3,%4]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="567"/>
         <source>PeriodicFeStreamDef - ValidityRange tag is not an object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="497"/>
+        <location filename="periodicfestreamdef.cpp" line="586"/>
+        <source>StartDate - tag is not a string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="592"/>
+        <source>Start Date - value %1 is not a valid ISO Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="599"/>
+        <source>EndDate - Cannot find tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="604"/>
+        <source>EndDate - tag is not a string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="610"/>
+        <source>EndDate - value %1 is not a valid ISO Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="617"/>
+        <source>Cannot find UseScenarioForEndDate tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="622"/>
+        <source>UseScenarioForEndDate tag is not a boolean</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="629"/>
+        <source>End Date occur before Start Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="periodicfestreamdef.cpp" line="641"/>
         <source>PeriodicFeStreamDef - InflationAdjustmentFactor tag is not a number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="503"/>
+        <location filename="periodicfestreamdef.cpp" line="647"/>
         <source>PeriodicFeStreamDef - InflationAdjustmentFactor value %1 is either smaller than 0 or too big</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="520"/>
+        <location filename="periodicfestreamdef.cpp" line="667"/>
         <source>Copy of</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="540"/>
-        <source>Every %1 %2 in %3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="periodicfestreamdef.cpp" line="543"/>
+        <location filename="periodicfestreamdef.cpp" line="697"/>
         <source>Growth: None</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="546"/>
+        <location filename="periodicfestreamdef.cpp" line="700"/>
         <source>Growth: Inflation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="periodicfestreamdef.cpp" line="549"/>
+        <location filename="periodicfestreamdef.cpp" line="703"/>
         <source>Growth: Custom</source>
         <translation></translation>
     </message>
@@ -3433,229 +3552,245 @@ Details : %2</source>
 <context>
     <name>Scenario</name>
     <message>
-        <location filename="scenario.cpp" line="159"/>
+        <location filename="scenario.cpp" line="176"/>
         <source>Cannot form a valid Json Document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="165"/>
+        <location filename="scenario.cpp" line="182"/>
         <source>Runtime error: (%1)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="171"/>
+        <location filename="scenario.cpp" line="188"/>
         <source>Error: (%1)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="178"/>
+        <location filename="scenario.cpp" line="195"/>
         <source>Unknown error occured (%1)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="190"/>
-        <source>Cannot open the already existing file in write-only mode</source>
-        <translation></translation>
+        <location filename="scenario.cpp" line="207"/>
+        <source>Cannot open the file in write-only mode</source>
+        <oldsource>Cannot open the already existing file in write-only mode</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="194"/>
+        <location filename="scenario.cpp" line="211"/>
         <source>Cannot create the file in write-only mode</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="203"/>
+        <location filename="scenario.cpp" line="220"/>
         <source>Cannot write to the file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="324"/>
+        <location filename="scenario.cpp" line="360"/>
         <source>File %1 does not exist</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="330"/>
+        <location filename="scenario.cpp" line="366"/>
         <source>Cannot open file %1 in read-only mode</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="341"/>
+        <location filename="scenario.cpp" line="377"/>
         <source>File %1 is not a GBP scenario file.
 
 Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="353"/>
+        <location filename="scenario.cpp" line="390"/>
         <source>Cannot find Version tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="359"/>
+        <location filename="scenario.cpp" line="396"/>
         <source>Version tag is not a string</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="366"/>
+        <location filename="scenario.cpp" line="403"/>
         <source>Version tag has a length %1, which is longer than max allowed of %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="372"/>
-        <source>File %1 is of version %2, which is incompatible with current version %3 (Scenario)</source>
-        <translation></translation>
+        <location filename="scenario.cpp" line="415"/>
+        <source>Scenario file %1 is of version %2, which is incompatible with version %3 used by this version of the application</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="381"/>
+        <location filename="scenario.cpp" line="425"/>
         <source>Cannot find Name tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="387"/>
+        <location filename="scenario.cpp" line="431"/>
         <source>Name tag is not a string</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="394"/>
+        <location filename="scenario.cpp" line="438"/>
         <source>Name tag is too long</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="403"/>
+        <location filename="scenario.cpp" line="447"/>
         <source>Cannot find Description tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="409"/>
+        <location filename="scenario.cpp" line="453"/>
         <source>Description tag is not a string</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="416"/>
+        <location filename="scenario.cpp" line="460"/>
         <source>Description tag has a length of %1, which is greater than the maximum allowed of %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="425"/>
+        <location filename="scenario.cpp" line="474"/>
+        <source>FeGeneration tag is not a number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenario.cpp" line="482"/>
+        <source>FeGenerationDuration - Value %1 is not an integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenario.cpp" line="487"/>
+        <source>FeGenerationDuration - Value %1 is too big</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenario.cpp" line="497"/>
         <source>Cannot find CountryCode tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="431"/>
+        <location filename="scenario.cpp" line="503"/>
         <source>CountryCode tag is not a string</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="438"/>
+        <location filename="scenario.cpp" line="510"/>
         <source>Country code %1 is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="447"/>
+        <location filename="scenario.cpp" line="519"/>
         <source>Cannot find Inflation tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="453"/>
+        <location filename="scenario.cpp" line="525"/>
         <source>Inflation tag is not an object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="461"/>
+        <location filename="scenario.cpp" line="533"/>
         <source>Inflation value is invalid : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="477"/>
+        <location filename="scenario.cpp" line="549"/>
         <source>Cannot find IncomesPeriodic tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="483"/>
+        <location filename="scenario.cpp" line="555"/>
         <source>IncomesPeriodic tag is not an object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="491"/>
+        <location filename="scenario.cpp" line="563"/>
         <source>Too many Periodic Incomes items found (%1 found, max is %2)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="500"/>
+        <location filename="scenario.cpp" line="572"/>
         <source>Periodic Income - Value for key %1 is not a valid UUID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="508"/>
+        <location filename="scenario.cpp" line="580"/>
         <source>Periodic Income - Value for key %1 is not an Object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="530"/>
+        <location filename="scenario.cpp" line="602"/>
         <source>Cannot find IncomesIrregular tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="536"/>
+        <location filename="scenario.cpp" line="608"/>
         <source>IncomesIrregular tag is not an object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="544"/>
+        <location filename="scenario.cpp" line="616"/>
         <source>Too many Irregular Incomes items found (%1 found, max is %2)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="553"/>
+        <location filename="scenario.cpp" line="625"/>
         <source>Irregular Income - Value for key %1 is not a valid UUID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="561"/>
+        <location filename="scenario.cpp" line="633"/>
         <source>Irregular Income - Value for key %1 is not an Object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="583"/>
+        <location filename="scenario.cpp" line="655"/>
         <source>Cannot find ExpensesPeriodic tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="594"/>
+        <location filename="scenario.cpp" line="666"/>
         <source>Too many Periodic Expenses items found (%1 found, max is %2)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="603"/>
+        <location filename="scenario.cpp" line="675"/>
         <source>Periodic Expense - Value for key %1 is not a valid UUID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="611"/>
+        <location filename="scenario.cpp" line="683"/>
         <source>Periodic Expense - Value for key %1 is not an Object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="633"/>
+        <location filename="scenario.cpp" line="705"/>
         <source>Cannot find ExpensesIrregular tag</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="639"/>
+        <location filename="scenario.cpp" line="711"/>
         <source>ExpensesIrregular tag is not an object</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="647"/>
+        <location filename="scenario.cpp" line="719"/>
         <source>Too many Irregular Expenses items found (%1 found, max is %2)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="656"/>
+        <location filename="scenario.cpp" line="728"/>
         <source>Irregular Expense - Value for key %1 is not a valid UUID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="664"/>
+        <location filename="scenario.cpp" line="736"/>
         <source>Irregular Expense - Value for key %1 is not an Object</source>
         <translation></translation>
     </message>
@@ -3683,14 +3818,14 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenariofetablemodel.cpp" line="426"/>
-        <location filename="scenariofetablemodel.cpp" line="467"/>
+        <location filename="scenariofetablemodel.cpp" line="433"/>
+        <location filename="scenariofetablemodel.cpp" line="474"/>
         <source>Periodic</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenariofetablemodel.cpp" line="447"/>
-        <location filename="scenariofetablemodel.cpp" line="488"/>
+        <location filename="scenariofetablemodel.cpp" line="454"/>
+        <location filename="scenariofetablemodel.cpp" line="495"/>
         <source>Irregular</source>
         <translation></translation>
     </message>
@@ -3720,44 +3855,45 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
     </message>
     <message>
         <location filename="scenariopropertiesdialog.ui" line="106"/>
-        <location filename="scenariopropertiesdialog.ui" line="124"/>
-        <location filename="scenariopropertiesdialog.ui" line="214"/>
-        <location filename="scenariopropertiesdialog.ui" line="232"/>
-        <location filename="scenariopropertiesdialog.ui" line="243"/>
+        <location filename="scenariopropertiesdialog.ui" line="137"/>
+        <location filename="scenariopropertiesdialog.ui" line="292"/>
+        <location filename="scenariopropertiesdialog.ui" line="323"/>
+        <location filename="scenariopropertiesdialog.ui" line="370"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.ui" line="115"/>
+        <location filename="scenariopropertiesdialog.ui" line="128"/>
         <source>File Last Modification Date :</source>
         <oldsource>File Last Modification Date : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.ui" line="133"/>
+        <location filename="scenariopropertiesdialog.ui" line="159"/>
         <source>No of Periodic Incomes :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.ui" line="151"/>
+        <location filename="scenariopropertiesdialog.ui" line="190"/>
         <source>No of Irregular Incomes :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.ui" line="169"/>
+        <location filename="scenariopropertiesdialog.ui" line="221"/>
         <source>No of Periodic Expenses :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.ui" line="187"/>
+        <location filename="scenariopropertiesdialog.ui" line="252"/>
         <source>No of Irregular Expenses :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.ui" line="142"/>
-        <location filename="scenariopropertiesdialog.ui" line="160"/>
-        <location filename="scenariopropertiesdialog.ui" line="178"/>
-        <location filename="scenariopropertiesdialog.ui" line="196"/>
+        <location filename="scenariopropertiesdialog.ui" line="168"/>
+        <location filename="scenariopropertiesdialog.ui" line="199"/>
+        <location filename="scenariopropertiesdialog.ui" line="230"/>
+        <location filename="scenariopropertiesdialog.ui" line="261"/>
+        <location filename="scenariopropertiesdialog.ui" line="388"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3772,44 +3908,59 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.ui" line="205"/>
+        <location filename="scenariopropertiesdialog.ui" line="283"/>
         <source>Currency :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.ui" line="223"/>
+        <location filename="scenariopropertiesdialog.ui" line="314"/>
         <source>Inflation :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.ui" line="285"/>
+        <location filename="scenariopropertiesdialog.ui" line="346"/>
+        <source>percent,  annually</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="379"/>
+        <source>Duration of Financial Events Generation :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="411"/>
+        <source>years(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="scenariopropertiesdialog.ui" line="466"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.cpp" line="52"/>
         <location filename="scenariopropertiesdialog.cpp" line="53"/>
+        <location filename="scenariopropertiesdialog.cpp" line="54"/>
         <source>Not set yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.cpp" line="65"/>
-        <location filename="scenariopropertiesdialog.cpp" line="72"/>
+        <location filename="scenariopropertiesdialog.cpp" line="66"/>
+        <location filename="scenariopropertiesdialog.cpp" line="73"/>
         <source>Info not available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.cpp" line="86"/>
+        <location filename="scenariopropertiesdialog.cpp" line="87"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.cpp" line="92"/>
+        <location filename="scenariopropertiesdialog.cpp" line="93"/>
         <source>Constant annual inflation of %1 percent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.cpp" line="94"/>
+        <location filename="scenariopropertiesdialog.cpp" line="95"/>
         <source>Variable inflation</source>
         <oldsource>Variable Inflation</oldsource>
         <translation type="unfinished"></translation>
@@ -3978,7 +4129,7 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="408"/>
+        <location filename="util.cpp" line="428"/>
         <source>Red:%1  Green:%2  Blue:%3</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3991,99 +4142,140 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.ui" line="64"/>
+        <location filename="visualizeoccurrencesdialog.ui" line="42"/>
+        <source>Show Points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.ui" line="82"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="60"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="140"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="137"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="229"/>
         <source>Dates are in ISO 8601 format (YYYY-MM-DD).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="69"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="148"/>
         <source>Using constant adjusted annual inflation of %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="71"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="150"/>
         <source>Using variable inflation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="77"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="157"/>
         <source>Using custom constant growth of %1 percent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="80"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="161"/>
         <source>Using custom variable growth.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="85"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="166"/>
         <source>No growth of any kind is applied.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="90"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="144"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="171"/>
+        <source>Converting Future Values to Present Values using an annual discount  rate of %1 percent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="181"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="243"/>
+        <source>No event generated before tomorrow %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="183"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="245"/>
+        <source>Scenario does not allow events past %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="233"/>
         <source>Converting Future Values to Present Values using an annual discount rate of %1 percent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="99"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="152"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="176"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="238"/>
         <source>Amount was too big %1 times and have been capped to %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="101"/>
-        <source>%1 %2 event(s) have been generated for the whole Validity Range.
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="102"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="154"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="186"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="248"/>
         <source>income</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="102"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="154"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="186"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="248"/>
         <source>expense</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="109"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="162"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="193"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="256"/>
         <source>Amount is bigger than the maximum allowed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="113"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="167"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="199"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="263"/>
         <source>Error during amount conversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="118"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="172"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="206"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="270"/>
         <source>%1 : %2 (cummul=%3)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="121"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="175"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="210"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="274"/>
         <source>  *** PAST -&gt; discarded ***</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="154"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="185"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="247"/>
         <source>%1 %2 event(s) have been generated.
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WelcomeDialog</name>
+    <message>
+        <location filename="welcomedialog.ui" line="14"/>
+        <source>Welcome</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="welcomedialog.ui" line="30"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="welcomedialog.ui" line="61"/>
+        <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

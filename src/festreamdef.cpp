@@ -161,7 +161,6 @@ void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedS
     }
     name = jsonValue.toString();
     if (name.length()>NAME_MAX_LEN){
-        QString s =
         result.errorStringUI = tr("Name is too long (max length is %1)").arg(NAME_MAX_LEN);
         result.errorStringLog = QString("Name is too long (max length is %1)").arg(NAME_MAX_LEN);
         return;

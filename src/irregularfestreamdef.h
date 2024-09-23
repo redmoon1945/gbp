@@ -23,6 +23,8 @@
 #include "currencyhelper.h"
 #include <quuid.h>
 #include <QCoreApplication>
+#include "daterange.h"
+#include "fe.h"
 
 
 
@@ -63,7 +65,9 @@ public:
     bool operator==(const IrregularFeStreamDef &o) const;
 
     // methods
-    QList<Fe> generateEventStream(DateRange fromto,  double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount) const;
+    QList<Fe> generateEventStream(DateRange fromto,   QDate maxDateScenarioFeGeneration,
+        double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount,
+        FeMinMaxInfo& minMaxInfo) const;
     QString toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const;
     QJsonObject toJson() const;
     static IrregularFeStreamDef fromJson(const QJsonObject& jsonObject, Util::OperationResult &result);

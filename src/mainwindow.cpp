@@ -126,9 +126,9 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
 
     // build dummy data representing "no scenario" situation
     QVector<QCPGraphData> timeData(0);// dummy data for "no scenario"
-    // intitial values for axes limits
+    // initial values for axes limits
     fullFromDateX = GbpController::getInstance().getTomorrow(); // we are interested only from TOMORROW to infinity
-    fullToDateX = fullFromDateX.addYears(GbpController::getInstance().getScenarioMaxYearsSpan()).addDays(-1);
+    fullToDateX = fullFromDateX.addYears(Scenario::DEFAULT_DURATION_FE_GENERATION).addDays(-1);
     fullFromDoubleX = Util::dateToDateTimeLocal(fullFromDateX,QTimeZone::systemTimeZone()).toSecsSinceEpoch();
     fullToDoubleX = Util::dateToDateTimeLocal(fullToDateX,QTimeZone::systemTimeZone()).toSecsSinceEpoch();
     fitFromDoubleX = fullFromDoubleX;
@@ -185,7 +185,6 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     // ***********************************************
 
     emptyDailyInfoSection();
-    setVisibilityZoomButtons();
 
     //
     // connect MainWindow and edit scenario dialog
@@ -244,58 +243,6 @@ void MainWindow::setChartTitle(QString theTitle)
     } else {
         chartTitle->setText(theTitle);
     }
-}
-
-
-void MainWindow::setVisibilityZoomButtons()
-{
-    qint16 years = GbpController::getInstance().getScenarioMaxYearsSpan();
-    if (years>=50) {
-        ui->toolButton_50Y->setVisible(true);
-    }else{
-        ui->toolButton_50Y->setVisible(false);
-    }
-    if (years>=25) {
-        ui->toolButton_25Y->setVisible(true);
-    }else{
-        ui->toolButton_25Y->setVisible(false);
-    }
-    if (years>=20) {
-        ui->toolButton_20Y->setVisible(true);
-    }else{
-        ui->toolButton_20Y->setVisible(false);
-    }
-    if (years>=15) {
-        ui->toolButton_15Y->setVisible(true);
-    }else{
-        ui->toolButton_15Y->setVisible(false);
-    }
-    if (years>=10) {
-        ui->toolButton_10Y->setVisible(true);
-    }else{
-        ui->toolButton_10Y->setVisible(false);
-    }
-    if (years>=5) {
-        ui->toolButton_5Y->setVisible(true);
-    }else{
-        ui->toolButton_5Y->setVisible(false);
-    }
-    if (years>=3) {
-        ui->toolButton_3Y->setVisible(true);
-    }else{
-        ui->toolButton_3Y->setVisible(false);
-    }
-    if (years>=2) {
-        ui->toolButton_2Y->setVisible(true);
-    }else{
-        ui->toolButton_2Y->setVisible(false);
-    }
-    if (years>=1) {
-        ui->toolButton_1Y->setVisible(true);
-    }else{
-        ui->toolButton_1Y->setVisible(false);
-    }
-
 }
 
 
@@ -480,9 +427,12 @@ void MainWindow::updateBaselineWidgets(CurrencyInfo currInfo)
 
 
 // Compared current scenario in memory with its counterpart on disk. If an error (i.e. mismatch)
-// occurred, true is returned in "match". If no scenario loaded, match = true
-void MainWindow::checkIfCurrentScenarioMatchesDiskVersion(bool &match) const {
+// occurred, true is returned in "match". If no scenario loaded, match = true.
+// If the file on disk is an older version, oldVersion is set to true and a mismatch is returned, even
+// if the content is the same.
+void MainWindow::checkIfCurrentScenarioMatchesDiskVersion(bool &match, bool& oldVersion) const {
     match = true;
+    oldVersion = false;
     // anything loaded ?
     if ( GbpController::getInstance().isScenarioLoaded() == false ){
         match = true;
@@ -495,7 +445,12 @@ void MainWindow::checkIfCurrentScenarioMatchesDiskVersion(bool &match) const {
     }
     // load scenario on disk and compare to what we have in memory
     Scenario::FileResult result = Scenario::loadFromFile(GbpController::getInstance().getFullFileName());
-    if (result.code != Scenario::FileResultCode::SUCCESS){
+    if(result.version1found){
+        // the file version on disk is older than the current one. This is automatically a mismatch.
+        match = false;
+        oldVersion = true;
+        return;
+    } else if (result.code != Scenario::FileResultCode::SUCCESS){
         // unexpected error (should not happen normally at this point), declare that it matches
         match = true;
         return;
@@ -510,24 +465,34 @@ void MainWindow::checkIfCurrentScenarioMatchesDiskVersion(bool &match) const {
 }
 
 
-// to be called before current scenario must be closed following an action (e.g. new scenario, open a scenario, close app)
-// Return true if user wants to proceed, false otherwise (Cancel pressed)
+// To be called before current scenario must be closed following an action (e.g. new scenario,
+// open a scenario, close app). If scenario file is of another version, it means that we had
+// problems updating the file when loading it : as a consequence, do nothing and discard the
+// scenario object.
+// Return true if user wants to proceed, false otherwise (Cancel or ESC pressed)
 bool MainWindow::checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding()
 {
-    // check first if the current scenario needs to be saved
     bool match;
-    checkIfCurrentScenarioMatchesDiskVersion(match);
-    if (match==false){
-        QMessageBox::StandardButtons answer;
-        answer = QMessageBox::question(this,tr("Modifications not saved"),
-                                       tr("Current scenario has been modified, but not saved on disk. Do you want to SAVE THE CHANGES before going forward ?"),
-                                       QMessageBox::StandardButtons(QMessageBox::StandardButton::Yes|QMessageBox::StandardButton::No|QMessageBox::StandardButton::Cancel),
-                                       QMessageBox::StandardButton::Cancel);
-        if (answer == QMessageBox::StandardButton::Yes ){
-            on_actionSave_triggered();  // save current scenario and proceed. If new scenario, user has to choose a file name
-        } else if (answer == QMessageBox::StandardButton::Cancel){
-            return false; // Cancel or ESC pressed
-        }
+    bool oldVersion;
+
+    // check if content of scenario in memory matches what is on file
+    checkIfCurrentScenarioMatchesDiskVersion(match, oldVersion);
+
+    if((oldVersion==true) || (match==true) ){
+        return true;
+    }
+
+    QMessageBox::StandardButtons answer;
+    answer = QMessageBox::question(this,tr("Modifications not saved"),
+        tr("Current scenario has been modified, but it is not saved yet on disk. Do you want to SAVE THE CHANGES before going forward ?"),
+        QMessageBox::StandardButtons(QMessageBox::StandardButton::Yes|
+        QMessageBox::StandardButton::No|QMessageBox::StandardButton::Cancel),
+        QMessageBox::StandardButton::Cancel);
+    if (answer == QMessageBox::StandardButton::Yes ){
+        // save current scenario and proceed. If new scenario, user has to choose a file name
+        on_actionSave_triggered();
+    } else if (answer == QMessageBox::StandardButton::Cancel){
+        return false; // Cancel or ESC pressed
     }
 
     return true;
@@ -567,7 +532,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::on_actionAbout_triggered()
 {
-    emit signalAboutDialogPrepareContent();
+    emit signalAboutDialogPrepareContent(locale);
     aboutDlg->show();
 }
 
@@ -659,23 +624,20 @@ void MainWindow::on_actionSave_As_triggered()
         QFileInfo fileInfo(fileName);
         GbpController::getInstance().setLastDir(fileInfo.path());
         // save the current scenario file
-        bool success = saveScenario(fileName);
-        if (success){
+        Scenario::FileResult result = saveScenario(fileName);
+        if (result.code == Scenario::FileResultCode::SUCCESS){
             // switch scenario
             GbpController::getInstance().setFullFileName(fileName);
-            // update the filename label
-            //changeFilenameLabel(fileName);
             // update status bar
             msgStatusbar(tr("Scenario saved successfully"));
             // add it to the recent files list
             GbpController::getInstance().recentFilenamesAdd(fileName, maxRecentFiles);
             recentFilesMenuUpdate();
+        } else {
+            QMessageBox::critical(nullptr,"Saving Scenario Failed",result.errorStringUI);
         }
     }
 }
-
-
-
 
 
 // a scenario must be loaded for that function to work
@@ -693,17 +655,23 @@ void MainWindow::on_actionSave_triggered()
         MainWindow::on_actionSave_As_triggered();
         return;
     }
-    if ( true == saveScenario(fileName) ){
+    Scenario::FileResult result = saveScenario(fileName);
+    if(result.code == Scenario::FileResultCode::SUCCESS){
         // update status bar
         msgStatusbar(tr("Scenario saved successfully"));
+    } else {
+        QMessageBox::critical(nullptr,"Saving Scenario Failed",result.errorStringUI);
     }
 }
 
-
-// return true if successful, false otherwise
+// Load a scenario file into a Scenario object.
+// If the scenario file is of an older file format version, always attempt
+// to update it transarently (could fail if user does not have the write permission on the file).
+// Return true if successful, false otherwise
 bool MainWindow::loadScenarioFile(QString fileName)
 {
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("Attempting to load scenario from file \"%1\" ...").arg(fileName));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("Attempting to load scenario from file \"%1\" ...").arg(fileName));
 
     QString errorStringUI;
     QString errorStringLog;
@@ -725,8 +693,10 @@ bool MainWindow::loadScenarioFile(QString fileName)
                 errorStringLog = fr.errorStringLog;
                 break;
             case Scenario::LOAD_JSON_SEMANTIC_ERROR:
-                errorStringUI = QString(tr("Error found in the file content.\n\nDetails : %1")).arg(fr.errorStringUI);
-                errorStringLog = QString("Error found in the file content.\n\nDetails : %1").arg(fr.errorStringLog);
+                errorStringUI = QString(tr("Error found in the file content.\n\nDetails : %1")).arg(
+                    fr.errorStringUI);
+                errorStringLog = QString("Error found in the file content.\n\nDetails : %1").arg(
+                    fr.errorStringLog);
                 break;
             default:
                 errorStringUI = fr.errorStringUI;
@@ -734,14 +704,19 @@ bool MainWindow::loadScenarioFile(QString fileName)
                 break;
             }
             QMessageBox::critical(nullptr,tr("Loading Scenario Failed"), errorStringUI);
-            GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Error, QString("Loading scenario failed :  error code = %1 , error message = %2").arg(fr.code).arg(fr.errorStringLog));
+            GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Error,
+                QString("Loading scenario failed :  error code = %1 , error message = %2").arg(
+                fr.code).arg(fr.errorStringLog));
             return false;
         }
     } catch(...){
         std::exception_ptr p = std::current_exception();
-        errorStringUI = QString(tr("An unexpected error has occured.\n\nDetails : %1")).arg((p ? p.__cxa_exception_type()->name() : "null"));
-        QMessageBox::critical(nullptr,"Loading Scenario Failed", errorStringUI);
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Error, QString("Loading scenario failed : unexpected exception occured : %1").arg((p ? p.__cxa_exception_type()->name() : "null")));
+        errorStringUI = QString(tr("An unexpected error has occured.\n\nDetails : %1")).arg(
+            (p ? p.__cxa_exception_type()->name() : "null"));
+        QMessageBox::critical(nullptr,tr("Loading Scenario Failed"), errorStringUI);
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Error,
+            QString("Loading scenario failed : unexpected exception occured : %1").arg(
+            (p ? p.__cxa_exception_type()->name() : "null")));
         return false;
     }
     // switch scenario
@@ -755,20 +730,51 @@ bool MainWindow::loadScenarioFile(QString fileName)
     // update the scenario data
     updateScenarioDataDisplayed(true,true);
 
+    // Check if the scenario file is of an older file format version (in any case, the loaded
+    // scenario object has already been converted to the latest format).  If yes, attempt to
+    // transparently save back the scenario object into the file, in order to update to the latest
+    // file format. This could fail if user does not have the write permission on the file.
+    if (fr.version1found==true){
+        Scenario::FileResult result = saveScenario(GbpController::getInstance().getFullFileName());
+        if (result.code != Scenario::FileResultCode::SUCCESS) {
+            QMessageBox::warning(nullptr,tr("Error updating file on disk"), tr(
+                "Upgrading the file format of this scenario file from v1 to v2 failed. This could indicates a write permission issue with the file."));
+        }
+    }
+
     // update status bar
-    msgStatusbar(tr("Scenario opened successfully"));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Scenario loaded successfully"));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Name = %1").arg(fr.scenarioPtr->getName()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Country ISO code = %1").arg(fr.scenarioPtr->getCountryCode()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Version = %1").arg(fr.scenarioPtr->getVersion()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic incomes = %1").arg(fr.scenarioPtr->getIncomesDefPeriodic().size()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular incomes = %1").arg(fr.scenarioPtr->getIncomesDefIrregular().size()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic expenses = %1").arg(fr.scenarioPtr->getExpensesDefPeriodic().size()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular expenses = %1").arg(fr.scenarioPtr->getExpensesDefIrregular().size()));
+    if (fr.version1found==false) {
+        msgStatusbar(tr("Scenario opened successfully"));
+    } else {
+        msgStatusbar(tr("Scenario opened successfully (converted from version 1 to 2)"));
+    }
+
+    // Some logging
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Scenario loaded successfully"));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    Name = %1").arg(fr.scenarioPtr->getName()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    Country ISO code = %1").arg(fr.scenarioPtr->getCountryCode()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    Version = %1").arg(fr.scenarioPtr->getVersion()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    No of periodic incomes = %1").arg(fr.scenarioPtr->getIncomesDefPeriodic().
+        size()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    No of irregular incomes = %1").arg(fr.scenarioPtr->getIncomesDefIrregular().
+        size()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    No of periodic expenses = %1").arg(fr.scenarioPtr->getExpensesDefPeriodic().
+         size()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    No of irregular expenses = %1").arg(fr.scenarioPtr->getExpensesDefIrregular().
+        size()));
 
     // Get currency info for the current scenario about to be edited
     bool found;
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, fr.scenarioPtr->getCountryCode(), found);
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale,
+        fr.scenarioPtr->getCountryCode(), found);
     if(!found){
         return false; // should never happen
     }
@@ -780,60 +786,31 @@ bool MainWindow::loadScenarioFile(QString fileName)
 }
 
 
-// Save current scenario under the provided filename.
-// return true if successful, false otherwise
-bool MainWindow::saveScenario(QString fileName){
+// Save current scenario under the provided filename. No error message is displayed, but
+// loggin is performed.
+// Return info about the operation result in Scenario::FileResult.
+Scenario::FileResult MainWindow::saveScenario(QString fileName){
     QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario();
-    QString errorStringUI;
-    QString errorStringLog;
 
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("Attempting to save scenario \"%1\" under file name \"%2\"").arg(scenario->getName()).arg(fileName));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("Attempting to save scenario \"%1\" under file name \"%2\"").arg(
+        scenario->getName()).arg(fileName));
 
-    try {
-        Scenario::FileResult fr;
-        fr = scenario->saveToFile(fileName);
-        if (fr.code != Scenario::SUCCESS){
-            switch (fr.code) {
-            case Scenario::SAVE_ERROR_CREATING_FILE_FOR_WRITING:
-                errorStringUI = fr.errorStringUI;
-                errorStringLog = fr.errorStringLog;
-                break;
-            case Scenario::SAVE_ERROR_OPENING_FILE_FOR_WRITING:
-                errorStringUI = fr.errorStringUI;
-                errorStringLog = fr.errorStringLog;
-                break;
-            case Scenario::SAVE_ERROR_WRITING_TO_FILE:
-                errorStringUI = fr.errorStringUI;
-                errorStringLog = fr.errorStringLog;
-                break;
-            case Scenario::SAVE_ERROR_INTERNAL_JSON_CREATION:
-                errorStringUI = QString(tr("Error no %1 has occured.\n\nDetails : %2")).arg(fr.code).arg(fr.errorStringUI);
-                errorStringLog = QString("Error no %1 has occured.\n\nDetails : %2").arg(fr.code).arg(fr.errorStringLog);
-                break;
-            default:
-                errorStringUI = QString(tr("Error no %1 has occured.\n\nDetails : %2")).arg(fr.code).arg(fr.errorStringUI);
-                errorStringLog = QString("Error no %1 has occured.\n\nDetails : %2").arg(fr.code).arg(fr.errorStringLog);
-                break;
-            }
-            QMessageBox::critical(nullptr,tr("Saving Scenario Failed"), errorStringUI);
-            GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Warning, QString("Saving scenario failed : error code=%1  error message=%2").arg(fr.code).arg(fr.errorStringLog));
-            return false;
-        }
-    } catch(...){
-        std::exception_ptr p = std::current_exception();
-        errorStringUI = QString(tr("An unexpected error has occured.\n\nDetails : %1")).arg((p ? p.__cxa_exception_type()->name() : "null"));
-        QMessageBox::critical(nullptr,"Saving Scenario Failed",errorStringUI);
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Warning, QString("Saving scenario failed, unexpected exception occured : %1").arg((p ? p.__cxa_exception_type()->name() : "null")));
-        return false;
+    Scenario::FileResult fr = scenario->saveToFile(fileName);
+    if(fr.code != Scenario::FileResultCode::SUCCESS){
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Warning,
+            QString("Saving scenario failed : error code=%1  error message=%2").arg(fr.code).arg(
+            fr.errorStringLog));
+        return fr;
     }
 
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Scenario saved successully"));
-
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "Scenario saved successully"));
     // update the "last directory" used in settings
     QFileInfo fi(fileName);
     GbpController::getInstance().setLastDir(fi.path());
 
-    return true;
+    return fr;
 }
 
 
@@ -876,10 +853,24 @@ void MainWindow::on_actionNew_triggered()
 void MainWindow::updateScenarioDataDisplayed(bool rescaleXaxis, bool resetBaselineValue)
 {
 
-    // recalculate X axis limits ( "Options->Scenario years" may have changed)
     QTimeZone tz = QTimeZone::systemTimeZone();
+
+    if (!(GbpController::getInstance().isScenarioLoaded())){
+        // *** if no scenario loaded ***
+        fullFromDateX = GbpController::getInstance().getTomorrow(); // Always TOMORROW
+        fullToDateX = fullFromDateX.addYears(Scenario::DEFAULT_DURATION_FE_GENERATION).addDays(-1);
+        fullFromDoubleX = Util::dateToDateTimeLocal(fullFromDateX,tz).toSecsSinceEpoch();
+        fullToDoubleX = Util::dateToDateTimeLocal(fullToDateX,tz).toSecsSinceEpoch();
+        chart->xAxis->setRange(fullFromDoubleX, fullToDoubleX);
+        chart->replot();
+        return;
+    }
+
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario();
+
+    // recalculate X axis limits ( "Options->Scenario years" may have changed)
     fullFromDateX = GbpController::getInstance().getTomorrow(); // Always TOMORROW
-    fullToDateX = fullFromDateX.addYears(GbpController::getInstance().getScenarioMaxYearsSpan()).addDays(-1);
+    fullToDateX = fullFromDateX.addYears(scenario->getFeGenerationDuration()).addDays(-1);
     fullFromDoubleX = Util::dateToDateTimeLocal(fullFromDateX,tz).toSecsSinceEpoch();
     fullToDoubleX = Util::dateToDateTimeLocal(fullToDateX,tz).toSecsSinceEpoch();
     QDate fitFromDateX = fullFromDateX;
@@ -887,123 +878,114 @@ void MainWindow::updateScenarioDataDisplayed(bool rescaleXaxis, bool resetBaseli
     fitFromDoubleX = fullFromDoubleX;
     fitToDoubleX = fullToDoubleX;
 
-    if (!(GbpController::getInstance().isScenarioLoaded())){
-        // *** if no scenario loaded ***  => may happen if Options->Scenario years changes without a first scenario loaded
-        chart->xAxis->setRange(fullFromDoubleX, fullToDoubleX);
-        chart->replot();
-        return;
-    } else{
-        // *** a scenario is loaded ***
+    // empty DailyInfo section
+    emptyDailyInfoSection();
 
-        // empty DailyInfo section
-        emptyDailyInfoSection();
+    // unselect any point selected
+    chart->graph()->setSelection(QCPDataSelection());        // make sure axis are visible
 
-        // unselect any point selected
-        chart->graph()->setSelection(QCPDataSelection());        // make sure axis are visible
-
-        if ( chart->yAxis->visible() == false ){
-            chart->yAxis->setVisible(true);
-        }
-        if ( chart->xAxis->visible() == false ){
-            chart->xAxis->setVisible(true);
-        }
-
-        QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario();
-        bool found;
-        CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, scenario->getCountryCode(), found);
-        if(!found){
-            return; // should never happen
-        }
-
-        // re-configure baseline edit widget if a new scenario has been loaded or created (currency may have changed)
-        if( resetBaselineValue==true ){
-            updateBaselineWidgets(currInfo);
-        }
-
-        // regenerate all the data from the Scenario (can be expensive)
-        uint saturationNo;
-        chartRawData = scenario->generateFinancialEvents(locale, DateRange(fullFromDateX, fullToDateX),
-            (GbpController::getInstance().getUsePresentValue()==true)?(GbpController::getInstance().getPvDiscountRate()):(0),
-            GbpController::getInstance().getTomorrow(), saturationNo);
-
-        // init min/max for later stage
-        fullMinY = std::numeric_limits<double>::max();
-        fullMaxY = std::numeric_limits<double>::min();
-        if (chartRawData.size()==0){
-            // no data
-            fullMinY = 0;
-            fullMaxY = 1;
-        }
-
-        // remember current X range (for baseline value change)
-        QCPRange oldXrange = chart->xAxis->range();
-
-        // *** Completely rebuild chart data and find Y min/max at the same time ***
-        QList<QDate> keys = chartRawData.keys();
-        QVector<QCPGraphData> timeData(keys.size());
-        double cumulAmount = ui->baselineDoubleSpinBox->value(); // important !
-        QDateTime dt;
-        int i=0;
-        foreach(QDate date, keys){
-            CombinedFeStreams::DailyInfo item = chartRawData.value(date);
-            cumulAmount += item.totalDelta;
-            dt = Util::dateToDateTimeLocal(date, tz );
-            timeData[i].key = dt.toSecsSinceEpoch();
-            timeData[i].value = cumulAmount;
-            // min / max
-            if (cumulAmount > fullMaxY) {
-                fullMaxY = cumulAmount;
-            }
-            if (cumulAmount < fullMinY) {
-                fullMinY = cumulAmount;
-            }
-            // next point
-            i++;
-        }
-
-        // if min == max, spread the scale to 0.95 min to 1.05 max
-        if (fullMinY==fullMaxY) {
-            double temp = fullMinY;
-            fullMinY = 0.95*temp;
-            fullMaxY = 1.05*temp;
-        }
-
-        // set "fit" limits :
-        if (chartRawData.size()==0){
-            // nothing to fit, we keep the default
-
-        } else if(chartRawData.size()==1){
-            // we set X axis limit to +/- 1 month around the point
-            QDate date = chartRawData.keys().first();
-            fitFromDateX = date.addMonths(-1);
-            fitToDateX = date.addMonths(1);
-            fitFromDoubleX = Util::dateToDateTimeLocal(fitFromDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();
-            fitToDoubleX = Util::dateToDateTimeLocal(fitToDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();;
-        } else{
-            fitFromDateX = chartRawData.keys().first();
-            fitToDateX = chartRawData.keys().last();
-            fitFromDoubleX = Util::dateToDateTimeLocal(fitFromDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();
-            fitToDoubleX = Util::dateToDateTimeLocal(fitToDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();;
-        }
-
-        // update chart
-        setChartTitle(scenario->getName());
-        chart->yAxis->setNumberPrecision(currInfo.noOfDecimal); // currency may have changed
-        chart->graph()->data()->set(timeData, true);
-
-        if ( rescaleXaxis==true ){
-            chart->xAxis->setRange(fullFromDoubleX, fullToDoubleX); // do not touche the X axis if only the baseline value changed
-            chart->yAxis->setRange(fullMinY, fullMaxY);
-            chart->xAxis->scaleRange(chartScalingFactor);
-        } else {
-            chart->xAxis->setRange(oldXrange);
-            chart->graph(0)->rescaleValueAxis(false,true);
-        }
-
-        chart->yAxis->scaleRange(chartScalingFactor);
-
-        chart->replot();
+    if ( chart->yAxis->visible() == false ){
+        chart->yAxis->setVisible(true);
     }
+    if ( chart->xAxis->visible() == false ){
+        chart->xAxis->setVisible(true);
+    }
+
+    bool found;
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, scenario->getCountryCode(), found);
+    if(!found){
+        return; // should never happen
+    }
+
+    // re-configure baseline edit widget if a new scenario has been loaded or created (currency may have changed)
+    if( resetBaselineValue==true ){
+        updateBaselineWidgets(currInfo);
+    }
+
+    // regenerate all the data from the Scenario (can be expensive)
+    uint saturationNo;
+    chartRawData = scenario->generateFinancialEvents(GbpController::getInstance().getToday(), locale, DateRange(fullFromDateX, fullToDateX),
+        (GbpController::getInstance().getUsePresentValue()==true)?(GbpController::getInstance().getPvDiscountRate()):(0),
+        GbpController::getInstance().getTomorrow(), saturationNo);
+
+    // init min/max for later stage
+    fullMinY = std::numeric_limits<double>::max();
+    fullMaxY = std::numeric_limits<double>::min();
+    if (chartRawData.size()==0){
+        // no data
+        fullMinY = 0;
+        fullMaxY = 1;
+    }
+
+    // remember current X range (for baseline value change)
+    QCPRange oldXrange = chart->xAxis->range();
+
+    // *** Completely rebuild chart data and find Y min/max at the same time ***
+    QList<QDate> keys = chartRawData.keys();
+    QVector<QCPGraphData> timeData(keys.size());
+    double cumulAmount = ui->baselineDoubleSpinBox->value(); // important !
+    QDateTime dt;
+    int i=0;
+    foreach(QDate date, keys){
+        CombinedFeStreams::DailyInfo item = chartRawData.value(date);
+        cumulAmount += item.totalDelta;
+        dt = Util::dateToDateTimeLocal(date, tz );
+        timeData[i].key = dt.toSecsSinceEpoch();
+        timeData[i].value = cumulAmount;
+        // min / max
+        if (cumulAmount > fullMaxY) {
+            fullMaxY = cumulAmount;
+        }
+        if (cumulAmount < fullMinY) {
+            fullMinY = cumulAmount;
+        }
+        // next point
+        i++;
+    }
+
+    // if min == max, spread the scale to 0.95 min to 1.05 max
+    if (fullMinY==fullMaxY) {
+        double temp = fullMinY;
+        fullMinY = 0.95*temp;
+        fullMaxY = 1.05*temp;
+    }
+
+    // set "fit" limits :
+    if (chartRawData.size()==0){
+        // nothing to fit, we keep the default
+
+    } else if(chartRawData.size()==1){
+        // we set X axis limit to +/- 1 month around the point
+        QDate date = chartRawData.keys().first();
+        fitFromDateX = date.addMonths(-1);
+        fitToDateX = date.addMonths(1);
+        fitFromDoubleX = Util::dateToDateTimeLocal(fitFromDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();
+        fitToDoubleX = Util::dateToDateTimeLocal(fitToDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();;
+    } else{
+        fitFromDateX = chartRawData.keys().first();
+        fitToDateX = chartRawData.keys().last();
+        fitFromDoubleX = Util::dateToDateTimeLocal(fitFromDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();
+        fitToDoubleX = Util::dateToDateTimeLocal(fitToDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();;
+    }
+
+    // update chart
+    setChartTitle(scenario->getName());
+    chart->yAxis->setNumberPrecision(currInfo.noOfDecimal); // currency may have changed
+    chart->graph()->data()->set(timeData, true);
+
+    if ( rescaleXaxis==true ){
+        chart->xAxis->setRange(fullFromDoubleX, fullToDoubleX); // do not touche the X axis if only the baseline value changed
+        chart->yAxis->setRange(fullMinY, fullMaxY);
+        chart->xAxis->scaleRange(chartScalingFactor);
+    } else {
+        chart->xAxis->setRange(oldXrange);
+        chart->graph(0)->rescaleValueAxis(false,true);
+    }
+
+    chart->yAxis->scaleRange(chartScalingFactor);
+
+    chart->replot();
+
 
 }
 
@@ -1014,7 +996,7 @@ void MainWindow::slotSelectCountryCompleted()
 }
 
 
-void MainWindow::slotEditScenarioResult(bool currentlyEditingNewScenario)
+void MainWindow::slotEditScenarioResult(bool currentlyEditingNewScenario, bool rescaleXaxis)
 {
     if (currentlyEditingNewScenario){
         // this is a brand new scenario, not saved yet on disk
@@ -1024,7 +1006,12 @@ void MainWindow::slotEditScenarioResult(bool currentlyEditingNewScenario)
         updateScenarioDataDisplayed(true,true);
     } else{
         // this is an existing scenario , that has been modified (potentially)
-        updateScenarioDataDisplayed(false,false);
+        if (rescaleXaxis==true) {
+            // need to rescale completely the X axis
+            updateScenarioDataDisplayed(true,false);
+        } else {
+            updateScenarioDataDisplayed(false,false);
+        }
     }
 }
 
@@ -1050,7 +1037,6 @@ void MainWindow::slotOptionsResult(OptionsDialog::OptionsChangesImpact impact)
     // update main chart scaling factor in case it has been changed
     chartScalingFactor = 1 + (GbpController::getInstance().getPercentageMainChartScaling())/100.0;
     // mandatory actions
-    setVisibilityZoomButtons();
     setChartColors();
     analysisDlg->themeChanged();
     // Act on impact for main chart
@@ -1520,7 +1506,7 @@ void MainWindow::on_actionUser_Manual_triggered()
     //  check if the temp file exist. Copy only if non existent
     bool success;
     if (tempFile.exists()==true) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Viewing User Manual : Already exists in temp directory, not copied");
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Viewing User Manual : File already exists in temp directory, not copied");
     } else {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing User Manual : Ready to copy User Manual in tmp directory : %1").arg(tempFileFullName));
         success = userManualFile.copy(tempFileFullName);
@@ -1562,7 +1548,7 @@ void MainWindow::on_actionQuick_Tutorial_triggered()
     //  check if the temp file exist. Copy only if non existent
     bool success;
     if (tempFile.exists()==true) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Viewing Quick Tutorial : Already exists in temp directory, not copied");
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Viewing Quick Tutorial : File already exists in temp directory, not copied");
     } else {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Quick Tutorial : Ready to copy Quick Tutorial in tmp directory : %1").arg(tempFileFullName));
         success = quickTutorialFile.copy(tempFileFullName);
@@ -1601,4 +1587,46 @@ void MainWindow::on_actionProperties_triggered()
 
 
 
+
+
+void MainWindow::on_actionChange_Log_triggered()
+{
+    // first, copy the changelog included in the resource to a tmp directory
+    // Name of the file in temp dir is dependant on the version !
+    QString baseFileName = QString("/gbp_CHANGELOG-%1.pdf").arg(QCoreApplication::applicationVersion());
+    QString tempFileFullName = QDir::tempPath().append(baseFileName);
+    QFile tempFile(tempFileFullName);
+
+    // build resource name and check if it exists (it should)
+    QFile changelogFile(QString(":/Doc/resources/Graphical Budget Planner - CHANGELOG.pdf"));
+    if(changelogFile.exists()==false){
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing Change Log : %1 does not exist in the resource file").arg(changelogFile.fileName()));
+        return;
+    }
+
+    //  check if the temp file exist. Copy only if non existent
+    bool success;
+    if (tempFile.exists()==true) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Viewing Change Log : File already exists in temp directory, not copied");
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Change Log : Ready to copy Change Log in tmp directory : %1").arg(tempFileFullName));
+        success = changelogFile.copy(tempFileFullName);
+        if (success==true) {
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Change Log : Copy succeeded"));
+
+        } else {
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing Change Log : Copy failed"));
+            return;
+        }
+    }
+
+    // then, use the system defaut application to read the file
+    success = QDesktopServices::openUrl(QUrl::fromLocalFile(tempFileFullName));
+    if (success==true) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Change Log : PDF Viewer Launch succeeded"));
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing Change Log : PDF Viewer Launch failed"));
+    }
+
+}
 

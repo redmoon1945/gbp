@@ -103,3 +103,11 @@ QDate DateHelper::getNextEndOfMonth(QDate date, quint16 multiplier)
     return result;
 }
 
+
+// Check if a date correspond to the end of the month
+bool DateHelper::isEndOfMonth(QDate date)
+{
+    QDate nextDay = date.addDays(1);
+    return (nextDay.month()!=date.month());
+}
+

@@ -3,6 +3,9 @@
     <qresource prefix="/Doc">
         <file>resources/Graphical Budget Planner - User Manual.pdf</file>
         <file>resources/Graphical Budget Planner - Quick Tutorial.pdf</file>
+        <file>resources/Graphical Budget Planner - CHANGELOG.pdf</file>
+        <file>resources/Graphical Budget Planner - Welcome-en.pdf</file>
+        <file>resources/Graphical Budget Planner - Welcome-fr.pdf</file>
     </qresource>
     <qresource prefix="/Samples">
         <file>resources/budget-example.json</file>

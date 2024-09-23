@@ -29,15 +29,17 @@
 //     - Be the owner of the current scenario
 //     - Manage the configuration settings
 //     - Provide logging facilities
+//     - Single source of truth as for what "today" is
 class GbpController
 {
 
 public:
 
     enum LogType{Info, Warning, Error};
-    enum LogLevel{NONE=0, Minimal=1, Debug=2};  // Minimal (defaut) contains no data that can be considered as "private", that is
-                                                // no file content, no dir or file name, no income or expense name.
-                                                // Debug is for full debug process and may contain private data
+
+    // no file content, no dir or file name, no income or expense name.
+    // Debug is for full debug process and may contain private data
+    enum LogLevel{NONE=0, Minimal=1, Debug=2};
 
     // methods
     static GbpController& getInstance();
@@ -67,8 +69,6 @@ public:
     void setLastDir(const QString &newLastDir);
     QStringList getRecentFilenames() const;
     void setRecentFilenames(const QStringList &newRecentFilenames);
-    qint16 getScenarioMaxYearsSpan() const;
-    void setScenarioMaxYearsSpan(qint16 newScenarioMaxYearsSpan);
     bool getChartDarkMode() const;
     void setChartDarkMode(bool newChartDarkMode);
     QColor getCurveDarkModeColor() const;
@@ -97,30 +97,58 @@ public:
     QString getSettingsFullFileName() const;
     QString getLogFullFileName() const;
 
+
+    bool getNoSettingsFileAtStartup() const;
+
 private:
 
-    // *** data stored in the settings on file ***
-    QStringList recentFilenames;            // List of recent full file names used for scenario (open, save as)
-    qint16 scenarioMaxYearsSpan=25;         // no of years to be used to calculate the whole set of Fe by a scenario
+    // ************* data stored in the settings on file ****************
+
+    // List of recent full file names used for scenario (open, save as)
+    QStringList recentFilenames;
+
     bool chartDarkMode=false;
     QColor curveDarkModeColor;
     QColor curveLightModeColor;
     bool exportTextAmountLocalized=false;
-    QString lastDir;                        // last dir used for opening/saving scenario.
-    uint percentageMainChartScaling;        // how much space is given on the chart above X&Y axis min/max, in percentage over 100%
+
+    // last dir used for opening/saving scenario.
+    QString lastDir;
+
+    // how much space is given on the chart above X&Y axis min/max, in percentage over 100%
+    uint percentageMainChartScaling;
+
+    // Fonts
     bool useDefaultSystemFont;
     QString customApplicationFont;
-    bool todayUseSystemDate;                // If true, today's date if determined by real date-time (this is the default). If false, it is set using the value "todayCustomDate"
+
+    // If true, today's date if determined by real date-time (this is the default). If false,
+    // it is set using the value "todayCustomDate"
+    bool todayUseSystemDate;
     QDate todayCustomDate;
+
     bool allowDecorationColor;
-    bool usePresentValue;                   // if true, all calculated FE amounts are converted to present value using the pvDiscountRate
-    double pvDiscountRate;                  // ANNUAL discount rate for PV calculation, in percentage
+
+    // if true, all calculated FE amounts are converted to present value using the pvDiscountRate
+    bool usePresentValue;
+
+    // ANNUAL discount rate for PV calculation, in percentage
+    double pvDiscountRate;
+
+    // ****************************************************
+
 
     // *** misc variables ***
-    QDate today;                        // Date of "today" in local time, set ONCE, when the settings is loaded
-    QDate tomorrow;                     // derived from "today"
-    QString fullFileName;               // path+file name for current scenario. Empty means no file yet assigned (e.g. for new)
-    // logging
+
+    // Date of "today" in local time, set ONCE, when the settings is loaded
+    QDate today;
+
+     // derived from "today"
+    QDate tomorrow;
+
+    // path+file name for current scenario. Empty means no file yet assigned (e.g. for new)
+    QString fullFileName;
+
     QSharedPointer<Scenario> scenario;
     QTextStream logOutStream;
     QString logFolder;
@@ -128,11 +156,15 @@ private:
     QFile logFile;
     QString logFullFileName;
     LogLevel logLevel;
-    QString initialSystemApplicationFont;   // font upon app starts, before anything changed
+
+    // font upon app starts, before anything changed
+    QString initialSystemApplicationFont;
+
     // Settings
     QString settingsFullFileName;   // full file name for the config file
     QSettings* settingsPtr=nullptr; // cant find a way to use QSharedPointer...
     bool settingsLoaded=false;  // to prevent more than 1 loading
+    bool noSettingsFileAtStartup;   // no ini file found when gbp has started
 
     // *** methods ***
     GbpController();

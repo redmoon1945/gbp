@@ -47,7 +47,7 @@ public:
 
 signals:
     // For client of EditScenarioDialog : sending result and edition completion notification
-    void signalEditScenarioResult(bool currentlyEditingNewScenario);
+    void signalEditScenarioResult(bool currentlyEditingNewScenario, bool feGenerationDurationHasChanged);
     void signalEditScenarioCompleted();
 
     // edition of description : prepare Dialog before edition
@@ -57,10 +57,10 @@ signals:
     void signalEditVariableInflationPrepareContent(Growth growthIn);
 
     // edition of PeriodicFeStreamDef :  prepare Dialog before edition
-    void signalEditPeriodicStreamDefPrepareContent(bool isNewStreamDef, bool isIncome, PeriodicFeStreamDef psStreamDef, CurrencyInfo currInfo, Growth scenarioInflation);
+    void signalEditPeriodicStreamDefPrepareContent(bool isNewStreamDef, bool isIncome, PeriodicFeStreamDef psStreamDef, CurrencyInfo currInfo, Growth scenarioInflation, QDate theMaxDateFeGeneration);
 
     // edition of IrregularFeStreamDef :  prepare Dialog before edition
-    void signalEditIrregularStreamDefPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef irStreamDef, CurrencyInfo currInfo);
+    void signalEditIrregularStreamDefPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef irStreamDef, CurrencyInfo currInfo, QDate theMaxDateFeGeneration);
 
 
 public slots:
@@ -108,6 +108,8 @@ private slots:
     void on_irregularFilterPushButton_toggled(bool checked);
     void on_activeFilterPushButton_toggled(bool checked);
     void on_inactiveFilterPushButton_toggled(bool checked);
+
+    void on_maxDurationSpinBox_valueChanged(int arg1);
 
 private:
     Ui::EditScenarioDialog *ui;

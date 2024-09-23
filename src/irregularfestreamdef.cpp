@@ -17,7 +17,6 @@
  */
 
 #include "irregularfestreamdef.h"
-#include "fe.h"
 #include "currencyhelper.h"
 
 
@@ -75,15 +74,24 @@ IrregularFeStreamDef::~IrregularFeStreamDef()
 // Generate the whole suite of financial events for that Stream Definition.
 // Input params :
 //   DateRange fromTo : interval of time inside which the events should be generated
-//   double pvDiscountRate : ANNUAL discount rate in percentage to apply to transform the amounts to Present Value.
-//                           Value of 0 means do not transform future values into present value
+//   maxDateScenarioFeGeneration : Date where all FE generation must stop (derived from scenario)
+//   double pvDiscountRate : ANNUAL discount rate in percentage to apply to transform the amounts
+//                           to Present Value. Value of 0 means do not transform future values into
+//                           present value
 //   QDate pvPresent : first date (origin) to use for discounting FE amount (usually = tomorrow)
 // Output params:
+//   QList<Fe> : the ordered (by inc. time) list of financial events.
 //   uint &saturationCount : number of times the FE amount was over the maximum allowed
-QList<Fe> IrregularFeStreamDef::generateEventStream(DateRange fromto,  double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount) const
+//   FeMinMaxInfo& minMaxInfo : computed min/max for values (absolute value, never negative).
+//                              Invalid if 0 element returned.
+QList<Fe> IrregularFeStreamDef::generateEventStream(DateRange fromto,
+    QDate maxDateScenarioFeGeneration, double pvAnnualDiscountRate, QDate pvPresent,
+    uint &saturationCount, FeMinMaxInfo &minMaxInfo) const
 {
     QList<Fe> ss;
     saturationCount = 0;
+    minMaxInfo.yMin =std::numeric_limits<qint64>::max();
+    minMaxInfo.yMax = std::numeric_limits<qint64>::min();
 
     // is FeStreamDefinition is inactive, do not generate any Fe
     if (!active)  {
@@ -98,8 +106,8 @@ QList<Fe> IrregularFeStreamDef::generateEventStream(DateRange fromto,  double pv
 
     // iterate once in the set to generate Fes and convert future values to present values
     foreach (const QDate date, amountSet.keys()) {
-        // still in the validity range of this stream def ? Still in the fromto range ?
-        if ( fromto.includeDate(date) ){
+        // still in the validity range of this stream def ? Still in the fromto range ? Still under the max allowed ?
+        if ( fromto.includeDate(date) && (date<=maxDateScenarioFeGeneration) ){
             qint64 temp = amountSet.value(date).amount;
 
             // *** convert to present value (applied on a monthly basis) ***
@@ -114,6 +122,13 @@ QList<Fe> IrregularFeStreamDef::generateEventStream(DateRange fromto,  double pv
             // build Fe and insert in the result list
             qint64 feAmount = (isIncome?(pv):-(pv));
             Fe fe = {.amount=feAmount,.occurrence=date, .id=this->id};
+            // set min max for amount
+            if( abs(feAmount) > minMaxInfo.yMax){
+                minMaxInfo.yMax = abs(feAmount);
+            }
+            if( abs(feAmount) < minMaxInfo.yMin){
+                minMaxInfo.yMin = abs(feAmount);
+            }
             ss.append(fe);
         }
     }

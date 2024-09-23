@@ -53,11 +53,11 @@ signals:
     // show result : prepare Dialog before edition
     void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
     // Visualize occurrences : prepare Dialog before edition
-    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation, FeStreamDef *streamDef);
+    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation, QDate maxDateScenarioFeGeneration, FeStreamDef *streamDef);
 
 public slots:
     // From client of EditPeriodicDialog : Prepare edition
-    void slotPrepareContent(bool isNewStreamDef, bool isIncome, PeriodicFeStreamDef psStreamDef, CurrencyInfo newCurrInfo, Growth inflation);  // call this before show()
+    void slotPrepareContent(bool isNewStreamDef, bool isIncome, PeriodicFeStreamDef psStreamDef, CurrencyInfo newCurrInfo, Growth inflation, QDate theMaxDateFeGeneration);  // call this before show()
     // Edit variable growth child Dialog : receive result and edition completion notification
     void slotEditVariableGrowthResult(Growth growthOut);
     void slotEditVariableGrowthCompleted();
@@ -83,6 +83,8 @@ private slots:
     void on_decorationColorPushButton_clicked();
     void on_decorationColorCheckBox_clicked();
     void on_visualizeOccurrencesPushButton_clicked();
+    void on_toCustomRadioButton_toggled(bool checked);
+    void on_toScenarioRadioButton_toggled(bool checked);
 
 private:
     Ui::EditPeriodicDialog *ui;
@@ -96,11 +98,11 @@ private:
     QUuid initialId;
     Growth scenarioInflation;
     QColor decorationColor;
+    QDate maxDateFeGeneration;  // max date for Fe generation, come from scenario
 
     // children dialogs
     EditVariableGrowthDialog* editVariableGrowthDlg;
     PlainTextEditionDialog* editDescriptionDialog;
-    PlainTextEditionDialog* showResultDialog;
     VisualizeOccurrencesDialog* visualizeoccurrencesDialog;
 
     struct BuildFromFormDataResult{

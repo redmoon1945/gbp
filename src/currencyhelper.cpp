@@ -82,6 +82,7 @@ int CurrencyHelper::maxCharForMaxAmountInDouble(quint8 noOfDecimalDigits)
 // https://www.exploringbinary.com/decimal-precision-of-binary-floating-point-numbers/
 // So a qint64 can be stored completely in a long double and vice versa.
 // But since we limit max value of an amount (qint64) to 15 digits), it will always fit in a double.
+// If success, return result = 0;
 double CurrencyHelper::amountQint64ToDouble(qint64 amount, quint8 noOfDecimal, int &result)
 {
     // check if amount is above the max allowed

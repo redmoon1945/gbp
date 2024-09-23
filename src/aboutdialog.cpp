@@ -42,10 +42,17 @@ AboutDialog::~AboutDialog()
 }
 
 
-void AboutDialog::slotAboutDialogPrepareContent()
+void AboutDialog::slotAboutDialogPrepareContent(QLocale theLocale)
 {
     ui->configFilePlainTextEdit->setPlainText(GbpController::getInstance().getSettingsFullFileName());
     ui->logFilePlainTextEdit->setPlainText(GbpController::getInstance().getLogFullFileName());
+
+    // Locale
+    QString locString = QString("%1 (%2 %3)").
+        arg(theLocale.name()).
+        arg(theLocale.nativeLanguageName()).
+        arg(theLocale.nativeTerritoryName());
+    ui->localeLineEdit->setText(locString);
 }
 
 

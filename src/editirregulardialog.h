@@ -56,11 +56,11 @@ signals:
     // show result : prepare Dialog before edition
     void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
     // Visualize occurrences : prepare Dialog before edition
-    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation, FeStreamDef *streamDef);
+    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation, QDate maxDateScenarioFeGeneration, FeStreamDef *streamDef);
 
 public slots:
     // From client of EditPeriodicDialog : Prepare edition
-    void slotPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef psStreamDef, CurrencyInfo newCurrInfo);  // call this before show()
+    void slotPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef psStreamDef, CurrencyInfo newCurrInfo, QDate maxDateScenarioFeGeneration);  // call this before show()
     // PlainTextEdition child Dialog : receive result and edition completion notification
     void slotPlainTextEditionResult(QString result);
     void slotPlainTextEditionCompleted();
@@ -70,9 +70,6 @@ public slots:
     // For irregular import : getting result and completion notification
     void slotImportResult(QMap<QDate,IrregularFeStreamDef::AmountInfo> amountSet);
     void slotImportCompleted();
-    // Show Result child Dialog : receive result and edition completion notification
-    void slotShowResultResult(QString result);
-    void slotShowResultCompleted();
     // Visualize occurrences child Dialog : receive completion notification
     void slotVisualizeOccurrencesCompleted();
 
@@ -100,13 +97,13 @@ private:
     bool editingExistingStreamDef;
     QUuid initialId;
     QColor decorationColor;
+    QDate maxDateFeGeneration;  // max date for Fe generation, come from scenario
 
     // children dialogs
     Ui::EditIrregularDialog *ui;
     PlainTextEditionDialog* editDescriptionDialog;
     EditIrregularElementDialog* eie;
     LoadIrregularTextFileDialog* importDlg;
-    PlainTextEditionDialog* showResultDialog;
     VisualizeOccurrencesDialog* visualizeOccurrencesDialog;
 
     // table model

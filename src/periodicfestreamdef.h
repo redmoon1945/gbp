@@ -21,11 +21,14 @@
 
 #include <QCoreApplication>
 #include "festreamdef.h"
+#include "growth.h"
 #include "util.h"
+#include "daterange.h"
+#include "fe.h"
 
 // Definition of a Fe stream based on a single amount generated at a specific interval.
-// The amount may changed due to optional "growth" pattern (defined in this Stream Definition) or optional inflation (defined outside).
-// It is one of the other.
+// The amount may changed due to optional "growth" pattern (defined in this Stream Definition) or
+// optional inflation (defined outside). It is one of the other.
 class PeriodicFeStreamDef : public FeStreamDef
 {
     Q_DECLARE_TR_FUNCTIONS(PeriodicFeStreamDef)
@@ -45,9 +48,11 @@ public:
     // constructors and destructor
     PeriodicFeStreamDef();    // required for qmap.value default
     PeriodicFeStreamDef(const PeriodicFeStreamDef& o);
-    PeriodicFeStreamDef(PeriodType periodicType, quint16 periodMultiplier, qint64 amount, const Growth &growth, const GrowthStrategy &growthStrategy,
-                        quint16 growthApplicationPeriod, const QUuid &id, const QString &name, const QString &desc, bool active,
-                        bool isIncome, const QColor& decorationColor, const DateRange &validityRange, double inflationAdjustmentFactor);
+    PeriodicFeStreamDef(PeriodType periodicType, quint16 periodMultiplier, qint64 amount,
+        const Growth &growth, const GrowthStrategy &growthStrategy, quint16 growthApplicationPeriod,
+        const QUuid &id, const QString &name, const QString &desc, bool active, bool isIncome,
+        const QColor& decorationColor, const QDate &startDate, const QDate &endDate,
+        bool useScenarioForEndDate, double inflationAdjustmentFactor);
     virtual ~PeriodicFeStreamDef();
 
     // operators
@@ -55,10 +60,13 @@ public:
     bool operator==(const PeriodicFeStreamDef& o) const;
 
     // methods
-    QList<Fe> generateEventStream(DateRange fromto, const Growth &inflation, double pvDiscountRate, QDate pvPresent, uint &saturationCount) const;
+    QList<Fe> generateEventStream(DateRange fromto, QDate maxDateScenarioFeGeneration,
+        const Growth &inflation, double pvDiscountRate, QDate pvPresent, uint &saturationCount,
+        FeMinMaxInfo& minMaxInfo) const;
     QString toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const;
     QJsonObject toJson() const;
-    static PeriodicFeStreamDef fromJson(const QJsonObject& jsonObject, Util::OperationResult &result);
+    static PeriodicFeStreamDef fromJson(const QJsonObject& jsonObject,
+        Util::OperationResult &result);
     PeriodicFeStreamDef duplicate() const ; // copy of this object with a different ID
 
     // Getters and setters
@@ -68,23 +76,41 @@ public:
     Growth getGrowth() const;
     GrowthStrategy getGrowthStrategy() const;
     quint16 getGrowthApplicationPeriod() const;
-    DateRange getValidityRange() const;
     double getInflationAdjustmentFactor() const;
+    QDate getStartDate() const;
+    QDate getEndDate() const;
+    bool getUseScenarioForEndDate() const;
 
 private:
 
-    // Variables
+    // *** Variables ***
     PeriodType period;
-    quint16 periodMultiplier;   // multiplier of the period ( e.g. 2 means 1 Fe per 2 weeks). Value must be in [PERIOD_MULTIPLIER_MIN,PERIOD_MULTIPLIER_MAX]
-    qint64 amount;              // in smallest currency unit ! Always a non negative number even if this is an expense
-    Growth growth;              // Custom growth for an instance of PeriodicFeStreamDef, used when growStrategy is CUSTOM
+    // multiplier of the period ( e.g. 2 means 1 Fe per 2 weeks). Value must be in
+    // [PERIOD_MULTIPLIER_MIN,PERIOD_MULTIPLIER_MAX]
+    quint16 periodMultiplier;
+    // Amount to be repeated, expressed in the smallest currency unit.
+    // Always a non negative number even if this is an expense
+    qint64 amount;
+    // Custom growth for an instance of PeriodicFeStreamDef, used when growStrategy is CUSTOM
+    Growth growth;
     GrowthStrategy growthStrategy;
-    quint16 growthApplicationPeriod;    // apply growth every "growthApplicationPeriod" occurence of amount. Value must be in [GROWTH_APP_PERIOD_MIN,GROWTH_APP_PERIOD_MAX ]
-    DateRange validityRange;
-    double inflationAdjustmentFactor;   // if not 1, change the value of scenario inflation applied as a growth to this element
-                                        // (each growth value is multiplied by this factor). Cannot be negative. Max = MAX_INFLATION_ADJUSTMENT_FACTOR
+    // apply growth every "growthApplicationPeriod" occurence of amount. Value must be in
+    // [GROWTH_APP_PERIOD_MIN,GROWTH_APP_PERIOD_MAX ]
+    quint16 growthApplicationPeriod;
+    // Defines when the stream is allowed to start. First event may occur later than this date.
+    QDate startDate;
+    // Defines the date where the last financial events is allowed to occur. This date is NOT USED
+    // if useScenarioforEndDate==true, but the date is still defined and valid
+    QDate endDate;
+    // If true End date is determined by the scenario and is thus not contained in
+    // PeriodicFeStreamDef. If false, End date is custom to this PeriodicFeStreamDef
+    bool useScenarioForEndDate;
+    // if not 1, change the value of scenario inflation applied as a growth to this element
+    // (each growth value is multiplied by this factor). Cannot be negative.
+    // Max = MAX_INFLATION_ADJUSTMENT_FACTOR
+    double inflationAdjustmentFactor;
 
-    // methods
+    // *** methods ***
     QDate getNextEventDate(QDate date) const;
     Util::PeriodType convertPeriodTypeToUtil(PeriodicFeStreamDef::PeriodType periodType) const;
 

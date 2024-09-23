@@ -57,8 +57,6 @@ OptionsDialog::~OptionsDialog()
 void OptionsDialog::slotPrepareContent()
 {
     // load settings and init controls
-    qint16 years = GbpController::getInstance().getScenarioMaxYearsSpan();
-    ui->scenarioYearsSpinBox->setValue(years);
     ui->chartDarkModeCheckBox->setChecked(GbpController::getInstance().getChartDarkMode());
     // curve Dark Mode widgets
     curveDarkModeColor = GbpController::getInstance().getCurveDarkModeColor();
@@ -127,7 +125,6 @@ void OptionsDialog::slotPrepareContent()
 
 void OptionsDialog::on_applyPushButton_clicked()
 {
-    qint16 years = ui->scenarioYearsSpinBox->value();
     uint newMainChartScaling = ui->scalingMainChartSpinBox->value();
     bool chartDarkMode = ui->chartDarkModeCheckBox->isChecked();
     bool usePV = ui->usePresentValueCheckBox->isChecked();
@@ -136,8 +133,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     OptionsChangesImpact impact = {.chart=CHART_NONE, .decorationColorStreamDef=DECO_NONE}; // init
 
     // determine impact of options changes for the charts : from worst to less worst
-    if ( (years !=  GbpController::getInstance().getScenarioMaxYearsSpan()) ||
-        (usePV != GbpController::getInstance().getUsePresentValue()) ||
+    if ( (usePV != GbpController::getInstance().getUsePresentValue()) ||
         ( (usePV) && (discountrate!=GbpController::getInstance().getPvDiscountRate()) )  ) {
         impact.chart = CHART_FULL_RECALCULATION_REQUIRED;    // all data need to be recalculate, rescale and replot also
     } else if (newMainChartScaling != GbpController::getInstance().getPercentageMainChartScaling()  ) {
@@ -186,7 +182,6 @@ void OptionsDialog::on_applyPushButton_clicked()
     }
 
     // set settings new values
-    GbpController::getInstance().setScenarioMaxYearsSpan(years);
     GbpController::getInstance().setChartDarkMode(chartDarkMode);
     GbpController::getInstance().setCurveDarkModeColor(curveDarkModeColor);
     GbpController::getInstance().setCurveLightModeColor(curveLightModeColor);
@@ -208,7 +203,6 @@ void OptionsDialog::on_applyPushButton_clicked()
 
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Options have been changed"));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    Impact : chart=%1  deco=%2").arg(impact.chart).arg(impact.decorationColorStreamDef));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ScenarioMaxYearsSpan = %1").arg(years));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ChartDarkMode = %1").arg(chartDarkMode));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CurveDarkModeColor = %1").arg(curveDarkModeColor.rgba()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CurveDarkLightColor = %1").arg(curveLightModeColor.rgba()));

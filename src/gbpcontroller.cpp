@@ -41,6 +41,7 @@ GbpController::GbpController()
     allowDecorationColor = true;
     usePresentValue = false;
     pvDiscountRate = 0; // disable conversion to present values
+    noSettingsFileAtStartup = false;
 
     QStringList argList = QCoreApplication::arguments();
 
@@ -68,17 +69,20 @@ GbpController::GbpController()
         }
     }
 
-    // Init the value of "today".
-    // Set ONCE the date corresponding to "today" and "tomorrow". There are 3 reasons why we dont want the app to call everywhere "QDate::currentDate()"
-    // 1) the app could have been started near midnight and the transition to another day while running could mess up things (for log for example)
-    // 2) we want to offer the option of setting the "today" date as configuration parameter (in the "options")
+    // Init the value of "today". Set ONCE the date corresponding to "today" and "tomorrow".
+    // There are 3 reasons why we dont want the app to call everywhere "QDate::currentDate()"
+    // 1) the app could have been started near midnight and the transition to another day while
+    //    running could mess up things (for log for example)
+    // 2) we want to offer the option of setting the "today" date as configuration parameter
+    //    (in the "options")
     // 3) we want to make sure today is in LOCAL time
     today = QDateTime::currentDateTime().toLocalTime().date();
     tomorrow = today.addDays(1);
 
     // *** LOG FILES ***
 
-    // determine where to store the logs. try in QStandardPaths::AppDataLocation/logs (linux : ~/.local/share/graphical-budget-planner/logs), else use QDir::tempPath()/gbp
+    // determine where to store the logs. try in QStandardPaths::AppDataLocation/logs
+    // (linux : ~/.local/share/graphical-budget-planner/logs), else use QDir::tempPath()/gbp
     bool success=false;
 
     QString p = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -100,16 +104,19 @@ GbpController::GbpController()
     }
 
     // open log file and create out stream
-    logFullFileName = QString("%1/%2__%3.txt").arg(logFolder).arg(today.toString("yyyy-MM-dd")).arg(QTime::currentTime().toString("hh_mm_ss"));
+    logFullFileName = QString("%1/%2__%3.txt").arg(logFolder).arg(today.toString("yyyy-MM-dd")).arg(
+        QTime::currentTime().toString("hh_mm_ss"));
     logFile.setFileName(logFullFileName);
     success = logFile.open(QIODevice::Append | QIODevice::WriteOnly | QIODevice::Text);
     if (success == false){
         loggingEnabled = false;
-        QString errorString = QString("Logging is disabled (cannot create a log file in %1)").arg(logFolder);
+        QString errorString = QString("Logging is disabled (cannot create a log file in %1)").arg(
+            logFolder);
         qWarning().noquote() << errorString;
     } else {
         loggingEnabled = true;
-        QString successString = QString("Log file created : %1, log level=%2").arg(logFullFileName).arg(logLevel);
+        QString successString = QString("Log file created : %1, log level=%2").arg(
+            logFullFileName).arg(logLevel);
         qInfo().noquote() << successString;
     }
     logOutStream.setDevice(&logFile);
@@ -117,10 +124,18 @@ GbpController::GbpController()
 
     // *** SETTINGS ***
 
-    // define default path for settings before creating GbpController (we dont want OrganizationName be part of the path)
-    // One choose INI file structure (favor decentralization, portability and human readability)
-    settingsFullFileName = QString("%1/%2.ini").arg(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)).arg(QCoreApplication::applicationName());
+    // define default path for settings before creating GbpController (we dont want OrganizationName
+    // be part of the path). One choose INI file structure (favor decentralization, portability and
+    // human readability)
+    settingsFullFileName = QString("%1/%2.ini").arg(QStandardPaths::writableLocation(
+        QStandardPaths::ConfigLocation)).arg(QCoreApplication::applicationName());
+    QFile iniFile(settingsFullFileName);
+    if (iniFile.exists()==false){
+        noSettingsFileAtStartup = true;
+    }
     settingsPtr = new QSettings(settingsFullFileName, QSettings::IniFormat);
+
+
     QString configFileString = QString("Configuration file is : %1").arg(settingsFullFileName);
     qInfo().noquote() << configFileString;
 
@@ -153,7 +168,7 @@ bool GbpController::isScenarioLoaded() const
 }
 
 
-// This should be done only ONCE, as early as possible after the applicationis started
+// This should be done only ONCE, as EARLY AS possible after the applicationis started
 void GbpController::loadSettings()
 {
     // Ensure loading has not been already done
@@ -161,7 +176,8 @@ void GbpController::loadSettings()
         return;
     }
 
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Attempting to load settings from %1").arg(settingsPtr->fileName()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Attempting to load settings from %1").arg(settingsPtr->fileName()));
 
     QVariant v;
     // recent open files list
@@ -170,19 +186,6 @@ void GbpController::loadSettings()
         recentFilenames = v.toStringList(); // empty list if conversion failed
     } else{
         recentFilenames = {};
-    }
-
-    // no of years scenario's Fe list is generated
-    if (settingsPtr->contains("scenario_max_years")){
-        bool ok;
-        v = settingsPtr->value("scenario_max_years");
-        scenarioMaxYearsSpan = v.toInt(&ok);
-        if ( (!ok) || (scenarioMaxYearsSpan<1) || (scenarioMaxYearsSpan>100) )  {
-            // settings is invalid
-            scenarioMaxYearsSpan = 50;
-        }
-    } else{
-        scenarioMaxYearsSpan = 50;
     }
 
     // dark mode for chart
@@ -222,7 +225,8 @@ void GbpController::loadSettings()
         curveLightModeColor = QColor(0, 0, 180);
     }
 
-    // amount in exported text are localized or not (in which case format is : no thousand separator, decimal sep = "."
+    // amount in exported text are localized or not (in which case format is : no thousand
+    // separator, decimal sep = "."
     if (settingsPtr->contains("export_text_amount_localized")){
         v = settingsPtr->value("export_text_amount_localized");
         bool ok = Util::isValidBoolString(v.toString());
@@ -365,40 +369,55 @@ void GbpController::loadSettings()
             pvDiscountRate = 0;
         }
     } else{
-        usePresentValue = false; // cant find the Use Present Value flag (could be older version of GBP)
+        // cant find the Use Present Value flag (could be older version of GBP)
+        usePresentValue = false;
+
         pvDiscountRate = 0;
     }
 
-
-
-    // loaded is completed and successful
+     // loaded is completed and successful
     settingsLoaded = true;
 
     // Some loggings
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("Settings loaded successfully"));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info, QString("    recent_files = %1").arg(recentFilenames.join(",")));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    scenario_max_years = %1").arg(scenarioMaxYearsSpan));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    chart_dark_mode = %1").arg(chartDarkMode));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    chart_dark_mode_curve_color = %1").arg(curveDarkModeColor.name(QColor::HexRgb)));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    chart_light_mode_curve_color = %1").arg(curveLightModeColor.name(QColor::HexRgb)));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    export_text_amount_localized = %1").arg(exportTextAmountLocalized));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info, QString("    last_dir = %1").arg(lastDir));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    main_chart_scaling_percentage = %1").arg(percentageMainChartScaling));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    use_default_system_font = %1").arg(useDefaultSystemFont));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    custom_application_font = %1").arg(customApplicationFont));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    today_use_system_date = %1").arg(todayUseSystemDate));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    today_custom_date = %1").arg(todayCustomDate.toString(Qt::DateFormat::ISODate)));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    allow_decoration_color = %1").arg(allowDecorationColor));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    use_present_value = %1").arg(usePresentValue));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("    pv_discount_rate = %1").arg(pvDiscountRate));
-
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("Settings loaded successfully"));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
+        QString("    recent_files = %1").arg(recentFilenames.join(",")));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    chart_dark_mode = %1").arg(chartDarkMode));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    chart_dark_mode_curve_color = %1").arg(curveDarkModeColor.name(
+        QColor::HexRgb)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    chart_light_mode_curve_color = %1").arg(curveLightModeColor.name(
+        QColor::HexRgb)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    export_text_amount_localized = %1").arg(exportTextAmountLocalized));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
+        QString("    last_dir = %1").arg(lastDir));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    main_chart_scaling_percentage = %1").arg(percentageMainChartScaling));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    use_default_system_font = %1").arg(useDefaultSystemFont));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    custom_application_font = %1").arg(customApplicationFont));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    today_use_system_date = %1").arg(todayUseSystemDate));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    today_custom_date = %1").arg(todayCustomDate.toString(
+        Qt::DateFormat::ISODate)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    allow_decoration_color = %1").arg(allowDecorationColor));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    use_present_value = %1").arg(usePresentValue));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    pv_discount_rate = %1").arg(pvDiscountRate));
 }
 
 
 void GbpController::saveSettings()
 {
     settingsPtr->setValue("recent_files",recentFilenames);
-    settingsPtr->setValue("scenario_max_years",scenarioMaxYearsSpan);
     settingsPtr->setValue("chart_dark_mode",chartDarkMode);
     settingsPtr->setValue("chart_dark_mode_curve_color",curveDarkModeColor.name(QColor::HexRgb));
     settingsPtr->setValue("chart_light_mode_curve_color",curveLightModeColor.name(QColor::HexRgb));
@@ -446,7 +465,9 @@ void GbpController::log(LogLevel level, LogType type, QString message)
         return;
     }
     QString filteredMessage = message.replace('\n',' ');
-    QString outString = QString("[%1] - %2 - %3\n").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg((type==Info)?("INFO"):((type==Warning)?("WARNING"):("ERROR"))).arg(message);
+    QString outString = QString("[%1] - %2 - %3\n").arg(
+        QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg(
+        (type==Info)?("INFO"):((type==Warning)?("WARNING"):("ERROR"))).arg(message);
     logOutStream << outString;
     logOutStream.flush();
 }
@@ -479,7 +500,9 @@ void GbpController::cleanUpLogs()
     }
     foreach(QString fName, toBeDeleted){
         bool deletionSuccess = QFile::remove(fName); // return False if failed;
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info, QString("Deleting old log file %1 : success=%2").arg(fName).arg(deletionSuccess));
+        GbpController::getInstance().log(
+            GbpController::LogLevel::Minimal,GbpController::Info, QString(
+            "Deleting old log file %1 : success=%2").arg(fName).arg(deletionSuccess));
     }
 }
 
@@ -536,16 +559,6 @@ QStringList GbpController::getRecentFilenames() const
 void GbpController::setRecentFilenames(const QStringList &newRecentFilenames)
 {
     recentFilenames = newRecentFilenames;
-}
-
-qint16 GbpController::getScenarioMaxYearsSpan() const
-{
-    return scenarioMaxYearsSpan;
-}
-
-void GbpController::setScenarioMaxYearsSpan(qint16 newScenarioMaxYearsSpan)
-{
-    scenarioMaxYearsSpan = newScenarioMaxYearsSpan;
 }
 
 bool GbpController::getChartDarkMode() const
@@ -683,6 +696,12 @@ QString GbpController::getLogFullFileName() const
 {
     return logFullFileName;
 }
+
+bool GbpController::getNoSettingsFileAtStartup() const
+{
+    return noSettingsFileAtStartup;
+}
+
 
 
 

@@ -87,9 +87,6 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     // Visualize occurrences  Dialog
     visualizeOccurrencesDialog = new VisualizeOccurrencesDialog(locale,this);     // auto-destroyed by Qt because it is a child
     visualizeOccurrencesDialog->setModal(true);
-    // Show Result Dialog
-    showResultDialog = new PlainTextEditionDialog(this);     // auto-destroyed by Qt because it is a child
-    showResultDialog->setModal(true);
 
     // connect emitters & receivers for Dialogs : Description Edition
     QObject::connect(this, &EditIrregularDialog::signalPlainTextDialogPrepareContent, editDescriptionDialog, &PlainTextEditionDialog::slotPrepareContent);
@@ -104,10 +101,6 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     QObject::connect(this, &EditIrregularDialog::signalImportPrepareContent, importDlg, &LoadIrregularTextFileDialog::slotPrepareContent);
     QObject::connect(importDlg, &LoadIrregularTextFileDialog::signalImportResult, this, &EditIrregularDialog::slotImportResult);
     QObject::connect(importDlg, &LoadIrregularTextFileDialog::signalImportCompleted, this, &EditIrregularDialog::slotImportCompleted);
-    // connect emitters & receivers for Dialogs : Show Result
-    QObject::connect(this, &EditIrregularDialog::signalShowResultPrepareContent, showResultDialog, &PlainTextEditionDialog::slotPrepareContent);
-    QObject::connect(showResultDialog, &PlainTextEditionDialog::signalPlainTextEditionResult, this, &EditIrregularDialog::slotShowResultResult);
-    QObject::connect(showResultDialog, &PlainTextEditionDialog::signalPlainTextEditionCompleted, this, &EditIrregularDialog::slotShowResultCompleted);
     // connect emitters & receivers for Dialogs : Visualize occurrences
     QObject::connect(this, &EditIrregularDialog::signalVisualizeOccurrencesPrepareContent, visualizeOccurrencesDialog, &VisualizeOccurrencesDialog::slotPrepareContent);
     QObject::connect(visualizeOccurrencesDialog, &VisualizeOccurrencesDialog::signalCompleted, this, &EditIrregularDialog::slotVisualizeOccurrencesCompleted);
@@ -121,12 +114,13 @@ EditIrregularDialog::~EditIrregularDialog()
 }
 
 
-void EditIrregularDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef irStreamDef, CurrencyInfo newCurrInfo)
+void EditIrregularDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef irStreamDef, CurrencyInfo newCurrInfo, QDate maxDateScenarioFeGeneration)
 {
     // remember some variables
     this->editingExistingStreamDef = !isNewStreamDef;
     this->currInfo = newCurrInfo;
     this->isIncome = isIncome;
+    this->maxDateFeGeneration = maxDateScenarioFeGeneration;
 
     // Set the currency info for the table model and then
     // update model (the view will be automatically updated)
@@ -264,18 +258,6 @@ void EditIrregularDialog::slotImportResult(QMap<QDate, IrregularFeStreamDef::Amo
 
 
 void EditIrregularDialog::slotImportCompleted()
-{
-
-}
-
-
-void EditIrregularDialog::slotShowResultResult(QString result)
-{
-
-}
-
-
-void EditIrregularDialog::slotShowResultCompleted()
 {
 
 }
@@ -491,7 +473,7 @@ void EditIrregularDialog::on_visualizeOccurrencesPushButton_clicked()
     IrregularFeStreamDef irStreamDef(items, initialId, ui->nameLineEdit->text(), ui->descPlainTextEdit->toPlainText(),
                                      ui->activeYesRadioButton->isChecked(), isIncome, decorationColor);
 
-    emit signalVisualizeOccurrencesPrepareContent(currInfo, Growth(), &irStreamDef);
+    emit signalVisualizeOccurrencesPrepareContent(currInfo, Growth(), maxDateFeGeneration, &irStreamDef);
     visualizeOccurrencesDialog->show();
 }
 

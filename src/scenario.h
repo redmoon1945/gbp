@@ -34,11 +34,16 @@ class Scenario
     Q_DECLARE_TR_FUNCTIONS(Scenario)
 
 public:
-    static QString LatestVersion ;
-    static int VERSION_MAX_LEN;     // max length of the version
-    static int NAME_MAX_LEN;        // max length of the scenario name
-    static int DESC_MAX_LEN;        // max length of the scenario description
-    static int MAX_NO_STREAM_DEF;   // max no of Stream Definition per type
+    static QString LATEST_VERSION ;
+    static QString VERSION_1;
+
+    static int VERSION_MAX_LEN;         // max length of the version
+    static int NAME_MAX_LEN;            // max length of the scenario name
+    static int DESC_MAX_LEN;            // max length of the scenario description
+    static int MAX_NO_STREAM_DEF;       // max no of Stream Definition per type
+    static quint16 MIN_DURATION_FE_GENERATION;   // no Financial Events can ever be generated past this date. Min value in years from "tomorow"
+    static quint16 MAX_DURATION_FE_GENERATION;   // no Financial Events can ever be generated past this date. Max value in years from "tomorow"
+    static quint16 DEFAULT_DURATION_FE_GENERATION;   // default value when creating a new scenario
 
 
     enum FileResultCode { SUCCESS=1, ERROR_OTHER=2,
@@ -48,6 +53,7 @@ public:
         FileResultCode code;
         QString errorStringUI;  // for display (trnaslated in Locale language)
         QString errorStringLog; // for logging (stay in English)
+        bool version1found;     // Load only : version 1 of scenario file format found. If true, it has been converted anyway on the fly to v 2
         QSharedPointer<Scenario> scenarioPtr;  // for Load only, not filled if code != SUCCESS
     };
 
@@ -55,7 +61,8 @@ public:
 
     // Constructors and destructor
     Scenario(const Scenario& o);
-    Scenario(const QString version, const QString name, const QString description, const Growth inflation, QString countryCode,
+    Scenario(const QString version, const QString name, const QString description, const quint16 feGenerationDuration,
+             const Growth inflation, QString countryCode,
              const QMap<QUuid,PeriodicFeStreamDef> incomesDefPeriodicSet,
              const QMap<QUuid,IrregularFeStreamDef> incomesDefIrregularSet,
              const QMap<QUuid,PeriodicFeStreamDef> expensesDefPeriodicSet,
@@ -67,7 +74,7 @@ public:
     bool operator==(const Scenario &o) const;
 
     // Methods
-    QMap<QDate,CombinedFeStreams::DailyInfo>generateFinancialEvents(QLocale systemLocale, DateRange fromto, double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount) const;
+    QMap<QDate,CombinedFeStreams::DailyInfo>generateFinancialEvents(QDate today, QLocale systemLocale, DateRange fromto, double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount) const;
     void getStreamDefNameAndColorFromId(QUuid id,  QString& name, QColor& color, bool& found) const;
     FileResult saveToFile(QString fullFileName) const;
     static FileResult loadFromFile(QString fullFileName);
@@ -95,11 +102,14 @@ public:
     void setExpensesDefPeriodic(const QMap<QUuid, PeriodicFeStreamDef> &newExpensesDefPeriodic);
     QMap<QUuid, IrregularFeStreamDef> getExpensesDefIrregular() const;
     void setExpensesDefIrregular(const QMap<QUuid, IrregularFeStreamDef> &newExpensesDefIrregular);
+    quint16 getFeGenerationDuration() const;
+    void setFeGenerationDuration(quint16 newFeGenerationDuration);
 
 private:
     QString version;
     QString name;
     QString description;
+    quint16 feGenerationDuration; // in years, from "tomorrow". New from version 2.0.0 of file format
     Growth inflation;
     QString countryCode;   // ISO 3166 alpha-2 (used to derive currency and hence no of decimals). Cannot be changed once set
     QMap<QUuid,PeriodicFeStreamDef> incomesDefPeriodic;       // key is Stream Def ID
