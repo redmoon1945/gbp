@@ -42,9 +42,18 @@ DateIntervalDialog::~DateIntervalDialog()
 }
 
 
-void DateIntervalDialog::slotPrepareContent()
+void DateIntervalDialog::slotPrepareContent(QDate from, QDate to)
 {
-
+    if (to<=from) {
+        QMessageBox::critical(nullptr,tr("Data Invalid"),
+            tr("\"To\" date must occur after \"From\" date"));
+        return;
+    }
+    if( (from.isValid()==false) || (to.isValid()==false) ){
+        return;
+    }
+    ui->fromDateEdit->setDate(from);
+    ui->toDateEdit->setDate(to);
 }
 
 
@@ -53,7 +62,8 @@ void DateIntervalDialog::on_applyPushButton_clicked()
     QDate from = ui->fromDateEdit->date();
     QDate to = ui->toDateEdit->date();
     if (to<=from) {
-        QMessageBox::critical(nullptr,tr("Data Invalid"),tr("\"To\" date must occur after \"From\" date"));
+        QMessageBox::critical(nullptr,tr("Data Invalid"),
+            tr("\"To\" date must occur after \"From\" date"));
         return;
     }
     emit signalDateIntervalResult(from, to);

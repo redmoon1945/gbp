@@ -58,16 +58,19 @@ public:
     // operators
     PeriodicFeStreamDef& operator=(const PeriodicFeStreamDef& o);
     bool operator==(const PeriodicFeStreamDef& o) const;
+    bool operator!=(const PeriodicFeStreamDef& o) const;
 
     // methods
     QList<Fe> generateEventStream(DateRange fromto, QDate maxDateScenarioFeGeneration,
         const Growth &inflation, double pvDiscountRate, QDate pvPresent, uint &saturationCount,
         FeMinMaxInfo& minMaxInfo) const;
+    bool evaluateIfSameFeList(const PeriodicFeStreamDef& o) const;
     QString toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const;
     QJsonObject toJson() const;
     static PeriodicFeStreamDef fromJson(const QJsonObject& jsonObject,
         Util::OperationResult &result);
     PeriodicFeStreamDef duplicate() const ; // copy of this object with a different ID
+    QDate getRealEndDate(const QDate maxDateScenario) const;
 
     // Getters and setters
     PeriodType getPeriod() const;
@@ -91,23 +94,25 @@ private:
     // Amount to be repeated, expressed in the smallest currency unit.
     // Always a non negative number even if this is an expense
     qint64 amount;
+    // Is there no growth or if there is, is it borrowed from scenario inflation or
+    // a custom value for this StreamDef ?
+    GrowthStrategy growthStrategy;
     // Custom growth for an instance of PeriodicFeStreamDef, used when growStrategy is CUSTOM
     Growth growth;
-    GrowthStrategy growthStrategy;
     // apply growth every "growthApplicationPeriod" occurence of amount. Value must be in
-    // [GROWTH_APP_PERIOD_MIN,GROWTH_APP_PERIOD_MAX ]
+    // [GROWTH_APP_PERIOD_MIN,GROWTH_APP_PERIOD_MAX ]. Not used when growStrategy is None.
     quint16 growthApplicationPeriod;
     // Defines when the stream is allowed to start. First event may occur later than this date.
     QDate startDate;
-    // Defines the date where the last financial events is allowed to occur. This date is NOT USED
-    // if useScenarioforEndDate==true, but the date is still defined and valid
+    // Defines the date where the last financial events is allowed to occur. Used only if
+    // useScenarioforEndDate == false.
     QDate endDate;
     // If true End date is determined by the scenario and is thus not contained in
     // PeriodicFeStreamDef. If false, End date is custom to this PeriodicFeStreamDef
     bool useScenarioForEndDate;
     // if not 1, change the value of scenario inflation applied as a growth to this element
     // (each growth value is multiplied by this factor). Cannot be negative.
-    // Max = MAX_INFLATION_ADJUSTMENT_FACTOR
+    // Max = MAX_INFLATION_ADJUSTMENT_FACTOR. Used only if growthStrategy = INFLATION.
     double inflationAdjustmentFactor;
 
     // *** methods ***

@@ -636,8 +636,9 @@
         "b9f299eb-e0c6-4c91-944e-eb6815dce547": {
             "Active": true,
             "Amount": 16666,
+            "DecorationColor": "#00007f",
             "Description": "",
-            "EndDate": "2099-12-31",
+            "EndDate": "2049-10-22",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {
@@ -830,8 +831,9 @@
         "ffea2684-5404-4966-886d-8f0760bbd0ad": {
             "Active": true,
             "Amount": 10000,
+            "DecorationColor": "#00ffff",
             "Description": "",
-            "EndDate": "2099-12-31",
+            "EndDate": "2049-10-22",
             "Growth": {
                 "AnnualConstantGrowth": 0,
                 "AnnualVariableGrowth": {

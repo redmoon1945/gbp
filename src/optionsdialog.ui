@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>950</width>
-    <height>500</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -62,7 +62,7 @@
                   </sizepolicy>
                  </property>
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;quot;Today&amp;quot; is set from the computer's system date. Generated financial events will start not before the day after (&amp;quot;Tomorrow&amp;quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;quot;Today&amp;quot; in GBP is set from the computer's system date. Generated financial events will start not before &amp;quot;Tomorrow&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="text">
                   <string>System's date at start-up</string>
@@ -88,7 +88,7 @@
                   </sizepolicy>
                  </property>
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;quot;Today&amp;quot; is set manually by the user. Generated financial events will start not before the day after (&amp;quot;Tomorrow&amp;quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;quot;Today&amp;quot; in GBP is set manually by the user. Generated financial events will start not before &amp;quot;Tomorrow&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="text">
                   <string>Specific value</string>
@@ -456,6 +456,46 @@
             <number>10</number>
            </property>
            <item row="0" column="0">
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>Point Size in Pixels :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <widget class="QSpinBox" name="pointSizeSpinBox">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Size in pixels of the diameter of each disk representing data points on curve.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="minimum">
+                <number>5</number>
+               </property>
+               <property name="maximum">
+                <number>25</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_23">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
             <widget class="QLabel" name="label_2">
              <property name="font">
               <font>
@@ -467,7 +507,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
+           <item row="1" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_11">
              <item>
               <widget class="QCheckBox" name="chartDarkModeCheckBox">
@@ -500,7 +540,7 @@
              </item>
             </layout>
            </item>
-           <item row="1" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="label_3">
              <property name="font">
               <font>
@@ -508,14 +548,14 @@
               </font>
              </property>
              <property name="text">
-              <string>Dark Mode curve color :</string>
+              <string>Dark Mode Curve Color :</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="2" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_13">
              <item>
-              <widget class="QPushButton" name="curveDarkModeColorToolButton">
+              <widget class="QPushButton" name="darkModeCurveColorPushButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -523,7 +563,7 @@
                 </sizepolicy>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve to be used when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>
@@ -547,7 +587,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="QLabel" name="curveDMcolorLabel">
+              <widget class="QLabel" name="darkModeCurveColorLabel">
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -568,22 +608,17 @@
              </item>
             </layout>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_4">
-             <property name="font">
-              <font>
-               <bold>false</bold>
-              </font>
-             </property>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label">
              <property name="text">
-              <string>Light Mode curve color :</string>
+              <string>Dark Mode Point Color :</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <item row="3" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="QPushButton" name="curveLightModeColorToolButton">
+              <widget class="QPushButton" name="darkModePointColorPushButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -591,7 +626,138 @@
                 </sizepolicy>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve to be used when Charts Dark Mode is disabled (hence &amp;quot;Light Mode&amp;quot; in On).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the data points of the cash balance curve when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="darkModePointColorLabel">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_16">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Dark Mode Selected Point Color :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QPushButton" name="darkModeSelectedPointColorPushButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the selected point of the cash balance curve when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_17">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="darkModeSelectedPointColorLabel">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_18">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_4">
+             <property name="font">
+              <font>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Light Mode Curve Color :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_14">
+             <item>
+              <widget class="QPushButton" name="lightModeCurveColorPushButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve when Charts Dark Mode is disabled (hence &amp;quot;Light Mode&amp;quot; in On).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>
@@ -615,7 +781,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="QLabel" name="curveLMcolorLabel">
+              <widget class="QLabel" name="lightModeCurveColorLabel">
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -636,7 +802,133 @@
              </item>
             </layout>
            </item>
-           <item row="3" column="0">
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>Light Mode Point Color :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QPushButton" name="lightModePointColorPushButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the data points of the cash balance curve when Charts Dark Mode is disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_19">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="lightModePointColorLabel">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_20">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>Light Mode Selected Point Color :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <widget class="QPushButton" name="lightModeSelectedPointColorPushButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the selected data point of the cash balance curve when Charts Dark Mode is disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_21">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="lightModeSelectedPointColorLabel">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_22">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="8" column="0">
             <widget class="QLabel" name="label_8">
              <property name="font">
               <font>
@@ -648,7 +940,7 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="8" column="1">
             <layout class="QHBoxLayout" name="horizontalLayout_17">
              <item>
               <widget class="QSpinBox" name="scalingMainChartSpinBox">
@@ -659,13 +951,13 @@
                 </sizepolicy>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the level of &amp;quot;overscaling” to be applied on the Cash Balance chart X and Y axis. Overscaling helps to see data points located at the extreme corners. 0% means no overscaling,&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the level of &amp;quot;overscaling” to be applied on the Cash Balance Chart X and Y axis. It basically unzooms a bit the Chart, so that it is easier to see data points located at the extreme corners. 0% means no overscaling,&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="suffix">
                 <string>%</string>
                </property>
                <property name="maximum">
-                <number>5</number>
+                <number>10</number>
                </property>
               </widget>
              </item>
@@ -681,6 +973,40 @@
                 </size>
                </property>
               </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>Mouse wheel rotated away from user will :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="1">
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <widget class="QRadioButton" name="wheelZoomInRadioButton">
+               <property name="text">
+                <string>Zoom In</string>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">buttonGroup</string>
+               </attribute>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="wheelZoomOutRadioButton">
+               <property name="text">
+                <string>Zoom Out</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <attribute name="buttonGroup">
+                <string notr="true">buttonGroup</string>
+               </attribute>
+              </widget>
              </item>
             </layout>
            </item>
@@ -747,7 +1073,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

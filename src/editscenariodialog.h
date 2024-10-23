@@ -47,7 +47,7 @@ public:
 
 signals:
     // For client of EditScenarioDialog : sending result and edition completion notification
-    void signalEditScenarioResult(bool currentlyEditingNewScenario, bool feGenerationDurationHasChanged);
+    void signalEditScenarioResult(bool currentlyEditingNewScenario, bool regenerateData);
     void signalEditScenarioCompleted();
 
     // edition of description : prepare Dialog before edition
@@ -108,7 +108,6 @@ private slots:
     void on_irregularFilterPushButton_toggled(bool checked);
     void on_activeFilterPushButton_toggled(bool checked);
     void on_inactiveFilterPushButton_toggled(bool checked);
-
     void on_maxDurationSpinBox_valueChanged(int arg1);
 
 private:

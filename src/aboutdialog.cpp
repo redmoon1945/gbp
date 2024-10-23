@@ -19,7 +19,7 @@
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 #include "gbpcontroller.h"
-
+#include <QDesktopServices>
 
 AboutDialog::AboutDialog(QWidget *parent)
     : QDialog(parent)
@@ -33,6 +33,8 @@ AboutDialog::AboutDialog(QWidget *parent)
     QFontMetrics fm(ui->configFilePlainTextEdit->font());
     ui->configFilePlainTextEdit->setFixedHeight(fm.height()*3); // 2 lines min
     ui->logFilePlainTextEdit->setFixedHeight(fm.height()*3); // 2 lines min
+    // set first tab as current
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 
@@ -65,5 +67,19 @@ void AboutDialog::on_AboutDialog_rejected()
 void AboutDialog::on_closePushButton_clicked()
 {
     hide();
+}
+
+
+void AboutDialog::on_viewLogPushButton_clicked()
+{
+    // then, use the system defaut application to read the file
+    bool success = QDesktopServices::openUrl(QUrl::fromLocalFile(ui->logFilePlainTextEdit->toPlainText()));
+    if (success==true) {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
+            GbpController::Info, QString("Viewing Log File : Viewer Launch succeeded"));
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
+            GbpController::Error, QString("Viewing Log File : Viewer Launch failed"));
+    }
 }
 

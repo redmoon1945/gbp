@@ -28,6 +28,13 @@ bool Fe::operator==(const Fe& o) const {
     return true;
 }
 
+
+bool Fe::operator!=(const Fe &o) const
+{
+    return !(*this==o);
+}
+
+
 Fe &Fe::operator=(const Fe &o)
 {
     this->amount = o.amount;

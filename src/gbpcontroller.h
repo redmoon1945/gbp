@@ -51,8 +51,7 @@ public:
     void recentFilenamesClear();
     void log(LogLevel level, LogType type, QString message);
     void cleanUpLogs();
-    QDate getToday() const;
-    QDate getTomorrow() const;
+
 
     // methods forbidden for a singleton
     GbpController(const GbpController&) = delete;
@@ -61,29 +60,34 @@ public:
     GbpController& operator=(GbpController&&) = delete;
 
     // Getters and setters
-    QSharedPointer<Scenario> getScenario() const;
-    void setScenario(QSharedPointer<Scenario> newScenario);
-    QString getFullFileName() const;
-    void setFullFileName(const QString &newFullFileName);
-    QString getLastDir() const;
-    void setLastDir(const QString &newLastDir);
     QStringList getRecentFilenames() const;
     void setRecentFilenames(const QStringList &newRecentFilenames);
-    bool getChartDarkMode() const;
-    void setChartDarkMode(bool newChartDarkMode);
-    QColor getCurveDarkModeColor() const;
-    void setCurveDarkModeColor(const QColor &newCurveDarkModeColor);
-    QColor getCurveLightModeColor() const;
-    void setCurveLightModeColor(const QColor &newCurveLightModeColor);
+    uint getChartPointSize() const;
+    void setChartPointSize(uint newChartPointSize);
+    bool getIsDarkModeSet() const;
+    void setIsDarkModeSet(bool newIsDarkModeSet);
+    QColor getDarkModeCurveColor() const;
+    void setDarkModeCurveColor(const QColor &newDarkModeCurveColor);
+    QColor getLightModeCurveColor() const;
+    void setLightModeCurveColor(const QColor &newLightModeCurveColor);
+    QColor getDarkModePointColor() const;
+    void setDarkModePointColor(const QColor &newDarkModePointColor);
+    QColor getLightModePointColor() const;
+    void setLightModePointColor(const QColor &newLightModePointColor);
+    QColor getDarkModeSelectedPointColor() const;
+    void setDarkModeSelectedPointColor(const QColor &newDarkModeSelectedPointColor);
+    QColor getLightModeSelectedPointColor() const;
+    void setLightModeSelectedPointColor(const QColor &newLightModeSelectedPointColor);
     bool getExportTextAmountLocalized() const;
     void setExportTextAmountLocalized(bool newExportTextAmountLocalized);
+    QString getLastDir() const;
+    void setLastDir(const QString &newLastDir);
     uint getPercentageMainChartScaling() const;
     void setPercentageMainChartScaling(uint newPercentageMainChartScaling);
     bool getUseDefaultSystemFont() const;
     void setUseDefaultSystemFont(bool newUseDefaultSystemFont);
     QString getCustomApplicationFont() const;
     void setCustomApplicationFont(const QString &newCustomApplicationFont);
-    QString getInitialSystemApplicationFont() const;
     bool getTodayUseSystemDate() const;
     void setTodayUseSystemDate(bool newTodayUseSystemDate);
     QDate getTodayCustomDate() const;
@@ -94,77 +98,92 @@ public:
     void setUsePresentValue(bool newUsePresentValue);
     double getPvDiscountRate() const;
     void setPvDiscountRate(double newPvDiscountRate);
-    QString getSettingsFullFileName() const;
-    QString getLogFullFileName() const;
+    QString getFullFileName() const;
+    void setFullFileName(const QString &newFullFileName);
+    QSharedPointer<Scenario> getScenario() const;
+    void setScenario(QSharedPointer<Scenario> newScenario);
+    bool getWheelRotatedAwayZoomIn() const;
+    void setWheelRotatedAwayZoomIn(bool newWheelRotatedAwayZoomIn);
 
-
+    // Getters only
     bool getNoSettingsFileAtStartup() const;
+    QDate getToday() const;
+    QDate getTomorrow() const;
+    QString getLogFullFileName() const;
+    QString getInitialSystemApplicationFont() const;
+    QString getSettingsFullFileName() const;
+    LogLevel getLogLevel() const;
 
 private:
 
-    // ************* data stored in the settings on file ****************
-
+    // ************* data stored in the settings, in .ini file ****************
+    // ************* Required getters / setters                ****************
     // List of recent full file names used for scenario (open, save as)
     QStringList recentFilenames;
-
-    bool chartDarkMode=false;
-    QColor curveDarkModeColor;
-    QColor curveLightModeColor;
-    bool exportTextAmountLocalized=false;
-
+    // charts characteristics
+    uint chartPointSize;
+    bool isDarkModeSet;
+    QColor darkModeCurveColor;
+    QColor lightModeCurveColor;
+    QColor darkModePointColor;
+    QColor lightModePointColor;
+    QColor darkModeSelectedPointColor;
+    QColor lightModeSelectedPointColor;
+    // Specifies if amount in Expoeted file should be localized
+    bool exportTextAmountLocalized;
     // last dir used for opening/saving scenario.
     QString lastDir;
-
     // how much space is given on the chart above X&Y axis min/max, in percentage over 100%
     uint percentageMainChartScaling;
-
     // Fonts
     bool useDefaultSystemFont;
     QString customApplicationFont;
-
     // If true, today's date if determined by real date-time (this is the default). If false,
     // it is set using the value "todayCustomDate"
     bool todayUseSystemDate;
     QDate todayCustomDate;
-
+    // Allow names of Financial Stream Def to have specific colors
     bool allowDecorationColor;
-
     // if true, all calculated FE amounts are converted to present value using the pvDiscountRate
     bool usePresentValue;
-
     // ANNUAL discount rate for PV calculation, in percentage
     double pvDiscountRate;
+    // If true : vertical wheel rotating AWAY from the user will ZOOM IN
+    // If False : vertical wheel rotating TOWARD the user will ZOOM IN
+    bool wheelRotatedAwayZoomIn;
 
-    // ****************************************************
 
-
-    // *** misc variables ***
-
-    // Date of "today" in local time, set ONCE, when the settings is loaded
-    QDate today;
-
-     // derived from "today"
-    QDate tomorrow;
-
+    // ****** Variables with getter/setters ******
     // path+file name for current scenario. Empty means no file yet assigned (e.g. for new)
     QString fullFileName;
-
+    // Current loaded Scenario
     QSharedPointer<Scenario> scenario;
-    QTextStream logOutStream;
-    QString logFolder;
-    bool loggingEnabled=false;
-    QFile logFile;
-    QString logFullFileName;
-    LogLevel logLevel;
 
+
+    // ***** misc other variables with getter only ****
+    bool noSettingsFileAtStartup;   // indicates if no ini file were found when gbp started
+    // Date of "today" in local time, set ONCE, when the settings is loaded
+    QDate today;
+    // derived from "today"
+    QDate tomorrow;
+    // full name of the lo file
+    QString logFullFileName;
     // font upon app starts, before anything changed
     QString initialSystemApplicationFont;
+    // full file name for the config file
+    QString settingsFullFileName;
+    // Level of debugging
+    LogLevel logLevel;
 
-    // Settings
-    QString settingsFullFileName;   // full file name for the config file
+
+    // ***** Purely internal variables without getters/setters *****
+    QTextStream logOutStream;
+    QString logFolder;
+    QFile logFile;
+    bool loggingEnabled;
     QSettings* settingsPtr=nullptr; // cant find a way to use QSharedPointer...
     bool settingsLoaded=false;  // to prevent more than 1 loading
-    bool noSettingsFileAtStartup;   // no ini file found when gbp has started
+
 
     // *** methods ***
     GbpController();

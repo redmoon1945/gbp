@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>608</height>
+    <height>642</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -366,6 +366,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_19">
          <item>
           <widget class="QLabel" name="formatVersionLabel">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Version of the file format used for the content of a scenario file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>---</string>
            </property>

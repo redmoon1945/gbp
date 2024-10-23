@@ -35,7 +35,7 @@ public:
 
 public slots:
     // From client of DateIntervalDialog : Prepare Dialog before edition
-    void slotPrepareContent();
+    void slotPrepareContent(QDate from, QDate to);
 
 signals:
     // For client of DateIntervalDialog : Send results of edition and notify of edition completion

@@ -1,8 +1,12 @@
 # Change logs
 ## 1.3.0 to 1.4.0
 ### New Features
+- Moved from Qt 6.2.4 to 6.8.0
+- The Cash Balance chart component has been completely re-written (moved from QCustomPlot to standard QT QChart). This remove the bug related to incorrect X axis tick marks from time to time. 
+- Mouse wheel can be used to zoom in/out the Cash Balance curve. Options allow to set if moving away the wheel zoom in or out.
 - The scenario file format has changed and gone from version 1.0.0 to 2.0.0.
 - If no ini file (configuration file) is found at start-up, a welcome screen is shown.
+- New General Info panel has been added to Main Window
 - For Periodic Financial Stream Definition, when Scenario's inflation is selected to define the growth, offer an additional adjustment factor that allows the final growth to be proportional to inflation instead of exactly equal as before (e.g. inflation times a factor). 
 - For Edit Periodic and Irregular Financial Stream Definition Dialogs, completely rework the See Occurrence Dialog so that a chart for the generated events is also displayed (useful to see the general trend, not the details)
 - In Options, remove the max no of years for which financial events are generated and transfer it to the scenario data.
@@ -14,11 +18,12 @@
 - In About Dialog, add the name of the Locale used by GBP
 
 
-### Impacts on compatibility with older versions
+### Impacts on compatibility with older versions of GBP
 - Concerning the scenario file format change, gbp 1.4 and later will read without any problem the old format (1.0.0) and update transparently the file format to 2.0.0 when opening it. No data is lost or altered. However, older gbp 1.3 and previous versions wont be able to read scenario files created with gbp 1.4 and above, which are of version 2.0.0
 
 ### Fixes
 - For a Period Stream Definition of type "END-OF-MONTHLY", if the start date was not on an end of month, it was still part of the generated stream (which is wrong). It is now removed. 
+- In the Analysis : Monthly and Yearly Tables, all months/years are now shown, even if there is no income/expense (value of 0).
 
 
 ## 1.2.0 to 1.3.0

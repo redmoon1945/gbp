@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Charts Widgets LinguistTools PrintSupport )
+find_package(Qt6 REQUIRED COMPONENTS Charts Widgets LinguistTools )
 
 set(TS_FILES gbp_en.ts gbp_fr.ts)
 
@@ -27,6 +27,8 @@ set(PROJECT_SOURCES
     combinedfestreams.h
     currencyhelper.cpp
     currencyhelper.h
+    customqchartview.cpp
+    customqchartview.h
     datehelper.cpp
     datehelper.h
     dateintervaldialog.cpp
@@ -81,8 +83,6 @@ set(PROJECT_SOURCES
     plaintexteditiondialog.cpp
     plaintexteditiondialog.h
     plaintexteditiondialog.ui
-    qcustomplot.cpp
-    qcustomplot.h
     scenario.cpp
     scenario.h
     scenariofetablemodel.cpp
@@ -116,6 +116,8 @@ set(PROJECT_SOURCES
 # directory with generated binary files.
 # Recall that the ts files are edited by translators, while qm files are just
 # binary representation of the ts file for perfomance and size optimization.
+
+# Compiles Qt Linguist .ts files into .qm files
 qt6_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 #qt6_add_lupdate(gbp TS_FILES ${TS_FILES})
@@ -126,7 +128,7 @@ qt6_add_executable(gbp MANUAL_FINALIZATION ${PROJECT_SOURCES} ${QM_FILES}
 )
 
 
-target_link_libraries(gbp PRIVATE Qt6::Widgets Qt6::Charts Qt6::PrintSupport)
+target_link_libraries(gbp PRIVATE Qt6::Widgets Qt6::Charts)
 
 set_target_properties(gbp PROPERTIES
     ${BUNDLE_ID_OPTION}

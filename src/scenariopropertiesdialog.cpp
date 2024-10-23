@@ -60,24 +60,28 @@ void ScenarioPropertiesDialog::slotPrepareContent()
             ui->pathPlainTextEdit->setPlainText(filePath);
             QDateTime dt = fileInfo.birthTime();
             if (dt.isValid()){
-                QString s = locale.toString(dt);
+                QString s = locale.toString(dt, QLocale::FormatType::LongFormat);
                 ui->fileCreationDateLabel->setText(s);
             } else {
                 ui->fileCreationDateLabel->setText(tr("Info not available"));
             }
             dt = fileInfo.lastModified();
             if (dt.isValid()){
-                QString s = locale.toString(dt);
+                QString s = locale.toString(dt,QLocale::FormatType::LongFormat);
                 ui->fileModifDateLabel->setText(s);
             } else {
                 ui->fileModifDateLabel->setText(tr("Info not available"));
             }
         }
 
-        ui->noPeriodicIncomesLabel->setText(QString::number(theScenario->getNoOfPeriodicIncomes()));
-        ui->noIrregularIncomesLabel->setText(QString::number(theScenario->getNoOfIrregularIncomes()));
-        ui->noPeriodicExpensesLabel->setText(QString::number(theScenario->getNoOfPeriodicExpenses()));
-        ui->noIrregularExpensesLabel->setText(QString::number(theScenario->getNoOfIrregularExpenses()));
+        ui->noPeriodicIncomesLabel->setText(QString::number(
+            theScenario->getNoOfPeriodicIncomes(false)));
+        ui->noIrregularIncomesLabel->setText(QString::number(
+            theScenario->getNoOfIrregularIncomes(false)));
+        ui->noPeriodicExpensesLabel->setText(QString::number(
+            theScenario->getNoOfPeriodicExpenses(false)));
+        ui->noIrregularExpensesLabel->setText(QString::number(
+            theScenario->getNoOfIrregularExpenses(false)));
 
         bool found;
         CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, theScenario->getCountryCode(), found);

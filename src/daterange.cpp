@@ -20,20 +20,35 @@
 #include <stdexcept>
 
 
+// the most restrictive by default (empty)
 DateRange::DateRange(){
     this->type = EMPTY;
-    this->start = QDate(1000,1,1);  // Dummy value, so that the date is valid
-    this->end = QDate(1000,12,31);  // Dummy value, so that the date is valid
+    // dummy values
+    this->start = QDate(1000,1,1);
+    this->end = QDate(1000,12,31);
 }
 
 
-DateRange::DateRange(const QDate from){
-    if (from.isValid()==false){
-        throw std::invalid_argument("from is invalid");
-    }
-    this->start = from;
-    this->end = QDate(1000,12,31); // dummy value, so that the date is valid
-    this->type = BOUNDED_START_INFINITE_END;
+DateRange::DateRange(const DateRange &o)
+{
+    this->start = o.start;
+    this->end = o.end;
+    this->type = o.type;
+}
+
+
+// Does not make any sense to use it for BOUNDED (use the other constructor), but it works
+DateRange::DateRange(Type r){
+    this->type = r;
+    // Dummy values
+    this->start = QDate(1000,1,1);
+    this->end = QDate(1000,12,31);
+}
+
+
+DateRange::~DateRange()
+{
+
 }
 
 
@@ -56,187 +71,69 @@ DateRange::DateRange(const QDate from, const QDate to){
 }
 
 
-DateRange DateRange::getInfiniteRange()
-{
-    DateRange dr;
-    dr.type = INFINITE;
-    dr.start = QDate(1000,1,1);  // Dummy value, so that the date is valid
-    dr.end = QDate(1000,12,31);  // Dummy value, so that the date is valid
-    return  dr;
-}
-
-
-DateRange::DateRange(const DateRange &o)
-{
-    this->start = o.start;
-    this->end = o.end;
-    this->type = o.type;
-}
-
-
-DateRange::~DateRange()
-{
-
-}
-
-
 int DateRange::GetNoOfYearsSpanned() const {
     if (this->type == EMPTY){
         return 0;
-    } else if ( (this->type==INFINITE) || (this->type==BOUNDED_START_INFINITE_END)){
+    } else if (this->type==INFINITE){
             throw std::out_of_range("DateRange is infinite");
     }
     return (end.year()-start.year()+1);
 }
 
 
-// Tell if 2 DateRange intersects
-//
-//  this                            o                               result
-//  -----------------------------------------------------------------------
-//  INFINITE                        EMPTY                           false
-//  INFINITE                        INFINITE                        true
-//  INFINITE                        BOUNDED_START_INFINITE_END      true
-//  INFINITE                        BOUNDED                         true
-//  EMPTY                           EMPTY                           false
-//  EMPTY                           INFINITE                        false
-//  EMPTY                           BOUNDED_START_INFINITE_END      false
-//  EMPTY                           BOUNDED                         false
-//  BOUNDED                         EMPTY                           false
-//  BOUNDED                         INFINITE                        true
-//  BOUNDED                         BOUNDED_START_INFINITE_END      depends
-//  BOUNDED                         BOUNDED                         depends
-//  BOUNDED_START_INFINITE_END      EMPTY                           false
-//  BOUNDED_START_INFINITE_END      INFINITE                        true
-//  BOUNDED_START_INFINITE_END      BOUNDED_START_INFINITE_END      true
-//  BOUNDED_START_INFINITE_END      BOUNDED                         depends
+//  this        o       result
+//  ---------------------------
+//  INFINITE  EMPTY     false
+//  INFINITE  INFINITE  true
+//  INFINITE  BOUNDED   true
+//  EMPTY     EMPTY     false
+//  EMPTY     INFINITE  false
+//  EMPTY     BOUNDED   false
+//  BOUNDED   EMPTY     false
+//  BOUNDED   INFINITE  true
+//  BOUNDED   BOUNDED   depends
 bool DateRange::intersectWith(const DateRange o) const{
-    // TRUE (6 cases)
     if (
         ((this->type==INFINITE) && (o.type==INFINITE)) ||
-        ((this->type==INFINITE) && (o.type==BOUNDED_START_INFINITE_END)) ||
         ((this->type==INFINITE) && (o.type==BOUNDED)) ||
-        ((this->type==BOUNDED) && (o.type==INFINITE)) ||
-        ((this->type==BOUNDED_START_INFINITE_END) && (o.type==INFINITE)) ||
-        ((this->type==BOUNDED_START_INFINITE_END) && (o.type==BOUNDED_START_INFINITE_END)) ) {
+        ((this->type==BOUNDED) && (o.type==INFINITE)) ) {
         return true;
-
-    // DEPENDS (3 cases)
-    } else if ((this->type==BOUNDED) && (o.type==BOUNDED_START_INFINITE_END)){
-        return (o.start <= this->end);
     } else if ((this->type==BOUNDED) && (o.type==BOUNDED)){
         return (!((this->end<o.start) || (o.end < this->start)));
-    } else if ((this->type==BOUNDED_START_INFINITE_END) && (o.type==BOUNDED)){
-        return (this->start <= o.end);
-
-    // FALSE (7 cases)
     } else {
         return false;
     }
 }
 
-// Return the intersection range of 2 DateRange
-//
-//  this                            o                               result
-//  -----------------------------------------------------------------------
-//  INFINITE                        EMPTY                           EMPTY
-//  INFINITE                        INFINITE                        INFINITE
-//  INFINITE                        BOUNDED_START_INFINITE_END      BOUNDED_START_INFINITE_END
-//  INFINITE                        BOUNDED                         BOUNDED
-//  EMPTY                           EMPTY                           EMPTY
-//  EMPTY                           INFINITE                        EMPTY
-//  EMPTY                           BOUNDED_START_INFINITE_END      EMPTY
-//  EMPTY                           BOUNDED                         EMPTY
-//  BOUNDED                         EMPTY                           EMPTY
-//  BOUNDED                         INFINITE                        BOUNDED
-//  BOUNDED                         BOUNDED_START_INFINITE_END      depends
-//  BOUNDED                         BOUNDED                         depends
-//  BOUNDED_START_INFINITE_END      EMPTY                           EMPTY
-//  BOUNDED_START_INFINITE_END      INFINITE                        BOUNDED_START_INFINITE_END
-//  BOUNDED_START_INFINITE_END      BOUNDED_START_INFINITE_END      BOUNDED_START_INFINITE_END
-//  BOUNDED_START_INFINITE_END      BOUNDED                         depends
+
 DateRange DateRange::intersection(const DateRange o) const{
-    // INFINITE (1 cases)
-    if ( ((this->type==INFINITE) && (o.type==INFINITE)) ){
-        return DateRange::getInfiniteRange();
-
-    // BOUNDED_START_INFINITE_END (3 cases)
-    } else if(((this->type==INFINITE) && (o.type==BOUNDED_START_INFINITE_END))){
-        return o;
-    } else if(((this->type==BOUNDED_START_INFINITE_END) && (o.type==INFINITE))){
-        return *this;
-    } else if ( ((this->type==BOUNDED_START_INFINITE_END) && (o.type==BOUNDED_START_INFINITE_END)) ){
-        DateRange dr;
-        dr.type = BOUNDED;
-        dr.end = QDate(1000,1,1);  // Dummy value, so that the date is valid
-        if ( this->start <= o.start ){
-            dr.start = this->start;
-            return dr;
-        } else {
-            dr.start = o.start;
-            return dr;
-        }
-
-    // BOUNDED (2 cases)
+    if (false == intersectWith(o)){
+        return DateRange();
+    }
+    if ( ((this->type==INFINITE) && (o.type==INFINITE))  ) {
+        return DateRange(INFINITE);
     } else if ( ((this->type==INFINITE) && (o.type==BOUNDED)) ){
         return o;
     } else if ( ((this->type==BOUNDED) && (o.type==INFINITE)) ){
         return *this;
-
-    // Depends (3 cases)
-    } else if ( ((this->type==BOUNDED) && (o.type==BOUNDED_START_INFINITE_END)) ){
-        if ( o.start <= this->end ){
-            DateRange dr;
-            dr.type = BOUNDED;
-            dr.start = o.start;
-            dr.end = this->end;
-            return dr;
-        } else {
-            return DateRange(); // empty
-        }
-    } else if ( ((this->type==BOUNDED) && (o.type==BOUNDED)) ){
-        if ( intersectWith(o)==false){
-            return DateRange();
-        } else {
-            QDate from = ((start<o.start)?(o.start):(start));
-            QDate to=((end>o.end)?(o.end):(end));
-            return DateRange(from,to);
-        }
-    } else if ( ((this->type==BOUNDED_START_INFINITE_END) && (o.type==BOUNDED)) ){
-        if ( this->start <= o.end ){
-            DateRange dr;
-            dr.type = BOUNDED;
-            dr.start = this->start;
-            dr.end = o.end;
-            return dr;
-        } else {
-            return DateRange(); // empty
-        }
-
-    // EMPTY (7 cases)
-    } else{
-        return DateRange();
     }
+    // necessarily BOUNDED and BOUNDED
+    QDate from = ((start<o.start)?(o.start):(start));
+    QDate to=((end>o.end)?(o.end):(end));
+    return DateRange(from,to);
 }
 
 
 bool DateRange::includeDate(const QDate o) const{
     if (this->type==INFINITE){
         return true;
-    } else if (this->type==BOUNDED_START_INFINITE_END){
-        if (o <= start) {
-            return false;
-        } else {
-            return true;
-        }
-    } else if (this->type==BOUNDED) {
-        if ( (o<start) || (o>end)){
-            return false;
-        } else {
-            return true;
-        }
-    } else {
+    } else if (this->type==EMPTY){
+        return false;
+    }
+    if ( (o<start) || (o>end)){
          return false;
+    } else {
+         return true;
     }
 }
 
@@ -246,10 +143,9 @@ QList<QDate> DateRange::getDateList() const{
     QList<QDate> list;
     if ( this->type==EMPTY){
          return list;
-    } else if ( (this->type==INFINITE) || (this->type==BOUNDED_START_INFINITE_END) ){
+    } else if (this->type==INFINITE){
         throw std::out_of_range("DateRange is infinite");
     }
-    // BOUNDED
     list.reserve(GetNoOfYearsSpanned());
     QDate date = start;
     while (!(date>end)) {
@@ -259,25 +155,15 @@ QList<QDate> DateRange::getDateList() const{
     return list;
 }
 
-// stringForEndSideIfInfinite : if type==BOUNDED_START_INFINITE_END and stringForEndSideIfInfinite!="", replace "infinite" with this custom string
-QString DateRange::toString(QString stringForEndSideIfInfinite) const{
+
+// have to be internationalized
+QString DateRange::toString() const{
     if (this->type==EMPTY){
         return tr("Empty");
     } else if (this->type==INFINITE){
          return tr("Infinite");
-    } else if (this->type==BOUNDED_START_INFINITE_END){
-        QString s = QString::asprintf("[%04d-%02d-%02d,", start.year(), start.month(), start.day());
-        QString infiniteString;
-        if (stringForEndSideIfInfinite=="") {
-            infiniteString = tr("Infinite");
-        } else {
-            infiniteString = stringForEndSideIfInfinite;
-        }
-        QString s2 = QString("%1]").arg(s).arg(infiniteString);
-        return s2;
-    } else {
-        return QString::asprintf("[%04d-%02d-%02d,%04d-%02d-%02d]", start.year(), start.month(), start.day(), end.year(), end.month(), end.day());
     }
+    return QString::asprintf("[%04d-%02d-%02d,%04d-%02d-%02d]", start.year(), start.month(), start.day(), end.year(), end.month(), end.day());
 }
 
 
@@ -302,31 +188,6 @@ DateRange DateRange::fromJson(const QJsonObject &jsonObject, Util::OperationResu
     result.success = false;
     result.errorStringUI = "";
     result.errorStringLog = "";
-
-    // type
-    jsonValue = jsonObject.value("Type");
-    if (jsonValue == QJsonValue::Undefined){
-        result.errorStringUI = tr("DateRange - Cannot find Type tag");
-        result.errorStringLog = "DateRange - Cannot find Type tag";
-        return r;
-    }
-    if (jsonValue.isDouble()==false){
-        result.errorStringUI = tr("DateRange - Type tag is not a number");
-        result.errorStringLog = "DateRange - Type tag is not a number";
-        return r;
-    }
-    d = jsonValue.toDouble();
-    qint64 t = Util::extractQint64FromDoubleWithNoFracPart(d,ok); // int value of the enum Type
-    if ( ok==-1 ){
-        result.errorStringUI = tr("DateRange - Type tag %1 is not an integer").arg(d);
-        result.errorStringLog = QString("DateRange - Type tag %1 is not an integer").arg(d);
-        return r;
-    }
-    if ( ok==-2 ){
-        result.errorStringUI = tr("DateRange - Type tag %1 is far too big").arg(d);
-        result.errorStringLog = QString("DateRange - Type tag %1 is far too big").arg(d);
-        return r;
-    }
 
     // Start tag
     jsonValue = jsonObject.value("Start");
@@ -364,29 +225,52 @@ DateRange DateRange::fromJson(const QJsonObject &jsonObject, Util::OperationResu
         result.errorStringLog = QString("DateRange - End Date value %1 is not a valid ISO Date").arg(jsonValue.toString());
         return r;
     }
+    // check that dates are valid
 
-    // for BOUNDED, check that end is >= start
-    if( (t==1) && (e<s)){
+    // check that end is >= start
+    if(e<s){
         result.errorStringUI = tr("DateRange - End Date value %1 is smaller than start date %2").arg(e.toString(Qt::ISODate),s.toString(Qt::ISODate));
         result.errorStringLog = QString("DateRange - End Date value %1 is smaller than start date %2").arg(e.toString(Qt::ISODate),s.toString(Qt::ISODate));
         return r;
     }
 
-    // Build the DateRange object
+    // type
+    jsonValue = jsonObject.value("Type");
+    if (jsonValue == QJsonValue::Undefined){
+        result.errorStringUI = tr("DateRange - Cannot find Type tag");
+        result.errorStringLog = "DateRange - Cannot find Type tag";
+        return r;
+    }
+    if (jsonValue.isDouble()==false){
+        result.errorStringUI = tr("DateRange - Type tag is not a number");
+        result.errorStringLog = "DateRange - Type tag is not a number";
+        return r;
+    }
+
+    d = jsonValue.toDouble();
+    qint64 t = Util::extractQint64FromDoubleWithNoFracPart(d,ok);
+    if ( ok==-1 ){
+        result.errorStringUI = tr("DateRange - Type tag %1 is not an integer").arg(d);
+        result.errorStringLog = QString("DateRange - Type tag %1 is not an integer").arg(d);
+        return r;
+    }
+    if ( ok==-2 ){
+        result.errorStringUI = tr("DateRange - Type tag %1 is far too big").arg(d);
+        result.errorStringLog = QString("DateRange - Type tag %1 is far too big").arg(d);
+        return r;
+    }
+
     Type type;
     try {
         switch(t){
         case 0:
-            r = DateRange();
+            r = DateRange(EMPTY);
             break;
         case 1:
             r =  DateRange(s,e);
             break;
         case 2:
-            r = DateRange::getInfiniteRange();
-            break;
-        case 3:
-            r = DateRange(s);
+            r = DateRange(INFINITE);
             break;
         default:
             result.errorStringUI = tr("DateRange - Type tag %1 is unkown").arg(t);
@@ -405,66 +289,47 @@ DateRange DateRange::fromJson(const QJsonObject &jsonObject, Util::OperationResu
 }
 
 
-//  this                            o                           result
-//  ------------------------------------------------------------------
-//  INFINITE                        EMPTY                       false
-//  INFINITE                        INFINITE                    true
-//  INFINITE                        BOUNDED                     false
-//  INFINITE                        BOUNDED_START_INFINITE_END  false
-//  EMPTY                           EMPTY                       true
-//  EMPTY                           INFINITE                    false
-//  EMPTY                           BOUNDED                     false
-//  EMPTY                           BOUNDED_START_INFINITE_END  false
-//  BOUNDED                         EMPTY                       false
-//  BOUNDED                         INFINITE                    false
-//  BOUNDED                         BOUNDED                     depends
-//  BOUNDED                         BOUNDED_START_INFINITE_END  false
-//  BOUNDED_START_INFINITE_END      EMPTY                       false
-//  BOUNDED_START_INFINITE_END      INFINITE                    false
-//  BOUNDED_START_INFINITE_END      BOUNDED                     false
-//  BOUNDED_START_INFINITE_END      BOUNDED_START_INFINITE_END  depends
-
+//  this        o       result
+//  ---------------------------
+//  INFINITE  EMPTY     false
+//  INFINITE  INFINITE  true
+//  INFINITE  BOUNDED   false
+//  EMPTY     EMPTY     true
+//  EMPTY     INFINITE  false
+//  EMPTY     BOUNDED   false
+//  BOUNDED   EMPTY     false
+//  BOUNDED   INFINITE  false
+//  BOUNDED   BOUNDED   depends
 bool DateRange::operator==(const DateRange &o) const{
     if (
-        // FALSE (12 cases)
         ((this->type==INFINITE) && (o.type==EMPTY)) ||
         ((this->type==INFINITE) && (o.type==BOUNDED)) ||
-        ((this->type==INFINITE) && (o.type==BOUNDED_START_INFINITE_END)) ||
         ((this->type==EMPTY) && (o.type==INFINITE)) ||
         ((this->type==EMPTY) && (o.type==BOUNDED)) ||
-        ((this->type==EMPTY) && (o.type==BOUNDED_START_INFINITE_END)) ||
         ((this->type==BOUNDED) && (o.type==EMPTY)) ||
-        ((this->type==BOUNDED) && (o.type==BOUNDED_START_INFINITE_END)) ||
-        ((this->type==BOUNDED) && (o.type==INFINITE)) ||
-        ((this->type==BOUNDED_START_INFINITE_END) && (o.type==EMPTY)) ||
-        ((this->type==BOUNDED_START_INFINITE_END) && (o.type==BOUNDED)) ||
-        ((this->type==BOUNDED_START_INFINITE_END) && (o.type==INFINITE)) ) {
+        ((this->type==BOUNDED) && (o.type==INFINITE))  ) {
          return false;
     } else if (
-        // TRUE (2 cases)
         (this->type==INFINITE) && (o.type==INFINITE) ||
         (this->type==EMPTY) && (o.type==EMPTY)
         ){
          return true;
     } else {
-        // DEPENDS (2 cases)
-        if ( (this->type==BOUNDED) && (o.type==BOUNDED) ) {
-            if ( (start!=o.start) || (end!=o.end)){
-                return false;
-            } else {
-                return true;
-            }
-        } else if( (this->type==BOUNDED_START_INFINITE_END) && (o.type==BOUNDED_START_INFINITE_END) ) {
-            if ( start!=o.start){
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            throw std::invalid_argument("operator= : unknown depends case");
-        }
+
+         if ( (start!=o.start) || (end!=o.end)){
+             return false;
+         } else {
+             return true;
+         }
     }
 }
+
+
+bool DateRange::operator!=(const DateRange &o) const
+{
+    return !(*this==o);
+}
+
 
 DateRange &DateRange::operator=(const DateRange &o)
 {

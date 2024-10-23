@@ -42,6 +42,8 @@ private slots:
     void on_AboutDialog_rejected();
     void on_closePushButton_clicked();
 
+    void on_viewLogPushButton_clicked();
+
 private:
     Ui::AboutDialog *ui;
 };

@@ -39,7 +39,7 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     // use smaller font for description list
     QFont descFont = ui->descPlainTextEdit->font();
     uint oldFontSize = descFont.pointSize();
-    uint newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    uint newFontSize = Util::changeFontSize(1,true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Irregular Dialog - Description - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     descFont.setPointSize(newFontSize);
     ui->descPlainTextEdit->setFont(descFont);
@@ -47,7 +47,7 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     // use smaller font for the warning Label (for past events)
     QFont warninglabelFont = ui->warningLabel->font();
     oldFontSize = warninglabelFont.pointSize();
-    newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    newFontSize = Util::changeFontSize(1,true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Irregular Dialog - Warning Label - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     warninglabelFont.setPointSize(newFontSize);
     ui->warningLabel->setFont(warninglabelFont);
@@ -55,7 +55,7 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     // use smaller font for the "future" Label
     QFont futurLabelFont = ui->futurLabel->font();
     oldFontSize = futurLabelFont.pointSize();
-    newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    newFontSize = Util::changeFontSize(1,true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Irregular Dialog - Future Label - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     futurLabelFont.setPointSize(newFontSize);
     ui->futurLabel->setFont(futurLabelFont);

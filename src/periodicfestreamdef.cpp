@@ -146,6 +146,12 @@ bool PeriodicFeStreamDef::operator==(const PeriodicFeStreamDef& o) const
 }
 
 
+bool PeriodicFeStreamDef::operator!=(const PeriodicFeStreamDef &o) const
+{
+    return !(*this==o);
+}
+
+
 PeriodicFeStreamDef::~PeriodicFeStreamDef()
 {
 
@@ -155,7 +161,7 @@ PeriodicFeStreamDef::~PeriodicFeStreamDef()
 // Generate the whole suite of financial events for that Stream Definition.
 // Input params :
 //   fromTo : interval of time inside which the events should be generated. Must be of type BOUNDED.
-//   maxDateScenarioFeGeneration : Date where all FE generation must stop (derived from scenario)
+//   maxDateScenarioFeGeneration : Max date when an event can be generated (taken from scenario)
 //   inflation : scenario's inflation to apply to the events. Internally corrected with the
 //               Inflation Adjustment Factor.
 //   pvDiscountRate : ANNUAL discount rate in percentage to apply to transform the amounts to
@@ -190,13 +196,7 @@ QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto,
     // is END_OF_MONTH, set real start date so that it corresponds to a real end-of-month (since
     // there can be nothing before). For End Date, adjust it so that it does not go over max date
     // allowed by the scenario in any circumstance.
-    QDate realEndDate = endDate;
-    if (useScenarioForEndDate==true) {
-        realEndDate = maxDateScenarioFeGeneration;
-    } else {
-        realEndDate =
-            ( (endDate<maxDateScenarioFeGeneration)?(endDate):(maxDateScenarioFeGeneration) );
-    }
+    QDate realEndDate = getRealEndDate(maxDateScenarioFeGeneration);
     QDate realStartDate = startDate;
     if (period==END_OF_MONTHLY) {
         if (false==DateHelper::isEndOfMonth(startDate)){
@@ -308,6 +308,48 @@ QList<Fe> PeriodicFeStreamDef::generateEventStream(DateRange fromto,
 
 
     return ss;
+}
+
+
+// Compare this FeStreamDef with another one and evaluate if the list of FE generated will be
+// exactly the same. Return True if it is the case, False otherwise. Note that they are some more
+// complex cases where False is returned but the FE list is still the same.
+bool PeriodicFeStreamDef::evaluateIfSameFeList(const PeriodicFeStreamDef &o) const
+{
+    if (FeStreamDef::evaluateIfSameFeList(o)==false){
+        return false;
+    }
+
+    if ( (period != o.period) ||
+        (periodMultiplier != o.periodMultiplier) ||
+        (amount != o.amount) ||
+        (growthStrategy != o.growthStrategy) ||
+        (startDate != o.startDate) ||
+        (useScenarioForEndDate != o.useScenarioForEndDate) ) {
+        return false;
+    }
+
+    if ( (growthStrategy == GrowthStrategy::CUSTOM) &&
+        (growth != o.growth) ) {
+        return false;
+    }
+
+    if ( (growthStrategy != GrowthStrategy::NONE) &&
+        (growthApplicationPeriod != o.growthApplicationPeriod) ) {
+        return false;
+    }
+
+    if ( (growthStrategy==GrowthStrategy::INFLATION) &&
+        (inflationAdjustmentFactor != o.inflationAdjustmentFactor) )  {
+        return false;
+    }
+
+    if ( (useScenarioForEndDate == false) &&
+        (endDate != o.endDate) ) {
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -669,6 +711,18 @@ PeriodicFeStreamDef PeriodicFeStreamDef::duplicate() const
     ps.setId(QUuid::createUuid());
     ps.setName(newName);
     return ps;
+}
+
+// Get the effective earliest limit end date, taking into account the max date set by the scenario.
+QDate PeriodicFeStreamDef::getRealEndDate(const QDate maxDateScenario) const
+{
+    QDate realEndDate = endDate;
+    if (useScenarioForEndDate==true) {
+        realEndDate = maxDateScenario;
+    } else {
+        realEndDate = ( (endDate<maxDateScenario)?(endDate):(maxDateScenario) );
+    }
+    return realEndDate;
 }
 
 

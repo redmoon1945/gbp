@@ -25,13 +25,13 @@
 #include <QPen>
 #include <QColor>
 #include "gbpcontroller.h"
-#include "qevent.h"
 #include "currencyhelper.h"
 #include "editscenariodialog.h"
 #include "util.h"
-#include "qcustomplot.h"
-
-
+#include <QDateTime>
+#include <QDesktopServices>
+#include <cfloat>
+#include <qforeach.h>
 
 
 
@@ -64,14 +64,13 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
 
     // resize some QLabel to be sure we have enough space to display stuff
     QFontMetrics fm(ui->ciDateLabel->font());
-    // ui->ciDateLabel->setMinimumWidth(fm.averageCharWidth()*10);
     ui->ciAmountLabel->setMinimumWidth(fm.averageCharWidth()*15);
     ui->ciDeltaLabel->setMinimumWidth(fm.averageCharWidth()*10);
-    // ui->baselineDoubleSpinBox->setMinimumWidth(fm.averageCharWidth()*6);
 
     // set minimum/maximum value of baseline and erase currency label
-    ui->baselineDoubleSpinBox->setMaximum(CurrencyHelper::maxValueAllowedForAmountInDouble(3)); // no currency has more than 3 decinal digits
-    ui->baselineDoubleSpinBox->setMinimum(-CurrencyHelper::maxValueAllowedForAmountInDouble(3)); // no currency has more than 3 decinal digits
+    // no currency has more than 3 decimal digits
+    ui->baselineDoubleSpinBox->setMaximum(CurrencyHelper::maxValueAllowedForAmountInDouble(3));
+    ui->baselineDoubleSpinBox->setMinimum(-CurrencyHelper::maxValueAllowedForAmountInDouble(3));
     ui->baselineCurrencyLabel->setText("");
 
     // display todays's date in bottom startAmountLabel
@@ -84,8 +83,10 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     // use smaller font for Info list and enable custom sorting
     QFont listFont = ui->ciDetailsListWidget->font();
     uint oldFontSize = listFont.pointSize();
-    uint newFontSize = Util::changeFontSize(false,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Main Window - FE List - Font size from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    uint newFontSize = Util::changeFontSize(1,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Main Window - FE List - Font size from %1 to %2").arg(oldFontSize).arg(
+        newFontSize));
     listFont.setPointSize(newFontSize);
     ui->ciDetailsListWidget->setFont(listFont);
     ui->ciDetailsListWidget->setSortingEnabled(true);
@@ -93,8 +94,10 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     // use smaller font for "resize" toolbar buttons
     QFont resizeToolbarFont = ui->toolButton_1M->font();
     oldFontSize = resizeToolbarFont.pointSize();
-    newFontSize = Util::changeFontSize(false,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Main Window - Toolbar - Font size from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    newFontSize = Util::changeFontSize(1,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Main Window - Toolbar - Font size from %1 to %2").arg(oldFontSize).arg(
+        newFontSize));
     resizeToolbarFont.setPointSize(newFontSize);
     ui->toolButton_1M->setFont(resizeToolbarFont);
     ui->toolButton_3M->setFont(resizeToolbarFont);
@@ -120,71 +123,12 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     ui->splitter->setStretchFactor(0,1);
     ui->splitter->setStretchFactor(1,0);
 
-    // ***********************************************
-    // *** CHART SETTINGS ***
-    // ***********************************************
-
-    // build dummy data representing "no scenario" situation
-    QVector<QCPGraphData> timeData(0);// dummy data for "no scenario"
-    // initial values for axes limits
-    fullFromDateX = GbpController::getInstance().getTomorrow(); // we are interested only from TOMORROW to infinity
-    fullToDateX = fullFromDateX.addYears(Scenario::DEFAULT_DURATION_FE_GENERATION).addDays(-1);
-    fullFromDoubleX = Util::dateToDateTimeLocal(fullFromDateX,QTimeZone::systemTimeZone()).toSecsSinceEpoch();
-    fullToDoubleX = Util::dateToDateTimeLocal(fullToDateX,QTimeZone::systemTimeZone()).toSecsSinceEpoch();
-    fitFromDoubleX = fullFromDoubleX;
-    fitToDoubleX = fullToDoubleX;
-    fullMinY = 0;
-    fullMaxY = 1;
-    // create graph and assign data to it:
-    ui->curveWidget->installEventFilter(this);  // intercept resize event
-    chart = new QCustomPlot(ui->curveWidget);
-    chart->addGraph();
-    chart->graph()->setLineStyle(QCPGraph::lsLine);
-    chart->graph()->data()->set(timeData, true);
-    chart->xAxis2->setVisible(false);
-    chart->yAxis2->setVisible(false);
-    // configure bottom axis to show date instead of number:
-    QSharedPointer<QCPAxisTickerDateTime> dateTicker(new QCPAxisTickerDateTime);
-    dateTicker->setDateTimeFormat("d MMM\nyyyy");
-    dateTicker->setTickStepStrategy(QCPAxisTicker::TickStepStrategy::tssMeetTickCount);// doesnt seem to work very well..
-    dateTicker->setTickCount(10);
-    chart->xAxis->setTicker(dateTicker);
-    // keep default left axis, configure some stuff
-    chart->yAxis->ticker()->setTickCount(10);
-    chart->yAxis->setNumberFormat("f");
-    chart->yAxis->setNumberPrecision(2);
-    // set a more compact font size for bottom and left axis tick labels:
-    QFont f = chart->xAxis->tickLabelFont();
-    chart->xAxis->setTickLabelFont(QFont(f.family(), (8.0/12.0)*f.pointSize()));
-    chart->yAxis->setTickLabelFont(QFont(f.family(), (8.0/12.0)*f.pointSize()));
-    // set axis ranges to show all data:
-    chart->xAxis->setRange(fullFromDoubleX, fullToDoubleX);
-    chart->yAxis->setRange(fullMinY, fullMaxY);
-    chart->yAxis->setVisible(false);
-    chart->xAxis->setVisible(false);
-    chart->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    // set title
-    setChartTitle(tr("No Scenario Loaded"));
-    // set locale so Y axis is displaying separator and decimal point correctly
-    chart->setLocale(locale);
-    // set data point shape
-    chart->graph()->setLineStyle(QCPGraph::LineStyle::lsStepLeft);
-    chart->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 10));
-    // configure point selection
-    chart->graph()->setSelectable(QCP::stSingleData);
-    QObject::connect(chart, &QCustomPlot::selectionChangedByUser, this, &MainWindow::selectionChangedByUser);
-    // register event listener for axis scale change
-    QObject::connect(chart->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(rangeChangedX(QCPRange)));
-    QObject::connect(chart->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(rangeChangedY(QCPRange)));
-
-    // configure dark or light mode for chart
-    setChartColors();
-    // build
-    chart->replot();
-    // ***********************************************
-    // ***********************************************
-
+    // update general info section
+    emptyGeneralInfoSection();
     emptyDailyInfoSection();
+
+    // Build the QChart
+    initChart();
 
     //
     // connect MainWindow and edit scenario dialog
@@ -218,120 +162,131 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
 bool MainWindow::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() == QEvent::Resize && object == ui->curveWidget){
-        chart->resize(ui->curveWidget->size());
+        chartView->resize(ui->curveWidget->size());
     }
     return QObject::eventFilter(object, event);
 }
 
 
-
-
-void MainWindow::setChartTitle(QString theTitle)
+// Used ONLY by the toolbuttons above. A scenario myst be loaded.
+void MainWindow::rescaleXaxis(uint noOfMonths)
 {
-    if (chartTitle==nullptr) {
-        // first time setting
-        chartTitle = new QCPTextElement(chart);
-        QFont f = chartTitle->font();   // default
-        chartTitle->setText(theTitle);
-        chartTitle->setFont(QFont(f.family(), f.pointSize(), QFont::Bold));
-        // then we add it to the main plot layout:
-        chart->plotLayout()->insertRow(0); // insert an empty row above the axis rect
-        chart->plotLayout()->addElement(0, 0, chartTitle); // place the title in the empty cell we've just created
-    } else {
-        chartTitle->setText(theTitle);
+    if (!(GbpController::getInstance().isScenarioLoaded())){
+        return;
     }
-}
-
-
-void MainWindow::rescaleYaxis(uint noOfMonths)
-{
-    QDate newTo = fullFromDateX.addMonths(noOfMonths).addDays(-1);
-    QDateTime newToDateTime= Util::dateToDateTimeLocal(newTo, QTimeZone::systemTimeZone());
-    double newToDouble = newToDateTime.toSecsSinceEpoch();
-    chart->xAxis->setRange(fullFromDoubleX, newToDouble);
-    chart->graph(0)->rescaleValueAxis(false,true);
-    // give some space around min/max
-    chart->xAxis->scaleRange(chartScalingFactor);
-    chart->yAxis->scaleRange(chartScalingFactor);
-
-    chart->replot();
+    QDateTime newTo = fullFromDateX.addMonths(noOfMonths).addDays(-1);
+    // this is to rescale Yaxis
+    rescaleChart({.mode=X_RESCALE::X_RESCALE_CUSTOM, .from=fullFromDateX, .to=newTo}, true);
 }
 
 
 void MainWindow::shiftGraph(bool toTheRight)
 {
-    QCPRange range = chart->xAxis->range();
-    double xFromOrig = range.lower;
-    double xToOrig = range.upper;
-    double xFromNew;
-    double xToNew;
-    double deltaRange = fabs(xToOrig-xFromOrig);
-    if (toTheRight){
-        xFromNew = xFromOrig + deltaRange;
-        xToNew = xToOrig + deltaRange;
-    } else{
-        xFromNew = xFromOrig - deltaRange;
-        xToNew = xToOrig - deltaRange;
-    }
-    //
-    chart->xAxis->setRange(xFromNew, xToNew);
-    chart->graph(0)->rescaleValueAxis(false,true);
-    // give some space around min/max
-    chart->yAxis->scaleRange(chartScalingFactor);
+    // Get current Xaxis limits
+    QDateTime xMin = axisX->min();
+    QDateTime xMax = axisX->max();
 
-    chart->replot();
-}
-
-
-void MainWindow::setChartColors()
-{
-
-    if(GbpController::getInstance().getChartDarkMode()){
-        chartTitle->setTextColor(QColor(255, 255, 255));
-        chart->graph()->setPen(QPen(GbpController::getInstance().getCurveDarkModeColor()));
-        chart->setBackground(Qt::black);
-        chart->xAxis->setBasePen(QPen(QColor(255, 255, 255)));
-        chart->xAxis->setTickPen(QPen(QColor(255, 255, 255)));
-        chart->xAxis->setSubTickPen(QPen(QColor(255, 255, 255)));
-        chart->yAxis->setBasePen(QPen(QColor(255, 255, 255)));
-        chart->yAxis->setTickPen(QPen(QColor(255, 255, 255)));
-        chart->yAxis->setSubTickPen(QPen(QColor(255, 255, 255)));
-        chart->xAxis->setTickLabelColor(QColor(255, 255, 255));
-        chart->yAxis->setTickLabelColor(QColor(255, 255, 255));
-        chart->xAxis->grid()->setPen(QColor(35, 35, 35));
-        chart->yAxis->grid()->setPen(QColor(35, 35, 35));
+    // shift the range
+    int delta = xMin.daysTo(xMax);
+    if (toTheRight==true) {
+        xMin = xMin.addDays(delta+1);
+        xMax = xMax.addDays(delta+1);
     } else {
-        chartTitle->setTextColor(QColor(0, 0, 0));
-        chart->graph()->setPen(QPen(GbpController::getInstance().getCurveLightModeColor()));
-        chart->setBackground(Qt::white);
-        chart->xAxis->setBasePen(QPen(QColor(0, 0, 0)));
-        chart->xAxis->setTickPen(QPen(QColor(0, 0, 0)));
-        chart->xAxis->setSubTickPen(QPen(QColor(0, 0, 0)));
-        chart->yAxis->setBasePen(QPen(QColor(0, 0, 0)));
-        chart->yAxis->setTickPen(QPen(QColor(0, 0, 0)));
-        chart->yAxis->setSubTickPen(QPen(QColor(0, 0, 0)));
-        chart->xAxis->setLabelColor(QColor(0, 0, 0));
-        chart->yAxis->setLabelColor(QColor(0, 0, 0));
-        chart->xAxis->setTickLabelColor(QColor(0, 0, 0));
-        chart->yAxis->setTickLabelColor(QColor(0, 0, 0));
-        chart->xAxis->grid()->setPen(QColor(230, 230, 230));
-        chart->yAxis->grid()->setPen(QColor(230, 230, 230));
+        xMin = xMin.addDays(-(delta+1));
+        xMax = xMax.addDays(-(delta+1));
     }
+    xAxisRescale mode = {.mode=X_RESCALE::X_RESCALE_CUSTOM, .from=xMin, .to=xMax};
+    rescaleChart(mode, false);
 }
 
 
-void MainWindow::fillDailyInfoSection(const QDate& date, double amount, const CombinedFeStreams::DailyInfo& di)
+void MainWindow::themeChanged()
 {
-    ui->ciDateLabel->setText(locale.toString(date,"yyyy-MMM-dd"));
+    if(GbpController::getInstance().getIsDarkModeSet()==true){
+        chart->setTheme(QChart::ChartThemeDark);
+        chart->setBackgroundBrush(QBrush(QColor("black")));
+    } else {
+        chart->setTheme(QChart::ChartThemeLight);
+        chart->setBackgroundBrush(QBrush(QColor("white")));
+    }
+    setSeriesCharacteristics();
+    // Changing theme "sometimes" change font size (???). Set them again to be sure
+    // it stays constant
+    setXaxisFontSize(xAxisFontSize);
+    setYaxisFontSize(yAxisFontSize);
+}
+
+
+void MainWindow::setSeriesCharacteristics(){
+    if(GbpController::getInstance().getIsDarkModeSet()==true){
+        // point color
+        scatterSeries->setBrush(GbpController::getInstance().getDarkModePointColor());
+        // selected point color
+        scatterSeries->setSelectedColor(GbpController::getInstance().
+            getDarkModeSelectedPointColor());
+        // curve color (shadow series)
+        QPen pen = QPen(GbpController::getInstance().getDarkModeCurveColor());
+        shadowSeries->setPen(pen);
+    } else {
+        // point color
+        scatterSeries->setBrush(GbpController::getInstance().getLightModePointColor());
+        // selected point color
+        scatterSeries->setSelectedColor(GbpController::getInstance().
+            getLightModeSelectedPointColor());
+        // curve color (shadow series)
+        QPen pen = QPen(GbpController::getInstance().getLightModeCurveColor());
+        shadowSeries->setPen(pen);
+    }
+    scatterSeries->setBorderColor(Qt::transparent);    // no border on points
+    scatterSeries->setMarkerSize(GbpController::getInstance().getChartPointSize());
+    shadowSeries->setPointsVisible(false);
+
+}
+
+
+void MainWindow::reduceAxisFontSize()
+{
+    // X axis
+    QFont xAxisFont = axisX->labelsFont();
+    xAxisFontSize = Util::changeFontSize(2, true, xAxisFont.pointSize()); // set for ever
+    setXaxisFontSize(xAxisFontSize);
+
+    //  Y axis
+    QFont yAxisFont = axisY->labelsFont();
+    yAxisFontSize = Util::changeFontSize(2, true, yAxisFont.pointSize()); // set for ever
+    setYaxisFontSize(yAxisFontSize);
+}
+
+
+void MainWindow::setXaxisFontSize(uint fontSize){
+    QFont xAxisFont = axisX->labelsFont();
+    xAxisFont.setPointSize(fontSize);
+    axisX->setLabelsFont(xAxisFont);
+}
+
+
+void MainWindow::setYaxisFontSize(uint fontSize){
+    QFont yAxisFont = axisY->labelsFont();
+    yAxisFont.setPointSize(fontSize);
+    axisY->setLabelsFont(yAxisFont);
+}
+
+
+void MainWindow::fillDailyInfoSection(const QDate& date, double amount,
+    const CombinedFeStreams::DailyInfo& di)
+{
+    ui->ciDateLabel->setText(locale.toString(date, locale.dateFormat(QLocale::ShortFormat)));
     QColor red = QColor(210,0,0);
     QColor green = QColor(0,190,0);
 
     QString countryCode = GbpController::getInstance().getScenario()->getCountryCode();
     bool found;
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, countryCode, found);
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, countryCode,
+        found);
     if(!found){
         // should never happen
         return;
@@ -361,7 +316,7 @@ void MainWindow::fillDailyInfoSection(const QDate& date, double amount, const Co
     QSharedPointer<Scenario> sc = GbpController::getInstance().getScenario();
 
     // list box
-    // we need this in ordert o sort the list by StreamDef name
+    // we need this in order to sort the list by StreamDef name
     class CustomListItem : public QListWidgetItem {
     public:
         CustomListItem(const QString& text, QString theName) : QListWidgetItem(text) {
@@ -386,10 +341,11 @@ void MainWindow::fillDailyInfoSection(const QDate& date, double amount, const Co
         sc->getStreamDefNameAndColorFromId(fed.id, sName, color, streamFound);
         if(found){// should always be found
             item = new CustomListItem(fed.toString(sName, currInfo, locale),sName);
-            if( (GbpController::getInstance().getAllowDecorationColor()==true) && (color.isValid())){
+            if( (GbpController::getInstance().getAllowDecorationColor()==true) &&
+                (color.isValid())){
                 item->setForeground(color);
             }
-            ui->ciDetailsListWidget->addItem(item) ;    // list widget will take ownership of the item
+            ui->ciDetailsListWidget->addItem(item) ;  // list widget will take ownership of the item
         }
     }
     foreach(FeDisplay fed, di.expensesList){
@@ -399,7 +355,7 @@ void MainWindow::fillDailyInfoSection(const QDate& date, double amount, const Co
             if( (GbpController::getInstance().getAllowDecorationColor()==true) && (color.isValid())){
                 item->setForeground(color);
             }
-            ui->ciDetailsListWidget->addItem(item) ;    // list widget will take ownership of the item
+            ui->ciDetailsListWidget->addItem(item) ;  // list widget will take ownership of the item
         }
      }
 
@@ -415,9 +371,49 @@ void MainWindow::emptyDailyInfoSection()
 }
 
 
-// current Scenario has changed, update the baseline widgets
-void MainWindow::updateBaselineWidgets(CurrencyInfo currInfo)
+// A scenario must have been loaded
+void MainWindow::fillGeneralInfoSection()
 {
+   if (!(GbpController::getInstance().isScenarioLoaded())){
+    return;
+   }
+   QString countryCode = GbpController::getInstance().getScenario()->getCountryCode();
+   bool found;
+   CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, countryCode,
+                                                                          found);
+   if(!found){
+       // should never happen
+       return;
+   }
+   ui->giNoDaysLabel->setText(locale.toString(chartRawData.count()));
+
+   // Total no of events
+   ui->giNoEventsLabel->setText(locale.toString(calculateTotalNoOfEvents()));
+}
+
+
+void MainWindow::emptyGeneralInfoSection()
+{
+    ui->giNoDaysLabel->setText("");
+    ui->giNoEventsLabel->setText("");
+}
+
+
+// current Scenario has changed, reset the baseline widgets
+void MainWindow::resetBaselineWidgets()
+{
+    if (!(GbpController::getInstance().isScenarioLoaded())){
+        return;
+    }
+    QString countryCode = GbpController::getInstance().getScenario()->getCountryCode();
+    bool found;
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, countryCode,
+        found);
+    if(!found){
+        // should never happen
+        return;
+    }
+
     ui->baselineDoubleSpinBox->setMaximum(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal));
     ui->baselineDoubleSpinBox->setMinimum(-CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal));
     ui->baselineDoubleSpinBox->setDecimals(currInfo.noOfDecimal);
@@ -496,6 +492,57 @@ bool MainWindow::checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding()
     }
 
     return true;
+}
+
+
+void MainWindow::initChart()
+{
+    // intercept resize event of curveWidget and resize ChartView
+    ui->curveWidget->installEventFilter(this);
+
+    // initial values for axes limits
+    // we are interested only from TOMORROW to infinity
+    fullFromDateX = QDateTime(GbpController::getInstance().getTomorrow(),QTime(0,0,0));
+    fullToDateX = fullFromDateX.addYears(Scenario::DEFAULT_DURATION_FE_GENERATION).addDays(-1);
+
+    // Step 1 : Create the chart
+    chart = new QChart();
+    chart->legend()->hide();
+    chart->setTitle(tr("No Scenario Loaded"));
+    chart->setLocale(locale);
+    chart->setLocalizeNumbers(true);
+
+    // Step 2 : create X axis
+    axisX = new QDateTimeAxis;
+    axisX->setTickCount(11);
+    axisX->setFormat(locale.dateFormat(QLocale::ShortFormat));
+    axisX->setRange(fullFromDateX, fullToDateX);
+    chart->addAxis(axisX, Qt::AlignBottom);
+
+    // Step 3 : create Y axis
+    axisY = new QValueAxis;
+    axisY->setTickCount(11);
+    axisY->setRange(0,1);
+    chart->addAxis(axisY, Qt::AlignLeft);
+
+    // Step 4 : create empty series and attach them to both axis and chart
+    QList<QPointF> timeData = {};        // raw data for scatterSeries (real data)
+    QList<QPointF> shadowTimeData = {};
+    replaceChartSeries(timeData, shadowTimeData);
+
+    // reduce font size for axis
+    reduceAxisFontSize();
+
+    chartView = new CustomQChartView(chart,
+        GbpController::getInstance().getWheelRotatedAwayZoomIn(), ui->curveWidget);
+    chartView->setRenderHint(QPainter::Antialiasing, true);
+
+    connect(axisX,&QDateTimeAxis::rangeChanged, this, &MainWindow::handleXaxisRangeChange);
+    connect(axisY,&QValueAxis::rangeChanged, this, &MainWindow::handleYaxisRangeChange);
+
+    // configure dark or light mode for chart. reduceAxisFontSize() must have been called once
+    // before
+    themeChanged();
 }
 
 
@@ -666,12 +713,17 @@ void MainWindow::on_actionSave_triggered()
 
 // Load a scenario file into a Scenario object.
 // If the scenario file is of an older file format version, always attempt
-// to update it transarently (could fail if user does not have the write permission on the file).
+// to update it transparently (could fail if user does not have the write permission on the file).
 // Return true if successful, false otherwise
 bool MainWindow::loadScenarioFile(QString fileName)
 {
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("Attempting to load scenario from file \"%1\" ...").arg(fileName));
+    if (GbpController::getInstance().getLogLevel()==GbpController::Debug){
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("Attempting to load scenario from file \"%1\" ...").arg(fileName));
+    } else if (GbpController::getInstance().getLogLevel()==GbpController::Minimal){
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Attempting to load scenario ..."));
+    }
 
     QString errorStringUI;
     QString errorStringLog;
@@ -722,13 +774,25 @@ bool MainWindow::loadScenarioFile(QString fileName)
     // switch scenario
     GbpController::getInstance().setScenario(fr.scenarioPtr);
     GbpController::getInstance().setFullFileName(fileName);
+    chart->setTitle(fr.scenarioPtr->getName());
 
     // update the "last directory" used in settings
     QFileInfo fi(fileName);
     GbpController::getInstance().setLastDir(fi.path());
 
-    // update the scenario data
-    updateScenarioDataDisplayed(true,true);
+    // update the scenario data : recalculate flow data and refresh chart
+    //
+    QList<QPointF> timeData;
+    QList<QPointF> shadowTimeData;
+    regenerateRawData(timeData, shadowTimeData);
+    replaceChartSeries(timeData, shadowTimeData);
+    rescaleChart({.mode=X_RESCALE::X_RESCALE_DATA_MAX}, true);
+
+    // house keeping
+    emptyDailyInfoSection();
+    fillGeneralInfoSection();
+    resetBaselineWidgets();
+    changeYaxisLabelFormat();
 
     // Check if the scenario file is of an older file format version (in any case, the loaded
     // scenario object has already been converted to the latest format).  If yes, attempt to
@@ -752,6 +816,8 @@ bool MainWindow::loadScenarioFile(QString fileName)
     // Some logging
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
         QString("Scenario loaded successfully"));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    File name : %1").arg(GbpController::getInstance().getFullFileName()));
     GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
         QString("    Name = %1").arg(fr.scenarioPtr->getName()));
     GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
@@ -784,7 +850,6 @@ bool MainWindow::loadScenarioFile(QString fileName)
 
     return true;// full success
 }
-
 
 // Save current scenario under the provided filename. No error message is displayed, but
 // loggin is performed.
@@ -836,8 +901,6 @@ void MainWindow::on_actionEdit_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
-
-    // check first if the current scenario needs to be saved
     // check first if the current scenario needs to be saved
     if(false == checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding()){
         return;
@@ -849,144 +912,214 @@ void MainWindow::on_actionNew_triggered()
 }
 
 
-// All data need to be fully recalculated. Chart has to be rescaled and replotted
-void MainWindow::updateScenarioDataDisplayed(bool rescaleXaxis, bool resetBaselineValue)
+// Rescale both axis of the chart. Y axis is always auto-scaled. Chart's data is NOT changed.
+// A scenario must be loaded.
+// Input paramters:
+//   xAxisRescaleMode : how the xAxis will be rescaled
+//   addMarginAroundXaxis : Normally true. It means X axis limit are extended by the "rescaling
+//                          factor" set in Options, in order to prevent border point to fall
+//                          directly on Y axis. For "shitfing" however, we want this turned Off
+//                          (false)
+void MainWindow::rescaleChart(xAxisRescale xAxisRescaleMode, bool addMarginAroundXaxis)
 {
-
-    QTimeZone tz = QTimeZone::systemTimeZone();
-
     if (!(GbpController::getInstance().isScenarioLoaded())){
-        // *** if no scenario loaded ***
-        fullFromDateX = GbpController::getInstance().getTomorrow(); // Always TOMORROW
-        fullToDateX = fullFromDateX.addYears(Scenario::DEFAULT_DURATION_FE_GENERATION).addDays(-1);
-        fullFromDoubleX = Util::dateToDateTimeLocal(fullFromDateX,tz).toSecsSinceEpoch();
-        fullToDoubleX = Util::dateToDateTimeLocal(fullToDateX,tz).toSecsSinceEpoch();
-        chart->xAxis->setRange(fullFromDoubleX, fullToDoubleX);
-        chart->replot();
         return;
     }
 
     QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario();
 
-    // recalculate X axis limits ( "Options->Scenario years" may have changed)
-    fullFromDateX = GbpController::getInstance().getTomorrow(); // Always TOMORROW
+    // recalculate X axis scenario max limits ( "Options->Scenario years" may have changed)
     fullToDateX = fullFromDateX.addYears(scenario->getFeGenerationDuration()).addDays(-1);
-    fullFromDoubleX = Util::dateToDateTimeLocal(fullFromDateX,tz).toSecsSinceEpoch();
-    fullToDoubleX = Util::dateToDateTimeLocal(fullToDateX,tz).toSecsSinceEpoch();
-    QDate fitFromDateX = fullFromDateX;
-    QDate fitToDateX = fullToDateX;
-    fitFromDoubleX = fullFromDoubleX;
-    fitToDoubleX = fullToDoubleX;
 
-    // empty DailyInfo section
-    emptyDailyInfoSection();
+    // Get chart raw data
+    QList<QPointF> timeData = scatterSeries->points();
+    QList<QPointF> shadowTimeData = shadowSeries->points();
 
-    // unselect any point selected
-    chart->graph()->setSelection(QCPDataSelection());        // make sure axis are visible
-
-    if ( chart->yAxis->visible() == false ){
-        chart->yAxis->setVisible(true);
-    }
-    if ( chart->xAxis->visible() == false ){
-        chart->xAxis->setVisible(true);
-    }
-
+    // Get current currency
     bool found;
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, scenario->getCountryCode(), found);
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale,
+        scenario->getCountryCode(), found);
     if(!found){
         return; // should never happen
     }
 
-    // re-configure baseline edit widget if a new scenario has been loaded or created (currency may have changed)
-    if( resetBaselineValue==true ){
-        updateBaselineWidgets(currInfo);
+    // remember current X range
+    QDateTime oldXmin = axisX->min();
+    QDateTime oldXmax = axisX->max();
+
+    // *** Rescale X axis if requested. Data can be empty. ***
+
+    QDateTime xFrom,xTo;    // required also for Y axis re-scaling
+    if ( xAxisRescaleMode.mode==X_RESCALE::X_RESCALE_NONE ){
+        // keep the current one
+        xFrom = oldXmin;
+        xTo = oldXmax;
+    } else if ( xAxisRescaleMode.mode==X_RESCALE::X_RESCALE_CUSTOM ){
+        // set according to maximum allowed by scenario
+        xFrom = xAxisRescaleMode.from;
+        xTo = xAxisRescaleMode.to;
+    } else if ( xAxisRescaleMode.mode==X_RESCALE::X_RESCALE_SCENARIO_MAX ){
+        // set according to maximum allowed by scenario
+        xFrom = fullFromDateX;
+        xTo = fullToDateX;
+    } else if ( xAxisRescaleMode.mode==X_RESCALE::X_RESCALE_DATA_MAX ){
+        // DATA MAX : set according to data content
+        if (timeData.size()==0) {
+            // no data : it is better to show the max extend of X axis
+            // so that it is obvious that there is no data
+            xFrom = fullFromDateX;
+            xTo = fullToDateX;
+        } else if (timeData.size()==1){
+            xFrom = QDateTime::fromMSecsSinceEpoch(timeData.first().x()).addDays(-1);
+            xTo = QDateTime::fromMSecsSinceEpoch(timeData.last().x()).addDays(1);
+        } else {
+            xFrom = QDateTime::fromMSecsSinceEpoch(timeData.first().x());
+            xTo = QDateTime::fromMSecsSinceEpoch(timeData.last().x());
+        }
+    } else {
+        // unkown...
+        throw std::invalid_argument("Invalid xAxisRescaleMode");
+    }
+    // Add margin around xMin/xMax if requested (in most most cases it is)
+    QDateTime displayXfrom = xFrom;
+    QDateTime displayXto = xTo;
+    if(addMarginAroundXaxis==true){
+        Util::calculateZoomXaxis(displayXfrom, displayXto,
+           GbpController::getInstance().getPercentageMainChartScaling()/100.0);
+    }
+    // Set Min/Max with rescaling factor
+    if(xAxisRescaleMode.mode != X_RESCALE::X_RESCALE_NONE){
+        axisX->setRange(displayXfrom, displayXto);
     }
 
-    // regenerate all the data from the Scenario (can be expensive)
+    // *** Always rescale Y axis. Find min/max of range [xMin,xMax] ***
+    // Find min/max for Y axis. If just 1 point, or all Y values are the same,
+    // spread the scale to 0.95 min to 1.05 max init Y min/max
+    double yFrom ;
+    double yTo ;
+    if (timeData.size()==0){
+        // no data
+        yFrom = 0;
+        yTo = 1;
+    } else {
+        bool result = Util::findMinMaxInYvalues(timeData, xFrom.toMSecsSinceEpoch(),
+                xTo.toMSecsSinceEpoch(), yFrom, yTo);
+        // if no data is in the interval [xFrom-xTo], set arbitrary limits
+        if(result==false){
+            yFrom = 0;
+            yTo = 1;
+        }
+    }
+    // Add margin around yMin/yMax
+    double displayYfrom = yFrom;
+    double displayYto = yTo;
+    Util::calculateZoomYaxis(displayYfrom, displayYto, GbpController::getInstance().getPercentageMainChartScaling()/100.0);
+    axisY->setRange(displayYfrom, displayYto);
+
+
+
+}
+
+
+// Regenerate the Scenario Flow Data (that is the chartRawData). Do not touch the chart,
+// series or axis.
+// Output Parameters:
+//   timeData : list of final amount per day.
+//   shadowTimeData : list of final amount per day, plus fake points to simulate steps in line curve
+void MainWindow::regenerateRawData(QList<QPointF>& timeData, QList<QPointF>& shadowTimeData){
+
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario();
+
+    // regenerate the flow data from the Scenario (can be long). Always reenerate for maximum
+    // duration
     uint saturationNo;
-    chartRawData = scenario->generateFinancialEvents(GbpController::getInstance().getToday(), locale, DateRange(fullFromDateX, fullToDateX),
-        (GbpController::getInstance().getUsePresentValue()==true)?(GbpController::getInstance().getPvDiscountRate()):(0),
+    QDate toLimit = GbpController::getInstance().getTomorrow().addYears(
+        scenario->getFeGenerationDuration()).addDays(-1);
+    chartRawData.clear();
+    chartRawData = scenario->generateFinancialEvents(GbpController::getInstance().getToday(),
+        locale, DateRange(GbpController::getInstance().getTomorrow(), toLimit),
+        (GbpController::getInstance().getUsePresentValue()==true)?
+        (GbpController::getInstance().getPvDiscountRate()):(0),
         GbpController::getInstance().getTomorrow(), saturationNo);
 
-    // init min/max for later stage
-    fullMinY = std::numeric_limits<double>::max();
-    fullMaxY = std::numeric_limits<double>::min();
-    if (chartRawData.size()==0){
-        // no data
-        fullMinY = 0;
-        fullMaxY = 1;
-    }
-
-    // remember current X range (for baseline value change)
-    QCPRange oldXrange = chart->xAxis->range();
-
-    // *** Completely rebuild chart data and find Y min/max at the same time ***
+    // Update chart raw data that will later be used to display the curves
     QList<QDate> keys = chartRawData.keys();
-    QVector<QCPGraphData> timeData(keys.size());
+    timeData.clear();
+    timeData.reserve(keys.size());
+    shadowTimeData.clear();
+    shadowTimeData.reserve(2*keys.size()); // max possible
     double cumulAmount = ui->baselineDoubleSpinBox->value(); // important !
     QDateTime dt;
     int i=0;
+    double dtMsec ;
+    QPointF pt;
     foreach(QDate date, keys){
         CombinedFeStreams::DailyInfo item = chartRawData.value(date);
         cumulAmount += item.totalDelta;
-        dt = Util::dateToDateTimeLocal(date, tz );
-        timeData[i].key = dt.toSecsSinceEpoch();
-        timeData[i].value = cumulAmount;
-        // min / max
-        if (cumulAmount > fullMaxY) {
-            fullMaxY = cumulAmount;
+        dtMsec = QDateTime(date, QTime(0,0,0)).toMSecsSinceEpoch();
+        // real data
+        pt = {dtMsec,cumulAmount};
+        timeData.append(pt);
+        // shadow data
+        if(i!=0){
+            // insert fake point. Since we cant insert 2 Y values
+            // for the same X value, use the trick to insert the fake one just 1 msec before
+            pt = {dtMsec-1,timeData.at(i-1).y()};
+            shadowTimeData.append(pt);
         }
-        if (cumulAmount < fullMinY) {
-            fullMinY = cumulAmount;
-        }
+        pt = {dtMsec,cumulAmount};
+        shadowTimeData.append(pt);
         // next point
         i++;
     }
+}
 
-    // if min == max, spread the scale to 0.95 min to 1.05 max
-    if (fullMinY==fullMaxY) {
-        double temp = fullMinY;
-        fullMinY = 0.95*temp;
-        fullMaxY = 1.05*temp;
-    }
 
-    // set "fit" limits :
-    if (chartRawData.size()==0){
-        // nothing to fit, we keep the default
 
-    } else if(chartRawData.size()==1){
-        // we set X axis limit to +/- 1 month around the point
-        QDate date = chartRawData.keys().first();
-        fitFromDateX = date.addMonths(-1);
-        fitToDateX = date.addMonths(1);
-        fitFromDoubleX = Util::dateToDateTimeLocal(fitFromDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();
-        fitToDoubleX = Util::dateToDateTimeLocal(fitToDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();;
-    } else{
-        fitFromDateX = chartRawData.keys().first();
-        fitToDateX = chartRawData.keys().last();
-        fitFromDoubleX = Util::dateToDateTimeLocal(fitFromDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();
-        fitToDoubleX = Util::dateToDateTimeLocal(fitToDateX, QTimeZone::systemTimeZone()).toSecsSinceEpoch();;
-    }
+// Rebuild chart's series and set characteristics (like Colors).
+// data and shadowData are coming from chartRawData.
+// Does not update the Chart (rescaling)
+// Input Parameters:
+//   timeData : list of final amount per day.
+//   shadowTimeData : list of final amount per day, plus fake points to simulate steps in line curve
+void MainWindow::replaceChartSeries(QList<QPointF> data, QList<QPointF> shadowData)
+{
+    // first destroy the current series and all the data they have
+    chart->removeAllSeries();
 
-    // update chart
-    setChartTitle(scenario->getName());
-    chart->yAxis->setNumberPrecision(currInfo.noOfDecimal); // currency may have changed
-    chart->graph()->data()->set(timeData, true);
+    // rebuild
+    scatterSeries = new QScatterSeries(); // only true data, for markers only, superimposed
+    shadowSeries = new QLineSeries(); // to simulate step curve
 
-    if ( rescaleXaxis==true ){
-        chart->xAxis->setRange(fullFromDoubleX, fullToDoubleX); // do not touche the X axis if only the baseline value changed
-        chart->yAxis->setRange(fullMinY, fullMaxY);
-        chart->xAxis->scaleRange(chartScalingFactor);
+    // Set scatter chart characteristics
+    if (ui->showPointsCheckBox->isChecked()==true) {
+        scatterSeries->show();
     } else {
-        chart->xAxis->setRange(oldXrange);
-        chart->graph(0)->rescaleValueAxis(false,true);
+        scatterSeries->hide();
     }
 
-    chart->yAxis->scaleRange(chartScalingFactor);
+    // set colors and characteristics for the series
+    setSeriesCharacteristics();
 
-    chart->replot();
+    // intercept point selection
+    connect(scatterSeries, SIGNAL(clicked(QPointF)), this, SLOT(mypoint_clicked(QPointF)));
 
+    // fill series with data
+    scatterSeries->append(data); // take ownership
+    shadowSeries->append(shadowData); // take ownership
 
+    // attach to chart
+    chart->addSeries(shadowSeries);  // chart takes ownership
+    chart->addSeries(scatterSeries); // chart takes ownership
+
+    // re-attach axis
+    shadowSeries->attachAxis(axisX);
+    scatterSeries->attachAxis(axisX);
+    shadowSeries->attachAxis(axisY);
+    scatterSeries->attachAxis(axisY);
+
+    // no point have been selected yet
+    indexLastPointSelected = -1;
 }
 
 
@@ -996,23 +1129,44 @@ void MainWindow::slotSelectCountryCompleted()
 }
 
 
-void MainWindow::slotEditScenarioResult(bool currentlyEditingNewScenario, bool rescaleXaxis)
+// regenerateData at true means all FE list must be recalculated from scratch.
+void MainWindow::slotEditScenarioResult(bool currentlyEditingNewScenario, bool regenerateData)
 {
     if (currentlyEditingNewScenario){
         // this is a brand new scenario, not saved yet on disk
         GbpController::getInstance().setFullFileName(""); // indicate scenario file is not saved
-
-        // finally , update the chart
-        updateScenarioDataDisplayed(true,true);
+        // All data have to be generated
+        QList<QPointF> timeData;        // raw data for scatterSeries (real data)
+        QList<QPointF> shadowTimeData;
+        regenerateRawData(timeData, shadowTimeData);
+        replaceChartSeries(timeData, shadowTimeData);
+        rescaleChart({.mode=X_RESCALE::X_RESCALE_DATA_MAX}, true);
+        emptyDailyInfoSection();
+        resetBaselineWidgets();
+        changeYaxisLabelFormat();
+        // update general info section
+        fillGeneralInfoSection();
+        // notify user
+        msgStatusbar(tr("A new scenario has been created"));
     } else{
-        // this is an existing scenario , that has been modified (potentially)
-        if (rescaleXaxis==true) {
-            // need to rescale completely the X axis
-            updateScenarioDataDisplayed(true,false);
-        } else {
-            updateScenarioDataDisplayed(false,false);
+        // this is an existing scenario, that has been modified (potentially).
+        // Do not touch X axis if no regeneration has to be performed
+        if (regenerateData==true) {
+            QList<QPointF> timeData;        // raw data for scatterSeries (real data)
+            QList<QPointF> shadowTimeData;
+            regenerateRawData(timeData, shadowTimeData);
+            replaceChartSeries(timeData, shadowTimeData);
+            rescaleChart({.mode=X_RESCALE::X_RESCALE_DATA_MAX}, true);
+            emptyDailyInfoSection();
+            // update general info section
+            fillGeneralInfoSection();
         }
+        // notify user
+        msgStatusbar(tr("Current scenario has been modified"));
     }
+    // Reset the chart title, because we cannot know if it has changed
+    chart->setTitle(GbpController::getInstance().getScenario()->getName());
+
 }
 
 
@@ -1036,57 +1190,71 @@ void MainWindow::slotOptionsResult(OptionsDialog::OptionsChangesImpact impact)
 {
     // update main chart scaling factor in case it has been changed
     chartScalingFactor = 1 + (GbpController::getInstance().getPercentageMainChartScaling())/100.0;
-    // mandatory actions
-    setChartColors();
-    analysisDlg->themeChanged();
-    // Act on impact for main chart
-    switch(impact.chart){
-    case OptionsDialog::OPTIONS_IMPACT_CHART::CHART_FULL_RECALCULATION_REQUIRED:
-            updateScenarioDataDisplayed(true, false);
-            break;
-        case OptionsDialog::OPTIONS_IMPACT_CHART::CHART_RESCALE_AND_REPLOT:
-            // order is important !
-            chart->graph(0)->rescaleAxes(false);
-            chart->xAxis->scaleRange(chartScalingFactor);
-            chart->yAxis->scaleRange(chartScalingFactor);
-            chart->replot();
-            break;
-        case OptionsDialog::OPTIONS_IMPACT_CHART::CHART_REPLOT:
-            chart->replot();
-            break;
-        default:
-            break;
+
+    // Act on impact for main Cash Balance chart
+    if(impact.data == OptionsDialog::OPTIONS_IMPACT_DATA::DATA_RECALCULATE){
+        // the raw data must be fully recalculated
+        QList<QPointF> timeData;
+        QList<QPointF> shadowTimeData;
+        regenerateRawData(timeData, shadowTimeData);
+        replaceChartSeries(timeData, shadowTimeData);
+        rescaleChart({.mode=X_RESCALE::X_RESCALE_NONE}, true);
+        emptyDailyInfoSection();
+    } else if(impact.chart_scaling ==
+        OptionsDialog::OPTIONS_IMPACT_CHART_SCALING::CHART_SCALING_RESCALE){
+        // Because it is difficult to add the overscaling factor in all circumstances, we cut
+        // short and fully redisplay the chart with "fit scaling"
+         rescaleChart({.mode=X_RESCALE::X_RESCALE_DATA_MAX}, true);
     }
+
+    // Act for chart theme changes
+    if (impact.charts_theme==OptionsDialog::OPTIONS_IMPACT_CHARTS_THEME::CHARTS_THEME_REFRESH) {
+        // re-theme all charts
+        themeChanged();
+        analysisDlg->themeChanged();
+    }
+
     // Act for decoration color changes
-    if (impact.decorationColorStreamDef==OptionsDialog::OPTIONS_IMPACT_DECORATION_COLOR::DECO_REFRESH){
+    if (impact.decorationColorStreamDef ==
+        OptionsDialog::OPTIONS_IMPACT_DECORATION_COLOR::DECO_REFRESH){
         if ( GbpController::getInstance().isScenarioLoaded()==true){
-            editScenarioDlg->allowDecorationColor(GbpController::getInstance().getAllowDecorationColor());  // update scenation StreamDef list now
-            selectionChangedByUser();   // update the daily info now
+            // update scenario StreamDef list now
+            editScenarioDlg->allowDecorationColor(
+                GbpController::getInstance().getAllowDecorationColor());
+            // redisplay Daily Info info panel to update the name colors. To do so, simulate
+            // a click on the already selected point.
+            QList<int> selPoints = scatterSeries->selectedPoints();
+            if (selPoints.size()==1){
+                QList<QPointF> thePoints = scatterSeries->points();
+                QPointF pt = thePoints.at(selPoints.at(0));
+                mypoint_clicked(pt);
+            }
         }
     }
 
+    // Act for mouse wheel zooming behavior change
+    if (impact.mouseWheelZoom ==
+        OptionsDialog::OPTIONS_IMPACT_WHEEL_ZOOM::WHEEL_ZOOM_REFRESH){
+        chartView->setWheelRotatedAwayZoomIn(
+            GbpController::getInstance().getWheelRotatedAwayZoomIn());
+    }
+
+    GbpController::getInstance().saveSettings();
+    msgStatusbar(tr("Options changes have been successfully saved"));
 }
 
 
 void MainWindow::slotOptionsCompleted()
 {
-
 }
 
 
 void MainWindow::slotDateIntervalResult(QDate from, QDate to)
 {
-    QDateTime fromDateTime= Util::dateToDateTimeLocal(from, QTimeZone::systemTimeZone());
-    QDateTime toDateTime= Util::dateToDateTimeLocal(to, QTimeZone::systemTimeZone());
-    double fromDouble = fromDateTime.toSecsSinceEpoch();
-    double toDouble = toDateTime.toSecsSinceEpoch();
-    chart->xAxis->setRange(fromDouble, toDouble);
-    chart->graph(0)->rescaleValueAxis(false,true);
-    // give some space around min/max
-    chart->xAxis->scaleRange(chartScalingFactor);
-    chart->yAxis->scaleRange(chartScalingFactor);
-
-    chart->replot();
+    QDateTime fromDateTime= QDateTime(from, QTime(0,0,0));
+    QDateTime toDateTime= QDateTime(to, QTime(0,0,0));
+    // rescale Yaxis
+    rescaleChart({.mode=X_RESCALE::X_RESCALE_CUSTOM, .from=fromDateTime, .to=toDateTime}, true);
 }
 
 
@@ -1102,46 +1270,62 @@ void MainWindow::slotScenarioPropertiesCompleted()
 }
 
 
-// a point has been selected or unselected
-void MainWindow::selectionChangedByUser()
+// A point has been selected or unselected. This is SLOW... Optimisation required.
+void MainWindow::mypoint_clicked(QPointF pt)
 {
-    QCPDataSelection selection = chart->graph()->selection();
-    if (selection.dataPointCount()==1){
-        QCPDataRange range = selection.dataRange(0);
-        if(range.size()==1){
-            QCPGraphDataContainer::const_iterator begin = chart->graph()->data()->at(range.begin());
-            double d = begin->mainKey();
-            double v = begin->mainValue();
-            // convert to date and get the corresponding DI
-            QDateTime dt = QDateTime::fromSecsSinceEpoch(d);
-            QDate date = dt.date();
-            if (chartRawData.contains(date)) {
-                CombinedFeStreams::DailyInfo di = chartRawData.value(date); // should always be there
-                fillDailyInfoSection(date, v, di );
-            } else {
-                emptyDailyInfoSection();
-            }
-        } else {
-            emptyDailyInfoSection();
-        }
-    } else{
+    // find the index of the point in the series
+    QList<QPointF> ptList = scatterSeries->points();
+    int index = ptList.indexOf(pt);
+    if(index==-1){
+        // should not happen
+        return;
+    }
+
+    QDateTime dt = QDateTime::fromMSecsSinceEpoch(pt.x());
+    if (dt.isValid()==false){
+        return;
+    }
+
+    // set selected points to normal color, then unselect
+    //
+    //if (scatterSeries->isPointSelected(index)==true) {
+    if (indexLastPointSelected==index) {
+        // unselect the point
+        scatterSeries->setPointSelected(indexLastPointSelected,false);
+        indexLastPointSelected = -1;
         emptyDailyInfoSection();
+    } else {
+        // those 2 are very slow with high number of points. Need optimization...
+        // Tried to block signal : it does the job but then points do change color when selected...
+        //scatterSeries->deselectAllPoints();
+        if(indexLastPointSelected != -1){
+            scatterSeries->setPointSelected(indexLastPointSelected,false);
+        }
+        scatterSeries->setPointSelected(index,true);
+        // convert to date and get the corresponding DI
+        QDate date = dt.date();
+        // should always be there, but if not, for any reason, do nothing
+        CombinedFeStreams::DailyInfo defaultDi;
+        defaultDi.totalDelta = DBL_MAX; // this is an illegal value
+        CombinedFeStreams::DailyInfo di = chartRawData.value(date, defaultDi);
+        if(di.totalDelta==DBL_MAX){
+            return; // point not found, this is not normal
+        }
+        fillDailyInfoSection(date, pt.y(), di );
+        indexLastPointSelected = index;
     }
 }
 
 
-// X axis scale has been changed
-void MainWindow::rangeChangedX(const QCPRange &newRange)
+void MainWindow::handleXaxisRangeChange(QDateTime dtFrom, QDateTime dtTo)
 {
-    QDateTime dtFrom = QDateTime::fromSecsSinceEpoch(newRange.lower);
-    QDateTime dtTo = QDateTime::fromSecsSinceEpoch(newRange.upper);
     QDate from = dtFrom.date();
     QDate to = dtTo.date();
-    Util::DateDifference delta =  Util::dateDifference(from, to);
+    Util::DateDifference delta = Util::dateDifference(from, to);
 
-    QString s = locale.toString(from,"yyyy-MMM-dd");
+    QString s = locale.toString(from, locale.dateFormat(QLocale::ShortFormat));
     ui->dateRangeFromLabel->setText(s);
-    s = locale.toString(to,"yyyy-MMM-dd");
+    s = locale.toString(to, locale.dateFormat(QLocale::ShortFormat));
     ui->dateRangeToLabel->setText(s);
 
     QString deltaStringYear = tr("y",this->metaObject()->className());
@@ -1149,12 +1333,10 @@ void MainWindow::rangeChangedX(const QCPRange &newRange)
     QString deltaStringDay= tr("d",this->metaObject()->className());
     QString deltaString = QString("%1%2 %3%4 %5%6").arg(delta.years).arg(deltaStringYear).arg(delta.months).arg(deltaStringMonth).arg(delta.days).arg(deltaStringDay);
     ui->deltaRangeXLabel->setText(deltaString);
-
 }
 
 
-// Y axis scale has been changed
-void MainWindow::rangeChangedY(const QCPRange &newRange)
+void MainWindow::handleYaxisRangeChange(qreal min, qreal max)
 {
 
 }
@@ -1254,109 +1436,94 @@ void MainWindow::on_actionOptions_triggered()
 
 void MainWindow::on_toolButton_Fit_clicked()
 {
-    chart->xAxis->setRange(fitFromDoubleX, fitToDoubleX);
-    chart->yAxis->setRange(fullMinY, fullMaxY);
-
-    // give some space around min/max
-    chart->xAxis->scaleRange(chartScalingFactor);
-    chart->yAxis->scaleRange(chartScalingFactor);
-
-    chart->replot();
+    rescaleChart({ .mode=X_RESCALE::X_RESCALE_DATA_MAX}, true);
 }
 
 
 void MainWindow::on_toolButton_Max_clicked()
 {
-    chart->xAxis->setRange(fullFromDoubleX, fullToDoubleX);
-    chart->yAxis->setRange(fullMinY, fullMaxY);
-    // give some space around min/max
-    chart->xAxis->scaleRange(chartScalingFactor);
-    chart->yAxis->scaleRange(chartScalingFactor);
-
-    chart->replot();
-}
+    rescaleChart({.mode=X_RESCALE::X_RESCALE_SCENARIO_MAX}, true);}
 
 
 void MainWindow::on_toolButton_1M_clicked()
 {
-    rescaleYaxis(1);
+    rescaleXaxis(1);
 }
 
 
 void MainWindow::on_toolButton_3M_clicked()
 {
-    rescaleYaxis(3);
+    rescaleXaxis(3);
 }
 
 
 void MainWindow::on_toolButton_6M_clicked()
 {
-    rescaleYaxis(6);
+    rescaleXaxis(6);
 }
 
 
 void MainWindow::on_toolButton_1Y_clicked()
 {
-    rescaleYaxis(12);
+    rescaleXaxis(12);
 }
 
 
 void MainWindow::on_toolButton_2Y_clicked()
 {
-    rescaleYaxis(2*12);
+    rescaleXaxis(2*12);
 }
 
 
 void MainWindow::on_toolButton_3Y_clicked()
 {
-    rescaleYaxis(3*12);
+    rescaleXaxis(3*12);
 }
 
 
 void MainWindow::on_toolButton_5Y_clicked()
 {
-    rescaleYaxis(5*12);
+    rescaleXaxis(5*12);
 }
 
 
 void MainWindow::on_toolButton_10Y_clicked()
 {
-    rescaleYaxis(10*12);
+    rescaleXaxis(10*12);
 }
 
 
 void MainWindow::on_toolButton_15Y_clicked()
 {
-    rescaleYaxis(15*12);
+    rescaleXaxis(15*12);
 }
 
 
 void MainWindow::on_toolButton_20Y_clicked()
 {
-    rescaleYaxis(20*12);
+    rescaleXaxis(20*12);
 }
 
 
 void MainWindow::on_toolButton_25Y_clicked()
 {
-    rescaleYaxis(25*12);
+    rescaleXaxis(25*12);
 }
 
 
 void MainWindow::on_toolButton_50Y_clicked()
 {
-    rescaleYaxis(50*12);
+    rescaleXaxis(50*12);
 }
 
 
 void MainWindow::on_showPointsCheckBox_stateChanged(int arg1)
 {
     if (ui->showPointsCheckBox->isChecked()==true) {
-        chart->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 10));
+        scatterSeries->show();
     } else {
-        chart->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssNone, 10));
+        scatterSeries->hide();
     }
-    chart->replot();
 }
 
 
@@ -1476,14 +1643,25 @@ void MainWindow::on_exportTextFilePushButton_clicked()
 
 void MainWindow::on_baselineDoubleSpinBox_editingFinished()
 {
-    updateScenarioDataDisplayed(false,false);
+    QList<QPointF> timeData;
+    QList<QPointF> shadowTimeData;
+    regenerateRawData(timeData, shadowTimeData);
+    replaceChartSeries(timeData, shadowTimeData);
+    rescaleChart({.mode=X_RESCALE::X_RESCALE_NONE}, true);
     ui->baselineDoubleSpinBox->clearFocus();
 }
 
 
 void MainWindow::on_customToolButton_clicked()
 {
-    emit signalDateIntervalPrepareContent();
+    if (!(GbpController::getInstance().isScenarioLoaded())){
+        return;
+    }
+    // overscaling will be apply again...Too complicated to remove it (0,1,2,N points)
+    QDate from = axisX->min().date();
+    QDate to = axisX->max().date();
+
+    emit signalDateIntervalPrepareContent(from,to);
     dateIntervalDlg->show();
 }
 
@@ -1630,3 +1808,29 @@ void MainWindow::on_actionChange_Log_triggered()
 
 }
 
+void MainWindow::changeYaxisLabelFormat(){
+    if (!(GbpController::getInstance().isScenarioLoaded())){
+        return;
+    }
+    QString countryCode = GbpController::getInstance().getScenario()->getCountryCode();
+    bool found;
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, countryCode,
+                                                                           found);
+    if(!found){
+        // should never happen
+        return;
+    }
+    QString yValFormat = QString("\%.%1f").arg(currInfo.noOfDecimal);
+    axisY->setLabelFormat(yValFormat);
+}
+
+
+uint MainWindow::calculateTotalNoOfEvents()
+{
+    uint noEvents = 0;
+    foreach(CombinedFeStreams::DailyInfo di, chartRawData){
+        noEvents += di.incomesList.size();
+        noEvents += di.expensesList.size();
+    }
+    return noEvents;
+}

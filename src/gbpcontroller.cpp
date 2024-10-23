@@ -32,6 +32,7 @@ GbpController::GbpController()
     lastDir = QDir::homePath();
     fullFileName = "";
     recentFilenames.clear();
+    loggingEnabled = true;
     logLevel = LogLevel::Minimal;
     useDefaultSystemFont = true;
     customApplicationFont = "";
@@ -42,6 +43,10 @@ GbpController::GbpController()
     usePresentValue = false;
     pvDiscountRate = 0; // disable conversion to present values
     noSettingsFileAtStartup = false;
+    isDarkModeSet = false;
+    exportTextAmountLocalized = false;
+    chartPointSize = 10;
+    wheelRotatedAwayZoomIn = false;
 
     QStringList argList = QCoreApplication::arguments();
 
@@ -142,6 +147,7 @@ GbpController::GbpController()
 }
 
 
+
 GbpController::~GbpController()
 {
     delete settingsPtr;
@@ -188,41 +194,104 @@ void GbpController::loadSettings()
         recentFilenames = {};
     }
 
-    // dark mode for chart
+    // Chart Point Size in pixels
+    if (settingsPtr->contains("chart_point_size")){
+        bool ok;
+        v = settingsPtr->value("chart_point_size");
+        int anInt = v.toInt(&ok);
+        if ( (!ok) || (anInt<5) || (anInt>25) )  {
+            // settings is invalid
+            chartPointSize = 10;
+        } else {
+            chartPointSize = anInt;
+        }
+    } else{
+        chartPointSize = 10; // default is 10 pixels
+    }
+
+    // dark mode for all charts : enabled or not
     if (settingsPtr->contains("chart_dark_mode")){
         v = settingsPtr->value("chart_dark_mode");
         bool ok = Util::isValidBoolString(v.toString());
         if(ok){
-            chartDarkMode = v.toBool();
+            isDarkModeSet = v.toBool();
         } else {
-            chartDarkMode = false;
+            isDarkModeSet = false;
         }
     } else{
-        chartDarkMode = false;;
+        isDarkModeSet = false;;
     }
 
     // curve color for dark mode for chart
     if (settingsPtr->contains("chart_dark_mode_curve_color")){
         v = settingsPtr->value("chart_dark_mode_curve_color");
         QString s = v.toString();
-        curveDarkModeColor = QColor(s);
-        if (curveDarkModeColor.isValid()==false) {
-            curveDarkModeColor = QColor(180, 0, 0);
+        darkModeCurveColor = QColor(s);
+        if (darkModeCurveColor.isValid()==false) {
+            darkModeCurveColor = QColor(192, 0, 0);
         }
     } else{
-        curveDarkModeColor = QColor(180, 0, 0);
+        darkModeCurveColor = QColor(192, 0, 0);
     }
 
     // curve color for light mode for chart
     if (settingsPtr->contains("chart_light_mode_curve_color")){
         v = settingsPtr->value("chart_light_mode_curve_color");
         QString s = v.toString();
-        curveLightModeColor = QColor(s);
-        if (curveLightModeColor.isValid()==false) {
-            curveLightModeColor = QColor(0, 0, 180);
+        lightModeCurveColor = QColor(s);
+        if (lightModeCurveColor.isValid()==false) {
+            lightModeCurveColor = QColor(0, 0, 192);
         }
     } else{
-        curveLightModeColor = QColor(0, 0, 180);
+        lightModeCurveColor = QColor(0, 0, 192);
+    }
+
+    // point color for dark mode for chart
+    if (settingsPtr->contains("chart_dark_mode_point_color")){
+        v = settingsPtr->value("chart_dark_mode_point_color");
+        QString s = v.toString();
+        darkModePointColor= QColor(s);
+        if (darkModePointColor.isValid()==false) {
+            darkModePointColor = QColor(255, 0, 0);
+        }
+    } else{
+        darkModePointColor = QColor(255,0, 0);
+    }
+
+    // point color for light mode for chart
+    if (settingsPtr->contains("chart_light_mode_point_color")){
+        v = settingsPtr->value("chart_light_mode_point_color");
+        QString s = v.toString();
+        lightModePointColor = QColor(s);
+        if (lightModePointColor.isValid()==false) {
+            lightModePointColor = QColor(0, 0, 255);
+        }
+    } else{
+        lightModePointColor = QColor(0, 0, 255);
+    }
+
+    // selected point color for dark mode for chart
+    if (settingsPtr->contains("chart_dark_mode_selected_point_color")){
+        v = settingsPtr->value("chart_dark_mode_selected_point_color");
+        QString s = v.toString();
+        darkModeSelectedPointColor = QColor(s);
+        if (darkModeSelectedPointColor.isValid()==false) {
+            darkModeSelectedPointColor = QColor(0, 255, 0);
+        }
+    } else{
+        darkModeSelectedPointColor = QColor(0,255, 0);
+    }
+
+    // selected point color for light mode for chart
+    if (settingsPtr->contains("chart_light_mode_selected_point_color")){
+        v = settingsPtr->value("chart_light_mode_selected_point_color");
+        QString s = v.toString();
+        lightModeSelectedPointColor = QColor(s);
+        if (lightModeSelectedPointColor.isValid()==false) {
+            lightModeSelectedPointColor = QColor(0, 192, 0);
+        }
+    } else{
+        lightModeSelectedPointColor = QColor(0, 192, 0);
     }
 
     // amount in exported text are localized or not (in which case format is : no thousand
@@ -261,14 +330,14 @@ void GbpController::loadSettings()
         bool ok;
         v = settingsPtr->value("main_chart_scaling_percentage");
         int anInt = v.toInt(&ok);
-        if ( (!ok) || (percentageMainChartScaling<0) || (percentageMainChartScaling>5) )  {
+        if ( (!ok) || (anInt<0) || (anInt>10) )  {
             // settings is invalid
-            percentageMainChartScaling = 2;
+            percentageMainChartScaling = 5;
         } else {
             percentageMainChartScaling = anInt;
         }
     } else{
-        percentageMainChartScaling = 2; // default is 102%
+        percentageMainChartScaling = 5; // default is 105%
     }
 
     // use default system font for the application font
@@ -375,6 +444,20 @@ void GbpController::loadSettings()
         pvDiscountRate = 0;
     }
 
+    // mouse wheel moving away from user : effect on zoom
+    // allow the use of decoration color for incomes/expenses
+    if (settingsPtr->contains("wheel_rotated_away_zoom_in")){
+        v = settingsPtr->value("wheel_rotated_away_zoom_in");
+        bool ok = Util::isValidBoolString(v.toString());
+        if (ok){
+            wheelRotatedAwayZoomIn = v.toBool();
+        } else {
+            wheelRotatedAwayZoomIn = false;    // default if data is invalid
+        }
+    } else{
+        wheelRotatedAwayZoomIn = false;
+    }
+
      // loaded is completed and successful
     settingsLoaded = true;
 
@@ -384,12 +467,24 @@ void GbpController::loadSettings()
     GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
         QString("    recent_files = %1").arg(recentFilenames.join(",")));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
-        QString("    chart_dark_mode = %1").arg(chartDarkMode));
+       QString("    chart_point_size = %1").arg(chartPointSize));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
-        QString("    chart_dark_mode_curve_color = %1").arg(curveDarkModeColor.name(
+        QString("    chart_dark_mode = %1").arg(isDarkModeSet));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    chart_dark_mode_curve_color = %1").arg(darkModeCurveColor.name(
         QColor::HexRgb)));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
-        QString("    chart_light_mode_curve_color = %1").arg(curveLightModeColor.name(
+        QString("    chart_light_mode_curve_color = %1").arg(lightModeCurveColor.name(
+        QColor::HexRgb)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    point_color_dark_mode = %1").arg(darkModePointColor.name(QColor::HexRgb)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    point_color_light_mode = %1").arg(lightModePointColor.name(QColor::HexRgb)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    selected_point_dark_mode = %1").arg(darkModeSelectedPointColor.name(
+        QColor::HexRgb)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    selected_point_light_mode = %1").arg(lightModeSelectedPointColor.name(
         QColor::HexRgb)));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
         QString("    export_text_amount_localized = %1").arg(exportTextAmountLocalized));
@@ -412,15 +507,27 @@ void GbpController::loadSettings()
         QString("    use_present_value = %1").arg(usePresentValue));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
         QString("    pv_discount_rate = %1").arg(pvDiscountRate));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    wheel_rotated_away_zoom_in = %1").arg(wheelRotatedAwayZoomIn));
+
 }
 
 
 void GbpController::saveSettings()
 {
     settingsPtr->setValue("recent_files",recentFilenames);
-    settingsPtr->setValue("chart_dark_mode",chartDarkMode);
-    settingsPtr->setValue("chart_dark_mode_curve_color",curveDarkModeColor.name(QColor::HexRgb));
-    settingsPtr->setValue("chart_light_mode_curve_color",curveLightModeColor.name(QColor::HexRgb));
+    settingsPtr->setValue("chart_point_size",chartPointSize);
+    settingsPtr->setValue("chart_dark_mode",isDarkModeSet);
+    settingsPtr->setValue("chart_dark_mode_curve_color",darkModeCurveColor.name(QColor::HexRgb));
+    settingsPtr->setValue("chart_light_mode_curve_color",lightModeCurveColor.name(QColor::HexRgb));
+    settingsPtr->setValue("chart_light_mode_point_color",
+        lightModePointColor.name(QColor::HexRgb));
+    settingsPtr->setValue("chart_dark_mode_point_color",
+        darkModePointColor.name(QColor::HexRgb));
+    settingsPtr->setValue("chart_light_mode_selected_point_color",
+        lightModeSelectedPointColor.name(QColor::HexRgb));
+    settingsPtr->setValue("chart_dark_mode_selected_point_color",
+        darkModeSelectedPointColor.name(QColor::HexRgb));
     settingsPtr->setValue("export_text_amount_localized",exportTextAmountLocalized);
     settingsPtr->setValue("last_dir",lastDir);
     settingsPtr->setValue("main_chart_scaling_percentage",percentageMainChartScaling);
@@ -431,6 +538,7 @@ void GbpController::saveSettings()
     settingsPtr->setValue("allow_decoration_color",allowDecorationColor);
     settingsPtr->setValue("use_present_value",usePresentValue);
     settingsPtr->setValue("pv_discount_rate",pvDiscountRate);
+    settingsPtr->setValue("wheel_rotated_away_zoom_in",wheelRotatedAwayZoomIn);
 }
 
 
@@ -507,49 +615,7 @@ void GbpController::cleanUpLogs()
 }
 
 
-QDate GbpController::getToday() const
-{
-    return today;
-}
-
-
-QDate GbpController::getTomorrow() const
-{
-    return tomorrow;
-}
-
-
-// Getters and Setters
-
-QSharedPointer<Scenario> GbpController::getScenario() const
-{
-    return scenario;
-}
-
-void GbpController::setScenario(QSharedPointer<Scenario> newScenario)
-{
-    scenario = newScenario;
-}
-
-QString GbpController::getFullFileName() const
-{
-    return fullFileName;
-}
-
-void GbpController::setFullFileName(const QString &newFullFileName)
-{
-    fullFileName = newFullFileName;
-}
-
-QString GbpController::getLastDir() const
-{
-    return lastDir;
-}
-
-void GbpController::setLastDir(const QString &newLastDir)
-{
-    lastDir = newLastDir;
-}
+// *** Getters and Setters ***
 
 QStringList GbpController::getRecentFilenames() const
 {
@@ -561,36 +627,75 @@ void GbpController::setRecentFilenames(const QStringList &newRecentFilenames)
     recentFilenames = newRecentFilenames;
 }
 
-bool GbpController::getChartDarkMode() const
+bool GbpController::getIsDarkModeSet() const
 {
-    return chartDarkMode;
+    return isDarkModeSet;
 }
 
-void GbpController::setChartDarkMode(bool newChartDarkMode)
+void GbpController::setIsDarkModeSet(bool newIsDarkModeSet)
 {
-    chartDarkMode = newChartDarkMode;
+    isDarkModeSet = newIsDarkModeSet;
 }
 
-QColor GbpController::getCurveDarkModeColor() const
+QColor GbpController::getDarkModeCurveColor() const
 {
-    return curveDarkModeColor;
+    return darkModeCurveColor;
 }
 
-void GbpController::setCurveDarkModeColor(const QColor &newCurveDarkModeColor)
+void GbpController::setDarkModeCurveColor(const QColor &newDarkModeCurveColor)
 {
-    curveDarkModeColor = newCurveDarkModeColor;
+    darkModeCurveColor = newDarkModeCurveColor;
 }
 
-QColor GbpController::getCurveLightModeColor() const
+QColor GbpController::getLightModeCurveColor() const
 {
-    return curveLightModeColor;
+    return lightModeCurveColor;
 }
 
-void GbpController::setCurveLightModeColor(const QColor &newCurveLightModeColor)
+void GbpController::setLightModeCurveColor(const QColor &newLightModeCurveColor)
 {
-    curveLightModeColor = newCurveLightModeColor;
+    lightModeCurveColor = newLightModeCurveColor;
 }
 
+QColor GbpController::getDarkModePointColor() const
+{
+    return darkModePointColor;
+}
+
+void GbpController::setDarkModePointColor(const QColor &newDarkModePointColor)
+{
+    darkModePointColor = newDarkModePointColor;
+}
+
+QColor GbpController::getLightModePointColor() const
+{
+    return lightModePointColor;
+}
+
+void GbpController::setLightModePointColor(const QColor &newLightModePointColor)
+{
+    lightModePointColor = newLightModePointColor;
+}
+
+QColor GbpController::getDarkModeSelectedPointColor() const
+{
+    return darkModeSelectedPointColor;
+}
+
+void GbpController::setDarkModeSelectedPointColor(const QColor &newDarkModeSelectedPointColor)
+{
+    darkModeSelectedPointColor = newDarkModeSelectedPointColor;
+}
+
+QColor GbpController::getLightModeSelectedPointColor() const
+{
+    return lightModeSelectedPointColor;
+}
+
+void GbpController::setLightModeSelectedPointColor(const QColor &newLightModeSelectedPointColor)
+{
+    lightModeSelectedPointColor = newLightModeSelectedPointColor;
+}
 
 bool GbpController::getExportTextAmountLocalized() const
 {
@@ -600,6 +705,16 @@ bool GbpController::getExportTextAmountLocalized() const
 void GbpController::setExportTextAmountLocalized(bool newExportTextAmountLocalized)
 {
     exportTextAmountLocalized = newExportTextAmountLocalized;
+}
+
+QString GbpController::getLastDir() const
+{
+    return lastDir;
+}
+
+void GbpController::setLastDir(const QString &newLastDir)
+{
+    lastDir = newLastDir;
 }
 
 uint GbpController::getPercentageMainChartScaling() const
@@ -630,11 +745,6 @@ QString GbpController::getCustomApplicationFont() const
 void GbpController::setCustomApplicationFont(const QString &newCustomApplicationFont)
 {
     customApplicationFont = newCustomApplicationFont;
-}
-
-QString GbpController::getInitialSystemApplicationFont() const
-{
-    return initialSystemApplicationFont;
 }
 
 bool GbpController::getTodayUseSystemDate() const
@@ -687,9 +797,44 @@ void GbpController::setPvDiscountRate(double newPvDiscountRate)
     pvDiscountRate = newPvDiscountRate;
 }
 
-QString GbpController::getSettingsFullFileName() const
+QString GbpController::getFullFileName() const
 {
-    return settingsFullFileName;
+    return fullFileName;
+}
+
+void GbpController::setFullFileName(const QString &newFullFileName)
+{
+    fullFileName = newFullFileName;
+}
+
+QSharedPointer<Scenario> GbpController::getScenario() const
+{
+    return scenario;
+}
+
+void GbpController::setScenario(QSharedPointer<Scenario> newScenario)
+{
+    scenario = newScenario;
+}
+
+
+
+
+// *** Getters ***
+
+bool GbpController::getNoSettingsFileAtStartup() const
+{
+    return noSettingsFileAtStartup;
+}
+
+QDate GbpController::getToday() const
+{
+    return today;
+}
+
+QDate GbpController::getTomorrow() const
+{
+    return tomorrow;
 }
 
 QString GbpController::getLogFullFileName() const
@@ -697,13 +842,37 @@ QString GbpController::getLogFullFileName() const
     return logFullFileName;
 }
 
-bool GbpController::getNoSettingsFileAtStartup() const
+QString GbpController::getInitialSystemApplicationFont() const
 {
-    return noSettingsFileAtStartup;
+    return initialSystemApplicationFont;
 }
 
+QString GbpController::getSettingsFullFileName() const
+{
+    return settingsFullFileName;
+}
 
+GbpController::LogLevel GbpController::getLogLevel() const
+{
+    return logLevel;
+}
 
+bool GbpController::getWheelRotatedAwayZoomIn() const
+{
+    return wheelRotatedAwayZoomIn;
+}
 
+void GbpController::setWheelRotatedAwayZoomIn(bool newWheelRotatedAwayZoomIn)
+{
+    wheelRotatedAwayZoomIn = newWheelRotatedAwayZoomIn;
+}
 
+uint GbpController::getChartPointSize() const
+{
+    return chartPointSize;
+}
 
+void GbpController::setChartPointSize(uint newChartPointSize)
+{
+    chartPointSize = newChartPointSize;
+}

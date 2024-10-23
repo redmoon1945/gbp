@@ -66,7 +66,7 @@
           </sizepolicy>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Can be unique or not, although it is recommanded that each Financial Stream Definition have its own name. Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="maxLength">
           <number>100</number>
@@ -279,7 +279,7 @@
             </sizepolicy>
            </property>
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The period &amp;quot;unit&amp;quot; used in the definition of the repetition interval. End-of-month means that all generated financial events will occur on the very end of a month.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The period &amp;quot;unit&amp;quot; used in the definition of the repetition interval. For the value &amp;quot;End-of-month&amp;quot;, it means that all generated financial events will occur on the very end of a month.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
@@ -400,7 +400,7 @@
             <date>
              <year>1999</year>
              <month>11</month>
-             <day>24</day>
+             <day>23</day>
             </date>
            </property>
            <property name="displayFormat">
@@ -1022,7 +1022,7 @@
            <item>
             <widget class="QRadioButton" name="toScenarioRadioButton">
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;No financial events will be generated past this date, specified at the scenario level. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;No financial events &lt;span style=&quot; background-color:transparent;&quot;&gt; for this Financial Stream Definition &lt;/span&gt;will be generated past this date, which is specified at the scenario level. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>Date defined in the scenario</string>
@@ -1087,7 +1087,7 @@
               <date>
                <year>1999</year>
                <month>11</month>
-               <day>26</day>
+               <day>25</day>
               </date>
              </property>
              <property name="displayFormat">
@@ -1140,6 +1140,9 @@
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QPushButton" name="visualizeOccurrencesPushButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View the financial events that will be generated with these parameters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Visualize occurences...</string>
          </property>
@@ -1181,8 +1184,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

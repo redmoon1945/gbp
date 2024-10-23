@@ -37,12 +37,35 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QCheckBox" name="showPointsCheckBox">
-       <property name="text">
-        <string>Show Points</string>
+      <widget class="QPushButton" name="fitPushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Rescale the chart so that the X axis range covers exactly the &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;date range of the financial events&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; generated for this specific Periodic Stream Definition. Y axis is rescaled to include the min and max values in the new X range.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
-       <property name="checked">
-        <bool>true</bool>
+       <property name="text">
+        <string>Fit</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>60</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="selectedPointLabel">
+       <property name="text">
+        <string>Selected Point :</string>
        </property>
       </widget>
      </item>

@@ -94,6 +94,12 @@ bool FeStreamDef::operator==(const FeStreamDef &o) const
 }
 
 
+bool FeStreamDef::operator!=(const FeStreamDef &o) const
+{
+    return !(*this==o);
+}
+
+
 void FeStreamDef::toJson(QJsonObject &jsonObject) const
 {
     jsonObject["Id"] = id.toString(QUuid::WithoutBraces);
@@ -106,7 +112,24 @@ void FeStreamDef::toJson(QJsonObject &jsonObject) const
     if (decorationColor.isValid()) {
         jsonObject["DecorationColor"] = decorationColor.name(QColor::HexRgb);
     }
+}
 
+
+// Compare this FeStreamDef with another one and evaluate if the list of FE generated will be
+// exactly the same. Return True if it is the case, False otherwise. Note that they may be some
+// complex cases where False is returned but the FE list is still the same.
+bool FeStreamDef::evaluateIfSameFeList(const FeStreamDef &o) const
+{
+    if ( streamType != o.streamType ) {
+        return false;
+    }
+    if ( active != o.active ) {
+        return false;
+    }
+    if ( isIncome != o.isIncome ) {
+        return false;
+    }
+    return true;
 }
 
 

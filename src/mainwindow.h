@@ -34,8 +34,8 @@
 #include <QDateTimeAxis>
 #include <QValueAxis>
 #include "combinedfestreams.h"
-#include "qcustomplot.h"
 #include "scenario.h"
+#include "customqchartview.h"
 #include <QUuid>
 
 QT_BEGIN_NAMESPACE
@@ -60,7 +60,7 @@ signals:
     // For Analysis Dialog : prepare content before edition
     void signalAnalysisPrepareContent(QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData, CurrencyInfo currInfo);
     // For DateInterval Dialog : prepare content before edition
-    void signalDateIntervalPrepareContent();
+    void signalDateIntervalPrepareContent(QDate from, QDate to);
     //
     void signalSelectCountryPrepareContent();
     // For Scenario Properties display : prepare content before edition
@@ -73,7 +73,7 @@ public slots:
     void slotSelectCountryResult(QString countryCode, CurrencyInfo currInfo);
     void slotSelectCountryCompleted();
     // From Edit Scenario : result and edition completion notification
-    void slotEditScenarioResult(bool currentlyEditingNewScenario, bool rescaleXaxis);
+    void slotEditScenarioResult(bool currentlyEditingNewScenario, bool regenerateData);
     void slotEditScenarioCompleted();
     // From Options Edit : result and edition completion notification
     void slotOptionsResult(OptionsDialog::OptionsChangesImpact impact);
@@ -83,12 +83,11 @@ public slots:
     void slotDateIntervalCompleted();
     // From ScenarioProperties : completion notification
     void slotScenarioPropertiesCompleted();
-    // to catch point selection signal
-    void selectionChangedByUser();
-    // to catch scale change in an axis
-    void rangeChangedX(const QCPRange &newRange);
-    void rangeChangedY(const QCPRange &newRange);
-
+    // to catch point selection signal in main chart
+    void mypoint_clicked(QPointF pt);
+    // to catch scale change in an axis in main chart
+    void handleXaxisRangeChange(QDateTime dtFrom, QDateTime dtTo);
+    void handleYaxisRangeChange(qreal min, qreal max);
 
 protected:
     void closeEvent(QCloseEvent * event) override;
@@ -137,6 +136,14 @@ private:
 
     Ui::MainWindow *ui;
 
+    enum class X_RESCALE {X_RESCALE_NONE=0, X_RESCALE_CUSTOM=1, X_RESCALE_DATA_MAX=2,
+        X_RESCALE_SCENARIO_MAX=3};
+    struct xAxisRescale{
+        X_RESCALE mode;
+        QDateTime from; // used only when mode = X_RESCALE_CUSTOM=1
+        QDateTime to;   // used only when mode = X_RESCALE_CUSTOM=1
+    };
+
     // Dialogs
     EditScenarioDialog* editScenarioDlg;
     SelectCountryDialog* selectCountryDialog;
@@ -149,40 +156,53 @@ private:
     // variables
     int maxRecentFiles = 10;
     QList<QAction*> recentFileActionList;
-    double chartScalingFactor;
+    double chartScalingFactor;      // see QChart. 1 means no zoom
     QLocale locale;                 // system locale, as determined when constructor un
 
     // variables for the chart
-    QCustomPlot* chart;
+    CustomQChartView *chartView;
+    QChart *chart ;
+    QLineSeries *shadowSeries;      // shadow the points just to trace line between them
+    QScatterSeries* scatterSeries;  // contains only the real points
+    QDateTimeAxis *axisX;
+    QValueAxis *axisY;
     QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData;
-    QCPTextElement *chartTitle = nullptr ;
-    QDate fullFromDateX;        // tomorrow
-    QDate fullToDateX;          // max date of calculation
-    double fullFromDoubleX;     // "no fo sec from epoch" version of fullFromDateX
-    double fullToDoubleX;       // "no fo sec from epoch" version of fullToDateX
-    double fitFromDoubleX;      // "no fo sec from epoch" version of fitFromDateX
-    double fitToDoubleX;        // "no fo sec from epoch" version of fitToDateX
-    double fullMinY;            // min value of Y for the toal range of raw data
-    double fullMaxY;            // max value of Y for the toal range of raw data
+    QDateTime fullFromDateX;        // tomorrow
+    QDateTime fullToDateX;          // max date of calculation for the current scenario
+    uint xAxisFontSize;
+    uint yAxisFontSize;
+    int indexLastPointSelected = -1;
 
-    // methods
-    void updateScenarioDataDisplayed(bool rescaleXaxis, bool resetBaselineValue);
+    // *** methods ***
+
+    // Chart-related stuff
+    void regenerateRawData(QList<QPointF>& timeData, QList<QPointF>& shadowTimeData);
+    void replaceChartSeries(QList<QPointF> data, QList<QPointF> shadowData);
+    void rescaleChart(xAxisRescale xAxisRescaleMode, bool addMarginAroundXaxis);
+    void rescaleXaxis(uint noOfMonths);
+    void shiftGraph(bool toTheRight);
+    void themeChanged();
+    void setSeriesCharacteristics();
+    void reduceAxisFontSize();
+    void setXaxisFontSize(uint fontSize);
+    void setYaxisFontSize(uint fontSize);
+    void initChart();
+
+    // misc
     bool loadScenarioFile(QString fileName);
     Scenario::FileResult saveScenario(QString fileName);
     void msgStatusbar(QString msg);
     void recentFilesMenuInit();
     void recentFilesMenuUpdate();
     bool eventFilter(QObject *object, QEvent *event) override;
-    void setChartTitle(QString theTitle);
-    void rescaleYaxis(uint noOfMonths);
-    void shiftGraph(bool toTheRight);
-    void setChartColors();
     void fillDailyInfoSection(const QDate& date, double amount, const CombinedFeStreams::DailyInfo& di);
     void emptyDailyInfoSection();
-    void updateBaselineWidgets(CurrencyInfo currInfo);
+    void fillGeneralInfoSection();
+    void emptyGeneralInfoSection();
+    void resetBaselineWidgets();
     void checkIfCurrentScenarioMatchesDiskVersion(bool& match, bool &oldVersion) const;
     bool checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding();
-
-
+    void changeYaxisLabelFormat();
+    uint calculateTotalNoOfEvents();
 };
 #endif // MAINWINDOW_H

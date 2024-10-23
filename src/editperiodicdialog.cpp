@@ -43,8 +43,10 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     // use smaller font for description list
     QFont descFont = ui->descPlainTextEdit->font();
     uint oldFontSize = descFont.pointSize();
-    uint newFontSize = Util::changeFontSize(false,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Periodic Dialog - Description - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    uint newFontSize = Util::changeFontSize(1,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Edit Periodic Dialog - Description - Font size set from %1 to %2").
+        arg(oldFontSize).arg(newFontSize));
     descFont.setPointSize(newFontSize);
     ui->descPlainTextEdit->setFont(descFont);
 
@@ -57,7 +59,8 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     ui->toScenarioRadioButton->setChecked(true);
     ui->toDateEdit->setEnabled(false);
     ui->fromDateEdit->setDate(GbpController::getInstance().getTomorrow());
-    ui->toDateEdit->setDate(GbpController::getInstance().getToday().addYears(Scenario::DEFAULT_DURATION_FE_GENERATION));
+    ui->toDateEdit->setDate(GbpController::getInstance().getToday().addYears(
+        Scenario::DEFAULT_DURATION_FE_GENERATION));
 
     // adjust parameters of growth edit box
     ui->growthDoubleSpinBox->setMinimum(Growth::MIN_GROWTH_DOUBLE);
@@ -117,7 +120,8 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome, 
     ui->currencyIsoCodeLabel->setText(currInfo.isoCode);
 
     // set name of Label for end date for Scenario case
-    ui->toScenarioRadioButton->setText(tr("Date defined at the scenario level (currently = %1)").arg(maxDateFeGeneration.toString(Qt::ISODate)));
+    ui->toScenarioRadioButton->setText(tr("Date defined at the scenario level (currently = %1)").
+        arg(locale.toString(maxDateFeGeneration,locale.dateFormat(QLocale::ShortFormat))));
 
     // Name colorization
     if (isNewStreamDef) {

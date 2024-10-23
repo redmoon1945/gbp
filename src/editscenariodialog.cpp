@@ -75,7 +75,7 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     QFont infoActiveTableFont = ui->itemsTableView->font();
     infoActiveTableFont.setItalic(true);
     oldFontSize = infoActiveTableFont.pointSize();
-    newFontSize = Util::changeFontSize(false, true, oldFontSize);
+    newFontSize = Util::changeFontSize(1, true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - infoActiveTable - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     infoActiveTableFont.setPointSize(newFontSize);
     //
@@ -83,7 +83,7 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     infoInactiveTableFont.setStrikeOut(true);
     infoInactiveTableFont.setItalic(true);
     oldFontSize = infoInactiveTableFont.pointSize();
-    newFontSize = Util::changeFontSize(false, true, oldFontSize);
+    newFontSize = Util::changeFontSize(1, true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - infoInactiveTable - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     infoInactiveTableFont.setPointSize(newFontSize);
 
@@ -102,7 +102,7 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     // use smaller font for description list
     QFont descFont = ui->DescPlainTextEdit->font();
     oldFontSize = descFont.pointSize();
-    newFontSize = Util::changeFontSize(false,true, oldFontSize);
+    newFontSize = Util::changeFontSize(1,true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - Description - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     descFont.setPointSize(newFontSize);
     ui->DescPlainTextEdit->setFont(descFont);
@@ -110,7 +110,7 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     // use smaller font for filter buttons
     QFont filterButtonFont = ui->periodicFilterPushButton->font();
     oldFontSize = filterButtonFont.pointSize();
-    newFontSize =Util::changeFontSize(true,true, oldFontSize);
+    newFontSize =Util::changeFontSize(2,true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - Filter Buttons - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     filterButtonFont.setPointSize(newFontSize);
     ui->periodicFilterPushButton->setFont(filterButtonFont);
@@ -494,7 +494,7 @@ void EditScenarioDialog::on_fullViewPushButton_clicked()
 
 void EditScenarioDialog::on_applyPushButton_clicked()
 {
-    // gather & validate data to create a new Scenario
+    // *** gather & validate data to create a new Scenario ***
 
     QString name = ui->scenarioNameLineEdit->text();
     QString desc = ui->DescPlainTextEdit->toPlainText();
@@ -511,7 +511,8 @@ void EditScenarioDialog::on_applyPushButton_clicked()
     QMap<QUuid,IrregularFeStreamDef> incomesDefIrregular = itemTableModel->getIncomesDefIrregular();
     QMap<QUuid,PeriodicFeStreamDef> expensesDefPeriodic = itemTableModel->getExpensesDefPeriodic();
     QMap<QUuid,IrregularFeStreamDef> expensesDefIrregular = itemTableModel->getExpensesDefIrregular();
-    // Create it
+
+    // *** Create a new scenario from the edit dialog data
     QSharedPointer<Scenario> scenario;
     try {
         scenario = QSharedPointer<Scenario>(new Scenario(
@@ -527,23 +528,23 @@ void EditScenarioDialog::on_applyPushButton_clicked()
             QMessageBox::critical(nullptr,tr("Error creating scenario"), errorString);
             GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Warning, QString("Creating a new scenario failed, unexpected exception occured : %1").arg((p ? p.__cxa_exception_type()->name() : "null")));
         }
-
         return;
     }
 
-    // update scenario data displayed.If FeDurationGeneratio duration has changed, notify the caller
-    bool rescaleXaxis = false;
+    // *** Evaluate the type of changes made to the scenario. There are 2 options :
+    // *** 1) Scenario flow data will be different (e.g. new/deleted streamDef, max duration modified)
+    // ***    in which case data will have to be regenerated before chart is refreshed.
+    // *** 2) Cosmetic or no change
+    bool regenerateData = true;
     if(GbpController::getInstance().isScenarioLoaded()==true){
-        quint16 previousFeGenerationDuration = GbpController::getInstance().getScenario()->getFeGenerationDuration();
-        if (previousFeGenerationDuration != maxDuration) {
-            rescaleXaxis = true; // X axis will change, need to rescale
-        }
+        regenerateData = !(GbpController::getInstance().getScenario()->evaluateIfSameFlowData(
+            scenario));
     }
 
-    // switch to the new/editted scenario
+    // *** switch to the new/editted scenario
     GbpController::getInstance().setScenario(scenario);
 
-    // log the changes
+    // *** log the changes
     if (currentlyEditingExistingScenario){
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Modifications to the existing scenario have been applied (but not saved yet"));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Name = %1").arg(scenario->getName()));
@@ -566,15 +567,19 @@ void EditScenarioDialog::on_applyPushButton_clicked()
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular().size()));
     }
 
-    emit signalEditScenarioResult(!currentlyEditingExistingScenario,rescaleXaxis);
+    // *** Provide the editing result to caller
+    // Retrieve New/edited scenario using GbpController::getInstance()
+    emit signalEditScenarioResult(!currentlyEditingExistingScenario, regenerateData);
 
-    // If it was a new scenario that we were editing, close the window.
-    // For existing scenario being edited, keep the window opened for convenience.
+    // *** If it was a new scenario that we were editing, close the window.
+    // *** For existing scenario being edited, keep the window opened for convenience.
     if (!currentlyEditingExistingScenario){
         GbpController::getInstance().setFullFileName("");  // new scenario has not been saved yet
         this->hide();
         emit signalEditScenarioCompleted();
     }
+    // remove focus from apply button (it is also an indication that processing is completed)
+    ui->itemsTableView->setFocus();
 }
 
 

@@ -31,6 +31,7 @@
 #include <QBarSet>
 #include <QBarCategoryAxis>
 #include <QValueAxis>
+#include <cfloat>
 
 
 
@@ -59,7 +60,7 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
               QColor("lightcoral"), QColor("firebrick"), QColor("dimgray"), QColor("darksalmon"), QColor("darkturquoise"),
               QColor("darkolivegreen"), QColor("crimson"), QColor("blueviolet"), QColor("bisque"), QColor("orchid"),
               QColor("palegreen")};
-    if(GbpController::getInstance().getChartDarkMode()==true){
+    if(GbpController::getInstance().getIsDarkModeSet()==true){
         chartRelativeWeigth->setTheme(QChart::ChartThemeDark);
     } else {
         chartRelativeWeigth->setTheme(QChart::ChartThemeLight);
@@ -87,7 +88,7 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     // make smaller selected bar info
     QFont font = ui->monthlyReportChartSelectedLabel->font();
     uint oldFontSize = font.pointSize();
-    uint newFontSize = Util::changeFontSize(false, true, oldFontSize);
+    uint newFontSize = Util::changeFontSize(1, true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Monthly and Yearly Chart - Selected Bar Info font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     font.setPointSize(newFontSize);
     ui->monthlyReportChartSelectedTextLabel->setFont(font);
@@ -128,7 +129,8 @@ AnalysisDialog::~AnalysisDialog()
 }
 
 
-void AnalysisDialog::slotAnalysisPrepareContent(QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData, CurrencyInfo currencyInfo)
+void AnalysisDialog::slotAnalysisPrepareContent(
+    QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData, CurrencyInfo currencyInfo)
 {
     this->chartRawData = chartRawData;
     this->currInfo = currencyInfo;
@@ -156,7 +158,7 @@ void AnalysisDialog::slotAnalysisPrepareContent(QMap<QDate,CombinedFeStreams::Da
 
 void AnalysisDialog::themeChanged()
 {
-    if(GbpController::getInstance().getChartDarkMode()==true){
+    if(GbpController::getInstance().getIsDarkModeSet()==true){
         chartMonthlyReport->setTheme(QChart::ChartThemeDark);
         chartYearlyReport->setTheme(QChart::ChartThemeDark);
         chartRelativeWeigth->setTheme(QChart::ChartThemeDark);
@@ -218,10 +220,12 @@ void AnalysisDialog::updateRelativeWeightChart()
     }
 
     // *** step 1 : count individual contribution of each StreamDef ***
-    QHash<QUuid,double> bins = {}; // no need to sort keys. key = Stream Def UUID, value = total amount contributed by the StreamDef in the period. Positive for Income, negative for expense
+    // no need to sort keys. key = Stream Def UUID, value = total amount contributed by the
+    // StreamDef in the period. Positive for Income, negative for expense
+    QHash<QUuid,double> bins = {};
     double d;
-    double minDouble = std::numeric_limits<double>::min();
-    double maxDouble = std::numeric_limits<double>::max();
+    double minDouble = -DBL_MAX;
+    double maxDouble = DBL_MAX;
     double grandTotal=0;
     foreach(QDate date, chartRawData.keys()){
         if( (date<from) || (date>to) ){
@@ -338,6 +342,7 @@ void AnalysisDialog::updateRelativeWeightChart()
 // annualDiscountRate is in percentage
 void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr, QTableWidget* tableWidget)
 {
+    // Reset bin to empty
     if(rTypr==MONTHLY){
         binsMonthly = {};
     } else {
@@ -409,12 +414,6 @@ void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr, QTabl
 // use already calculated bins to update table content
 void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr, QTableWidget* tableWidget)
 {
-    if (chartRawData.size()==0){
-        tableWidget->clearContents();
-        tableWidget->setRowCount(0);
-        return;  // nothing to do after
-    }
-
     // choose the right bins
     QMap<QDate,MonthlyYearlyReport>* binsPtr;
     if (rTypr==MONTHLY) {
@@ -423,9 +422,38 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr, QT
         binsPtr = &binsYearly;
     }
 
+    // determine how many rows in the table. We display all month/years between
+    // tomorrow and max date as established by the scenario
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+    QDate maxDate = tomorrow.addYears(
+        GbpController::getInstance().getScenario()->getFeGenerationDuration()).addDays(-1);
+    int noRows;
+    int noOfMonths = 1 + (12*maxDate.year()+maxDate.month()) - (12*tomorrow.year()+tomorrow.month());
+    int noOfYears = 1 + (maxDate.year()) - (tomorrow.year());
+    if (rTypr==MONTHLY) {
+        noRows = noOfMonths;
+    } else{
+        noRows = noOfYears;
+    }
+
+    // Generate the list of dates
+    QList<QDate> dateList;
+    QDate date = tomorrow;
+    if (rTypr==MONTHLY) {
+        while(date <= maxDate){
+            dateList.append(QDate(date.year(),date.month(),1));
+            date = date.addMonths(1);
+        }
+    } else{
+        while(date <= maxDate){
+            dateList.append(QDate(date.year(),1,1));
+            date = date.addYears(1);
+        }
+    }
+
     // fill table
     tableWidget->clearContents();
-    tableWidget->setRowCount(binsPtr->size()); // must be done BEFORE inserting item...
+    tableWidget->setRowCount(noRows); // must be done BEFORE inserting item...
     int row = 0;
     QString s1,s2,s3,s4;
     QFont defaultFont = tableWidget->font();
@@ -434,8 +462,14 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr, QT
 
     QBrush red = QBrush(QColor(210,0,0));
     QBrush green = QBrush(QColor(0,200,0));
-    foreach(QDate date, binsPtr->keys()){
-        MonthlyYearlyReport mr = binsPtr->value(date);
+    foreach(QDate date, dateList){
+        MonthlyYearlyReport mr;
+        if ( true == binsPtr->contains(date)){
+            mr = binsPtr->value(date);
+        } else {
+            mr = {.income=0, .expense=0, .delta=0};
+        }
+
         // build items
         if (rTypr==MONTHLY) {
             s1 = locale.toString(date,"yyyy MMMM");
@@ -458,7 +492,7 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr, QT
         wi4->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         if(mr.delta<0){
             wi4->setForeground(red);
-        } else {
+        } else if (mr.delta>0) {
             wi4->setForeground(green);
         }
         // add to intrinsic table model
@@ -725,69 +759,111 @@ void AnalysisDialog::on_exportYearlyReportToTextPushButton_clicked()
 
 
 void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Initiating Report type \"%1\" export").arg(rType));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Initiating Report type \"%1\" export").arg(rType));
 
     QString defaultExtension = ".csv";
     QString defaultExtensionUsed = ".csv";
     QString filter = tr("Text Files (*.txt *.TXT *.csv *.CSV)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a File"), GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
-    if (fileName != ""){
-        // fix the filename to add the proper suffix
-        QFileInfo fi(fileName);
-        if(fi.suffix()==""){    // user has not specified an extension
-            fileName.append(defaultExtension);
-        }
-
-        QFile file(fileName);
-        if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
-            QMessageBox::critical(nullptr,tr("Export Failed"),tr("Cannot open the file for saving"));
-            GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("Yearly Report export failed : Cannot open file %1").arg(fileName));
-            return;
-        }
-
-        QMap<QDate,MonthlyYearlyReport>* binsPtr;
-        QString dateFormat;
-        if (rType == MONTHLY) {
-            dateFormat = "yyyy-MM";
-            binsPtr = &binsMonthly;
-        } else {
-            dateFormat = "yyyy";
-            binsPtr = &binsYearly;
-        }
-
-        QString inc ;
-        QString exp ;
-        QString total ;
-        QString s;
-
-        // write header
-        s = QString("%1\t%2\t%3\t%4\n").arg(tr("Period"),tr("Total Incomes"),tr("Total Expenses"),tr("Delta"));
-        file.write(s.toUtf8());
-
-        // write data
-        foreach(QDate date, binsPtr->keys()){
-            MonthlyYearlyReport item = binsPtr->value(date);
-            QString dateString = locale.toString(date,dateFormat);
-            if (GbpController::getInstance().getExportTextAmountLocalized()) {
-                // Localized
-                inc = CurrencyHelper::formatAmount(item.income, currInfo, locale, false);
-                exp = CurrencyHelper::formatAmount(item.expense, currInfo, locale, false);
-                total = CurrencyHelper::formatAmount(item.delta, currInfo, locale, false);
-            } else {
-                // not localized
-                inc = QString::number(item.income,'f', currInfo.noOfDecimal);
-                exp = QString::number(item.expense,'f', currInfo.noOfDecimal);
-                total = QString::number(item.delta,'f', currInfo.noOfDecimal);
-            }
-
-            s = QString("%1\t%2\t%3\t%4\n").arg(dateString,inc,exp,total);
-            file.write(s.toUtf8());
-        }
-        file.close();
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Success of Yearly Report export");
-    } else{
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Yearly Report export canceled");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a File"),
+        GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
+    if (fileName == ""){
+        // User has canceled
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            "Yearly Report export canceled");
+        return;
     }
+
+    // fix the filename to add the proper suffix
+    QFileInfo fi(fileName);
+    if(fi.suffix()==""){    // user has not specified an extension
+        fileName.append(defaultExtension);
+    }
+
+    QFile file(fileName);
+    if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
+        QMessageBox::critical(nullptr,tr("Export Failed"),tr("Cannot open the file for saving"));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("Yearly Report export failed : Cannot open file %1").arg(fileName));
+        return;
+    }
+
+    QMap<QDate,MonthlyYearlyReport>* binsPtr;
+    QString dateFormat;
+    if (rType == MONTHLY) {
+        dateFormat = "yyyy-MM";
+        binsPtr = &binsMonthly;
+    } else {
+        dateFormat = "yyyy";
+        binsPtr = &binsYearly;
+    }
+
+    QString inc ;
+    QString exp ;
+    QString total ;
+    QString s;
+
+    // determine how many elements there are. We display all month/years between
+    // tomorrow and max date as established by the scenario
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+    QDate maxDate = tomorrow.addYears(
+        GbpController::getInstance().getScenario()->getFeGenerationDuration()).addDays(-1);
+    int noRows;
+    int noOfMonths = 1 + (12*maxDate.year()+maxDate.month()) - (12*tomorrow.year()+tomorrow.month());
+    int noOfYears = 1 + (maxDate.year()) - (tomorrow.year());
+    if (rType==MONTHLY) {
+        noRows = noOfMonths;
+    } else{
+        noRows = noOfYears;
+    }
+
+    // Generate the list of dates
+    QList<QDate> dateList;
+    QDate date = tomorrow;
+    if (rType==MONTHLY) {
+        while(date <= maxDate){
+            dateList.append(QDate(date.year(),date.month(),1));
+            date = date.addMonths(1);
+        }
+    } else{
+        while(date <= maxDate){
+            dateList.append(QDate(date.year(),1,1));
+            date = date.addYears(1);
+        }
+    }
+
+    // write header
+    s = QString("%1\t%2\t%3\t%4\n").arg(tr("Period"),tr("Total Incomes"),tr("Total Expenses"),tr("Delta"));
+    file.write(s.toUtf8());
+
+    // write data
+    foreach(QDate date, dateList){
+        MonthlyYearlyReport item;
+        if ( true == binsPtr->contains(date)){
+            item = binsPtr->value(date);
+        } else {
+            item = {.income=0, .expense=0, .delta=0};
+        }
+
+        QString dateString = locale.toString(date,dateFormat);
+        if (GbpController::getInstance().getExportTextAmountLocalized()) {
+            // Localized
+            inc = CurrencyHelper::formatAmount(item.income, currInfo, locale, false);
+            exp = CurrencyHelper::formatAmount(item.expense, currInfo, locale, false);
+            total = CurrencyHelper::formatAmount(item.delta, currInfo, locale, false);
+        } else {
+            // not localized
+            inc = QString::number(item.income,'f', currInfo.noOfDecimal);
+            exp = QString::number(item.expense,'f', currInfo.noOfDecimal);
+            total = QString::number(item.delta,'f', currInfo.noOfDecimal);
+        }
+
+        s = QString("%1\t%2\t%3\t%4\n").arg(dateString,inc,exp,total);
+        file.write(s.toUtf8());
+    }
+    file.close();
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Success of Yearly Report export");
+
 }
 
 
@@ -890,7 +966,7 @@ void AnalysisDialog::initReportChart(ReportType type)
     //
     QFont fontX = (*xAxisPtr)->labelsFont();
     uint oldFontSize = fontX.pointSize();
-    uint newFontSize = Util::changeFontSize(true, true, fontX.pointSize());
+    uint newFontSize = Util::changeFontSize(2, true, fontX.pointSize());
     if (type == ReportType::MONTHLY) {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Monthly Chart - X axis - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     } else {
@@ -907,7 +983,7 @@ void AnalysisDialog::initReportChart(ReportType type)
     //
     QFont fontY = (*yAxisPtr)->labelsFont();
     oldFontSize = fontY.pointSize();
-    newFontSize = Util::changeFontSize(true, true, fontY.pointSize());
+    newFontSize = Util::changeFontSize(2, true, fontY.pointSize());
     if (type == ReportType::MONTHLY) {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Monthly Chart - X axis font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     } else {
@@ -921,7 +997,7 @@ void AnalysisDialog::initReportChart(ReportType type)
     (*yAxisPtr)->setMinorTickCount(4); // 5 bins
     (*chartPtr)->addAxis((*yAxisPtr), Qt::AlignLeft); // the CHART (not the series) takes ownership
     series->attachAxis((*yAxisPtr));
-    if(GbpController::getInstance().getChartDarkMode()==true){
+    if(GbpController::getInstance().getIsDarkModeSet()==true){
         (*chartPtr)->setTheme(QChart::ChartThemeDark);
     } else {
         (*chartPtr)->setTheme(QChart::ChartThemeLight);

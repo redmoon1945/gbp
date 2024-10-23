@@ -17,6 +17,7 @@
  */
 
 #include "visualizeoccurrencesdialog.h"
+#include "customqchartview.h"
 #include "ui_visualizeoccurrencesdialog.h"
 #include "gbpcontroller.h"
 #include <qdatetimeaxis.h>
@@ -30,8 +31,8 @@ VisualizeOccurrencesDialog::VisualizeOccurrencesDialog(QLocale locale, QWidget *
 {
     ui->setupUi(this);
     ui->widget->installEventFilter(this);   // pass resize event received by "widget" to the Chart widget
-    initChart();
     this->locale = locale;
+    initChart();
 }
 
 
@@ -43,30 +44,91 @@ VisualizeOccurrencesDialog::~VisualizeOccurrencesDialog()
 
 // scenarioInflation is used only when streamDef is a Periodic stream def
 void VisualizeOccurrencesDialog::slotPrepareContent(CurrencyInfo currInfo, Growth scenarioInflation,
-    QDate maxDateScenarioFeGeneration, FeStreamDef *streamDef)
+    QDate maxDateScenario, FeStreamDef *streamDef)
 {
     this->currInfo = currInfo;
     uint noOfSaturations;
     FeMinMaxInfo minMax;
-    this->maxDateScenarioFeGeneration = maxDateScenarioFeGeneration;
+    maxDateScenarioFeGeneration = maxDateScenario;
+    indexLastPointSelected = -1;
     QList<Fe> feList = generateFinancialEvents(scenarioInflation, streamDef, noOfSaturations,
         minMax);
+
+    // build the search vector to accelerate search when a point is clicked
+    searchVector.resize(feList.count());
+    QTime zero = QTime(0,0,0);
+    for(int i=0;i<searchVector.size();i++){
+        searchVector[i] = QDateTime(feList.at(i).occurrence,zero).toMSecsSinceEpoch();
+    }
 
     // 50% of the space for each widget
     ui->splitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
 
     updateTextTab(feList, noOfSaturations, scenarioInflation, streamDef);
     updateChartTab(feList, noOfSaturations, scenarioInflation, streamDef, minMax);
+
+    feList.clear(); // get rid of it immediately
+}
+
+
+// Need some improvement toi optimize speed
+void VisualizeOccurrencesDialog::mypoint_clicked(const QPointF pt)
+{
+    // find the index of the point in the series
+    QList<QPointF> ptList = series->points();
+
+    QDateTime dt = QDateTime::fromMSecsSinceEpoch(pt.x());
+    if (dt.isValid()==false){
+        return;
+    }
+
+    int index = ptList.indexOf(pt);
+    if(index==-1){
+        // should not happen
+        return;
+    }
+
+    // // this does not appears to save time in a noticeable way
+    // int index = binarySearch(searchVector,pt.x());
+    // if(index==-1){
+    //     qInfo()<<"Index not found for x="<<dt;
+    //     return;
+    // }
+
+
+    // This section is quite slow for high number of points. Tried several things,
+    // but nothing worked.
+
+    // set selected points to normal color, then unselect
+    // {
+    // const QSignalBlocker blocker(series);
+    if (indexLastPointSelected != -1){
+        series->setPointSelected(indexLastPointSelected,false);
+    }
+    series->setPointSelected(index,true);
+    indexLastPointSelected = index;
+    // }
+
+    // display
+    QDate date = dt.date();
+    QString s = tr("Selected Point :  Date=%1  Amount=%2").
+        arg(locale.toString(date, locale.dateFormat(QLocale::ShortFormat))).
+        arg(locale.toString(pt.y(),'f',currInfo.noOfDecimal));
+    ui->selectedPointLabel->setText(s);
+
 }
 
 
 void VisualizeOccurrencesDialog::on_closePushButton_clicked()
 {
-    this->hide();
-    ui->plainTextEdit->setPlainText(""); // dont hold the text, no use for that now
-    emit signalCompleted();
-}
+    // clean some objects we dont need
+    ui->plainTextEdit->clear(); // dont hold the text, no use for that now
+    chart->removeAllSeries();
 
+    this->hide();
+    emit signalCompleted();
+
+}
 
 
 void VisualizeOccurrencesDialog::on_VisualizeOccurrencesDialog_rejected()
@@ -88,26 +150,18 @@ QList<Fe> VisualizeOccurrencesDialog::generateFinancialEvents(Growth scenarioInf
 
 
     // Generate financial events
+    // build for the maximum range set by scenario, but if the Periodic Stream Def set its own
+    // limit date arealier, the latter will take precedence
+    DateRange fromto = DateRange(GbpController::getInstance().getTomorrow(),
+        maxDateScenarioFeGeneration);
     if(streamDef->getStreamType()==FeStreamDef::PERIODIC){
         PeriodicFeStreamDef* psd = (PeriodicFeStreamDef *)streamDef;
-
-        // build fromto
-        DateRange fromto = DateRange(GbpController::getInstance().getTomorrow(),
-            (psd->getUseScenarioForEndDate()==true)?(maxDateScenarioFeGeneration):
-            (psd->getEndDate()));
-
-        result = psd->generateEventStream(fromto,
-            maxDateScenarioFeGeneration, scenarioInflation, (usePvConversion)?
-            (pvAnnualDiscountRate):(0), GbpController::getInstance().getTomorrow(), saturationCount,
-            minMax);
+        result = psd->generateEventStream(fromto, maxDateScenarioFeGeneration, scenarioInflation,
+            (usePvConversion)?(pvAnnualDiscountRate):(0),
+            GbpController::getInstance().getTomorrow(), saturationCount, minMax);
 
     } else {
         IrregularFeStreamDef* isd = (IrregularFeStreamDef *)streamDef;
-
-        // build fromto
-        DateRange fromto = DateRange(GbpController::getInstance().getTomorrow(),
-            maxDateScenarioFeGeneration);
-
         result = isd->generateEventStream(fromto, maxDateScenarioFeGeneration,
             (usePvConversion)?(pvAnnualDiscountRate):(0),
             GbpController::getInstance().getTomorrow(), saturationCount, minMax);
@@ -134,7 +188,6 @@ void VisualizeOccurrencesDialog::updateTextTab(QList<Fe> feList, uint saturation
         // Build headers
         QStringList resultStringList;
         int ok;
-        resultStringList.append(tr("Dates are in ISO 8601 format (YYYY-MM-DD)."));
         if (psd->getGrowthStrategy()==PeriodicFeStreamDef::GrowthStrategy::INFLATION){
             // adjust inflation if required
             Growth adjustedInflation = scenarioInflation;
@@ -178,10 +231,10 @@ void VisualizeOccurrencesDialog::updateTextTab(QList<Fe> feList, uint saturation
                 currInfo.noOfDecimal)));
         }
         QDate tomorrow = GbpController::getInstance().getTomorrow();
-        resultStringList.append(tr("No event generated before tomorrow %1.").arg(
-            tomorrow.toString(Qt::ISODate)));
-        resultStringList.append(tr("Scenario does not allow events past %1.").arg(
-            maxDateScenarioFeGeneration.toString(Qt::ISODate)));
+        resultStringList.append(tr("No event will be generated before tomorrow %1 and past %2.")
+            .arg(locale.toString(tomorrow, locale.dateFormat(QLocale::ShortFormat)))
+            .arg(locale.toString(psd->getRealEndDate(maxDateScenarioFeGeneration),
+            locale.dateFormat(QLocale::ShortFormat))));
         resultStringList.append(tr("%1 %2 event(s) have been generated.\n").arg(feList.count()).arg(
             (psd->getIsIncome())?(tr("income")):(tr("expense"))));
 
@@ -189,8 +242,9 @@ void VisualizeOccurrencesDialog::updateTextTab(QList<Fe> feList, uint saturation
         long double cummul = 0;
         foreach(Fe fe, feList){
             if (abs(fe.amount) > CurrencyHelper::maxValueAllowedForAmount() ){ // should not happen
-                resultStringList.append(QString("%1 : %2").arg(fe.occurrence.toString(
-                    Qt::ISODate)).arg(tr("Amount is bigger than the maximum allowed")));
+                resultStringList.append(QString("%1 : %2").
+                    arg(locale.toString(fe.occurrence, locale.dateFormat(QLocale::ShortFormat))).
+                    arg(tr("Amount is bigger than the maximum allowed")));
             } else {
                 double amountDouble = CurrencyHelper::amountQint64ToDouble(abs(fe.amount),
                     currInfo.noOfDecimal, ok);
@@ -203,7 +257,9 @@ void VisualizeOccurrencesDialog::updateTextTab(QList<Fe> feList, uint saturation
                     cummul += amountDouble;
                     QString cummulString = CurrencyHelper::formatAmount(static_cast<double>(cummul),
                         currInfo, locale, true);
-                    QString s = tr("%1 : %2 (cummul=%3)").arg(fe.occurrence.toString(Qt::ISODate)).
+                    QString s = tr("%1 : %2 (cummul=%3)").
+                        arg(locale.toString(fe.occurrence,
+                            locale.dateFormat(QLocale::ShortFormat))).
                         arg(amountString).arg(cummulString);
                     if (fe.occurrence<tomorrow){
                         // if event is in the past, mention it
@@ -226,7 +282,6 @@ void VisualizeOccurrencesDialog::updateTextTab(QList<Fe> feList, uint saturation
         // Build headers
         QStringList resultStringList;
         int ok;
-        resultStringList.append(tr("Dates are in ISO 8601 format (YYYY-MM-DD)."));
         bool usePvConversion = GbpController::getInstance().getUsePresentValue();
         double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
         if ((usePvConversion==true)&&(pvAnnualDiscountRate!=0)) {
@@ -240,10 +295,10 @@ void VisualizeOccurrencesDialog::updateTextTab(QList<Fe> feList, uint saturation
                 currInfo.noOfDecimal)));
         }
         QDate tomorrow = GbpController::getInstance().getTomorrow();
-        resultStringList.append(tr("No event generated before tomorrow %1.").arg(
-            tomorrow.toString(Qt::ISODate)));
-        resultStringList.append(tr("Scenario does not allow events past %1.").arg(
-            maxDateScenarioFeGeneration.toString(Qt::ISODate)));
+        resultStringList.append(tr("No event will be generated before tomorrow %1 and past %2")
+            .arg(locale.toString(tomorrow, locale.dateFormat(QLocale::ShortFormat)))
+            .arg(locale.toString(maxDateScenarioFeGeneration, locale.dateFormat(
+            QLocale::ShortFormat))));
         resultStringList.append(tr("%1 %2 event(s) have been generated.\n").arg(feList.count()).
             arg((isd->getIsIncome())?(tr("income")):(tr("expense"))));
 
@@ -252,8 +307,9 @@ void VisualizeOccurrencesDialog::updateTextTab(QList<Fe> feList, uint saturation
         QString amountString,cummulString,s;
         foreach(Fe fe, feList){
             if (abs(fe.amount) > CurrencyHelper::maxValueAllowedForAmount() ){ // should not happen
-                resultStringList.append(QString("%1 : %2").arg(fe.occurrence.toString(Qt::ISODate))
-                    .arg(tr("Amount is bigger than the maximum allowed")));
+                resultStringList.append(QString("%1 : %2").
+                    arg(locale.toString(fe.occurrence, locale.dateFormat(QLocale::ShortFormat))).
+                    arg(tr("Amount is bigger than the maximum allowed")));
             } else {
                 double amountDouble = CurrencyHelper::amountQint64ToDouble(abs(fe.amount),
                     currInfo.noOfDecimal, ok);
@@ -267,7 +323,8 @@ void VisualizeOccurrencesDialog::updateTextTab(QList<Fe> feList, uint saturation
                     cummul += amountDouble;
                     cummulString = CurrencyHelper::formatAmount(static_cast<double>(cummul),
                         currInfo, locale, true);
-                    s = tr("%1 : %2 (cummul=%3)").arg(fe.occurrence.toString(Qt::ISODate)).
+                    s = tr("%1 : %2 (cummul=%3)").
+                        arg(locale.toString(fe.occurrence, locale.dateFormat(QLocale::ShortFormat))).
                         arg(amountString).arg(cummulString);
                     if (fe.occurrence<tomorrow){
                         // if event is in the past, mention it
@@ -282,143 +339,83 @@ void VisualizeOccurrencesDialog::updateTextTab(QList<Fe> feList, uint saturation
         QString r = resultStringList.join("\n");
         ui->plainTextEdit->setPlainText(r);
     }
-
-
-
 }
 
-// Using the generated FeList, update the chart data with double representation in proper currency
+// Using the generated FeList, update the chart data with representation in proper currency
 void VisualizeOccurrencesDialog::updateChartTab(QList<Fe> feList, uint saturationCount,
     Growth scenarioInflation,  FeStreamDef *streamDef, FeMinMaxInfo minMax)
 {
-    // remove existing data
-    chart->removeAllSeries();
-
+    // regenerate Data
+    QList<QPointF> timeData;
     // add new data
     int convResult;
     double amount;
-    series = new QLineSeries();
     QDateTime momentInTime;
     foreach(Fe fe, feList){
         momentInTime.setDate(fe.occurrence);
         amount = CurrencyHelper::amountQint64ToDouble(abs(fe.amount), currInfo.noOfDecimal,
             convResult);
         if (convResult==0) {
-            series->append(momentInTime.toMSecsSinceEpoch(), amount);
+            timeData.append({static_cast<qreal>(momentInTime.toMSecsSinceEpoch()), amount});
         }
     }
 
-    // show symbols
-    series->setPointsVisible(ui->showPointsCheckBox->isChecked());
-    series->setMarkerSize(5);
+    replaceChartSeries(timeData);
+    rescaleChart();
+    changeYaxisLabelFormat();
 
-    // find min max for X axis (date)
-    QDateTime xMin, xMax;
-    if (feList.size()==0) {
-        xMin = QDateTime(QDate::currentDate(),QTime(0,0));
-        xMax = xMin.addDays(1);
-    } else if (feList.size()==1){
-        xMin = QDateTime(feList[0].occurrence.addDays(-1),QTime(0,0));
-        xMax = QDateTime(feList[0].occurrence.addDays(1),QTime(0,0));
-    } else {
-        xMin = QDateTime(feList[0].occurrence,QTime(0,0));
-        xMax = QDateTime(feList[feList.size()-1].occurrence,QTime(0,0));
-    }
-
-    // min/max for Y axis, in currency format
-    double doubleYmin;
-    double doubleYmax;
-    if (feList.size()==0) {
-        doubleYmin = 0;
-        doubleYmax = 1;
-    } else if (feList.size()==1){
-        // 10% above and below the value
-        if (feList[0].amount==0) {
-            doubleYmin = 0;
-            doubleYmax = 1;
-        } else {
-            double val = CurrencyHelper::amountQint64ToDouble(abs(feList[0].amount), currInfo.noOfDecimal, convResult);;
-            doubleYmin = val*0.75;
-            doubleYmax = val*1.25;
-        }
-    } else {
-        // 2 or more
-        double tempMin = CurrencyHelper::amountQint64ToDouble(abs(minMax.yMin), currInfo.noOfDecimal, convResult);
-        double tempMax = CurrencyHelper::amountQint64ToDouble(abs(minMax.yMax), currInfo.noOfDecimal, convResult);
-        double delta = tempMax-tempMin;
-        if (delta==0) {
-            if (tempMin==0) {
-                doubleYmin = 0;
-                doubleYmax = 1;
-            } else {
-                doubleYmin = fmax(0,0.95*tempMin);
-                doubleYmax = fmax(0,1.05*tempMax);
-            }
-        } else {
-            doubleYmin = fmax(0,tempMin - 0.05*delta);
-            doubleYmax = fmax(0,tempMax + 0.05*delta);
-        }
-    }
-
-    // currency may be different
-    QString yAxisFormat = QString("\%#.%1f").arg(currInfo.noOfDecimal);
-    axisY->setLabelFormat(yAxisFormat);
-
-    chart->addSeries(series);
-
-    series->attachAxis(axisX);
-    series->attachAxis(axisY);
-
-    // set ranges for axes
-    axisX->setRange(xMin,xMax);
-    axisY->setRange(doubleYmin, doubleYmax);
-
-    // set background color
-    if (GbpController::getInstance().getChartDarkMode()==true) {
-        // dark mode enabled
-        chart->setTheme(QChart::ChartThemeDark);
-        series->setColor(GbpController::getInstance().getCurveDarkModeColor());
-    } else {
-        // light mode enabled
-        chart->setTheme(QChart::ChartThemeLight);
-        series->setColor(GbpController::getInstance().getCurveLightModeColor());
-    }
-
+    ui->selectedPointLabel->setText(tr("Selected Point :"));
 }
 
 void VisualizeOccurrencesDialog::initChart()
 {
-    series = new QLineSeries();
-
-    QDateTime momentInTime;
-
-    // dummy data for debugging
-    momentInTime.setDate(QDate(2001,1,1));
-    series->append(momentInTime.toMSecsSinceEpoch(), 35);
-    momentInTime.setDate(QDate(2001,1,2));
-    series->append(momentInTime.toMSecsSinceEpoch(), 2);
-
+    // Step 1 : Create the chart
     chart = new QChart();
-    chart->addSeries(series);
     chart->legend()->hide();
-    chart->layout()->setContentsMargins(1, 1, 1, 1);
-    chart->setBackgroundRoundness(0);
+    chart->setTitle(tr("Financial Events"));
+    //chart->layout()->setContentsMargins(1, 1, 1, 1);
+    //chart->setBackgroundRoundness(0);
+    chart->setLocale(locale);
+    chart->setLocalizeNumbers(true);    series = new QScatterSeries();
 
+    // Step 2 : create X axis
     axisX = new QDateTimeAxis;
     axisX->setTickCount(6);
-    axisX->setFormat("dd MMM yy");
+    axisX->setFormat(locale.dateFormat(QLocale::ShortFormat));
+    axisX->setRange(QDateTime(QDate(2000,1,1),QTime(0,0,0)),
+        QDateTime(QDate(2001,1,1),QTime(0,0,0)));
     chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
 
+    // Step 3 : create Y axis
     axisY = new QValueAxis;
-    axisY->setLabelFormat("%f");
+    axisY->setTickCount(6);
+    axisY->setRange(0,1);
     chart->addAxis(axisY, Qt::AlignLeft);
-    series->attachAxis(axisY);
 
-    chartView = new QChartView(chart, ui->widget);  // this is where we tie the chart to the parent widget
-    chartView->setRenderHint(QPainter::Antialiasing);
+    // Step 4 : create empty series and set characteristics
+    QList<QPointF> timeData = {};
+    replaceChartSeries(timeData);
+
+    // reduce font size for axis
+    reduceAxisFontSize();
+
+    // Step 9
+    chartView = new CustomQChartView(chart,
+        GbpController::getInstance().getWheelRotatedAwayZoomIn(), ui->widget);
+    chartView->setRenderHint(QPainter::Antialiasing, true);
+
+    //axisX->setRange(first,second);
+    // Weird...looks like we have to "reserve" space for the very first invocation of this dialog.
+    // There is something I dont understand here
+    //axisY->setRange(0, CurrencyHelper::maxValueAllowedForAmountInDouble(3));
+
+    // remove focus on Fit button
+    ui->closePushButton->setFocus();
+
+    // configure dark or light mode for chart. reduceAxisFontSize() must have been called once
+    // before
+    themeChanged();
 }
-
 
 
 // for chart resizing
@@ -430,8 +427,198 @@ bool VisualizeOccurrencesDialog::eventFilter(QObject *object, QEvent *event)
     return QObject::eventFilter(object, event);
 }
 
-void VisualizeOccurrencesDialog::on_showPointsCheckBox_stateChanged(int arg1)
+
+// Set X axis range according to max DATA range
+void VisualizeOccurrencesDialog::on_fitPushButton_clicked()
 {
-    series->setPointsVisible(ui->showPointsCheckBox->isChecked());
+    rescaleChart();
 }
+
+
+void VisualizeOccurrencesDialog::reduceAxisFontSize()
+{
+    // X axis
+    QFont xAxisFont = axisX->labelsFont();
+    xAxisFontSize = Util::changeFontSize(2, true, xAxisFont.pointSize()); // set for ever
+    setXaxisFontSize(xAxisFontSize);
+
+    //  Y axis
+    QFont yAxisFont = axisY->labelsFont();
+    yAxisFontSize = Util::changeFontSize(2, true, yAxisFont.pointSize()); // set for ever
+    setYaxisFontSize(yAxisFontSize);
+}
+
+
+void VisualizeOccurrencesDialog::setXaxisFontSize(uint fontSize){
+    QFont xAxisFont = axisX->labelsFont();
+    xAxisFont.setPointSize(fontSize);
+    axisX->setLabelsFont(xAxisFont);
+}
+
+
+void VisualizeOccurrencesDialog::setYaxisFontSize(uint fontSize){
+    QFont yAxisFont = axisY->labelsFont();
+    yAxisFont.setPointSize(fontSize);
+    axisY->setLabelsFont(yAxisFont);
+}
+
+
+int VisualizeOccurrencesDialog::binarySearch(const std::vector<double>& vec, double target) {
+    int low = 0;
+    int high = vec.size() - 1;
+
+    while (low <= high) {
+        int mid = (low + high) / 2;
+        if (vec[mid] == target) {
+            return mid; // found the target
+        } else if (vec[mid] < target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+    return -1; // not found
+}
+
+
+void VisualizeOccurrencesDialog::themeChanged()
+{
+    if(GbpController::getInstance().getIsDarkModeSet()==true){
+        chart->setTheme(QChart::ChartThemeDark);
+        chart->setBackgroundBrush(QBrush(QColor("black")));
+    } else {
+        chart->setTheme(QChart::ChartThemeLight);
+        chart->setBackgroundBrush(QBrush(QColor("white")));
+    }
+    setSeriesCharacteristics();
+    // Changing theme "sometimes" change font size (???). Set them again to be sure
+    // it stays constant
+    setXaxisFontSize(xAxisFontSize);
+    setYaxisFontSize(yAxisFontSize);
+}
+
+void VisualizeOccurrencesDialog::setSeriesCharacteristics(){
+    if(GbpController::getInstance().getIsDarkModeSet()==true){
+        // point color
+        series->setBrush(GbpController::getInstance().getDarkModePointColor());
+        // selected point color
+        series->setSelectedColor(GbpController::getInstance().
+                                        getDarkModeSelectedPointColor());
+    } else {
+        // point color
+        series->setBrush(GbpController::getInstance().getLightModePointColor());
+        // selected point color
+        series->setSelectedColor(GbpController::getInstance().
+                                        getLightModeSelectedPointColor());
+    }
+    series->setBorderColor(Qt::transparent);    // no border on points
+    series->setMarkerSize(GbpController::getInstance().getChartPointSize());
+}
+
+
+void VisualizeOccurrencesDialog::replaceChartSeries(QList<QPointF> data)
+{
+    // first destroy the current series and all the data they have
+    chart->removeAllSeries();
+
+    // rebuild
+    series = new QScatterSeries(); // only true data, for markers only, superimposed
+
+    // set colors and characteristics for the series
+    setSeriesCharacteristics();
+
+    // intercept point selection
+    connect(series, SIGNAL(clicked(QPointF)), this, SLOT(mypoint_clicked(QPointF)));
+
+    // fill series with data
+    series->append(data); // take ownership
+
+    // attach to chart
+    chart->addSeries(series);  // chart takes ownership
+
+    // re-attach axis
+    series->attachAxis(axisX);
+    series->attachAxis(axisY);
+
+    // no point have been selected yet
+    indexLastPointSelected = -1;
+}
+
+
+// Always rescaled to "fit"
+void VisualizeOccurrencesDialog::rescaleChart()
+{
+    // Get chart raw data
+    QList<QPointF> timeData = series->points();
+
+    // Get current currency
+    bool found;
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario();
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale,
+        scenario->getCountryCode(), found);
+    if(!found){
+        return; // should never happen
+    }
+
+    // *** Rescale X axis. Data can be empty. ***
+    QDateTime xFrom;
+    QDateTime xTo;    // required also for Y axis re-scaling
+    if (timeData.size()==0) {
+        // no data : have a X axis scale of 1 year (arbitrary)
+        xFrom = QDateTime(GbpController::getInstance().getTomorrow(),QTime(0,0,0));
+        xTo = xFrom.addYears(1).addDays(-1);
+    } else if (timeData.size()==1){
+        // Surround the unique point by a =/- 1 day, so it is centered
+        xFrom = QDateTime::fromMSecsSinceEpoch(timeData.first().x()).addDays(-1);
+        xTo = QDateTime::fromMSecsSinceEpoch(timeData.last().x()).addDays(1);
+    } else {
+        xFrom = QDateTime::fromMSecsSinceEpoch(timeData.first().x());
+        xTo = QDateTime::fromMSecsSinceEpoch(timeData.last().x());
+    }
+    // Add margin around xMin/xMax and set range
+    QDateTime displayXfrom = xFrom;
+    QDateTime displayXto = xTo;
+    Util::calculateZoomXaxis(displayXfrom, displayXto, GbpController::getInstance().getPercentageMainChartScaling()/100.0);
+    axisX->setRange(displayXfrom, displayXto);
+
+    // *** Rescale Y axis ***
+    double yFrom ;
+    double yTo ;
+    if (timeData.size()==0){
+        // no data
+        yFrom = 0;
+        yTo = 1;
+    } else {
+        bool result = Util::findMinMaxInYvalues(timeData, xFrom.toMSecsSinceEpoch(), xTo.toMSecsSinceEpoch(),
+            yFrom, yTo);
+        // if no data is in the interval [xFrom-xTo], set arbitrary limits
+        if(result==false){
+            yFrom = 0;
+            yTo = 1;
+        }
+    }
+    // Add margin around yMin/yMax
+    double displayYfrom = yFrom;
+    double displayYto = yTo;
+    Util::calculateZoomYaxis(displayYfrom, displayYto, GbpController::getInstance().getPercentageMainChartScaling()/100.0);
+    axisY->setRange(displayYfrom, displayYto);
+}
+
+
+
+
+void VisualizeOccurrencesDialog::changeYaxisLabelFormat()
+{
+    QString countryCode = GbpController::getInstance().getScenario()->getCountryCode();
+    bool found;
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, countryCode,
+        found);
+    if(!found){
+        return;// should never happen
+    }
+    QString yValFormat = QString("\%.%1f").arg(currInfo.noOfDecimal);
+    axisY->setLabelFormat(yValFormat);
+}
+
+
 

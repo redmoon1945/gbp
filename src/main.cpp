@@ -23,7 +23,7 @@
 #include <QTranslator>
 #include <QStandardPaths>
 #include <QDir>
-
+#include <QDesktopServices>
 #include "gbpcontroller.h"
 
 void showWelcomeScreen(bool french);
@@ -118,9 +118,9 @@ int main(int argc, char *argv[])
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
         "    Territory : " + QLocale::territoryToString(sysLocale.territory()));
 
-    // set translation mechanism asap
+    // set translation mechanism asap. Only language is considered in the Locale, not the territory
     QTranslator translator;
-    QString trFileName = "gbp_"+sysLocale.name()+".qm" ;
+    QString trFileName = "gbp_"+sysLocale.languageToCode(sysLocale.language())+".qm" ;
     // required for AppImage (they are "mounted" in a temp dir by the system)
     QString pathToTranslationFiles =  QCoreApplication::applicationDirPath();
     //
@@ -133,8 +133,11 @@ int main(int argc, char *argv[])
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
             "Translation file found and loaded");
     } else {
+        QString langString = QString(
+            "No Translation file found for this language \"%1\", English will be used.")
+            .arg(sysLocale.languageToCode(sysLocale.language()));
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Warning,
-            "No Translation file found for this locale");
+            langString);
     }
 
     // init some Classes before starting

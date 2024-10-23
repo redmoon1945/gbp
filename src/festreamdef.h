@@ -49,9 +49,11 @@ public:
     // operators
     FeStreamDef& operator=(const FeStreamDef& o);
     bool operator==(const FeStreamDef& o) const;
+    bool operator!=(const FeStreamDef& o) const;
 
     // methods
     void toJson(QJsonObject &jsonObject) const;
+    bool evaluateIfSameFeList(const FeStreamDef& o) const;
     static void fromJson(const QJsonObject &jsonObject, FeStreamType expectedStreamType, QUuid &id, QString &name, QString &desc,
                          bool &active, bool &isIncome, QColor& decorationColor, Util::OperationResult &result); // we cant build a base class, so we return instead the components
 

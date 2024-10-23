@@ -57,17 +57,35 @@ OptionsDialog::~OptionsDialog()
 void OptionsDialog::slotPrepareContent()
 {
     // load settings and init controls
-    ui->chartDarkModeCheckBox->setChecked(GbpController::getInstance().getChartDarkMode());
+    ui->chartDarkModeCheckBox->setChecked(GbpController::getInstance().getIsDarkModeSet());
+
+    // chart point size
+    ui->pointSizeSpinBox->setValue(GbpController::getInstance().getChartPointSize());
+
     // curve Dark Mode widgets
-    curveDarkModeColor = GbpController::getInstance().getCurveDarkModeColor();
-    setDarkModeColorInfo();
+    darkModeCurveColor = GbpController::getInstance().getDarkModeCurveColor();
+    darkModePointColor = GbpController::getInstance().getDarkModePointColor();
+    darkModeSelectedPointColor = GbpController::getInstance().getDarkModeSelectedPointColor();
+    setColorInfo(CT_DARK_MODE,CI_CURVE);
+    setColorInfo(CT_DARK_MODE,CI_POINT);
+    setColorInfo(CT_DARK_MODE,CI_SELECTED_POINT);
+
     // curve Light Mode widgets
-    curveLightModeColor = GbpController::getInstance().getCurveLightModeColor();
-    setLightModeColorInfo();
+    lightModeCurveColor = GbpController::getInstance().getLightModeCurveColor();
+    lightModePointColor = GbpController::getInstance().getLightModePointColor();
+    lightModeSelectedPointColor = GbpController::getInstance().getLightModeSelectedPointColor();
+    setColorInfo(CT_LIGHT_MODE,CI_CURVE);
+    setColorInfo(CT_LIGHT_MODE,CI_POINT);
+    setColorInfo(CT_LIGHT_MODE,CI_SELECTED_POINT);
+
     // export text amount localization
-    ui->exportTextAmountLocalizedCheckBox->setChecked(GbpController::getInstance().getExportTextAmountLocalized());
+    ui->exportTextAmountLocalizedCheckBox->setChecked(
+        GbpController::getInstance().getExportTextAmountLocalized());
+
     // main chart scaling
-    ui->scalingMainChartSpinBox->setValue( GbpController::getInstance().getPercentageMainChartScaling());
+    ui->scalingMainChartSpinBox->setValue(
+        GbpController::getInstance().getPercentageMainChartScaling());
+
     // Application Font
     newCustomFontString = "";
     if (GbpController::getInstance().getUseDefaultSystemFont()){
@@ -75,7 +93,8 @@ void OptionsDialog::slotPrepareContent()
     } else {
         ui->customFontRadioButton->setChecked(true);
     }
-    QString s = GbpController::getInstance().getCustomApplicationFont();    // we dont know if it is valid or not set
+    // we dont know if it is valid or not set
+    QString s = GbpController::getInstance().getCustomApplicationFont();
     QString customFontString=tr("None defined");
     if (s.trimmed().length() != 0) {
         QFont f;
@@ -86,12 +105,14 @@ void OptionsDialog::slotPrepareContent()
         }
     }
     setCustomFontlabel(customFontString);
+
     // disable Font choosing button if system font is selected
     if ( ui->systemFontRadioButton->isChecked()){
         ui->setCustomFontPushButton->setEnabled(false);
     } else {
         ui->setCustomFontPushButton->setEnabled(true);
     }
+
     // Today's Date
     if (GbpController::getInstance().getTodayUseSystemDate()==true) {
         ui->todaySystemRadioButton->setChecked(true);
@@ -102,12 +123,14 @@ void OptionsDialog::slotPrepareContent()
         ui->todayDateEdit->setDate(GbpController::getInstance().getTodayCustomDate());
         ui->todayDateEdit->setEnabled(true);
     }
+
     // Allow Decoration Colors
     if (GbpController::getInstance().getAllowDecorationColor()==true) {
         ui->allowDecorationColorCheckBox->setChecked(true);
     } else {
         ui->allowDecorationColorCheckBox->setChecked(false);
     }
+
     // use Present Value
     ui->pvDiscountRateDoubleSpinBox->setValue(GbpController::getInstance().getPvDiscountRate());
     if (GbpController::getInstance().getUsePresentValue()==true) {
@@ -120,55 +143,96 @@ void OptionsDialog::slotPrepareContent()
         ui->pvDiscountRateDoubleSpinBox->setEnabled(false);
     }
 
+    // wheel mouse zooming direction
+    if (GbpController::getInstance().getWheelRotatedAwayZoomIn()==true) {
+        ui->wheelZoomInRadioButton->setChecked(true);
+    } else {
+        ui->wheelZoomInRadioButton->setChecked(false);
+    }
+
 }
 
 
+// It is this Dialog that determines the impacts of the settings changes on the application
 void OptionsDialog::on_applyPushButton_clicked()
 {
     uint newMainChartScaling = ui->scalingMainChartSpinBox->value();
     bool chartDarkMode = ui->chartDarkModeCheckBox->isChecked();
     bool usePV = ui->usePresentValueCheckBox->isChecked();
     double discountrate = ui->pvDiscountRateDoubleSpinBox->value();
+    uint chartPointSize = ui->pointSizeSpinBox->value();
 
-    OptionsChangesImpact impact = {.chart=CHART_NONE, .decorationColorStreamDef=DECO_NONE}; // init
+    OptionsChangesImpact impact = {.data=DATA_UNCHANGED, .chart_scaling=CHART_SCALING_NONE,
+        .decorationColorStreamDef=DECO_NONE, .mouseWheelZoom=WHEEL_ZOOM_NONE,.charts_theme=CHARTS_THEME_NONE};
 
-    // determine impact of options changes for the charts : from worst to less worst
+    // determine impact of options changes for data. All data have to be recalculated if PV changes
     if ( (usePV != GbpController::getInstance().getUsePresentValue()) ||
         ( (usePV) && (discountrate!=GbpController::getInstance().getPvDiscountRate()) )  ) {
-        impact.chart = CHART_FULL_RECALCULATION_REQUIRED;    // all data need to be recalculate, rescale and replot also
-    } else if (newMainChartScaling != GbpController::getInstance().getPercentageMainChartScaling()  ) {
-        impact.chart = CHART_RESCALE_AND_REPLOT;             // data stay the same, but rescale is required
-    } else if (
-        ( chartDarkMode != GbpController::getInstance().getChartDarkMode() ) ||
-        ( curveDarkModeColor != GbpController::getInstance().getCurveDarkModeColor() ) ||
-        ( curveLightModeColor != GbpController::getInstance().getCurveLightModeColor() )
-        ) {
-        impact.chart = CHART_REPLOT;                        // just redraw with different colors or background
+        // All data need to be recalculated, charts completely rebuilt
+        impact.data = DATA_RECALCULATE;
     }
+    // determine impact of options changes on Cash Balance chart scaling (overscaling factor).
+    if (newMainChartScaling !=
+            GbpController::getInstance().getPercentageMainChartScaling()  ) {
+        // Data stay the same but chart must be rescaled
+        impact.chart_scaling = CHART_SCALING_RESCALE;
+    }
+    // determine impact of options changes on charts theme (overscaling factor).
+    if  (
+        ( chartDarkMode != GbpController::getInstance().getIsDarkModeSet() ) ||
+        ( darkModeCurveColor != GbpController::getInstance().getDarkModeCurveColor() ) ||
+        ( lightModeCurveColor != GbpController::getInstance().getLightModeCurveColor() ) ||
+        ( darkModePointColor != GbpController::getInstance().getDarkModePointColor() ) ||
+        ( lightModePointColor != GbpController::getInstance().getLightModePointColor() ) ||
+        ( darkModeSelectedPointColor !=
+            GbpController::getInstance().getDarkModeSelectedPointColor() ) ||
+        ( lightModeSelectedPointColor !=
+            GbpController::getInstance().getLightModeSelectedPointColor() ) ||
+        ( chartPointSize != GbpController::getInstance().getChartPointSize() ) )
+        {
+        // Data and chart's scaling stay the same : just redraw charts with different
+        // colors or background
+        impact.charts_theme = CHARTS_THEME_REFRESH;
+    }
+
     // determine impact for decoration change
-    if (ui->allowDecorationColorCheckBox->isChecked() != GbpController::getInstance().getAllowDecorationColor()){
+    if (ui->allowDecorationColorCheckBox->isChecked() !=
+        GbpController::getInstance().getAllowDecorationColor()){
         impact.decorationColorStreamDef = DECO_REFRESH;
+    }
+
+    // determine impact for wheel mouse zooming behavior
+    if (ui->wheelZoomInRadioButton->isChecked() !=
+        GbpController::getInstance().getWheelRotatedAwayZoomIn()){
+        impact.mouseWheelZoom = WHEEL_ZOOM_REFRESH;
     }
 
     // if custom font selected, a choice must have been made
     if ( ui->customFontRadioButton->isChecked() == true) {
         if ( newCustomFontString.length() == 0 ){
-            QMessageBox::warning(nullptr,tr("Font Unselected"),tr("You must choose a custom font if you don't use the default system font"));
+            QMessageBox::warning(nullptr,tr("Font Unselected"),
+                tr("You must choose a custom font if you don't use the default system font"));
             return;
         }
     }
 
     // if application font has changed, warn user the app has to be restarted
-    if ( (GbpController::getInstance().getUseDefaultSystemFont() != ui->systemFontRadioButton->isChecked()) ||
+    if ( (GbpController::getInstance().getUseDefaultSystemFont() !=
+         ui->systemFontRadioButton->isChecked()) ||
         (GbpController::getInstance().getCustomApplicationFont() != newCustomFontString) ) {
-        QMessageBox::warning(nullptr,tr("Font Changed"),tr("Application must be restarted for font changes to take effect"));
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Font Setting changed");
+        QMessageBox::warning(nullptr,tr("Font Changed"),
+            tr("Application must be restarted for font changes to take effect"));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            "Font Setting changed");
     }
 
-    // if today's date determination mechanism or custom date have changed, warn user the app has to be restarted
-    QString oldCustomDateString = GbpController::getInstance().getTodayCustomDate().toString(Qt::DateFormat::ISODate);
+    // if today's date determination mechanism or custom date have changed,
+    // warn user the app has to be restarted
+    QString oldCustomDateString = GbpController::getInstance().getTodayCustomDate().toString(
+        Qt::DateFormat::ISODate);
     QString newCustomDateString = ui->todayDateEdit->date().toString(Qt::DateFormat::ISODate);
-    if ( GbpController::getInstance().getTodayUseSystemDate() != ui->todaySystemRadioButton->isChecked() ) {
+    if ( GbpController::getInstance().getTodayUseSystemDate() !=
+        ui->todaySystemRadioButton->isChecked() ) {
         QMessageBox::warning(nullptr,tr("Today's Determination Changed"),
             tr("Today's date determination mechanism changed. Application must be restarted for changes to take effect"));
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
@@ -178,19 +242,28 @@ void OptionsDialog::on_applyPushButton_clicked()
         QMessageBox::warning(nullptr,tr("Today's Custom Date Changed"),
             tr("Today's replacement date has changed from %1 to %2. Application must be restarted for changes to take effect").arg(oldCustomDateString).arg(newCustomDateString));
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Today's custom date has changed from %1 to %2").arg(oldCustomDateString).arg(newCustomDateString));
+            QString("Today's custom date has changed from %1 to %2").arg(oldCustomDateString).arg
+                (newCustomDateString));
     }
 
     // set settings new values
-    GbpController::getInstance().setChartDarkMode(chartDarkMode);
-    GbpController::getInstance().setCurveDarkModeColor(curveDarkModeColor);
-    GbpController::getInstance().setCurveLightModeColor(curveLightModeColor);
-    GbpController::getInstance().setExportTextAmountLocalized(ui->exportTextAmountLocalizedCheckBox->isChecked());
+
+    GbpController::getInstance().setIsDarkModeSet(chartDarkMode);
+    GbpController::getInstance().setChartPointSize(chartPointSize);
+    GbpController::getInstance().setDarkModeCurveColor(darkModeCurveColor);
+    GbpController::getInstance().setDarkModePointColor(darkModePointColor);
+    GbpController::getInstance().setDarkModeSelectedPointColor(darkModeSelectedPointColor);
+    GbpController::getInstance().setLightModeCurveColor(lightModeCurveColor);
+    GbpController::getInstance().setLightModePointColor(lightModePointColor);
+    GbpController::getInstance().setLightModeSelectedPointColor(lightModeSelectedPointColor);
+    GbpController::getInstance().setExportTextAmountLocalized(
+        ui->exportTextAmountLocalizedCheckBox->isChecked());
     GbpController::getInstance().setPercentageMainChartScaling(newMainChartScaling);
     GbpController::getInstance().setUseDefaultSystemFont(ui->systemFontRadioButton->isChecked());
     GbpController::getInstance().setCustomApplicationFont(newCustomFontString);
     GbpController::getInstance().setTodayUseSystemDate(ui->todaySystemRadioButton->isChecked());
-    GbpController::getInstance().setAllowDecorationColor(ui->allowDecorationColorCheckBox->isChecked());
+    GbpController::getInstance().setAllowDecorationColor(
+        ui->allowDecorationColorCheckBox->isChecked());
     if (ui->todaySpecificRadioButton->isChecked()) {
         GbpController::getInstance().setTodayCustomDate(ui->todayDateEdit->date());
     } else {
@@ -198,24 +271,52 @@ void OptionsDialog::on_applyPushButton_clicked()
     }
     GbpController::getInstance().setPvDiscountRate(ui->pvDiscountRateDoubleSpinBox->value());
     GbpController::getInstance().setUsePresentValue(ui->usePresentValueCheckBox->isChecked());
+    GbpController::getInstance().setWheelRotatedAwayZoomIn(
+        ui->wheelZoomInRadioButton->isChecked());
+
 
     GbpController::getInstance().saveSettings();
 
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Options have been changed"));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    Impact : chart=%1  deco=%2").arg(impact.chart).arg(impact.decorationColorStreamDef));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ChartDarkMode = %1").arg(chartDarkMode));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CurveDarkModeColor = %1").arg(curveDarkModeColor.rgba()));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CurveDarkLightColor = %1").arg(curveLightModeColor.rgba()));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    ExportTextAmountLocalized = %1").arg(ui->exportTextAmountLocalizedCheckBox->isChecked()));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    PercentageMainChartScaling = %1").arg(newMainChartScaling));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    UseDefaultSystemFont = %1").arg(ui->systemFontRadioButton->isChecked()));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CustomApplicationFont = %1").arg(newCustomFontString));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    UseSystemDateForToday = %1").arg(ui->todaySystemRadioButton->isChecked()));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    CustomTodayDate = %1").arg(
+    // Log the new values
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "Options have been changed"));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    Impact : data=%1 chart_scaling=%2 deco=%3 charts theme=%4").arg(impact.data).
+        arg(impact.chart_scaling).arg(impact.decorationColorStreamDef).arg(impact.charts_theme));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    ChartDarkMode = %1").arg(chartDarkMode));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    DarkModeCurveColor = %1").arg(darkModeCurveColor.rgba()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    DarkModePointColor = %1").arg(darkModePointColor.rgba()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    DarkModeSelectedPointColor = %1").arg(darkModeSelectedPointColor.rgba()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    LightModeCurveColor = %1").arg(lightModeCurveColor.rgba()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    LightModePointColor = %1").arg(lightModePointColor.rgba()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    LightModeSelectedPointColor = %1").arg(lightModeSelectedPointColor.rgba()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    ExportTextAmountLocalized = %1").arg(
+        ui->exportTextAmountLocalizedCheckBox->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    PercentageMainChartScaling = %1").arg(newMainChartScaling));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    UseDefaultSystemFont = %1").arg(ui->systemFontRadioButton->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    CustomApplicationFont = %1").arg(newCustomFontString));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    UseSystemDateForToday = %1").arg(ui->todaySystemRadioButton->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    CustomTodayDate = %1").arg(
         GbpController::getInstance().getTodayCustomDate().toString(Qt::DateFormat::ISODate)));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    AllowDecorationColor = %1").arg(ui->allowDecorationColorCheckBox->isChecked()));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    UsePresentValue = %1").arg(ui->usePresentValueCheckBox->isChecked()));
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("    pvDiscountrate = %1").arg(ui->pvDiscountRateDoubleSpinBox->value()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    AllowDecorationColor = %1").arg(ui->allowDecorationColorCheckBox->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    UsePresentValue = %1").arg(ui->usePresentValueCheckBox->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    pvDiscountrate = %1").arg(ui->pvDiscountRateDoubleSpinBox->value()));
 
     emit signalOptionsResult(impact);
     this->hide();
@@ -236,23 +337,51 @@ void OptionsDialog::on_OptionsDialog_rejected()
 }
 
 
-void OptionsDialog::setDarkModeColorInfo()
+void OptionsDialog::setColorInfo(ColorTheme theme, ColorItem item)
 {
     QString COLOR_STYLE("QPushButton { background-color : %1; border: none;}");
-    ui->curveDarkModeColorToolButton->setStyleSheet(COLOR_STYLE.arg(curveDarkModeColor.name()));
+    QColor c;
+    QLabel* label;
+    QPushButton* pushButton;
+    QColor color;
+    if(theme==CT_DARK_MODE){
+        if(item==CI_CURVE){
+            label = ui->darkModeCurveColorLabel;
+            pushButton = ui->darkModeCurveColorPushButton;
+            color = darkModeCurveColor;
+        } else if (item==CI_POINT){
+            label = ui->darkModePointColorLabel;
+            pushButton = ui->darkModePointColorPushButton;
+            color = darkModePointColor;
+        } else if (item==CI_SELECTED_POINT){
+            label = ui->darkModeSelectedPointColorLabel;
+            pushButton = ui->darkModeSelectedPointColorPushButton;
+            color = darkModeSelectedPointColor;        }
+        else {
+            throw std::invalid_argument("Unknown color item");
+        }
+    } else if (theme==CT_LIGHT_MODE){
+        if(item==CI_CURVE){
+            label = ui->lightModeCurveColorLabel;
+            pushButton = ui->lightModeCurveColorPushButton;
+            color = lightModeCurveColor;
+        } else if (item==CI_POINT){
+            label = ui->lightModePointColorLabel;
+            pushButton = ui->lightModePointColorPushButton;
+            color = lightModePointColor;
+        } else if (item==CI_SELECTED_POINT){
+            label = ui->lightModeSelectedPointColorLabel;
+            pushButton = ui->lightModeSelectedPointColorPushButton;
+            color = lightModeSelectedPointColor;
+        } else {
+            throw std::invalid_argument("Unknown color item");
+        }
+    } else {
+        throw std::invalid_argument("Unknown color theme");
+    }
 
-    QColor c = curveDarkModeColor.name(QColor::HexRgb);
-    ui->curveDMcolorLabel->setText(Util::buildColorDisplayName(c));
-}
-
-
-void OptionsDialog::setLightModeColorInfo()
-{
-    QString COLOR_STYLE("QPushButton { background-color : %1; border: none;}");
-    ui->curveLightModeColorToolButton->setStyleSheet(COLOR_STYLE.arg(curveLightModeColor.name()));
-
-    QColor c = curveLightModeColor.name(QColor::HexRgb);
-    ui->curveLMcolorLabel->setText(Util::buildColorDisplayName(c));
+    pushButton->setStyleSheet(COLOR_STYLE.arg( color.name()));
+    label->setText(Util::buildColorDisplayName(color));
 }
 
 
@@ -264,11 +393,14 @@ QString OptionsDialog::fontLabel(const QFont font) const
     // the info we report depends on the style and weight
     QString customFontString;
     if ( (style != QFont::Style::StyleNormal) && (w != QFont::Weight::Normal) ){
-        customFontString = QString("%1 %2 %3 %4").arg(font.family()).arg(fontWeightToString(font)).arg(fontStyleToString(font)).arg(font.pointSize());
+        customFontString = QString("%1 %2 %3 %4").arg(font.family()).arg(
+            fontWeightToString(font)).arg(fontStyleToString(font)).arg(font.pointSize());
     } else if ( (style == QFont::Style::StyleNormal) && (w != QFont::Weight::Normal) ) {
-        customFontString = QString("%1 %2 %3").arg(font.family()).arg(fontWeightToString(font)).arg(font.pointSize());
+        customFontString = QString("%1 %2 %3").arg(font.family()).arg(fontWeightToString(font)).arg(
+            font.pointSize());
     } else if ( (style != QFont::Style::StyleNormal) && (w == QFont::Weight::Normal) ) {
-        customFontString = QString("%1 %2 %3").arg(font.family()).arg(fontStyleToString(font)).arg(font.pointSize());
+        customFontString = QString("%1 %2 %3").arg(font.family()).arg(fontStyleToString(font)).arg(
+            font.pointSize());
     } else if ( (style == QFont::Style::StyleNormal) && (w == QFont::Weight::Normal) ) {
         customFontString = QString("%1 %2").arg(font.family()).arg(font.pointSize());
     }
@@ -341,32 +473,6 @@ void OptionsDialog::setCustomFontlabel(QString fontLabel)
 }
 
 
-void OptionsDialog::on_curveDarkModeColorToolButton_clicked()
-{
-    //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
-    QColor color = QColorDialog::getColor(curveDarkModeColor, this, tr("Color Chooser"));
-    if (color.isValid()==false) {
-        return;
-    } else {
-        curveDarkModeColor = color;
-        setDarkModeColorInfo();
-    }
-}
-
-
-void OptionsDialog::on_curveLightModeColorToolButton_clicked()
-{
-    //QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
-    QColor color = QColorDialog::getColor(curveLightModeColor,this, tr("Color Chooser"));
-    if (color.isValid()==false) {
-        return;
-    } else {
-        curveLightModeColor = color;
-        setLightModeColorInfo();
-    }
-}
-
-
 void OptionsDialog::on_setCustomFontPushButton_clicked()
 {
     bool ok;
@@ -377,22 +483,22 @@ void OptionsDialog::on_setCustomFontPushButton_clicked()
         QFont cFont;
         bool fOK = cFont.fromString(newCustomFontString);
         if (fOK){
-            // GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Passing custom font to FontDialog : " + cFont.toString());
-            // f = QFontDialog::getFont(&ok, cFont);
-
             // FontDialog seems to have a bug some tim ewith the font passed...
             f = QFontDialog::getFont(&ok);
         } else {
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Warning, "Cannot create custom font : " +newCustomFontString);
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal,
+                GbpController::Warning, "Cannot create custom font : " +newCustomFontString);
             f = QFontDialog::getFont(&ok );
         }
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "No custom font available to pass to FontDialog");
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
+            GbpController::Info, "No custom font available to pass to FontDialog");
         f = QFontDialog::getFont(&ok );
     }
 
     if (ok){
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Font returned by FontDialog : " + f.toString());
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
+            GbpController::Info, "Font returned by FontDialog : " + f.toString());
         // record the new font
         newCustomFontString = f.toString();
         // update the label of custom string
@@ -431,5 +537,83 @@ void OptionsDialog::on_usePresentValueCheckBox_toggled(bool checked)
         ui->pvDiscountRateDoubleSpinBox->setEnabled(false);
     }
 
+}
+
+
+void OptionsDialog::on_darkModeCurveColorPushButton_clicked()
+{
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
+    QColor color = QColorDialog::getColor(darkModeCurveColor, this, tr("Color Chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        darkModeCurveColor = color;
+        setColorInfo(CT_DARK_MODE, CI_CURVE);
+    }
+}
+
+
+void OptionsDialog::on_darkModePointColorPushButton_clicked()
+{
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
+    QColor color = QColorDialog::getColor(darkModePointColor, this, tr("Color Chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        darkModePointColor = color;
+        setColorInfo(CT_DARK_MODE, CI_POINT);
+    }
+}
+
+
+void OptionsDialog::on_darkModeSelectedPointColorPushButton_clicked()
+{
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
+    QColor color = QColorDialog::getColor(darkModeSelectedPointColor, this, tr("Color Chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        darkModeSelectedPointColor = color;
+        setColorInfo(CT_DARK_MODE, CI_SELECTED_POINT);
+    }
+}
+
+
+void OptionsDialog::on_lightModeCurveColorPushButton_clicked()
+{
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
+    QColor color = QColorDialog::getColor(lightModeCurveColor, this, tr("Color Chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        lightModeCurveColor = color;
+        setColorInfo(CT_LIGHT_MODE, CI_CURVE);
+    }
+}
+
+
+void OptionsDialog::on_lightModePointColorPushButton_clicked()
+{
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
+    QColor color = QColorDialog::getColor(lightModePointColor, this, tr("Color Chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        lightModePointColor = color;
+        setColorInfo(CT_LIGHT_MODE, CI_POINT);
+    }
+}
+
+
+void OptionsDialog::on_lightModeSelectedPointColorPushButton_clicked()
+{
+    //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
+    QColor color = QColorDialog::getColor(lightModeSelectedPointColor, this, tr("Color Chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        lightModeSelectedPointColor = color;
+        setColorInfo(CT_LIGHT_MODE, CI_SELECTED_POINT);
+    }
 }
 

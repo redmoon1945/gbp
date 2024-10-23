@@ -57,20 +57,25 @@ public:
     IrregularFeStreamDef();     // used only for some QMap operations
     IrregularFeStreamDef(const IrregularFeStreamDef& o);
     IrregularFeStreamDef(const QMap<QDate, AmountInfo> &amountSet);
-    IrregularFeStreamDef(QMap<QDate,AmountInfo> amountSet, const QUuid &id, const QString &name, const QString &desc, bool active, bool isIncome, const QColor& decorationColor);
+    IrregularFeStreamDef(QMap<QDate,AmountInfo> amountSet, const QUuid &id,
+        const QString &name, const QString &desc, bool active, bool isIncome,
+        const QColor& decorationColor);
     virtual ~IrregularFeStreamDef();
 
     // operators
     IrregularFeStreamDef& operator=(const IrregularFeStreamDef &o);
     bool operator==(const IrregularFeStreamDef &o) const;
+    bool operator!=(const IrregularFeStreamDef &o) const;
 
     // methods
     QList<Fe> generateEventStream(DateRange fromto,   QDate maxDateScenarioFeGeneration,
         double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount,
         FeMinMaxInfo& minMaxInfo) const;
+    bool evaluateIfSameFeList(const IrregularFeStreamDef& o) const;
     QString toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const;
     QJsonObject toJson() const;
-    static IrregularFeStreamDef fromJson(const QJsonObject& jsonObject, Util::OperationResult &result);
+    static IrregularFeStreamDef fromJson(const QJsonObject& jsonObject,
+        Util::OperationResult &result);
     IrregularFeStreamDef duplicate() const;
 
     // getters and setters

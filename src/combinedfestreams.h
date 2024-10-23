@@ -26,9 +26,9 @@
 
 
 
-// Aggregator class intended to merge several QList<Fe> produced by individual FeStreamDef in a single scenario.
-// One use real currency "double" value (and not qint64 decimal representation), because no more calculationis required
-// from this stage before displaying to the chart.
+// Aggregator class intended to merge several QList<Fe> produced by individual FeStreamDef in a
+// single scenario. One use real currency "double" value (and not qint64 decimal representation),
+// because no more calculationis required from this stage before displaying to the chart.
 class CombinedFeStreams
 {
     // this is to be able to use the "tr" translation function
@@ -36,12 +36,13 @@ class CombinedFeStreams
 
 public:
 
+    // In currency unit. Pack all daily information produced by calculation.
     struct DailyInfo{
-        double totalIncomes;    // already in currency unit
-        double totalExpenses;   // currency unit, negative number
-        double totalDelta;      // currency unit, total incomes - total expenses
-        QList<FeDisplay> incomesList;
-        QList<FeDisplay> expensesList;
+        double totalIncomes;    // sum of all incomes occurring during that day
+        double totalExpenses;   // negative number. Sum of all expenses occurring during that day
+        double totalDelta;      // total incomes - total expenses
+        QList<FeDisplay> incomesList;   // List of all incomes occurring during that day
+        QList<FeDisplay> expensesList;  // List of all expenses occurring during that day
         bool operator==(const DailyInfo& o) const;
         DailyInfo& operator=(const DailyInfo& o);
         };
@@ -58,7 +59,6 @@ public:
 
     // Methods
     void addStream(const QList<Fe> theStream, CurrencyInfo currInfo);
-    //QString toString(CurrencyInfo currInfo, QLocale locale) const;
 
     // getters & setters
     QMap<QDate, DailyInfo> getCombinedStreams() const;

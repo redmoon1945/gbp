@@ -46,7 +46,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="scenarioNameLineEdit">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name of the Scenario. Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="maxLength">
         <number>100</number>
@@ -152,7 +152,7 @@
           </sizepolicy>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit or View the variable inflation growth pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit or View the variable inflation growth pattern defined for this scenario.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>View/Edit...</string>
@@ -209,7 +209,7 @@
           </font>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Limited to 4000 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Descritive text for the Scenario. Limited to 4000 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -523,7 +523,7 @@
      <item>
       <widget class="QPushButton" name="editPushButton">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modify the selected income/expense.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modify the selected Financial Stream Definition.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Edit...</string>
@@ -533,7 +533,7 @@
      <item>
       <widget class="QPushButton" name="duplicatePushButton">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate each of the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate each of the selected Financial Stream Definitions. Name of each copy sees the prefix &amp;quot;Copy of&amp;quot; added to the name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Duplicate</string>
@@ -543,7 +543,7 @@
      <item>
       <widget class="QPushButton" name="deletePushButton">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete the selected incomes/expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete the selected Financial Stream Definitions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Delete</string>
@@ -583,7 +583,7 @@
      <item>
       <widget class="QPushButton" name="enablePushButton">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected incomes/expenses are activated, meaning they &lt;span style=&quot; font-weight:700;&quot;&gt;will&lt;/span&gt; all be taken into account in the calculation of the scenario data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected Financial Stream Definitions are activated, meaning they &lt;span style=&quot; font-weight:700;&quot;&gt;will&lt;/span&gt; all be taken into account in the generation of the financial events for this Scenario.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Enable</string>
@@ -593,7 +593,7 @@
      <item>
       <widget class="QPushButton" name="disablePushButton">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected incomes/expenses are de-activated, meaning they will&lt;span style=&quot; font-weight:700;&quot;&gt; NOT &lt;/span&gt;be taken into account in the calculation of the scenario data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The selected Financial Stream Definitins are de-activated, meaning they will&lt;span style=&quot; font-weight:700;&quot;&gt; NOT &lt;/span&gt;be taken into account in the generation of the financial events for this Scenario.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Disable</string>
@@ -674,6 +674,9 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply all the modifications to the current Scenario and update all the curves, charts and related information. The modifications are NOT saved to disk.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Apply</string>

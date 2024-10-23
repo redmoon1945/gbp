@@ -19,6 +19,8 @@
 #include "util.h"
 #include "float.h"
 #include <QRandomGenerator64>
+#include <iomanip>
+
 
 
 
@@ -206,33 +208,6 @@ bool Util::areDoublesApproxEqual(double a, double b, double epsilon=DBL_EPSILON)
 }
 
 
-
-// // No of guaranteed decimal digits precision :
-// // float : 6
-// // double : 15
-// // long double : 18
-// // qint64 : 18 (max is 9223372036854775808, 9999999999999999999 cannot be stored)
-// // https://www.exploringbinary.com/decimal-precision-of-binary-floating-point-numbers/
-// // So a qint64 can be stored completely in a long double and vice versa
-// long double Util::qint64ToLongDouble(qint64 amount, quint8 noOfDecimal)
-// {
-//     long double d = static_cast<long double>(amount)/Util::quickPow10(noOfDecimal);
-//     return d;
-// }
-
-
-// qint64 Util::longextractQint64FromDoubleWithNoFracPart(long double amount, quint8 noOfDecimal)
-// {
-//     long double ld = amount*Util::quickPow10(noOfDecimal);
-//     long double t = std::round(ld);
-//     if ( (t > std::numeric_limits<qint64>::max()) ||
-//          (t < std::numeric_limits<qint64>::min()) ){ // long double needed to compared to quint64, potential of truncation for crazy number...
-//         throw std::domain_error("amount is too big to fit in a quint64");
-//     }
-//     return static_cast<qint64>(t); // loss of precision possible here
-// }
-
-
 // Convert into a qint64 a double that contains no fractional part
 // Result :
 // 0 : success
@@ -275,15 +250,6 @@ quint16 Util::extractQuint16FromDoubleWithNoFracPart(double amount, quint16 maxV
     result = 0;
     return r;
 }
-
-
-// // Format a raw amount (qint64) to currency string, taking into account the locale's decimal point and group separator
-// QString Util::quint64ToDoubleString(quint64 amount, quint8 noOfDecimal, QLocale locale)
-// {
-//     long double ld = Util::qint64ToLongDouble(amount,noOfDecimal);
-//     double d = static_cast<double>(ld); // potential loss off precision,if amount has more than 15 significant digits
-//     return locale.toString(d,'f',noOfDecimal);
-// }
 
 
 //  QString do not support long double for "number"
@@ -390,21 +356,38 @@ bool Util::isValidBoolString(const QString& input) {
 }
 
 
-uint Util::changeFontSize(bool aggressive, bool decreaseSize, uint originalSize)
+// Intensity : how aggressive the change will be
+//             1 : weak
+//             2 : average
+//             3 : aggressive
+uint Util::changeFontSize(int intensity, bool decreaseSize, uint originalSize)
 {
-    if (aggressive) {
-        if (decreaseSize) {
-            return( static_cast<uint>(originalSize * 0.75));
-        } else {
-            return( static_cast<uint>(originalSize * 1.25));
+    switch (intensity) {
+        case 1:
+            if (decreaseSize) {
+                return( static_cast<uint>(originalSize * 0.90));
+            } else {
+                return( static_cast<uint>(originalSize * (1/0.9)));
+            }
+        break;
+        case 2:
+            if (decreaseSize) {
+                return( static_cast<uint>(originalSize * 0.75));
+            } else {
+                return( static_cast<uint>(originalSize * (1/0.75)));
+            }
+            break;
+        case 3:
+            if (decreaseSize) {
+                return( static_cast<uint>(originalSize * 0.5));
+            } else {
+                return( static_cast<uint>(originalSize * (1/0.5)));
+            }
+            break;
+        default:
+            throw std::invalid_argument("Unknown intensity factor");
+            break;
         }
-    } else {
-        if (decreaseSize) {
-            return( static_cast<uint>(originalSize * 0.90));
-        } else {
-            return( static_cast<uint>(originalSize * 1.1));
-        }
-    }
 }
 
 
@@ -413,7 +396,7 @@ QString Util::getColorSmartName(QColor color, bool &found)
     found = false;
     QColor cmp;
     for(auto i : qtColorNames) {
-        cmp.setNamedColor(i);
+        cmp.fromString(i);
         if(cmp == color){
             found = true;
             return i;
@@ -521,4 +504,106 @@ QLocale Util::getLocale(QStringList arguments, bool& systemLocale){
 }
 
 
+// Calculate expansion of a Date interval. Only integer multiple of Day" is done.
+// Input Parameters:
+//   expansionFactor : Portion of the range. e.g. 0.1 will have the range grow by 10% total
+//                     Valid values are : [0-0.1]
+void Util::calculateZoomXaxis( QDateTime &min, QDateTime &max, double expansionFactor)
+{
+    // make sure min is not more recent than max. Should never happen.
+    if (max < min) {
+        throw std::invalid_argument("Max is smaller than Min");
+    }
+    if( (expansionFactor < 0) || (expansionFactor > 0.1) ){
+        throw std::invalid_argument("expansionFactor is invalid");
+    }
 
+    if(min==max){
+        min = min.addDays(-1);
+        max = max.addDays(1);
+    } else {
+        uint dayDelta = min.daysTo(max); // at least = 1
+
+        // at least 1 day from each side
+        int noOfDaysToAdd = round((0.5*expansionFactor)*dayDelta);
+
+        min = min.addDays(-noOfDaysToAdd);
+        max = max.addDays(noOfDaysToAdd);
+    }
+}
+
+
+// Calculate expansion of a Date interval.
+// Input Parameters:
+//   expansionFactor : Portion of the range. e.g. 0.1 will have the range grows
+//                     by 10% total. Valid values are : [0-0.1]
+void Util::calculateZoomYaxis(double &min, double &max, double expansionFactor)
+{
+    if ((max==0) && (min==0)) {
+        min = -1;
+        max = 1;
+        return;
+    }
+
+    if (max < min) {
+        throw std::invalid_argument("Max is smaller than Min");
+    }
+    if( (expansionFactor < 0) || (expansionFactor > 0.1) ){
+        throw std::invalid_argument("expansionFactor is invalid");
+    }
+
+    double delta = max - min;
+    double amountToAdd;
+    if (delta==0) {
+        // there is no delta, so expansionFactor has no meaning here.
+        // We choose to have scale 0.1 total of the min
+        amountToAdd = (0.05 * abs(min));
+    } else {
+        amountToAdd = ( (0.5*expansionFactor) * delta );
+    }
+
+    min = min - amountToAdd;
+    max = max + amountToAdd;
+}
+
+
+// Find the min and max Y values in a list of QPointF. The X component of a QPointF is
+// a QDateTime converted to Msec.
+// Input Parameters:
+//   ptList : the list of QPointF to search in.
+//   from : do not considered QPointF for which X component is smaller than "from"
+//   to : do not considered QPointF for which X component is greater than "to"
+// Ouput Parameters:
+//   min: the min found
+//   max : the max found
+// Return Value :
+//   True if there is at least one point in this [from-to] range.
+//   False otherwise, in which case value of min & max returned are invalid.
+bool Util::findMinMaxInYvalues(const QList<QPointF> ptList, double from, double to, double &min,
+    double &max)
+{
+    if(ptList.size()==0){
+        return false;
+    }
+    min = DBL_MAX;
+    max = -DBL_MAX;
+    bool found = false;
+    double dt;
+    double val;
+    foreach (QPointF pt, ptList) {
+        dt = pt.x();
+        if ( (dt>=from) && (dt<=to) ) {
+            // at least 1 point is in the interval
+            found = true;
+            // we are inside the range, check for min/max
+            double val = pt.y();
+            if ( val < min ) {
+                min  = val;
+            }
+            if (val > max) {
+                max = val;
+            }
+        }
+    }
+    return found;
+}

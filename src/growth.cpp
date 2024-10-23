@@ -137,6 +137,12 @@ bool Growth::operator==(const Growth& o) const
 }
 
 
+bool Growth::operator!=(const Growth &o) const
+{
+    return !(*this==o);
+}
+
+
 Growth::~Growth()
 {
     annualVariableGrowth.clear();    // most probaly useless : TODO : check

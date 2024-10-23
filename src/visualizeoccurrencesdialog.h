@@ -20,6 +20,7 @@
 #define VISUALIZEOCCURRENCESDIALOG_H
 
 #include "currencyhelper.h"
+#include "customqchartview.h"
 #include "festreamdef.h"
 #include "growth.h"
 #include "fe.h"
@@ -43,7 +44,10 @@ public:
     ~VisualizeOccurrencesDialog();
 
 public slots:
-    void slotPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation, QDate maxDateScenarioFeGeneration, FeStreamDef* streamDef );
+    void slotPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation,
+        QDate maxDateScenario, FeStreamDef* streamDef );
+    // to catch point selection signal in chart
+    void mypoint_clicked(const QPointF pt);
 
 signals:
     // For client of VisualizeOccurrencesDialog : sending completion notification
@@ -52,8 +56,7 @@ signals:
 private slots:
     void on_closePushButton_clicked();
     void on_VisualizeOccurrencesDialog_rejected();
-
-    void on_showPointsCheckBox_stateChanged(int arg1);
+    void on_fitPushButton_clicked();
 
 private:
     Ui::VisualizeOccurrencesDialog *ui;
@@ -61,13 +64,20 @@ private:
     // *** Variables ***
     QLocale locale;
     CurrencyInfo currInfo;
+    // last event limit date according to scenario (could not be in use). Limit set by Periodic
+    // Stream def could override that value (if it is smaller)
     QDate maxDateScenarioFeGeneration;
     // Curve
-    QChartView *chartView = nullptr;
+    CustomQChartView *chartView;
     QChart* chart;
     QDateTimeAxis *axisX ;
     QValueAxis *axisY;
-    QLineSeries *series;
+    QScatterSeries *series;
+    QDateTime xMin, xMax;
+    uint xAxisFontSize;
+    uint yAxisFontSize;
+    std::vector<double> searchVector;
+    int indexLastPointSelected = -1;
 
     // Methods
     bool eventFilter(QObject *object, QEvent *event) override;
@@ -75,6 +85,15 @@ private:
     void updateTextTab(QList<Fe> feList, uint saturationCount, Growth scenarioInflation,  FeStreamDef *streamDef);
     void updateChartTab(QList<Fe> feList, uint saturationCount, Growth scenarioInflation,  FeStreamDef *streamDef,FeMinMaxInfo minMax);
     void initChart();
+    void reduceAxisFontSize();
+    void setXaxisFontSize(uint fontSize);
+    void setYaxisFontSize(uint fontSize);
+    int binarySearch(const std::vector<double>& vec, double target);
+    void themeChanged();
+    void setSeriesCharacteristics();
+    void replaceChartSeries(QList<QPointF> data);
+    void rescaleChart();
+    void changeYaxisLabelFormat();
 };
 
 #endif // VISUALIZEOCCURRENCESDIALOG_H

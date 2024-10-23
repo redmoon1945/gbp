@@ -118,6 +118,7 @@ public:
     // operators
     Growth& operator=(const Growth &o);
     bool operator==(const Growth& o) const;
+    bool operator!=(const Growth& o) const;
 
     // Methods
     QMap<QDate,qint64> adjustForGrowth(quint64 amount, QList<QDate> occurrenceDates, ApplicationStrategy appStrategy, double pvDiscountRate, QDate pvCalculationReferenceDate, AdjustForGrowthResult &ok) const;

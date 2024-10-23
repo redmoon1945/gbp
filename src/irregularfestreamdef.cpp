@@ -65,6 +65,12 @@ bool IrregularFeStreamDef::operator==(const IrregularFeStreamDef &o) const
 }
 
 
+bool IrregularFeStreamDef::operator!=(const IrregularFeStreamDef &o) const
+{
+    return !(*this==o);
+}
+
+
 IrregularFeStreamDef::~IrregularFeStreamDef()
 {
 }
@@ -135,6 +141,21 @@ QList<Fe> IrregularFeStreamDef::generateEventStream(DateRange fromto,
 
     return ss;
 }
+
+
+// Compare this FeStreamDef with another one and evaluate if the list of FE generated will be
+// exactly the same.
+bool IrregularFeStreamDef::evaluateIfSameFeList(const IrregularFeStreamDef &o) const
+{
+    if (FeStreamDef::evaluateIfSameFeList(o)==false){
+        return false;
+    }
+    if ( amountSet != o.amountSet ) {
+        return false;
+    }
+    return true;
+}
+
 
 QString IrregularFeStreamDef::toStringForDisplay(CurrencyInfo currInfo, QLocale locale) const
 {

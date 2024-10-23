@@ -112,9 +112,9 @@ private:
     QBarCategoryAxis* chartYearlyReportAxisX;
     QValueAxis* chartYearlyReportAxisY;
     // Common data
-    QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData;      // Raw data
-    QMap<QDate,MonthlyYearlyReport> binsMonthly;                // for Monthly report data. Day=1
-    QMap<QDate,MonthlyYearlyReport> binsYearly;                 // for Yearly report data. Day=1, month=1
+    QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData;// Raw data
+    QMap<QDate,MonthlyYearlyReport> binsMonthly;          // for Monthly report data. Day=1
+    QMap<QDate,MonthlyYearlyReport> binsYearly;           // for Yearly report data. Day=1, month=1
 
     // methods
     bool eventFilter(QObject *object, QEvent *event) override;

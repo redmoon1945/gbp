@@ -24,9 +24,8 @@
 #include <QColor>
 #include <QDate>
 #include <QCoreApplication>
-#include <sstream>
-#include <iomanip>
-#include <limits>
+#include <QPointF>
+
 
 
 // All methods should be static, because there wont be any Util object created
@@ -91,7 +90,7 @@ public:
     static long double presentValue(long double futureValue, double discountRate, int period);
     static long double presentValueConversionFactor(long double discountRate, int period);
     static bool isValidBoolString(const QString& input);
-    static uint changeFontSize(bool aggressive, bool decreaseSize, uint originalSize);
+    static uint changeFontSize(int intensity, bool decreaseSize, uint originalSize);
     static QString getColorSmartName(QColor color, bool& found);
     static QString buildColorDisplayName(QColor color);
     static quint32 bitSet(quint32 number, quint32 n);
@@ -100,6 +99,9 @@ public:
     static quint32 bitCheck(quint32 number, quint32 n);
     static int noOfMonthDifference(QDate from , QDate to);
     static QLocale getLocale(QStringList arguments, bool& systemLocale);
+    static void calculateZoomXaxis( QDateTime &min, QDateTime &max, double expansionFactor);
+    static void calculateZoomYaxis(double &min, double &max, double expansionFactor);
+    static bool findMinMaxInYvalues(const QList<QPointF> ptList, double from, double to, double &min, double &max);
 
 private:
 
