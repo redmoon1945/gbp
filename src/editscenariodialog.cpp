@@ -510,30 +510,38 @@ void EditScenarioDialog::on_applyPushButton_clicked()
     QMap<QUuid,PeriodicFeStreamDef> incomesDefPeriodic = itemTableModel->getIncomesDefPeriodic();
     QMap<QUuid,IrregularFeStreamDef> incomesDefIrregular = itemTableModel->getIncomesDefIrregular();
     QMap<QUuid,PeriodicFeStreamDef> expensesDefPeriodic = itemTableModel->getExpensesDefPeriodic();
-    QMap<QUuid,IrregularFeStreamDef> expensesDefIrregular = itemTableModel->getExpensesDefIrregular();
+    QMap<QUuid,IrregularFeStreamDef> expensesDefIrregular =
+        itemTableModel->getExpensesDefIrregular();
 
     // *** Create a new scenario from the edit dialog data
     QSharedPointer<Scenario> scenario;
     try {
         scenario = QSharedPointer<Scenario>(new Scenario(
-            Scenario::LATEST_VERSION, name, desc, maxDuration, inflation, countryCode, incomesDefPeriodic, incomesDefIrregular, expensesDefPeriodic, expensesDefIrregular));
-    } catch (...) {
+            Scenario::LATEST_VERSION, name, desc, maxDuration, inflation, countryCode,
+            incomesDefPeriodic, incomesDefIrregular, expensesDefPeriodic, expensesDefIrregular));
+    } catch (const std::exception& e) {
         // we should not get any exception...but plan for the worst
-        std::exception_ptr p = std::current_exception();
-        QString errorString = QString(tr("An unexpected error has occured.\n\nDetails : %1")).arg((p ? p.__cxa_exception_type()->name() : "null"));
+        QString errorString = QString(tr("An unexpected error has occured.\n\nDetails : %1"))
+            .arg(e.what());
         if (currentlyEditingExistingScenario) {
             QMessageBox::critical(nullptr,tr("Error modifying an existing scenario"), errorString);
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Warning, QString("Modifying an existing scenario failed, unexpected exception occured : %1").arg((p ? p.__cxa_exception_type()->name() : "null")));
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal,
+                GbpController::Warning, QString(
+                "Modifying an existing scenario failed, unexpected exception occured : %1")
+                .arg(e.what()));
         } else {
             QMessageBox::critical(nullptr,tr("Error creating scenario"), errorString);
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Warning, QString("Creating a new scenario failed, unexpected exception occured : %1").arg((p ? p.__cxa_exception_type()->name() : "null")));
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal,
+                GbpController::Warning, QString(
+                "Creating a new scenario failed, unexpected exception occured : %1")
+                .arg(e.what()));
         }
         return;
     }
 
     // *** Evaluate the type of changes made to the scenario. There are 2 options :
-    // *** 1) Scenario flow data will be different (e.g. new/deleted streamDef, max duration modified)
-    // ***    in which case data will have to be regenerated before chart is refreshed.
+    // *** 1) Scenario flow data will be different (e.g. new/deleted streamDef, max duration
+    //        modified) in which case data will have to be regenerated before chart is refreshed.
     // *** 2) Cosmetic or no change
     bool regenerateData = true;
     if(GbpController::getInstance().isScenarioLoaded()==true){
@@ -546,25 +554,52 @@ void EditScenarioDialog::on_applyPushButton_clicked()
 
     // *** log the changes
     if (currentlyEditingExistingScenario){
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Modifications to the existing scenario have been applied (but not saved yet"));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Name = %1").arg(scenario->getName()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Country ISO code = %1").arg(scenario->getCountryCode()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Version = %1").arg(scenario->getVersion()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Fe Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic().size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular().size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic().size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular().size()));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Modifications to the existing scenario have been applied (but not saved yet"));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    Name = %1").arg(scenario->getName()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug,
+            GbpController::Info, QString("    Country ISO code = %1")
+            .arg(scenario->getCountryCode()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    Version = %1").arg(scenario->getVersion()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    Fe Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic()
+            .size()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular()
+            .size()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic()
+            .size()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular()
+            .size()));
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Creation of a new scenario have succeeded (but not saved yet"));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Name = %1").arg(scenario->getName()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Country ISO code = %1").arg(scenario->getCountryCode()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    Version = %1").arg(scenario->getVersion()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    F Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic().size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular().size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic().size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular().size()));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Creation of a new scenario have succeeded (but not saved yet"));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    Name = %1").arg(scenario->getName()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    Country ISO code = %1").arg(scenario->getCountryCode()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    Version = %1").arg(scenario->getVersion()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    F Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic()
+            .size()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular()
+            .size()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic()
+            .size()));
+        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+            QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular()
+            .size()));
     }
 
     // *** Provide the editing result to caller

@@ -723,52 +723,52 @@ Credits :
         <translation>DateRange - L&apos;étiquette &quot;Start&quot; a une valeur %1 qui n&apos;est pas une date ISO valide</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="213"/>
+        <location filename="daterange.cpp" line="215"/>
         <source>DateRange - Cannot find End tag</source>
         <translation>DateRange - L&apos;étiquette &quot;End&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="218"/>
+        <location filename="daterange.cpp" line="220"/>
         <source>DateRange - End tag is not a string</source>
         <translation>DateRange - L&apos;étiquette &quot;End&quot;n&apos;est pas une chaine de caractère valide</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="224"/>
+        <location filename="daterange.cpp" line="226"/>
         <source>DateRange - End Date value %1 is not a valid ISO Date</source>
         <translation>DateRange - L&apos;étiquette &quot;End&quot; a une valeur %1 qui n&apos;est pas une date ISO valide</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="232"/>
+        <location filename="daterange.cpp" line="236"/>
         <source>DateRange - End Date value %1 is smaller than start date %2</source>
         <translation>DateRange - La date %1 survient avant la date %2</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="240"/>
+        <location filename="daterange.cpp" line="247"/>
         <source>DateRange - Cannot find Type tag</source>
         <translation>DateRange - L&apos;étiquette &quot;Type&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="245"/>
+        <location filename="daterange.cpp" line="252"/>
         <source>DateRange - Type tag is not a number</source>
         <translation>DateRange - L&apos;étiquette &quot;Type&quot; n&apos;est pas un nombre valide</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="253"/>
+        <location filename="daterange.cpp" line="260"/>
         <source>DateRange - Type tag %1 is not an integer</source>
         <translation>DateRange - L&apos;étiquette &quot;Type&quot; a une valeur %1 qui n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="258"/>
+        <location filename="daterange.cpp" line="265"/>
         <source>DateRange - Type tag %1 is far too big</source>
         <translation>DateRange - L&apos;étiquette &quot;Type&quot; a une valeur %1 qui n&apos;est pas valide</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="276"/>
+        <location filename="daterange.cpp" line="283"/>
         <source>DateRange - Type tag %1 is unkown</source>
         <translation>DateRange - L&apos;étiquette &quot;Type&quot; a une valeur %1 qui est inconnue</translation>
     </message>
     <message>
-        <location filename="daterange.cpp" line="282"/>
+        <location filename="daterange.cpp" line="288"/>
         <source>DateRange - An unexpected error has occured.
 
 Details : %1</source>
@@ -1752,7 +1752,7 @@ Détails : %1</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.cpp" line="289"/>
-        <location filename="editperiodicdialog.cpp" line="593"/>
+        <location filename="editperiodicdialog.cpp" line="594"/>
         <source>Invalid Data Entered</source>
         <translation>Donnée invalide</translation>
     </message>
@@ -1791,7 +1791,7 @@ Détails : %1</translation>
         <translation>Erreur lors du traitement du montant : code = %1</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="451"/>
+        <location filename="editperiodicdialog.cpp" line="450"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
@@ -1800,7 +1800,7 @@ Details : %1</source>
 Détails : %1</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="545"/>
+        <location filename="editperiodicdialog.cpp" line="546"/>
         <source>Edit Description</source>
         <translation>Édition de la description</translation>
     </message>
@@ -1872,7 +1872,7 @@ Détails : %1</translation>
         <translation type="vanished">Résultats</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="556"/>
+        <location filename="editperiodicdialog.cpp" line="557"/>
         <source>Color Chooser</source>
         <translation>Sélection de couleur</translation>
     </message>
@@ -2266,7 +2266,7 @@ Détails : %1</translation>
         <translation>Éditer la description</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="523"/>
+        <location filename="editscenariodialog.cpp" line="524"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
@@ -2275,53 +2275,53 @@ Details : %1</source>
 Détails : %1</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="525"/>
+        <location filename="editscenariodialog.cpp" line="527"/>
         <source>Error modifying an existing scenario</source>
         <translation>Erreur lors de la modification du scénario</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="528"/>
+        <location filename="editscenariodialog.cpp" line="533"/>
         <source>Error creating scenario</source>
         <translation>Erreur lors de la création d&apos;un scénario</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="620"/>
+        <location filename="editscenariodialog.cpp" line="655"/>
         <source>No items</source>
         <translation>Aucun item</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="622"/>
+        <location filename="editscenariodialog.cpp" line="657"/>
         <source>1 item</source>
         <translation>1 item</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="624"/>
+        <location filename="editscenariodialog.cpp" line="659"/>
         <source>%1 items</source>
         <translation>%1 items</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="637"/>
-        <location filename="editscenariodialog.cpp" line="674"/>
-        <location filename="editscenariodialog.cpp" line="707"/>
-        <location filename="editscenariodialog.cpp" line="734"/>
-        <location filename="editscenariodialog.cpp" line="750"/>
+        <location filename="editscenariodialog.cpp" line="672"/>
+        <location filename="editscenariodialog.cpp" line="709"/>
+        <location filename="editscenariodialog.cpp" line="742"/>
+        <location filename="editscenariodialog.cpp" line="769"/>
+        <location filename="editscenariodialog.cpp" line="785"/>
         <source>Invalid Selection</source>
         <translation>Sélection invalide</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="637"/>
+        <location filename="editscenariodialog.cpp" line="672"/>
         <source>Select exactly one row</source>
         <translation>Sélectionner exactement une rangée</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="674"/>
+        <location filename="editscenariodialog.cpp" line="709"/>
         <source>Select at least 1 item</source>
         <translation>Sélectionner au moins un item</translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="707"/>
-        <location filename="editscenariodialog.cpp" line="734"/>
-        <location filename="editscenariodialog.cpp" line="750"/>
+        <location filename="editscenariodialog.cpp" line="742"/>
+        <location filename="editscenariodialog.cpp" line="769"/>
+        <location filename="editscenariodialog.cpp" line="785"/>
         <source>Select at least one item</source>
         <translation>Sélectionner au moins un item</translation>
     </message>
@@ -2964,85 +2964,85 @@ où :
         <translation>Importer</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="71"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="197"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="73"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="239"/>
         <source>File %1 does not exist</source>
         <translation>Le fichier %1 n&apos;existe pas</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="73"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="95"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="104"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="114"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="121"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="130"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="139"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="150"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="173"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="181"/>
-        <location filename="loadirregulartextfiledialog.cpp" line="198"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="75"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="100"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="113"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="127"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="138"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="155"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="169"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="186"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="213"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="222"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="240"/>
         <source>Import failed</source>
         <translation>Échec de l&apos;importation</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="93"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="96"/>
         <source>Bad format for line no %1 (no of tokens is not 3 or 2, but %2).</source>
         <translation>Format invalide pour la ligne no %1 (nombre de jetons n&apos;est pas 3 ou 2, mais %2).</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="102"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="109"/>
         <source>Date &quot;%1&quot; is invalid at line no %2.</source>
         <translation>La date &quot;%1&quot; est invalide à la ligne no %2.</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="112"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="123"/>
         <source>Amount &quot;%1&quot; is not a valid number at line no %2.</source>
         <translation>Le montant &quot;%1&quot; n&apos;est pas un nombre valide à la ligne no %2.</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="119"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="134"/>
         <source>Amount &quot;%1&quot; is smaller than 0 at line %2.</source>
         <translation>Le montant &quot;%1&quot; est inférieur à 0 à la ligne %2.</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="128"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="150"/>
         <source>Amount &quot;%1&quot; is bigger than the maximum allowed of %2 at line %3.</source>
         <translation>Le montant &quot;%1&quot; est supérieur au maximum permis de %2 à la ligne %3.</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="137"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="165"/>
         <source>Amount &quot;%1&quot; cannot be processed at line %2.</source>
         <translation>Le montant &quot;%1&quot; ne peut pas être traité à la ligne %2.</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="148"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="180"/>
         <source>Notes length (%1 char.) is longer than the max allowed of %2 at line %3.</source>
         <translation>La longueur de la note (%1 caractères) est supérieure au maximum permis de %2 à la ligne %3.</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="164"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="202"/>
         <source>Import succeeded</source>
         <translation>Succès de l&apos;importation</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="164"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="203"/>
         <source>%1 entry(ies) have been imported.</source>
         <translation>%1 entrées ont été importées.</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="171"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="210"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation>Une erreur est survenue. Détails : %1</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="179"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="220"/>
         <source>Cannot open file %1 in read-only mode</source>
         <translation>Impossible d&apos;ouvrir le fichier %1 en mode lecture</translation>
     </message>
     <message>
-        <location filename="loadirregulartextfiledialog.cpp" line="193"/>
+        <location filename="loadirregulartextfiledialog.cpp" line="235"/>
         <source>Select a Unicode text file</source>
         <translation>Choisir un fichier texte</translation>
     </message>
@@ -3515,7 +3515,7 @@ Details : %1</source>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="696"/>
-        <location filename="mainwindow.cpp" line="1563"/>
+        <location filename="mainwindow.cpp" line="1562"/>
         <source>No scenario loaded yet : nothing to save</source>
         <translation>Aucun scénario chargé</translation>
     </message>
@@ -3528,34 +3528,34 @@ Details : %1</source>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="758"/>
-        <location filename="mainwindow.cpp" line="768"/>
+        <location filename="mainwindow.cpp" line="767"/>
         <source>Loading Scenario Failed</source>
         <translation>Échec du chargement du scénario</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="766"/>
+        <location filename="mainwindow.cpp" line="765"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation>Une erreur est survenue. Détails : %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="804"/>
+        <location filename="mainwindow.cpp" line="803"/>
         <source>Error updating file on disk</source>
         <translation>Erreur lors de la mise à jour du fichier</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="804"/>
+        <location filename="mainwindow.cpp" line="803"/>
         <source>Upgrading the file format of this scenario file from v1 to v2 failed. This could indicates a write permission issue with the file.</source>
         <translation>Echec de la mise à jour du format de fichier de ce scénario de v1 vers v2. Une cause potentielle serait un problème de permission d&apos;écriture.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="811"/>
+        <location filename="mainwindow.cpp" line="810"/>
         <source>Scenario opened successfully</source>
         <translation>Scénario chargé avec succès</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="813"/>
+        <location filename="mainwindow.cpp" line="812"/>
         <source>Scenario opened successfully (converted from version 1 to 2)</source>
         <translation>Ouverture réussie du scénario (conversion de la version 1 à la version 2)</translation>
     </message>
@@ -3566,53 +3566,53 @@ Details : %2</source>
         <translation type="vanished">L&apos;erreur no %1 est survenue. Détails : %2</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="885"/>
+        <location filename="mainwindow.cpp" line="884"/>
         <source>Edit Scenario Failed</source>
         <translation>Échec de l&apos;édition du scénario</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="885"/>
-        <location filename="mainwindow.cpp" line="1756"/>
+        <location filename="mainwindow.cpp" line="884"/>
+        <location filename="mainwindow.cpp" line="1755"/>
         <source>No scenario loaded</source>
         <translation>Aucun scénario chargé</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1150"/>
+        <location filename="mainwindow.cpp" line="1149"/>
         <source>A new scenario has been created</source>
         <translation>Un nouveau scénario a été créé</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1165"/>
+        <location filename="mainwindow.cpp" line="1164"/>
         <source>Current scenario has been modified</source>
         <translation>Le scénario courant a ét modifié</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1243"/>
+        <location filename="mainwindow.cpp" line="1242"/>
         <source>Options changes have been successfully saved</source>
         <translation>Les changements aux options ont été sauvegardés avec succès</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1331"/>
+        <location filename="mainwindow.cpp" line="1330"/>
         <source>y</source>
         <translation>a</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1332"/>
+        <location filename="mainwindow.cpp" line="1331"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1333"/>
+        <location filename="mainwindow.cpp" line="1332"/>
         <source>d</source>
         <translation>j</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1366"/>
+        <location filename="mainwindow.cpp" line="1365"/>
         <source>Clear List</source>
         <translation>Effacer la liste</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1756"/>
+        <location filename="mainwindow.cpp" line="1755"/>
         <source>Scenario Properties Failed</source>
         <translation>Échec Propriétés du scénario</translation>
     </message>
@@ -3622,48 +3622,48 @@ Details : %2</source>
         <translation type="vanished">Le scénario courant a été modifié, mais les changements n&apos;ont pas été sauvegardés sur disque. Si vous ouvrez un autre scénario, ces modifications seront perdues. Désirez-vous quand même ouvrir un autre scénario ?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1563"/>
-        <location filename="mainwindow.cpp" line="1586"/>
+        <location filename="mainwindow.cpp" line="1562"/>
+        <location filename="mainwindow.cpp" line="1585"/>
         <source>Export Failed</source>
         <translation>Échec de l&apos;exportation</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1571"/>
+        <location filename="mainwindow.cpp" line="1570"/>
         <source>Text Files (*.txt *.TXT *.csv *.CSV)</source>
         <translation>Fichiers texte (*.txt *.TXT *.csv *.CSV)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1572"/>
+        <location filename="mainwindow.cpp" line="1571"/>
         <source>Select a File</source>
         <translation>Choisir un fichier</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1586"/>
+        <location filename="mainwindow.cpp" line="1585"/>
         <source>Cannot open the file for writing</source>
         <translation>Impossible d&apos;ouvrir le fichier en mode écriture</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1613"/>
+        <location filename="mainwindow.cpp" line="1612"/>
         <source>Date</source>
         <translation>Date</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1613"/>
+        <location filename="mainwindow.cpp" line="1612"/>
         <source>Total Daily Incomes</source>
         <translation>Total revenus quotidiens</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1613"/>
+        <location filename="mainwindow.cpp" line="1612"/>
         <source>Total Daily Expenses</source>
         <translation>Total dépenses quotidiennes</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1613"/>
+        <location filename="mainwindow.cpp" line="1612"/>
         <source>Total Delta</source>
         <translation>Écart total</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1613"/>
+        <location filename="mainwindow.cpp" line="1612"/>
         <source>Cumulative Total</source>
         <translation>Total cummulatif</translation>
     </message>
@@ -4309,55 +4309,54 @@ Details : %2</source>
         <translation>Erreur %1</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="198"/>
         <source>Unknown error occured (%1)</source>
-        <translation>Une erreur est survenue (%1)</translation>
+        <translation type="vanished">Une erreur est survenue (%1)</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="210"/>
+        <location filename="scenario.cpp" line="203"/>
         <source>Cannot open the file in write-only mode</source>
         <oldsource>Cannot open the already existing file in write-only mode</oldsource>
         <translation>Impossible d&apos;ouvrir le fichier en mode écriture</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="214"/>
+        <location filename="scenario.cpp" line="207"/>
         <source>Cannot create the file in write-only mode</source>
         <translation>Impossible de créer le fichier en mode écriture</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="223"/>
+        <location filename="scenario.cpp" line="216"/>
         <source>Cannot write to the file</source>
         <translation>Impossible d&apos;écrire dans le fichier</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="481"/>
+        <location filename="scenario.cpp" line="474"/>
         <source>File %1 does not exist</source>
         <translation>Le fichier %1 n&apos;existe pas</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="487"/>
+        <location filename="scenario.cpp" line="480"/>
         <source>Cannot open file %1 in read-only mode</source>
         <translation>Impossible d&apos;ouvrir le fichier %1 en mode lecture</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="498"/>
+        <location filename="scenario.cpp" line="491"/>
         <source>File %1 is not a GBP scenario file.
 
 Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation>Le fichier %1 n&apos;est pas un scénario valide. Détails: Code d&apos;erreur = %2, offset = %3, message d&apos;erreur = %4</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="511"/>
+        <location filename="scenario.cpp" line="504"/>
         <source>Cannot find Version tag</source>
         <translation>L&apos;étiquette &quot;Version&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="517"/>
+        <location filename="scenario.cpp" line="510"/>
         <source>Version tag is not a string</source>
         <translation>L&apos;étiquette &quot;Version&quot; a une valeur qui n&apos;est pas une chaine de caractère</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="524"/>
+        <location filename="scenario.cpp" line="517"/>
         <source>Version tag has a length %1, which is longer than max allowed of %2</source>
         <translation>L&apos;étiquette &quot;Version&quot; a une valeur qui a une longueur de %1 supérieure au maximum permis de %2</translation>
     </message>
@@ -4366,177 +4365,177 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation type="vanished">Le fichier &quot;%1&quot; est formatté pour fonctionner avec la version &quot;%2&quot;, qui elle est incompatible avec la version courante &quot;%3&quot;</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="536"/>
+        <location filename="scenario.cpp" line="529"/>
         <source>Scenario file %1 is of version %2, which is incompatible with version %3 used by this version of the application</source>
         <translation>Le fichier scénario %1 est de version %2, laquelle est incompatible avec la version %3 utilisée par cette version de l&apos;application</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="546"/>
+        <location filename="scenario.cpp" line="539"/>
         <source>Cannot find Name tag</source>
         <translation>L&apos;étiquette &quot;Name&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="552"/>
+        <location filename="scenario.cpp" line="545"/>
         <source>Name tag is not a string</source>
         <translation>L&apos;étiquette &quot;Name&quot; a une valeur qui n&apos;est pas une chaine de caractères</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="559"/>
+        <location filename="scenario.cpp" line="552"/>
         <source>Name tag is too long</source>
         <translation>L&apos;étiquette &quot;Name&quot; a une valeur qui est trop longue</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="568"/>
+        <location filename="scenario.cpp" line="561"/>
         <source>Cannot find Description tag</source>
         <translation>L&apos;étiquette &quot;Description&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="574"/>
+        <location filename="scenario.cpp" line="567"/>
         <source>Description tag is not a string</source>
         <translation>L&apos;étiquette &quot;Description&quot; a une valeur qui n&apos;est pas une chaine de caractères</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="581"/>
+        <location filename="scenario.cpp" line="574"/>
         <source>Description tag has a length of %1, which is greater than the maximum allowed of %2</source>
         <translation>L&apos;étiquette &quot;Description&quot; a une valeur de longueur %1, qui est supérieure au maximum permis de %2</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="595"/>
+        <location filename="scenario.cpp" line="588"/>
         <source>FeGeneration tag is not a number</source>
         <translation>La valeur de l&apos;étiquette FeGeneration tag n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="603"/>
+        <location filename="scenario.cpp" line="596"/>
         <source>FeGenerationDuration - Value %1 is not an integer</source>
         <translation>La valeur %1 de l&apos;étiquette FeGenerationDuration n&apos;est pas un entier</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="608"/>
+        <location filename="scenario.cpp" line="601"/>
         <source>FeGenerationDuration - Value %1 is too big</source>
         <translation>La valeur %1 de l&apos;étiquette FeGenerationDuration est trop grande</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="618"/>
+        <location filename="scenario.cpp" line="611"/>
         <source>Cannot find CountryCode tag</source>
         <translation>L&apos;étiquette &quot;CountryCode&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="624"/>
+        <location filename="scenario.cpp" line="617"/>
         <source>CountryCode tag is not a string</source>
         <translation>L&apos;étiquette &quot;CountryCode&quot; a une valeur qui n&apos;est pas une chaine de caractères</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="631"/>
+        <location filename="scenario.cpp" line="624"/>
         <source>Country code %1 is invalid</source>
         <translation>L&apos;étiquette &quot;CountryCode&quot; a une valeur %1 qui est invalide</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="640"/>
+        <location filename="scenario.cpp" line="633"/>
         <source>Cannot find Inflation tag</source>
         <translation>L&apos;étiquette &quot;Inflation&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="646"/>
+        <location filename="scenario.cpp" line="639"/>
         <source>Inflation tag is not an object</source>
         <translation>L&apos;étiquette &quot;Inflation&quot; a une valeur qui n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="654"/>
+        <location filename="scenario.cpp" line="647"/>
         <source>Inflation value is invalid : %1</source>
         <translation>L&apos;étiquette &quot;Inflation&quot; a une valeur %1 qui est invalide</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="670"/>
+        <location filename="scenario.cpp" line="663"/>
         <source>Cannot find IncomesPeriodic tag</source>
         <translation>L&apos;étiquette &quot;IncomesPeriodic&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="676"/>
+        <location filename="scenario.cpp" line="669"/>
         <source>IncomesPeriodic tag is not an object</source>
         <translation>L&apos;étiquette &quot;IncomesPeriodic&quot; a une valeur qui n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="684"/>
+        <location filename="scenario.cpp" line="677"/>
         <source>Too many Periodic Incomes items found (%1 found, max is %2)</source>
         <translation>%1 revenus de catégorie &quot;Périodique&quot;ont été trouvés, ce qui surpasse le maximum permis de %2</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="693"/>
+        <location filename="scenario.cpp" line="686"/>
         <source>Periodic Income - Value for key %1 is not a valid UUID</source>
         <translation>Periodic Income - La valeur de la clé %1 n&apos;est pas un UUID valide</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="701"/>
+        <location filename="scenario.cpp" line="694"/>
         <source>Periodic Income - Value for key %1 is not an Object</source>
         <translation>Periodic Income - La valeur de la clé %1 n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="723"/>
+        <location filename="scenario.cpp" line="716"/>
         <source>Cannot find IncomesIrregular tag</source>
         <translation>L&apos;étiquette &quot;IncomesIrregular&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="729"/>
+        <location filename="scenario.cpp" line="722"/>
         <source>IncomesIrregular tag is not an object</source>
         <translation>L&apos;étiquette &quot;IncomesIrregular&quot; a une valeur qui n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="737"/>
+        <location filename="scenario.cpp" line="730"/>
         <source>Too many Irregular Incomes items found (%1 found, max is %2)</source>
         <translation>%1 revenus de catégorie &quot;Irrégulier&quot;ont été trouvés, ce qui surpasse le maximum permis de %2</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="746"/>
+        <location filename="scenario.cpp" line="739"/>
         <source>Irregular Income - Value for key %1 is not a valid UUID</source>
         <translation>Irregular Income - La valeur de la clé %1 n&apos;est pas un UUID valide</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="754"/>
+        <location filename="scenario.cpp" line="747"/>
         <source>Irregular Income - Value for key %1 is not an Object</source>
         <translation>Irregular Income - La valeur de la clé %1 n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="776"/>
+        <location filename="scenario.cpp" line="769"/>
         <source>Cannot find ExpensesPeriodic tag</source>
         <translation>L&apos;étiquette &quot;ExpensesPeriodic&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="787"/>
+        <location filename="scenario.cpp" line="780"/>
         <source>Too many Periodic Expenses items found (%1 found, max is %2)</source>
         <translation>%1 dépenses de catégorie &quot;Périodique&quot;ont été trouvés, ce qui surpasse le maximum permis de %2</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="796"/>
+        <location filename="scenario.cpp" line="789"/>
         <source>Periodic Expense - Value for key %1 is not a valid UUID</source>
         <translation>Periodic Expense - La valeur de la clé %1 n&apos;est pas un UUID valide</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="804"/>
+        <location filename="scenario.cpp" line="797"/>
         <source>Periodic Expense - Value for key %1 is not an Object</source>
         <translation>Periodic Expense - La valeur de la clé %1 n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="826"/>
+        <location filename="scenario.cpp" line="819"/>
         <source>Cannot find ExpensesIrregular tag</source>
         <translation>L&apos;étiquette &quot;ExpensesIrregular&quot; n&apos;a pas été trouvée</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="832"/>
+        <location filename="scenario.cpp" line="825"/>
         <source>ExpensesIrregular tag is not an object</source>
         <translation>L&apos;étiquette &quot;ExpensesIrregular&quot; a une valeur qui n&apos;est pas un &quot;Object&quot;</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="840"/>
+        <location filename="scenario.cpp" line="833"/>
         <source>Too many Irregular Expenses items found (%1 found, max is %2)</source>
         <translation>%1 dépenses de catégorie &quot;Irrégulier&quot;ont été trouvés, ce qui surpasse le maximum permis de %2</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="849"/>
+        <location filename="scenario.cpp" line="842"/>
         <source>Irregular Expense - Value for key %1 is not a valid UUID</source>
         <translation>Irregular Expense - La valeur de la clé %1 n&apos;est pas un UUID valide</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="857"/>
+        <location filename="scenario.cpp" line="850"/>
         <source>Irregular Expense - Value for key %1 is not an Object</source>
         <translation>Irregular Expense - La valeur de la clé %1 n&apos;est pas un &quot;Object&quot;</translation>
     </message>

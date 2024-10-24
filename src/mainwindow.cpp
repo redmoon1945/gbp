@@ -761,14 +761,13 @@ bool MainWindow::loadScenarioFile(QString fileName)
                 fr.code).arg(fr.errorStringLog));
             return false;
         }
-    } catch(...){
-        std::exception_ptr p = std::current_exception();
+    } catch(const std::exception& e){
         errorStringUI = QString(tr("An unexpected error has occured.\n\nDetails : %1")).arg(
-            (p ? p.__cxa_exception_type()->name() : "null"));
+            e.what());
         QMessageBox::critical(nullptr,tr("Loading Scenario Failed"), errorStringUI);
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Error,
-            QString("Loading scenario failed : unexpected exception occured : %1").arg(
-            (p ? p.__cxa_exception_type()->name() : "null")));
+            QString("Loading scenario failed : unexpected exception occured : %1")
+            .arg(e.what()));
         return false;
     }
     // switch scenario
@@ -1150,13 +1149,13 @@ void MainWindow::slotEditScenarioResult(bool currentlyEditingNewScenario, bool r
         msgStatusbar(tr("A new scenario has been created"));
     } else{
         // this is an existing scenario, that has been modified (potentially).
-        // Do not touch X axis if no regeneration has to be performed
+        // Do not touch X axis is any cases : we assume user wants to keep unchanges the X axis
         if (regenerateData==true) {
             QList<QPointF> timeData;        // raw data for scatterSeries (real data)
             QList<QPointF> shadowTimeData;
             regenerateRawData(timeData, shadowTimeData);
             replaceChartSeries(timeData, shadowTimeData);
-            rescaleChart({.mode=X_RESCALE::X_RESCALE_DATA_MAX}, true);
+            rescaleChart({.mode=X_RESCALE::X_RESCALE_NONE}, false);
             emptyDailyInfoSection();
             // update general info section
             fillGeneralInfoSection();
@@ -1647,7 +1646,7 @@ void MainWindow::on_baselineDoubleSpinBox_editingFinished()
     QList<QPointF> shadowTimeData;
     regenerateRawData(timeData, shadowTimeData);
     replaceChartSeries(timeData, shadowTimeData);
-    rescaleChart({.mode=X_RESCALE::X_RESCALE_NONE}, true);
+    rescaleChart({.mode=X_RESCALE::X_RESCALE_NONE}, false);
     ui->baselineDoubleSpinBox->clearFocus();
 }
 

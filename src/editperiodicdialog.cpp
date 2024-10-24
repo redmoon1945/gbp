@@ -442,14 +442,15 @@ void EditPeriodicDialog::buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataR
     // build item
     try {
         result.pStreamDef = PeriodicFeStreamDef(periodicType, periodMultiplier, amount, growth, gs,
-                                                gap, initialId, ui->nameLineEdit->text(), ui->descPlainTextEdit->toPlainText(),
-                                                ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, from, to, ui->toScenarioRadioButton->isChecked(),
-                                                inflationModifFactor);
-    } catch (...) {
+            gap, initialId, ui->nameLineEdit->text(), ui->descPlainTextEdit->toPlainText(),
+            ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, from, to,
+            ui->toScenarioRadioButton->isChecked(),inflationModifFactor);
+    } catch (const std::exception& e) {
         // unexpected error, should never happen
-        std::exception_ptr p = std::current_exception();
-        result.errorMessageUI = QString(tr("An unexpected error has occured.\n\nDetails : %1")).arg((p ? p.__cxa_exception_type()->name() : "null"));
-        result.errorMessageLog = QString("An unexpected error has occured.\n\nDetails : %1").arg((p ? p.__cxa_exception_type()->name() : "null"));
+        result.errorMessageUI = QString(tr("An unexpected error has occured.\n\nDetails : %1"))
+            .arg(e.what());
+        result.errorMessageLog = QString("An unexpected error has occured.\n\nDetails : %1")
+            .arg(e.what());
         return;
     }
 

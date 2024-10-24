@@ -193,13 +193,6 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
         result.code = SAVE_ERROR_INTERNAL_JSON_CREATION;
         return result;
     }
-    catch (...) {
-        std::exception_ptr p = std::current_exception();
-        result.errorStringUI = tr("Unknown error occured (%1)").arg((p ? p.__cxa_exception_type()->name() : "null"));
-        result.errorStringLog = QString("Unknown error occured (%1)").arg((p ? p.__cxa_exception_type()->name() : "null"));
-        result.code = SAVE_ERROR_INTERNAL_JSON_CREATION;
-        return result;
-    }
 
     QFile file(fullFileName);
     bool fileAlreadyExist = file.exists();

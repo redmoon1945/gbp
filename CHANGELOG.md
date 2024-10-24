@@ -1,4 +1,9 @@
 # Change logs
+## 1.4.0 to 1.4.1
+### Fixes
+- In EditScenario, when "Apply" button is clicked, refresh the Cash Balance curve while maintaining the X axis scaling as it was.
+- In MainWindow, when baseline amount is changed, refresh the Cash Balance curve while maintaining the X axis scaling as it was.
+
 ## 1.3.0 to 1.4.0
 ### New Features
 - Moved from Qt 6.2.4 to 6.8.0

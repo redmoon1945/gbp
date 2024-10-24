@@ -203,8 +203,10 @@ DateRange DateRange::fromJson(const QJsonObject &jsonObject, Util::OperationResu
     }
     QDate s = QDate::fromString(jsonValue.toString(),Qt::ISODate);
     if( !(s.isValid()) ) {
-        result.errorStringUI = tr("DateRange - Start Date value %1 is not a valid ISO Date").arg(jsonValue.toString());
-        result.errorStringLog = QString("DateRange - Start Date value %1 is not a valid ISO Date").arg(jsonValue.toString());
+        result.errorStringUI = tr(
+            "DateRange - Start Date value %1 is not a valid ISO Date").arg(jsonValue.toString());
+        result.errorStringLog = QString("DateRange - Start Date value %1 is not a valid ISO Date")
+            .arg(jsonValue.toString());
         return r;
     }
     // End tag
@@ -221,16 +223,21 @@ DateRange DateRange::fromJson(const QJsonObject &jsonObject, Util::OperationResu
     }
     QDate e = QDate::fromString(jsonValue.toString(),Qt::ISODate);
     if( !(e.isValid()) ) {
-        result.errorStringUI = tr("DateRange - End Date value %1 is not a valid ISO Date").arg(jsonValue.toString());
-        result.errorStringLog = QString("DateRange - End Date value %1 is not a valid ISO Date").arg(jsonValue.toString());
+        result.errorStringUI = tr("DateRange - End Date value %1 is not a valid ISO Date")
+            .arg(jsonValue.toString());
+        result.errorStringLog = QString("DateRange - End Date value %1 is not a valid ISO Date")
+            .arg(jsonValue.toString());
         return r;
     }
     // check that dates are valid
 
     // check that end is >= start
     if(e<s){
-        result.errorStringUI = tr("DateRange - End Date value %1 is smaller than start date %2").arg(e.toString(Qt::ISODate),s.toString(Qt::ISODate));
-        result.errorStringLog = QString("DateRange - End Date value %1 is smaller than start date %2").arg(e.toString(Qt::ISODate),s.toString(Qt::ISODate));
+        result.errorStringUI = tr("DateRange - End Date value %1 is smaller than start date %2")
+            .arg(e.toString(Qt::ISODate),s.toString(Qt::ISODate));
+        result.errorStringLog = QString(
+            "DateRange - End Date value %1 is smaller than start date %2")
+            .arg(e.toString(Qt::ISODate),s.toString(Qt::ISODate));
         return r;
     }
 
@@ -277,10 +284,11 @@ DateRange DateRange::fromJson(const QJsonObject &jsonObject, Util::OperationResu
             result.errorStringLog = QString("DateRange - Type tag %1 is unkown").arg(t);
             return r;
         }
-    } catch (...) {
-        std::exception_ptr p = std::current_exception();
-        result.errorStringUI = tr("DateRange - An unexpected error has occured.\n\nDetails : %1").arg((p ? p.__cxa_exception_type()->name() : "null"));
-        result.errorStringLog = QString("DateRange - An unexpected error has occured.\n\nDetails : %1").arg((p ? p.__cxa_exception_type()->name() : "null"));
+    } catch (const std::exception& e) {
+        result.errorStringUI = tr("DateRange - An unexpected error has occured.\n\nDetails : %1")
+            .arg(e.what());
+        result.errorStringLog = QString(
+            "DateRange - An unexpected error has occured.\n\nDetails : %1").arg(e.what());
         return r;
     }
 
