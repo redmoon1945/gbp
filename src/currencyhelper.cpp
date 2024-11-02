@@ -36,12 +36,13 @@ quint8 CurrencyHelper::maxValueAllowedForNoOfDecimalsForCurrency()
 }
 
 
-// A limit to the max value of an amount is required, to detect the potential overflowing the qint64 storage
-// before it occurs and also to limit the values to the expected usage (good practice).
-// We set arbitrarily the max limit of an amount to 1000 trillion - 1, assuming max number of decimals in a currency (3).
-// This is way more than what is required in typical GBP usage, even with very depreciated currencies.
-// Also, importantly, we want the max to be storable in a double, which is needed when comparing values.
-// Double can store 15 digits in all cases (garanteed, it can be sometimes more).
+// A limit to the max value of an amount is required, to detect the potential overflowing the
+// qint64 storage before it occurs and also to limit the values to the expected usage (good
+// practice). We set arbitrarily the max limit of an amount to 1000 trillion - 1, assuming max
+// number of decimals in a currency (3). This is way more than what is required in typical GBP
+// usage, even with very depreciated currencies. Also, importantly, we want the max to be storable
+// in a double, which is needed when comparing values. Double can store 15 digits in all cases
+// (garanteed, it can be sometimes more).
 //     largest value of qint64      =  9 223 372 036 854 775 807 , that is 19 digits
 //     largest value of quint64     = 18 446 744 073 709 551 615 , that is 20 digits
 //     established limit of amount  =    999 999 999 999 999 999 , that is 15 digits

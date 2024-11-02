@@ -1,4 +1,8 @@
 # Change logs
+## 1.5.0 to 1.5.1
+### Fixes
+- In MainWindow, set limits to zoom in/out operations for the Cash Balance curve, in order to prevent insane levels (like zooming out 10000 years)
+
 ## 1.4.1 to 1.5.0
 ### New Features
 - In MainWindow, change the zooming mechanism with middle mouse button, so that the zoom is made around the mouse position and not the center of the chart

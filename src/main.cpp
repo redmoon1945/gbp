@@ -30,7 +30,7 @@ void showWelcomeScreen(bool french);
 
 
 #define APP_NAME "graphical-budget-planner"
-#define APP_VERSION "1.5.0"
+#define APP_VERSION "1.5.1"
 
 int main(int argc, char *argv[])
 {

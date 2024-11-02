@@ -39,6 +39,11 @@ protected:
 private:
     double zoomInFactor;
     double zoomOutFactor;
+    // min, max value for zoom in /out
+    quint64 xAxisRangeMaxInSec;
+    quint64 xAxisRangeMinInSec;
+    double yAxisRangeMaxInSec;
+    double yAxisRangeMinInSec;
 
     QPointF m_lastMousePos;  // last now position of the mouse
 

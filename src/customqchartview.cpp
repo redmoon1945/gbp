@@ -17,6 +17,7 @@
  */
 
 #include "customqchartview.h"
+#include "currencyhelper.h"
 #include <qdatetime.h>
 #include <qdatetimeaxis.h>
 #include <qvalueaxis.h>
@@ -30,6 +31,11 @@ CustomQChartView::CustomQChartView(QChart *chart, bool rotatedAwayZoomIn, QWidge
     // one followed by the other gives an effect of 1
     zoomInFactor = 0.8;
     zoomOutFactor = (1/zoomInFactor);
+    // calculate limits values for zooming
+    xAxisRangeMinInSec = 24 * 60 * 60; // 1 day
+    xAxisRangeMaxInSec = static_cast<quint64>(200 * (365.25*24*60*60)); // 200 average-length year
+    yAxisRangeMinInSec = 1; // 1 unit of currency
+    yAxisRangeMaxInSec = 2 * CurrencyHelper::maxValueAllowedForAmountInDouble(0);
 }
 
 
@@ -45,21 +51,21 @@ void CustomQChartView::wheelEvent(QWheelEvent *event)  {
         return;
     }
 
-    // we need a series to convert to "series domain"
+    // *** we need a series to convert to "series domain" ***
     QList<QAbstractSeries*> seriesList = theChart->series();
     if (seriesList.size()==0) {
-        qInfo() << "seriesList.size()==0";
         return;
     }
 
-    // Returns the relative amount that the wheel was rotated, in eighths of a degree. A positive
-    // value indicates that the wheel was rotated forwards away from the user; a negative value
-    // indicates that the wheel was rotated backwards toward the user. angleDelta(). y() provides the
-    // angle through which the common vertical mouse wheel was rotated since the previous event.
-    // angleDelta().x() provides the angle through which the horizontal mouse wheel was rotated, if
-    // the mouse has a horizontal wheel;
+    // *** Returns the relative amount that the wheel was rotated, in eighths of a degree. A
+    // positive value indicates that the wheel was rotated forwards away from the user; a negative
+    // value indicates that the wheel was rotated backwards toward the user. angleDelta(). y()
+    // provides the angle through which the common vertical mouse wheel was rotated since the
+    // previous event. angleDelta().x() provides the angle through which the horizontal mouse wheel
+    // was rotated, if the mouse has a horizontal wheel ***
     QPoint numDegrees = event->angleDelta();
 
+    // *** Build the final zoom factor ***
     qreal factor = 1.0;
     if (numDegrees.y() > 0) {
         // wheel AWAY from user
@@ -77,28 +83,25 @@ void CustomQChartView::wheelEvent(QWheelEvent *event)  {
         }
     }
 
-    // get the domain coordinated of the mouse point
+    // *** get the domain coordinated of the mouse point ***
     QPointF pt1 = event->position();
     QPointF pt2 = theChart->mapToValue(pt1.toPoint(), seriesList[0]);
     QDateTime mousePointDate = QDateTime::fromMSecsSinceEpoch(pt2.x());
     double mousePointValue = pt2.y();
 
-    // X AXIS calculation
+    // *** X AXIS calculation ***
     QList<QAbstractAxis *> axList = theChart->axes(Qt::Horizontal);
     if(axList.count() != 1){
-        qInfo() << "axList.count() != 1";   // Should not happen
-        return;
+        return; // should not happen
     }
     QDateTimeAxis* xAxis = dynamic_cast<QDateTimeAxis*>(axList.at(0));
     if (xAxis==nullptr) {
-        qInfo() << "xAxis is not QDateTimeAxis"; // Should not happen
-        return;  // this was not a QDateTimeAxis, this is unexpected
+        return;  // should not happen
     }
-    QDateTime xMin = xAxis->min(); // get the minimum value of the X-axis
-    QDateTime xMax = xAxis->max(); // get the maximum value of the X-axis
+    QDateTime xMin = xAxis->min();
+    QDateTime xMax = xAxis->max();
     if( (xMin.isValid()==false) || (xMax.isValid()==false) ){
-        qInfo() << "(minX.isValid()==false) || (maxX.isValid()==false)";  // should never happen
-        return;
+        return; // should not happen
     }
     qint64 xLeftDeltaInSec = mousePointDate.toSecsSinceEpoch()-xMin.toSecsSinceEpoch();
     qint64 xRightDeltaInSec = xMax.toSecsSinceEpoch() - mousePointDate.toSecsSinceEpoch();
@@ -107,15 +110,19 @@ void CustomQChartView::wheelEvent(QWheelEvent *event)  {
     QDateTime xNewMin = xMin;
     QDateTime xNewMax = xMax;
     bool applyXzoom = true;
-    if ( (xNewLeftDeltaInSec+xNewRightDeltaInSec)< (24*3600))  {
-        // enough zoom in X axis already...range is no less than 1 days
+    // check for max or min zoom level authorized
+    if ( (xNewLeftDeltaInSec+xNewRightDeltaInSec)< xAxisRangeMinInSec)  {
+        // excessive zoom in
+        applyXzoom = false;
+    } else if ((xNewLeftDeltaInSec+xNewRightDeltaInSec) > xAxisRangeMaxInSec){
+        // excessive zoom out
         applyXzoom = false;
     } else {
         xNewMin = mousePointDate.addSecs(-xNewLeftDeltaInSec);
         xNewMax = mousePointDate.addSecs(xNewRightDeltaInSec);
     }
 
-    // Y AXIS calculation
+    // *** Y AXIS calculation ***
     QList<QAbstractAxis *> ayList = theChart->axes(Qt::Vertical);
     if(ayList.count() != 1){
         qInfo() << "ayList.count() != 1";   // Should not happen
@@ -135,9 +142,12 @@ void CustomQChartView::wheelEvent(QWheelEvent *event)  {
     double yNewMin = yMin;
     double yNewMax = yMax;
     bool applyYzoom = true;
-    if ( (yNewBottomDeltaInSec+yNewTopDeltaInSec)< 1)  {
-        // enough zoom in y axis already...limit is arbitrary and correspond
-        // to 1 unit of currency
+    // check for max or min zoom level authorized
+    if ( (yNewBottomDeltaInSec+yNewTopDeltaInSec)< yAxisRangeMinInSec )  {
+        // excessive zoom in...
+        applyYzoom = false;
+    } else if( (yNewBottomDeltaInSec+yNewTopDeltaInSec) > yAxisRangeMaxInSec ) {
+        // excessive zoom out...
         applyYzoom = false;
     } else {
         yNewMin = mousePointValue - yNewBottomDeltaInSec;
