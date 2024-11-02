@@ -64,7 +64,8 @@ void CombinedFeStreams::addStream(const QList<Fe> theStream, CurrencyInfo currIn
         return;
     }
     foreach(Fe fe, theStream){
-        auto it = combinedStreams.find(fe.occurrence);   // find an existing entry for that date, if any
+        // find an existing entry for that date, if any
+        auto it = combinedStreams.find(fe.occurrence);
         CombinedFeStreams::DailyInfo di;
         if(it != combinedStreams.end()){    // there is already something for that date : add to it
             di = it.value();
@@ -78,7 +79,8 @@ void CombinedFeStreams::addStream(const QList<Fe> theStream, CurrencyInfo currIn
         }
         FeDisplay fed;
         int convResult;
-        double amount = CurrencyHelper::amountQint64ToDouble(fe.amount, currInfo.noOfDecimal, convResult) ;
+        double amount = CurrencyHelper::amountQint64ToDouble(fe.amount, currInfo.noOfDecimal,
+            convResult) ;
         if (convResult != 0){
             return; // should never happen
         }
@@ -100,7 +102,8 @@ void CombinedFeStreams::addStream(const QList<Fe> theStream, CurrencyInfo currIn
 
 
 // for the amount , a "loose" comparison is performed. 2 double are declared equal if
-// the difference is less than the smallest unit of all the currency available (3 decimals + 1 spare for rounding)
+// the difference is less than the smallest unit of all the currency available
+// (3 decimals + 1 spare for rounding)
 bool CombinedFeStreams::DailyInfo::operator==(const DailyInfo& o) const{
     if( fabs(totalIncomes - o.totalIncomes) >= 0.0001 )
         return false;

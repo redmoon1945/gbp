@@ -23,6 +23,8 @@
 #include <qdatetimeaxis.h>
 #include <qgraphicslayout.h>
 #include <qvalueaxis.h>
+#include <QMessageBox>
+#include <QFileDialog>
 
 
 VisualizeOccurrencesDialog::VisualizeOccurrencesDialog(QLocale locale, QWidget *parent)
@@ -621,4 +623,69 @@ void VisualizeOccurrencesDialog::changeYaxisLabelFormat()
 }
 
 
+void VisualizeOccurrencesDialog::on_exportPushButton_clicked()
+{
+    // *** get a file name ***
+    QString defaultExtension = ".csv";
+    QString defaultExtensionUsed = ".csv";
+    QString filter = tr("Text Files (*.txt *.TXT *.csv *.CSV)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a File"),
+        GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
+    if (fileName == ""){
+        return;
+    }
+    // *** fix the filename to add the proper suffix ***
+    QFileInfo fi(fileName);
+    if(fi.suffix()==""){    // user has not specified an extension
+        fileName.append(defaultExtension);
+    }
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("Attempting to export occurences to text file \"%1\" ...").arg(fileName));
+
+
+    QFile file(fileName);
+    if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
+        QMessageBox::critical(nullptr,tr("Export Failed"),tr("Cannot open the file for writing"));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Export failed : Cannot open the file for saving"));
+        return;
+    }
+
+    // *** export to the file ***
+
+    // write header
+    QString s = QString("%1\t%2\n").arg(tr("Date"),tr("Amount"));
+    file.write(s.toUtf8());
+
+    // set date format
+    QString dateFormat = "yyyy-MM-dd"; // ISO
+    if (GbpController::getInstance().getExportTextDateLocalized()==true) {
+        dateFormat = locale.dateFormat(QLocale::ShortFormat);
+    }
+
+    // write data
+    QString valueString;
+    QString dateString;
+    QDate date;
+    QList<QPointF> timeData = series->points();
+    foreach(QPointF pt, timeData){
+        date = (QDateTime::fromMSecsSinceEpoch(pt.x())).date();
+        double value = pt.y();
+        dateString = locale.toString(date, dateFormat);
+        if (GbpController::getInstance().getExportTextAmountLocalized()) {
+            // Localized
+            valueString = CurrencyHelper::formatAmount(value, currInfo, locale, false);
+        } else {
+            // not localized
+            valueString = QString::number(value,'f', currInfo.noOfDecimal);
+        }
+
+        s = QString("%1\t%2\n").arg(dateString,valueString);
+        file.write(s.toUtf8());
+    }
+    file.close();
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Exporting occurences succeeded"));
+
+}
 

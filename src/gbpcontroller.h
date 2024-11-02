@@ -80,6 +80,8 @@ public:
     void setLightModeSelectedPointColor(const QColor &newLightModeSelectedPointColor);
     bool getExportTextAmountLocalized() const;
     void setExportTextAmountLocalized(bool newExportTextAmountLocalized);
+    bool getExportTextDateLocalized() const;
+    void setExportTextDateLocalized(bool newExportTextDateLocalized);
     QString getLastDir() const;
     void setLastDir(const QString &newLastDir);
     uint getPercentageMainChartScaling() const;
@@ -114,6 +116,7 @@ public:
     QString getSettingsFullFileName() const;
     LogLevel getLogLevel() const;
 
+
 private:
 
     // ************* data stored in the settings, in .ini file ****************
@@ -129,8 +132,10 @@ private:
     QColor lightModePointColor;
     QColor darkModeSelectedPointColor;
     QColor lightModeSelectedPointColor;
-    // Specifies if amount in Expoeted file should be localized
+    // Specifies if amounts in Exported CSV file should be localized
     bool exportTextAmountLocalized;
+    // Specifies if dates in Exported CSV file should be localized
+    bool exportTextDateLocalized;
     // last dir used for opening/saving scenario.
     QString lastDir;
     // how much space is given on the chart above X&Y axis min/max, in percentage over 100%

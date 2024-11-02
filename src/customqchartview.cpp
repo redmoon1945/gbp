@@ -17,6 +17,9 @@
  */
 
 #include "customqchartview.h"
+#include <qdatetime.h>
+#include <qdatetimeaxis.h>
+#include <qvalueaxis.h>
 
 
 CustomQChartView::CustomQChartView(QChart *chart, bool rotatedAwayZoomIn, QWidget *parent) :
@@ -39,6 +42,13 @@ void CustomQChartView::zoom(qreal factor)
 void CustomQChartView::wheelEvent(QWheelEvent *event)  {
     QChart *theChart = this->chart();
     if(theChart==nullptr){
+        return;
+    }
+
+    // we need a series to convert to "series domain"
+    QList<QAbstractSeries*> seriesList = theChart->series();
+    if (seriesList.size()==0) {
+        qInfo() << "seriesList.size()==0";
         return;
     }
 
@@ -67,7 +77,93 @@ void CustomQChartView::wheelEvent(QWheelEvent *event)  {
         }
     }
 
-    theChart->zoom(factor);
+    // get the domain coordinated of the mouse point
+    QPointF pt1 = event->position();
+    QPointF pt2 = theChart->mapToValue(pt1.toPoint(), seriesList[0]);
+    QDateTime mousePointDate = QDateTime::fromMSecsSinceEpoch(pt2.x());
+    double mousePointValue = pt2.y();
+
+    // X AXIS calculation
+    QList<QAbstractAxis *> axList = theChart->axes(Qt::Horizontal);
+    if(axList.count() != 1){
+        qInfo() << "axList.count() != 1";   // Should not happen
+        return;
+    }
+    QDateTimeAxis* xAxis = dynamic_cast<QDateTimeAxis*>(axList.at(0));
+    if (xAxis==nullptr) {
+        qInfo() << "xAxis is not QDateTimeAxis"; // Should not happen
+        return;  // this was not a QDateTimeAxis, this is unexpected
+    }
+    QDateTime xMin = xAxis->min(); // get the minimum value of the X-axis
+    QDateTime xMax = xAxis->max(); // get the maximum value of the X-axis
+    if( (xMin.isValid()==false) || (xMax.isValid()==false) ){
+        qInfo() << "(minX.isValid()==false) || (maxX.isValid()==false)";  // should never happen
+        return;
+    }
+    qint64 xLeftDeltaInSec = mousePointDate.toSecsSinceEpoch()-xMin.toSecsSinceEpoch();
+    qint64 xRightDeltaInSec = xMax.toSecsSinceEpoch() - mousePointDate.toSecsSinceEpoch();
+    qint64 xNewLeftDeltaInSec = static_cast<qint64>(xLeftDeltaInSec * factor);
+    qint64 xNewRightDeltaInSec = static_cast<qint64>(xRightDeltaInSec * factor);
+    QDateTime xNewMin = xMin;
+    QDateTime xNewMax = xMax;
+    bool applyXzoom = true;
+    if ( (xNewLeftDeltaInSec+xNewRightDeltaInSec)< (24*3600))  {
+        // enough zoom in X axis already...range is no less than 1 days
+        applyXzoom = false;
+    } else {
+        xNewMin = mousePointDate.addSecs(-xNewLeftDeltaInSec);
+        xNewMax = mousePointDate.addSecs(xNewRightDeltaInSec);
+    }
+
+    // Y AXIS calculation
+    QList<QAbstractAxis *> ayList = theChart->axes(Qt::Vertical);
+    if(ayList.count() != 1){
+        qInfo() << "ayList.count() != 1";   // Should not happen
+        return;
+    }
+    QValueAxis* yAxis = dynamic_cast<QValueAxis*>(ayList.at(0));
+    if (yAxis==nullptr) {
+        qInfo() << "yAxis is not QValueAxis"; // Should not happen
+        return;  // this was not a QValueAxis, this is unexpected
+    }
+    double yMin = yAxis->min(); // get the minimum value of the Y-axis
+    double yMax = yAxis->max(); // get the maximum value of the Y-axis
+    double yBottomDeltaInSec = mousePointValue - yMin;
+    double yTopDeltaInSec = yMax - mousePointValue;
+    double yNewBottomDeltaInSec = yBottomDeltaInSec * factor;
+    double yNewTopDeltaInSec = yTopDeltaInSec * factor;
+    double yNewMin = yMin;
+    double yNewMax = yMax;
+    bool applyYzoom = true;
+    if ( (yNewBottomDeltaInSec+yNewTopDeltaInSec)< 1)  {
+        // enough zoom in y axis already...limit is arbitrary and correspond
+        // to 1 unit of currency
+        applyYzoom = false;
+    } else {
+        yNewMin = mousePointValue - yNewBottomDeltaInSec;
+        yNewMax = mousePointValue + yNewTopDeltaInSec;
+    }
+
+    // apply zoom
+    if (event->modifiers() & Qt::ShiftModifier){
+        // HORIZONTAL ZOOM around the mouse point
+        if (applyXzoom==true){
+            xAxis->setRange(xNewMin, xNewMax);
+        }
+    } else if (event->modifiers() & Qt::ControlModifier){
+        // VERTICAL ZOOM around the mouse point
+        if(applyYzoom==true){
+            yAxis->setRange(yNewMin, yNewMax);
+        }
+    } else{
+        // HORIZONTAL AND VERTICAL ZOOM around the mouse point
+        if (applyXzoom==true){
+            xAxis->setRange(xNewMin, xNewMax);
+        }
+        if(applyYzoom==true){
+            yAxis->setRange(yNewMin, yNewMax);
+        }
+    }
     event->ignore();    // pass the event to the parent
 }
 
@@ -89,7 +185,8 @@ void CustomQChartView::mouseMoveEvent(QMouseEvent *event) {
     QChart *theChart = this->chart();
     if ( (event->buttons() == Qt::LeftButton) && (theChart!=nullptr) ){
         // event->pos is in viewport coordinate
-        QPointF newValue = mapToScene(event->pos());
+        QPoint p = event->pos();
+        QPointF newValue = mapToScene(p);
         QPointF delta = newValue - m_lastMousePos;
         theChart->scroll(-delta.x(), 0);
         theChart->scroll(0, delta.y());

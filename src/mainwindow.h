@@ -115,6 +115,7 @@ private slots:
     void on_toolButton_1Y_clicked();
     void on_toolButton_2Y_clicked();
     void on_toolButton_3Y_clicked();
+    void on_toolButton_4Y_clicked();
     void on_toolButton_5Y_clicked();
     void on_toolButton_10Y_clicked();
     void on_toolButton_15Y_clicked();
@@ -131,6 +132,7 @@ private slots:
     void on_actionUser_Manual_triggered();
     void on_actionQuick_Tutorial_triggered();
     void on_actionChange_Log_triggered();
+
 
 private:
 

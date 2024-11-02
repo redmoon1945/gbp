@@ -1,4 +1,17 @@
 # Change logs
+## 1.4.1 to 1.5.0
+### New Features
+- In MainWindow, change the zooming mechanism with middle mouse button, so that the zoom is made around the mouse position and not the center of the chart
+- In MainWindow, upper toolbar, add the button "4Y"
+- In MainWindow, add a new horizontal-only zooming, by pressing the SHIFT key when rotating the mouse wheel.
+- In MainWindow, add a new vertical-only zooming, by pressing the CTRL key when rotating the mouse wheel.
+- In Edit Periodic/Irregular Financial Stream  Definition, add the capability to export the occurences to a CSV file.
+- In Option Dialog, add the option to localize the dates for all CSV exports. 
+
+### Fixes
+- In MainWindow, change the Y axis font of the Cash Balance chart to "mono" type, to prevent small jittering when values change.
+- In MainWindow, export to CSV, localize the date format according to System Locale.
+ 
 ## 1.4.0 to 1.4.1
 ### Fixes
 - In EditScenario, when "Apply" button is clicked, refresh the Cash Balance curve while maintaining the X axis scaling as it was.

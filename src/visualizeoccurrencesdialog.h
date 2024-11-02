@@ -58,6 +58,8 @@ private slots:
     void on_VisualizeOccurrencesDialog_rejected();
     void on_fitPushButton_clicked();
 
+    void on_exportPushButton_clicked();
+
 private:
     Ui::VisualizeOccurrencesDialog *ui;
 

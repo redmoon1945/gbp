@@ -31,6 +31,7 @@
 #include <QDateTime>
 #include <QDesktopServices>
 #include <cfloat>
+#include <qfontdatabase.h>
 #include <qforeach.h>
 
 
@@ -105,6 +106,7 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     ui->toolButton_1Y->setFont(resizeToolbarFont);
     ui->toolButton_2Y->setFont(resizeToolbarFont);
     ui->toolButton_3Y->setFont(resizeToolbarFont);
+    ui->toolButton_4Y->setFont(resizeToolbarFont);
     ui->toolButton_5Y->setFont(resizeToolbarFont);
     ui->toolButton_10Y->setFont(resizeToolbarFont);
     ui->toolButton_15Y->setFont(resizeToolbarFont);
@@ -270,9 +272,11 @@ void MainWindow::setXaxisFontSize(uint fontSize){
 
 
 void MainWindow::setYaxisFontSize(uint fontSize){
-    QFont yAxisFont = axisY->labelsFont();
-    yAxisFont.setPointSize(fontSize);
-    axisY->setLabelsFont(yAxisFont);
+    //QFont yAxisFont = axisY->labelsFont();
+    // use mono font to prevent Y axis slight move
+    QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    monoFont.setPointSize(fontSize);
+    axisY->setLabelsFont(monoFont);
 }
 
 
@@ -1480,6 +1484,12 @@ void MainWindow::on_toolButton_3Y_clicked()
 }
 
 
+void MainWindow::on_toolButton_4Y_clicked()
+{
+    rescaleXaxis(4*12);
+}
+
+
 void MainWindow::on_toolButton_5Y_clicked()
 {
     rescaleXaxis(5*12);
@@ -1559,7 +1569,7 @@ void MainWindow::on_exportTextFilePushButton_clicked()
 {
     if ( !(GbpController::getInstance().isScenarioLoaded())){
         // no scenario yet, must specify the file name
-        QMessageBox::critical(nullptr,tr("Export Failed"),tr("No scenario loaded yet : nothing to save"));
+        QMessageBox::critical(nullptr,tr("Export Failed"),tr("No scenario loaded yet : nothing to export"));
         return;
     }
 
@@ -1599,7 +1609,6 @@ void MainWindow::on_exportTextFilePushButton_clicked()
 
     // *** export to the file ***
 
-    QString dateFormat = "yyyy-MM-dd";
     double cumulAmount = ui->baselineDoubleSpinBox->value();  // start amount;
     QList<QDate> keys = chartRawData.keys();
     QString totalIncomes;
@@ -1612,12 +1621,18 @@ void MainWindow::on_exportTextFilePushButton_clicked()
     s = QString("%1\t%2\t%3\t%4\t%5\n").arg(tr("Date"),tr("Total Daily Incomes"),tr("Total Daily Expenses"),tr("Total Delta"),tr("Cumulative Total"));
     file.write(s.toUtf8());
 
+    // set date format
+    QString dateFormat = "yyyy-MM-dd";  // ISO
+    if (GbpController::getInstance().getExportTextDateLocalized()==true) {
+        dateFormat = locale.dateFormat(QLocale::ShortFormat);
+    }
+
     // write data
     foreach(QDate date, keys){
         CombinedFeStreams::DailyInfo item = chartRawData.value(date);
         cumulAmount += item.totalDelta;
 
-        QString dateString = locale.toString(date,dateFormat);
+        QString dateString = locale.toString(date, dateFormat );
         if (GbpController::getInstance().getExportTextAmountLocalized()) {
             // Localized
             totalIncomes = CurrencyHelper::formatAmount(item.totalIncomes, currInfo, locale, false);
@@ -1669,29 +1684,39 @@ void MainWindow::on_actionUser_Manual_triggered()
 {
     // first, copy the user manual included in the resource to a tmp directory
     // Name of the file in temp dir is dependant on the version !
-    QString baseFileName = QString("/gbp_User_Manual-%1.pdf").arg(QCoreApplication::applicationVersion());
+    QString baseFileName = QString("/gbp_User_Manual-%1.pdf").arg(
+        QCoreApplication::applicationVersion());
     QString tempFileFullName = QDir::tempPath().append(baseFileName);
     QFile tempFile(tempFileFullName);
 
     // build resource name and check if it exists (it should)
     QFile userManualFile(QString(":/Doc/resources/Graphical Budget Planner - User Manual.pdf"));
     if(userManualFile.exists()==false){
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing User Manual : User Manual %1 does not exist in the resource file").arg(userManualFile.fileName()));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
+            QString("Viewing User Manual : User Manual %1 does not exist in the resource file")
+            .arg(userManualFile.fileName()));
         return;
     }
 
     //  check if the temp file exist. Copy only if non existent
     bool success;
     if (tempFile.exists()==true) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Viewing User Manual : File already exists in temp directory, not copied");
+        QString sExist = QString("Viewing User Manual : File %1 already exists in temp directory"
+            ", not copied").arg(tempFile.fileName());
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            sExist);
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing User Manual : Ready to copy User Manual in tmp directory : %1").arg(tempFileFullName));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Viewing User Manual : File does not exist in tmp directory, "
+                "ready to copy : %1").arg(tempFileFullName));
         success = userManualFile.copy(tempFileFullName);
         if (success==true) {
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing User Manual : Copy succeeded"));
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+                QString("Viewing User Manual : Copy succeeded"));
 
         } else {
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing User Manual : Copy failed"));
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
+                QString("Viewing User Manual : Copy failed"));
             return;
         }
     }
@@ -1699,9 +1724,11 @@ void MainWindow::on_actionUser_Manual_triggered()
     // then, use the system defaut application to read the file
     success = QDesktopServices::openUrl(QUrl::fromLocalFile(tempFileFullName));
     if (success==true) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing User Manual : PDF Viewer Launch succeeded"));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Viewing User Manual : PDF Viewer Launch succeeded"));
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing User Manual : PDF Viewer Launch failed"));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
+            QString("Viewing User Manual : PDF Viewer Launch failed"));
     }
 
 }
@@ -1711,29 +1738,40 @@ void MainWindow::on_actionQuick_Tutorial_triggered()
 {
     // first, copy the quick tutorial included in the resource to a tmp directory
     // Name of the file in temp dir is dependant on the version !
-    QString baseFileName = QString("/gbp_Quick-Tutorial-%1.pdf").arg(QCoreApplication::applicationVersion());
+    QString baseFileName = QString("/gbp_Quick-Tutorial-%1.pdf").arg(
+        QCoreApplication::applicationVersion());
     QString tempFileFullName = QDir::tempPath().append(baseFileName);
     QFile tempFile(tempFileFullName);
 
     // build resource name and check if it exists (it should)
-    QFile quickTutorialFile(QString(":/Doc/resources/Graphical Budget Planner - Quick Tutorial.pdf"));
+    QFile quickTutorialFile(
+        QString(":/Doc/resources/Graphical Budget Planner - Quick Tutorial.pdf"));
     if(quickTutorialFile.exists()==false){
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing Quick Tutorial : Quick Tutorial %1 does not exist in the resource file").arg(quickTutorialFile.fileName()));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
+            QString("Viewing Quick Tutorial : Quick Tutorial %1 does not exist in the "
+                "resource file").arg(quickTutorialFile.fileName()));
         return;
     }
 
     //  check if the temp file exist. Copy only if non existent
     bool success;
     if (tempFile.exists()==true) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Viewing Quick Tutorial : File already exists in temp directory, not copied");
+        QString sExist = QString("Viewing Quick Tutorial : File %1 already exists in temp directory"
+            ", not copied").arg(tempFile.fileName());
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            sExist);
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Quick Tutorial : Ready to copy Quick Tutorial in tmp directory : %1").arg(tempFileFullName));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Viewing Quick Tutorial : Quick Tutorial does not exist in tmp directory, ready to copy : %1")
+                .arg(tempFileFullName));
         success = quickTutorialFile.copy(tempFileFullName);
         if (success==true) {
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Quick Tutorial : Copy succeeded"));
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+                QString("Viewing Quick Tutorial : Copy succeeded"));
 
         } else {
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing Quick Tutorial : Copy failed"));
+            GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
+                QString("Viewing Quick Tutorial : Copy failed"));
             return;
         }
     }
@@ -1741,9 +1779,11 @@ void MainWindow::on_actionQuick_Tutorial_triggered()
     // then, use the system defaut application to read the file
     success = QDesktopServices::openUrl(QUrl::fromLocalFile(tempFileFullName));
     if (success==true) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Viewing Quick Tutorial : PDF Viewer Launch succeeded"));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Viewing Quick Tutorial : PDF Viewer Launch succeeded"));
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error, QString("Viewing Quick Tutorial : PDF Viewer Launch failed"));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
+            QString("Viewing Quick Tutorial : PDF Viewer Launch failed"));
     }
 }
 
@@ -1833,3 +1873,5 @@ uint MainWindow::calculateTotalNoOfEvents()
     }
     return noEvents;
 }
+
+

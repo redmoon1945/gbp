@@ -78,9 +78,11 @@ void OptionsDialog::slotPrepareContent()
     setColorInfo(CT_LIGHT_MODE,CI_POINT);
     setColorInfo(CT_LIGHT_MODE,CI_SELECTED_POINT);
 
-    // export text amount localization
+    // export text localization
     ui->exportTextAmountLocalizedCheckBox->setChecked(
         GbpController::getInstance().getExportTextAmountLocalized());
+    ui->exportTextDateLocalizedCheckBox->setChecked(
+        GbpController::getInstance().getExportTextDateLocalized());
 
     // main chart scaling
     ui->scalingMainChartSpinBox->setValue(
@@ -258,6 +260,8 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().setLightModeSelectedPointColor(lightModeSelectedPointColor);
     GbpController::getInstance().setExportTextAmountLocalized(
         ui->exportTextAmountLocalizedCheckBox->isChecked());
+    GbpController::getInstance().setExportTextDateLocalized(
+        ui->exportTextDateLocalizedCheckBox->isChecked());
     GbpController::getInstance().setPercentageMainChartScaling(newMainChartScaling);
     GbpController::getInstance().setUseDefaultSystemFont(ui->systemFontRadioButton->isChecked());
     GbpController::getInstance().setCustomApplicationFont(newCustomFontString);
@@ -300,6 +304,9 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
         "    ExportTextAmountLocalized = %1").arg(
         ui->exportTextAmountLocalizedCheckBox->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    ExportTextDateLocalized = %1").arg(
+        ui->exportTextDateLocalizedCheckBox->isChecked()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
         "    PercentageMainChartScaling = %1").arg(newMainChartScaling));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(

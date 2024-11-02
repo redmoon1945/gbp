@@ -53,13 +53,15 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     chartViewRelativeWeigth->setRenderHint(QPainter::Antialiasing);
     chartRelativeWeigth->layout()->setContentsMargins(1, 1, 1, 1);
     chartRelativeWeigth->setBackgroundRoundness(0);
-    // Must have as many colors as max no of elements + 1. See https://www.w3.org/TR/SVG11/types.html#ColorKeywords
-    colorsRelativeWeigth = {QColor("cyan"), QColor("magenta"), QColor("red"), QColor("lightpink"), QColor("darkRed"),
-              QColor("darkCyan"), QColor("darkMagenta"), QColor("green"), QColor("darkGreen"), QColor("yellow"),
-              QColor("azure"), QColor("blueviolet"), QColor("chocolate"), QColor("lightgrey"), QColor("gold"),
-              QColor("lightcoral"), QColor("firebrick"), QColor("dimgray"), QColor("darksalmon"), QColor("darkturquoise"),
-              QColor("darkolivegreen"), QColor("crimson"), QColor("blueviolet"), QColor("bisque"), QColor("orchid"),
-              QColor("palegreen")};
+    // Must have as many colors as max no of elements + 1. See
+    // https://www.w3.org/TR/SVG11/types.html#ColorKeywords
+    colorsRelativeWeigth = {QColor("cyan"), QColor("magenta"), QColor("red"), QColor("lightpink"),
+        QColor("darkRed"), QColor("darkCyan"), QColor("darkMagenta"), QColor("green"),
+        QColor("darkGreen"), QColor("yellow"), QColor("azure"), QColor("blueviolet"),
+        QColor("chocolate"), QColor("lightgrey"), QColor("gold"), QColor("lightcoral"),
+        QColor("firebrick"), QColor("dimgray"), QColor("darksalmon"), QColor("darkturquoise"),
+        QColor("darkolivegreen"), QColor("crimson"), QColor("blueviolet"), QColor("bisque"),
+        QColor("orchid"), QColor("palegreen")};
     if(GbpController::getInstance().getIsDarkModeSet()==true){
         chartRelativeWeigth->setTheme(QChart::ChartThemeDark);
     } else {
@@ -82,14 +84,18 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     initReportChart(ReportType::MONTHLY);
     // other settings
     fillMonthlyReportComboBoxWithMonthNames();
-    ui->monthlyReportChartFromMonthComboBox->setCurrentIndex(GbpController::getInstance().getTomorrow().month()-1);
-    ui->monthlyReportChartFromYearSpinBox->setValue(GbpController::getInstance().getTomorrow().year());
+    ui->monthlyReportChartFromMonthComboBox->setCurrentIndex(GbpController::getInstance()
+        .getTomorrow().month()-1);
+    ui->monthlyReportChartFromYearSpinBox->setValue(GbpController::getInstance().getTomorrow()
+        .year());
     ui->monthlyReportChartDurationSpinBox->setValue(12);
     // make smaller selected bar info
     QFont font = ui->monthlyReportChartSelectedLabel->font();
     uint oldFontSize = font.pointSize();
     uint newFontSize = Util::changeFontSize(1, true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Monthly and Yearly Chart - Selected Bar Info font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Analysis Dialog - Monthly and Yearly Chart - Selected Bar Info font "
+        "size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     font.setPointSize(newFontSize);
     ui->monthlyReportChartSelectedTextLabel->setFont(font);
     ui->monthlyReportChartSelectedLabel->setFont(font);
@@ -97,7 +103,8 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     // *** Yearly REPORT - CHART ***
     initReportChart(ReportType::YEARLY);
     // other settings
-    ui->yearlyReportChartFromYearSpinBox->setValue(GbpController::getInstance().getTomorrow().year());
+    ui->yearlyReportChartFromYearSpinBox->setValue(GbpController::getInstance().getTomorrow()
+        .year());
     ui->yearlyReportChartDurationSpinBox->setValue(10);
     // make smaller selected bar info
     ui->yearlyReportChartSelectedTextLabel->setFont(font);
@@ -105,18 +112,20 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
 
     // *** MONTHLY REPORT - TABLE CONTROLS ***
     ui->monthlyReportTableWidget->setColumnCount(4);
-    ui->monthlyReportTableWidget->setHorizontalHeaderLabels({tr("Month"),tr("Incomes"),tr("Expenses"),tr("Delta")});
+    ui->monthlyReportTableWidget->setHorizontalHeaderLabels({tr("Month"),tr("Incomes"),
+        tr("Expenses"),tr("Delta")});
     ui->monthlyReportTableWidget->setSortingEnabled(false);
-    ui->monthlyReportTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);   // no edition
-    ui->monthlyReportTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);// force equal with of columns
+    ui->monthlyReportTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers); // no edition
+    ui->monthlyReportTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->monthlyReportTableWidget->verticalHeader()->setVisible(true);
 
     // *** YEARLY REPORT - TABLE CONTROLS ***
     ui->yearlyReportTableWidget->setColumnCount(4);
-    ui->yearlyReportTableWidget->setHorizontalHeaderLabels({tr("Year"),tr("Incomes"),tr("Expenses"),tr("Delta")});
+    ui->yearlyReportTableWidget->setHorizontalHeaderLabels({tr("Year"),tr("Incomes"),
+        tr("Expenses"),tr("Delta")});
     ui->yearlyReportTableWidget->setSortingEnabled(false);
-    ui->yearlyReportTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);   // no edition
-    ui->yearlyReportTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);// force equal with of columns
+    ui->yearlyReportTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);  // no edition
+    ui->yearlyReportTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->yearlyReportTableWidget->verticalHeader()->setVisible(true);
 
     ready = true;
@@ -152,7 +161,8 @@ void AnalysisDialog::slotAnalysisPrepareContent(
     // misc suff
     ui->monthlyReportChartSelectedTextLabel->setText("");
 
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog invoked"));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Analysis Dialog invoked"));
 }
 
 
@@ -208,13 +218,15 @@ void AnalysisDialog::updateRelativeWeightChart()
     } else if (to<from){
         QString fromString = from.toString(Qt::ISODate);
         QString toString = to.toString(Qt::ISODate);
-        QString s = QString(tr("\"To\" Date %1 cannot occur before \"From\" Date %2")).arg(toString).arg(fromString);
+        QString s = QString(tr("\"To\" Date %1 cannot occur before \"From\" Date %2"))
+            .arg(toString).arg(fromString);
         QMessageBox::critical(nullptr,"Invalid Dates",s.toLocal8Bit().data());
         return;
     } else if (from<tomorrow){
         QString fromString = from.toString(Qt::ISODate);
         QString tomorrowString = tomorrow.toString(Qt::ISODate);
-        QString s = QString(tr("\"From\" Date %1 cannot be smaller than \"tomorrow\" %2")).arg(fromString).arg(tomorrowString);
+        QString s = QString(tr("\"From\" Date %1 cannot be smaller than \"tomorrow\" %2"))
+            .arg(fromString).arg(tomorrowString);
         QMessageBox::critical(nullptr,tr("Invalid Dates"),s.toLocal8Bit().data());
         return;
     }
@@ -260,7 +272,8 @@ void AnalysisDialog::updateRelativeWeightChart()
         }
     }
 
-    // *** step 2 : sort by amount (biggest to smallest). Make positive the neg ative no of Expenses ***
+    // *** step 2 : sort by amount (biggest to smallest).
+    // Make positive the neg ative no of Expenses ***
     QList<Pair> tempList;
     foreach(QUuid id, bins.keys()){
         double d = fabs(bins.value(id));
@@ -283,8 +296,9 @@ void AnalysisDialog::updateRelativeWeightChart()
             cumulAmountRejected += tempList.at(noElements+i).amount;
         }
         tempList.remove(noElements,noRejected);
-        QUuid nullId = QUuid::fromString(QStringView()); // this will be a null QUuid because it is not valid
-        Pair othersPair = {.amount = cumulAmountRejected, .percentage = cumulPercentageRejected,.id = nullId };
+        QUuid nullId = QUuid::fromString(QStringView()); // will be null QUuid because not valid
+        Pair othersPair = {.amount = cumulAmountRejected, .percentage = cumulPercentageRejected,
+            .id = nullId };
         tempList.append(othersPair);
 
         // re-sort new TempList because "others" may have been created ****
@@ -308,7 +322,7 @@ void AnalysisDialog::updateRelativeWeightChart()
         } else{
             QString name;
             QColor color;
-            scenario->getStreamDefNameAndColorFromId(p.id, name, color,found); // will always be found
+            scenario->getStreamDefNameAndColorFromId(p.id, name, color,found); // always found
             originalSliceNames.append(name);
             seriesRelativeWeigth->append(name, fabs(p.amount));
         }
@@ -330,8 +344,10 @@ void AnalysisDialog::updateRelativeWeightChart()
     c = 0;
     QList<QLegendMarker *> mList = chartRelativeWeigth->legend()->markers();
     for(auto legendMarker : mList){
-        QString amountString = CurrencyHelper::formatAmount(tempList.at(c).amount,currInfo, locale, true);
-        QString s = QString("#%1: %2 (%3)").arg(c+1).arg(Util::elideText(originalSliceNames.at(c),30,true)).arg(amountString);
+        QString amountString = CurrencyHelper::formatAmount(tempList.at(c).amount,currInfo, locale,
+            true);
+        QString s = QString("#%1: %2 (%3)").arg(c+1).arg(Util::elideText(originalSliceNames.at(c),
+            30,true)).arg(amountString);
         legendMarker->setLabel(s);
         c++;
     }
@@ -340,7 +356,8 @@ void AnalysisDialog::updateRelativeWeightChart()
 
 
 // annualDiscountRate is in percentage
-void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr, QTableWidget* tableWidget)
+void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr,
+    QTableWidget* tableWidget)
 {
     // Reset bin to empty
     if(rTypr==MONTHLY){
@@ -412,7 +429,8 @@ void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr, QTabl
 
 
 // use already calculated bins to update table content
-void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr, QTableWidget* tableWidget)
+void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr,
+    QTableWidget* tableWidget)
 {
     // choose the right bins
     QMap<QDate,MonthlyYearlyReport>* binsPtr;
@@ -428,7 +446,8 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr, QT
     QDate maxDate = tomorrow.addYears(
         GbpController::getInstance().getScenario()->getFeGenerationDuration()).addDays(-1);
     int noRows;
-    int noOfMonths = 1 + (12*maxDate.year()+maxDate.month()) - (12*tomorrow.year()+tomorrow.month());
+    int noOfMonths = 1 + (12*maxDate.year()+maxDate.month()) -
+        (12*tomorrow.year()+tomorrow.month());
     int noOfYears = 1 + (maxDate.year()) - (tomorrow.year());
     if (rTypr==MONTHLY) {
         noRows = noOfMonths;
@@ -624,17 +643,20 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
             if (!ok) {
                 return ; // should never happen
             }
-            QString finaleCatString = QString("%1 %2").arg(locale.monthName(month, QLocale::FormatType::ShortFormat)).arg(catStringList.at(1));
-            QString text = QString("%1 / %2 / %3").arg(set->label()).arg(finaleCatString).arg(CurrencyHelper::formatAmount(set->at(index),currInfo, locale, true));
+            QString finaleCatString = QString("%1 %2").arg(locale.monthName(month,
+                QLocale::FormatType::ShortFormat)).arg(catStringList.at(1));
+            QString text = QString("%1 / %2 / %3").arg(set->label()).arg(finaleCatString)
+                .arg(CurrencyHelper::formatAmount(set->at(index),currInfo, locale, true));
             ui->monthlyReportChartSelectedTextLabel->setText(text);
         });
     } else {
-        QObject::connect(series, &QAbstractBarSeries::clicked, series, [=](int index, QBarSet *set) {
+        QObject::connect(series, &QAbstractBarSeries::clicked, series, [=](int index, QBarSet *set){
             QStringList cats = chartYearlyReportAxisX->categories();
             set->deselectAllBars();
             bool ok;
             QString cat = cats.at(index);
-            QString text = QString("%1 / %2 / %3").arg(set->label()).arg(cat).arg(CurrencyHelper::formatAmount(set->at(index),currInfo, locale, true));
+            QString text = QString("%1 / %2 / %3").arg(set->label()).arg(cat)
+                .arg(CurrencyHelper::formatAmount(set->at(index),currInfo, locale, true));
             ui->yearlyReportChartSelectedTextLabel->setText(text);
         });
     }
@@ -693,7 +715,8 @@ void AnalysisDialog::on_incomesRelativeWeigthRadioButton_toggled(bool checked)
         ui->noElementsLabel->setText(tr("No of most significant expenses to use :"));
     }
     updateRelativeWeightChart();
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("Income radiobutton changed to %1").arg(checked));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("Income radiobutton changed to %1").arg(checked));
 }
 
 
@@ -706,7 +729,8 @@ void AnalysisDialog::on_closePushButton_clicked()
     binsMonthly = {};   // now useless
     binsYearly = {};    // now useless
 
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog closed"));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Analysis Dialog closed"));
 }
 
 
@@ -720,7 +744,8 @@ void AnalysisDialog::on_AnalysisDialog_rejected()
 void AnalysisDialog::on_noElementsSpinBox_valueChanged(int arg1)
 {
     updateRelativeWeightChart();
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("No of elements changed to %1").arg(arg1));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("No of elements changed to %1").arg(arg1));
 
 }
 
@@ -728,14 +753,16 @@ void AnalysisDialog::on_noElementsSpinBox_valueChanged(int arg1)
 void AnalysisDialog::on_fromDateEdit_userDateChanged(const QDate &date)
 {
     updateRelativeWeightChart();
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("From date changed to %1").arg(date.toString()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("From date changed to %1").arg(date.toString()));
 }
 
 
 void AnalysisDialog::on_toDateEdit_userDateChanged(const QDate &date)
 {
     updateRelativeWeightChart();
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info, QString("To date changed to %1").arg(date.toString()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("To date changed to %1").arg(date.toString()));
 }
 
 
@@ -809,7 +836,8 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
     QDate maxDate = tomorrow.addYears(
         GbpController::getInstance().getScenario()->getFeGenerationDuration()).addDays(-1);
     int noRows;
-    int noOfMonths = 1 + (12*maxDate.year()+maxDate.month()) - (12*tomorrow.year()+tomorrow.month());
+    int noOfMonths = 1 + (12*maxDate.year()+maxDate.month()) -
+        (12*tomorrow.year()+tomorrow.month());
     int noOfYears = 1 + (maxDate.year()) - (tomorrow.year());
     if (rType==MONTHLY) {
         noRows = noOfMonths;
@@ -833,7 +861,8 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
     }
 
     // write header
-    s = QString("%1\t%2\t%3\t%4\n").arg(tr("Period"),tr("Total Incomes"),tr("Total Expenses"),tr("Delta"));
+    s = QString("%1\t%2\t%3\t%4\n").arg(tr("Period"),tr("Total Incomes"),tr("Total Expenses"),
+        tr("Delta"));
     file.write(s.toUtf8());
 
     // write data
@@ -862,7 +891,8 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
         file.write(s.toUtf8());
     }
     file.close();
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Success of Yearly Report export");
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        "Success of Yearly Report export");
 
 }
 
@@ -873,7 +903,8 @@ void AnalysisDialog::exportChartAsImage(QWidget* chartWidget)
     QString defaultExtension = ".png";
     QString defaultExtensionUsed = ".png";
     QString filter = tr("PNG Files (*.png *.PNG)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select an Image File"), GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select an Image File"),
+        GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
     if (fileName != ""){
         // fix the filename to add the proper suffix
         QFileInfo fi(fileName);
@@ -883,12 +914,15 @@ void AnalysisDialog::exportChartAsImage(QWidget* chartWidget)
         bool successful;
         successful = chartWidget->grab().save(fileName,"PNG", 100) ;  // max quality
         if(successful == false){
-            QMessageBox::critical(nullptr,tr("Export Failed"), tr("The creation of the image file did not succeed"));
+            QMessageBox::critical(nullptr,tr("Export Failed"),
+                tr("The creation of the image file did not succeed"));
             return;
         }
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Success of Chart export");
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            "Success of Chart export");
     } else{
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, "Chart export canceled");
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            "Chart export canceled");
     }
 }
 
@@ -968,15 +1002,19 @@ void AnalysisDialog::initReportChart(ReportType type)
     uint oldFontSize = fontX.pointSize();
     uint newFontSize = Util::changeFontSize(2, true, fontX.pointSize());
     if (type == ReportType::MONTHLY) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Monthly Chart - X axis - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Analysis Dialog - Monthly Chart - X axis - Font size set from %1 to %2")
+            .arg(oldFontSize).arg(newFontSize));
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Yearly Chart - X axis - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Analysis Dialog - Yearly Chart - X axis - Font size set from %1 to %2")
+            .arg(oldFontSize).arg(newFontSize));
     }
     fontX.setPointSize(newFontSize);
     (*xAxisPtr)->setLabelsFont(fontX);
     //
     (*xAxisPtr)->append(categories);
-    (*chartPtr)->addAxis((*xAxisPtr), Qt::AlignBottom); // the CHART (not the series) takes ownership
+    (*chartPtr)->addAxis((*xAxisPtr), Qt::AlignBottom); //the CHART (not the series) takes ownership
     series->attachAxis((*xAxisPtr));
     // y axis
     (*yAxisPtr) = new QValueAxis();
@@ -985,9 +1023,13 @@ void AnalysisDialog::initReportChart(ReportType type)
     oldFontSize = fontY.pointSize();
     newFontSize = Util::changeFontSize(2, true, fontY.pointSize());
     if (type == ReportType::MONTHLY) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Monthly Chart - X axis font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Analysis Dialog - Monthly Chart - X axis font size set from %1 to %2")
+            .arg(oldFontSize).arg(newFontSize));
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Analysis Dialog - Yearly Chart - X axis - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("Analysis Dialog - Yearly Chart - X axis - Font size set from %1 to %2")
+            .arg(oldFontSize).arg(newFontSize));
     }
     fontY.setPointSize(newFontSize);
     (*yAxisPtr)->setLabelsFont(fontY);
@@ -1007,19 +1049,22 @@ void AnalysisDialog::initReportChart(ReportType type)
 
 
 // Return full QDate for start end end period for the displayed bar chart, from the widgets content
-void AnalysisDialog::getStartEndDateReportChart(ReportType type, QDate &startDate, QDate &endDate) const
+void AnalysisDialog::getStartEndDateReportChart(ReportType type, QDate &startDate,
+    QDate &endDate) const
 {
     if (type==ReportType::YEARLY) {
         startDate = QDate(ui->yearlyReportChartFromYearSpinBox->value(),1,1);
         endDate = startDate.addYears(ui->yearlyReportChartDurationSpinBox->value()-1);
     } else {
-        startDate = QDate(ui->monthlyReportChartFromYearSpinBox->value(),ui->monthlyReportChartFromMonthComboBox->currentIndex()+1,1);
+        startDate = QDate(ui->monthlyReportChartFromYearSpinBox->value(),
+            ui->monthlyReportChartFromMonthComboBox->currentIndex()+1,1);
         endDate = startDate.addMonths(ui->monthlyReportChartDurationSpinBox->value()-1);
     }
 }
 
 
-void AnalysisDialog::getMinMaxReportChart(ReportType type, QBarSet* incomes, QBarSet* expenses, QBarSet* deltasPositive, QBarSet* deltasNegative, double& minY, double& maxY)
+void AnalysisDialog::getMinMaxReportChart(ReportType type, QBarSet* incomes, QBarSet* expenses,
+    QBarSet* deltasPositive, QBarSet* deltasNegative, double& minY, double& maxY)
 {
     bool useIncomes;
     bool useExpenses;
@@ -1063,15 +1108,18 @@ void AnalysisDialog::getMinMaxReportChart(ReportType type, QBarSet* incomes, QBa
 }
 
 
-void AnalysisDialog::findWhichSetsIsToBeUsedReportChart(ReportType type, bool &incomesSet, bool &expensesSet, bool &deltasSet)
+void AnalysisDialog::findWhichSetsIsToBeUsedReportChart(ReportType type, bool &incomesSet,
+    bool &expensesSet, bool &deltasSet)
 {
     if (type==ReportType::MONTHLY) {
-        if( ui->monthlyReportChartIncomesRadioButton->isChecked() || ui->monthlyReportChartIncomesExpensesRadioButton->isChecked() ){
+        if( ui->monthlyReportChartIncomesRadioButton->isChecked() ||
+            ui->monthlyReportChartIncomesExpensesRadioButton->isChecked() ){
             incomesSet = true;;
         } else{
             incomesSet = false;
         }
-        if( ui->monthlyReportChartExpensesRadioButton->isChecked() || ui->monthlyReportChartIncomesExpensesRadioButton->isChecked() ){
+        if( ui->monthlyReportChartExpensesRadioButton->isChecked() ||
+            ui->monthlyReportChartIncomesExpensesRadioButton->isChecked() ){
             expensesSet = true;
         } else{
             expensesSet = false;
@@ -1082,12 +1130,14 @@ void AnalysisDialog::findWhichSetsIsToBeUsedReportChart(ReportType type, bool &i
             deltasSet = false;
         }
     } else {
-        if( ui->yearlyReportChartIncomesRadioButton->isChecked() || ui->yearlyReportChartIncomesExpensesRadioButton->isChecked() ){
+        if( ui->yearlyReportChartIncomesRadioButton->isChecked() ||
+            ui->yearlyReportChartIncomesExpensesRadioButton->isChecked() ){
             incomesSet = true;;
         } else{
             incomesSet = false;
         }
-        if( ui->yearlyReportChartExpensesRadioButton->isChecked() || ui->yearlyReportChartIncomesExpensesRadioButton->isChecked() ){
+        if( ui->yearlyReportChartExpensesRadioButton->isChecked() ||
+            ui->yearlyReportChartIncomesExpensesRadioButton->isChecked() ){
             expensesSet = true;
         } else{
             expensesSet = false;
@@ -1101,7 +1151,8 @@ void AnalysisDialog::findWhichSetsIsToBeUsedReportChart(ReportType type, bool &i
 }
 
 
-void AnalysisDialog::setMonthlyYearlyChartTitle(QChart* chartPtr, bool useIncomes, bool useExpenses, bool useDeltas)
+void AnalysisDialog::setMonthlyYearlyChartTitle(QChart* chartPtr, bool useIncomes, bool useExpenses,
+    bool useDeltas)
 {
     if (useIncomes && useExpenses) {
         chartPtr->setTitle(tr("Incomes and Expenses"));
@@ -1123,7 +1174,8 @@ void AnalysisDialog::on_monthlyReportChartDurationSpinBox_valueChanged(int arg1)
 
 void AnalysisDialog::on_monthlyReportChartRightToolButton_clicked()
 {
-    QDate start = QDate(ui->monthlyReportChartFromYearSpinBox->value(),ui->monthlyReportChartFromMonthComboBox->currentIndex()+1,1);
+    QDate start = QDate(ui->monthlyReportChartFromYearSpinBox->value(),
+        ui->monthlyReportChartFromMonthComboBox->currentIndex()+1,1);
     start = start.addMonths(ui->monthlyReportChartDurationSpinBox->value());
     ui->monthlyReportChartFromYearSpinBox->setValue(start.year());
     ui->monthlyReportChartFromMonthComboBox->setCurrentIndex(start.month()-1);
@@ -1133,7 +1185,8 @@ void AnalysisDialog::on_monthlyReportChartRightToolButton_clicked()
 
 void AnalysisDialog::on_monthlyReportChartLeftToolButton_clicked()
 {
-    QDate start = QDate(ui->monthlyReportChartFromYearSpinBox->value(),ui->monthlyReportChartFromMonthComboBox->currentIndex()+1,1);
+    QDate start = QDate(ui->monthlyReportChartFromYearSpinBox->value(),
+        ui->monthlyReportChartFromMonthComboBox->currentIndex()+1,1);
     start = start.addMonths(-ui->monthlyReportChartDurationSpinBox->value());
     ui->monthlyReportChartFromYearSpinBox->setValue(start.year());
     ui->monthlyReportChartFromMonthComboBox->setCurrentIndex(start.month()-1);

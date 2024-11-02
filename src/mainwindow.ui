@@ -97,6 +97,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="toolButton_4Y">
+            <property name="text">
+             <string>4Y</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="toolButton_5Y">
             <property name="text">
              <string>5Y</string>

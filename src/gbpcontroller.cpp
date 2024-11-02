@@ -45,6 +45,7 @@ GbpController::GbpController()
     noSettingsFileAtStartup = false;
     isDarkModeSet = false;
     exportTextAmountLocalized = false;
+    exportTextDateLocalized = false;
     chartPointSize = 10;
     wheelRotatedAwayZoomIn = false;
 
@@ -294,7 +295,7 @@ void GbpController::loadSettings()
         lightModeSelectedPointColor = QColor(0, 192, 0);
     }
 
-    // amount in exported text are localized or not (in which case format is : no thousand
+    // Amounts in exported text are localized or not (in which case format is : no thousand
     // separator, decimal sep = "."
     if (settingsPtr->contains("export_text_amount_localized")){
         v = settingsPtr->value("export_text_amount_localized");
@@ -306,7 +307,21 @@ void GbpController::loadSettings()
         }
 
     } else{
-        exportTextAmountLocalized = false;;
+        exportTextAmountLocalized = false;
+    }
+
+    // Dates in exported text are localized or not (in which case format is : YYYY-MM-DD
+    if (settingsPtr->contains("export_text_date_localized")){
+        v = settingsPtr->value("export_text_date_localized");
+        bool ok = Util::isValidBoolString(v.toString());
+        if(ok){
+            exportTextDateLocalized = v.toBool();
+        } else {
+            exportTextDateLocalized = false;
+        }
+
+    } else{
+        exportTextDateLocalized = false;
     }
 
     // last directory
@@ -488,6 +503,8 @@ void GbpController::loadSettings()
         QColor::HexRgb)));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
         QString("    export_text_amount_localized = %1").arg(exportTextAmountLocalized));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    export_text_date_localized = %1").arg(exportTextDateLocalized));
     GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
         QString("    last_dir = %1").arg(lastDir));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
@@ -529,6 +546,7 @@ void GbpController::saveSettings()
     settingsPtr->setValue("chart_dark_mode_selected_point_color",
         darkModeSelectedPointColor.name(QColor::HexRgb));
     settingsPtr->setValue("export_text_amount_localized",exportTextAmountLocalized);
+    settingsPtr->setValue("export_text_date_localized",exportTextDateLocalized);
     settingsPtr->setValue("last_dir",lastDir);
     settingsPtr->setValue("main_chart_scaling_percentage",percentageMainChartScaling);
     settingsPtr->setValue("use_default_system_font",useDefaultSystemFont);
@@ -855,6 +873,16 @@ QString GbpController::getSettingsFullFileName() const
 GbpController::LogLevel GbpController::getLogLevel() const
 {
     return logLevel;
+}
+
+bool GbpController::getExportTextDateLocalized() const
+{
+    return exportTextDateLocalized;
+}
+
+void GbpController::setExportTextDateLocalized(bool newExportTextDateLocalized)
+{
+    exportTextDateLocalized = newExportTextDateLocalized;
 }
 
 bool GbpController::getWheelRotatedAwayZoomIn() const

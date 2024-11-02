@@ -196,11 +196,11 @@ https://codeberg.org/claude_dumas/gbp</source>
         <location filename="analysisdialog.ui" line="168"/>
         <location filename="analysisdialog.ui" line="455"/>
         <location filename="analysisdialog.ui" line="715"/>
-        <location filename="analysisdialog.cpp" line="108"/>
-        <location filename="analysisdialog.cpp" line="116"/>
-        <location filename="analysisdialog.cpp" line="556"/>
-        <location filename="analysisdialog.cpp" line="944"/>
-        <location filename="analysisdialog.cpp" line="1109"/>
+        <location filename="analysisdialog.cpp" line="115"/>
+        <location filename="analysisdialog.cpp" line="124"/>
+        <location filename="analysisdialog.cpp" line="575"/>
+        <location filename="analysisdialog.cpp" line="978"/>
+        <location filename="analysisdialog.cpp" line="1160"/>
         <source>Incomes</source>
         <translation></translation>
     </message>
@@ -214,11 +214,11 @@ https://codeberg.org/claude_dumas/gbp</source>
         <location filename="analysisdialog.ui" line="184"/>
         <location filename="analysisdialog.ui" line="468"/>
         <location filename="analysisdialog.ui" line="728"/>
-        <location filename="analysisdialog.cpp" line="108"/>
         <location filename="analysisdialog.cpp" line="116"/>
-        <location filename="analysisdialog.cpp" line="558"/>
-        <location filename="analysisdialog.cpp" line="945"/>
-        <location filename="analysisdialog.cpp" line="1111"/>
+        <location filename="analysisdialog.cpp" line="125"/>
+        <location filename="analysisdialog.cpp" line="577"/>
+        <location filename="analysisdialog.cpp" line="979"/>
+        <location filename="analysisdialog.cpp" line="1162"/>
         <source>Expenses</source>
         <translation></translation>
     </message>
@@ -325,7 +325,7 @@ https://codeberg.org/claude_dumas/gbp</source>
     <message>
         <location filename="analysisdialog.ui" line="481"/>
         <location filename="analysisdialog.ui" line="741"/>
-        <location filename="analysisdialog.cpp" line="1107"/>
+        <location filename="analysisdialog.cpp" line="1158"/>
         <source>Incomes and Expenses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -361,152 +361,152 @@ https://codeberg.org/claude_dumas/gbp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="70"/>
-        <location filename="analysisdialog.cpp" line="689"/>
+        <location filename="analysisdialog.cpp" line="72"/>
+        <location filename="analysisdialog.cpp" line="711"/>
         <source>Relative Weight of Incomes For That Period</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="108"/>
+        <location filename="analysisdialog.cpp" line="115"/>
         <source>Month</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="108"/>
         <location filename="analysisdialog.cpp" line="116"/>
-        <location filename="analysisdialog.cpp" line="836"/>
+        <location filename="analysisdialog.cpp" line="125"/>
+        <location filename="analysisdialog.cpp" line="865"/>
         <source>Delta</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="116"/>
+        <location filename="analysisdialog.cpp" line="124"/>
         <source>Year</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="203"/>
-        <location filename="analysisdialog.cpp" line="206"/>
-        <location filename="analysisdialog.cpp" line="218"/>
+        <location filename="analysisdialog.cpp" line="213"/>
+        <location filename="analysisdialog.cpp" line="216"/>
+        <location filename="analysisdialog.cpp" line="230"/>
         <source>Invalid Dates</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="203"/>
+        <location filename="analysisdialog.cpp" line="213"/>
         <source>From Date is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="206"/>
+        <location filename="analysisdialog.cpp" line="216"/>
         <source>To Date is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="211"/>
+        <location filename="analysisdialog.cpp" line="221"/>
         <source>&quot;To&quot; Date %1 cannot occur before &quot;From&quot; Date %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="217"/>
+        <location filename="analysisdialog.cpp" line="228"/>
         <source>&quot;From&quot; Date %1 cannot be smaller than &quot;tomorrow&quot; %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="306"/>
-        <location filename="analysisdialog.cpp" line="307"/>
+        <location filename="analysisdialog.cpp" line="320"/>
+        <location filename="analysisdialog.cpp" line="321"/>
         <source>Others</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="560"/>
+        <location filename="analysisdialog.cpp" line="579"/>
         <source>Deltas - Surplus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="562"/>
+        <location filename="analysisdialog.cpp" line="581"/>
         <source>Deltas - Deficit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="692"/>
+        <location filename="analysisdialog.cpp" line="714"/>
         <source>Relative Weight of Expenses For That Period</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="693"/>
+        <location filename="analysisdialog.cpp" line="715"/>
         <source>No of most significant expenses to use :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="767"/>
+        <location filename="analysisdialog.cpp" line="794"/>
         <source>Text Files (*.txt *.TXT *.csv *.CSV)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="768"/>
+        <location filename="analysisdialog.cpp" line="795"/>
         <source>Select a File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="785"/>
-        <location filename="analysisdialog.cpp" line="886"/>
+        <location filename="analysisdialog.cpp" line="812"/>
+        <location filename="analysisdialog.cpp" line="917"/>
         <source>Export Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="785"/>
+        <location filename="analysisdialog.cpp" line="812"/>
         <source>Cannot open the file for saving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="836"/>
+        <location filename="analysisdialog.cpp" line="864"/>
         <source>Period</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="836"/>
+        <location filename="analysisdialog.cpp" line="864"/>
         <source>Total Incomes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="836"/>
+        <location filename="analysisdialog.cpp" line="864"/>
         <source>Total Expenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="875"/>
+        <location filename="analysisdialog.cpp" line="905"/>
         <source>PNG Files (*.png *.PNG)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="876"/>
+        <location filename="analysisdialog.cpp" line="906"/>
         <source>Select an Image File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="886"/>
+        <location filename="analysisdialog.cpp" line="918"/>
         <source>The creation of the image file did not succeed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="940"/>
+        <location filename="analysisdialog.cpp" line="974"/>
         <source>Yearly Incomes and Expenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="497"/>
         <location filename="analysisdialog.ui" line="757"/>
-        <location filename="analysisdialog.cpp" line="1113"/>
+        <location filename="analysisdialog.cpp" line="1164"/>
         <source>Deltas</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="71"/>
-        <location filename="analysisdialog.cpp" line="690"/>
+        <location filename="analysisdialog.cpp" line="73"/>
+        <location filename="analysisdialog.cpp" line="712"/>
         <source>No of most significant incomes to use :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.cpp" line="933"/>
+        <location filename="analysisdialog.cpp" line="967"/>
         <source>Monthly Incomes and Expenses</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2589,548 +2589,557 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="102"/>
+        <location filename="mainwindow.ui" line="109"/>
         <source>5Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="109"/>
+        <location filename="mainwindow.ui" line="116"/>
         <source>10Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="116"/>
+        <location filename="mainwindow.ui" line="123"/>
         <source>15Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="123"/>
+        <location filename="mainwindow.ui" line="130"/>
         <source>20Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="130"/>
+        <location filename="mainwindow.ui" line="137"/>
         <source>25Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="137"/>
+        <location filename="mainwindow.ui" line="144"/>
         <source>50Y</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="144"/>
+        <location filename="mainwindow.ui" line="151"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Rescale the chart so that the X axis range is from &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;“tomorrow”&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; to “&lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;last allowed date for the financial events&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;” as set in the scenario. Y axis is rescaled to include the min and max values of the new X range.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Rescale the chart so that the X axis range is &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;“tomorrow”&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; to “&lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;last allowed date for the calculated data&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;”. Y axis is rescaled to include the min and max values.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="147"/>
+        <location filename="mainwindow.ui" line="154"/>
         <source>Max</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="157"/>
+        <location filename="mainwindow.ui" line="164"/>
         <source>Fit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="164"/>
+        <location filename="mainwindow.ui" line="171"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Manually specify the X axis date range. Y axis is rescaled to show the min/max in the new X range.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Manually specify the X axis date range.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="167"/>
+        <location filename="mainwindow.ui" line="174"/>
         <source>Custom</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="190"/>
+        <location filename="mainwindow.ui" line="197"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scroll the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;left&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span than the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scrolls the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;left&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span than the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="200"/>
+        <location filename="mainwindow.ui" line="207"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scroll the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;right&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span than the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scrolls the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;right&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span than the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="261"/>
+        <location filename="mainwindow.ui" line="268"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Baseline amount from which starts the cash balance curve. As the curve always begins from &lt;span style=&quot; font-weight:700;&quot;&gt;tomorrow&lt;/span&gt;, the baseline amount is the total cash balance you have, as determined by your own means, as of &lt;span style=&quot; font-weight:700;&quot;&gt;today&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Baseline amount from which starts the cash balance curve. As the curve always begins from &lt;span style=&quot; font-weight:700;&quot;&gt;tomorrow&lt;/span&gt;, the baseline amount is the total cash balance you determine by yourself, as of &lt;span style=&quot; font-weight:700;&quot;&gt;today&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="274"/>
+        <location filename="mainwindow.ui" line="281"/>
         <source>CAD</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="316"/>
+        <location filename="mainwindow.ui" line="323"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt;, show data points on Cash Balance curve as big color-filled disks&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt;, don&apos;t show data points.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt;, &amp;quot;localization disk&amp;quot; for each data point in the cash balance curve are shown.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt;, they are hidden.&lt;/p&gt;&lt;p&gt;Localization disks help to better localize data points on the chart.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="319"/>
+        <location filename="mainwindow.ui" line="326"/>
         <source>Show Points</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="345"/>
+        <location filename="mainwindow.ui" line="352"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all the data points of the cash balance curve (not just those displayed) into a CSV file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exports all the data points of the cash balance curve (not just those displayed) in a CSV file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="372"/>
+        <location filename="mainwindow.ui" line="379"/>
         <source>Selected Point Info</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="418"/>
+        <location filename="mainwindow.ui" line="425"/>
         <source>Date :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="619"/>
+        <location filename="mainwindow.ui" line="626"/>
         <source>No of Events :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="666"/>
+        <location filename="mainwindow.ui" line="673"/>
         <source>Displayed Date Range</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="747"/>
+        <location filename="mainwindow.ui" line="754"/>
         <source>Delta :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="454"/>
+        <location filename="mainwindow.ui" line="461"/>
         <source>Amount :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="193"/>
+        <location filename="mainwindow.ui" line="200"/>
         <source>&lt;--</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="203"/>
+        <location filename="mainwindow.ui" line="210"/>
         <source>--&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="248"/>
+        <location filename="mainwindow.ui" line="255"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="348"/>
+        <location filename="mainwindow.ui" line="355"/>
         <source>CSV Export...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="490"/>
+        <location filename="mainwindow.ui" line="497"/>
         <source>Change :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="436"/>
-        <location filename="mainwindow.ui" line="472"/>
-        <location filename="mainwindow.ui" line="508"/>
-        <location filename="mainwindow.ui" line="605"/>
-        <location filename="mainwindow.ui" line="642"/>
+        <location filename="mainwindow.ui" line="443"/>
+        <location filename="mainwindow.ui" line="479"/>
+        <location filename="mainwindow.ui" line="515"/>
+        <location filename="mainwindow.ui" line="612"/>
+        <location filename="mainwindow.ui" line="649"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="154"/>
+        <location filename="mainwindow.ui" line="102"/>
+        <source>4Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="161"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Rescale the chart so that the X axis range covers exactly the &lt;/span&gt;&lt;span style=&quot; font-weight:700; background-color:transparent;&quot;&gt;date range of the financial events&lt;/span&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt; generated by the  Scenario. Y axis is rescaled to include the min and max values in the new X range.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Rescale the chart so that the X axis range covers exactly the date range of the Scenario&apos;s calculated data (min to max date values). Y axis is rescaled to include the min and max values.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="552"/>
+        <location filename="mainwindow.ui" line="559"/>
         <source>General Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="582"/>
+        <location filename="mainwindow.ui" line="589"/>
         <source>Days With Events :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="602"/>
+        <location filename="mainwindow.ui" line="609"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In the set of financial events generated, how many days have at least one financial event.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="639"/>
+        <location filename="mainwindow.ui" line="646"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How many financial events in total have been generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="687"/>
+        <location filename="mainwindow.ui" line="694"/>
         <source>From :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="699"/>
+        <location filename="mainwindow.ui" line="706"/>
         <source>To :</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="793"/>
+        <location filename="mainwindow.ui" line="800"/>
         <source>Scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="797"/>
+        <location filename="mainwindow.ui" line="804"/>
         <source>Open Recent</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="819"/>
+        <location filename="mainwindow.ui" line="826"/>
         <source>Tools</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="826"/>
+        <location filename="mainwindow.ui" line="833"/>
         <source>Help</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="851"/>
+        <location filename="mainwindow.ui" line="858"/>
         <source>New...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="854"/>
+        <location filename="mainwindow.ui" line="861"/>
         <source>Close the current scenario and create a new scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="857"/>
+        <location filename="mainwindow.ui" line="864"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="862"/>
+        <location filename="mainwindow.ui" line="869"/>
         <source>Open...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="865"/>
+        <location filename="mainwindow.ui" line="872"/>
         <source>Close the current scenario and open an existing scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="868"/>
+        <location filename="mainwindow.ui" line="875"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="873"/>
+        <location filename="mainwindow.ui" line="880"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="876"/>
+        <location filename="mainwindow.ui" line="883"/>
         <source>Edit the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="879"/>
+        <location filename="mainwindow.ui" line="886"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="884"/>
+        <location filename="mainwindow.ui" line="891"/>
         <source>Save</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="887"/>
+        <location filename="mainwindow.ui" line="894"/>
         <source>Save the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="890"/>
+        <location filename="mainwindow.ui" line="897"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="895"/>
+        <location filename="mainwindow.ui" line="902"/>
         <source>Save As...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="898"/>
+        <location filename="mainwindow.ui" line="905"/>
         <source>Save the current scenario under a new file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="903"/>
+        <location filename="mainwindow.ui" line="910"/>
         <source>Quit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="908"/>
+        <location filename="mainwindow.ui" line="915"/>
         <source>About Graphical Budget Planner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="913"/>
+        <location filename="mainwindow.ui" line="920"/>
         <source>About Qt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="918"/>
+        <location filename="mainwindow.ui" line="925"/>
         <source>Options...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="923"/>
+        <location filename="mainwindow.ui" line="930"/>
         <source>Analysis...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="928"/>
+        <location filename="mainwindow.ui" line="935"/>
         <source>User Manual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="933"/>
+        <location filename="mainwindow.ui" line="940"/>
         <source>Open Example</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="938"/>
+        <location filename="mainwindow.ui" line="945"/>
         <source>Properties...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="943"/>
+        <location filename="mainwindow.ui" line="950"/>
         <source>Quick Tutorial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="948"/>
+        <location filename="mainwindow.ui" line="955"/>
         <source>Duplicate...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="953"/>
+        <location filename="mainwindow.ui" line="960"/>
         <source>Change Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="77"/>
+        <location filename="mainwindow.cpp" line="78"/>
         <source>Start Amount for Today %1 :</source>
         <oldsource>Start Amount Today %1 :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="511"/>
+        <location filename="mainwindow.cpp" line="515"/>
         <source>No Scenario Loaded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="482"/>
+        <location filename="mainwindow.cpp" line="486"/>
         <source>Modifications not saved</source>
         <oldsource>Modificatoins not saved</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="483"/>
+        <location filename="mainwindow.cpp" line="487"/>
         <source>Current scenario has been modified, but it is not saved yet on disk. Do you want to SAVE THE CHANGES before going forward ?</source>
         <oldsource>The scenario file on disk is of an older file format. Current scenario could also have been modified. Do you want to SAVE THE CHANGES and update to the latest file format before going forward ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="565"/>
+        <location filename="mainwindow.cpp" line="569"/>
         <source>About to quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="566"/>
+        <location filename="mainwindow.cpp" line="570"/>
         <source>Do you really want to quit the application ?</source>
         <oldsource>Do you really want to terminate the application ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="603"/>
+        <location filename="mainwindow.cpp" line="607"/>
         <source>Open an Existing Scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="655"/>
-        <location filename="mainwindow.cpp" line="696"/>
+        <location filename="mainwindow.cpp" line="659"/>
+        <location filename="mainwindow.cpp" line="700"/>
         <source>Saving Scenario Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="655"/>
+        <location filename="mainwindow.cpp" line="659"/>
         <source>No scenario loaded yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="663"/>
+        <location filename="mainwindow.cpp" line="667"/>
         <source>Choose Scenario Filename</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="679"/>
-        <location filename="mainwindow.cpp" line="708"/>
+        <location filename="mainwindow.cpp" line="683"/>
+        <location filename="mainwindow.cpp" line="712"/>
         <source>Scenario saved successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="696"/>
-        <location filename="mainwindow.cpp" line="1562"/>
+        <location filename="mainwindow.cpp" line="700"/>
         <source>No scenario loaded yet : nothing to save</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="748"/>
+        <location filename="mainwindow.cpp" line="752"/>
         <source>Error found in the file content.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="758"/>
-        <location filename="mainwindow.cpp" line="767"/>
+        <location filename="mainwindow.cpp" line="762"/>
+        <location filename="mainwindow.cpp" line="771"/>
         <source>Loading Scenario Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="765"/>
+        <location filename="mainwindow.cpp" line="769"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="803"/>
+        <location filename="mainwindow.cpp" line="807"/>
         <source>Error updating file on disk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="803"/>
+        <location filename="mainwindow.cpp" line="807"/>
         <source>Upgrading the file format of this scenario file from v1 to v2 failed. This could indicates a write permission issue with the file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="810"/>
+        <location filename="mainwindow.cpp" line="814"/>
         <source>Scenario opened successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="812"/>
+        <location filename="mainwindow.cpp" line="816"/>
         <source>Scenario opened successfully (converted from version 1 to 2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="884"/>
+        <location filename="mainwindow.cpp" line="888"/>
         <source>Edit Scenario Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="884"/>
-        <location filename="mainwindow.cpp" line="1755"/>
+        <location filename="mainwindow.cpp" line="888"/>
+        <location filename="mainwindow.cpp" line="1795"/>
         <source>No scenario loaded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1149"/>
+        <location filename="mainwindow.cpp" line="1153"/>
         <source>A new scenario has been created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1164"/>
+        <location filename="mainwindow.cpp" line="1168"/>
         <source>Current scenario has been modified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1242"/>
+        <location filename="mainwindow.cpp" line="1246"/>
         <source>Options changes have been successfully saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1330"/>
+        <location filename="mainwindow.cpp" line="1334"/>
         <source>y</source>
         <translation>y</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1331"/>
+        <location filename="mainwindow.cpp" line="1335"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1332"/>
+        <location filename="mainwindow.cpp" line="1336"/>
         <source>d</source>
         <translation>d</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1365"/>
+        <location filename="mainwindow.cpp" line="1369"/>
         <source>Clear List</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1562"/>
-        <location filename="mainwindow.cpp" line="1585"/>
+        <location filename="mainwindow.cpp" line="1572"/>
+        <location filename="mainwindow.cpp" line="1595"/>
         <source>Export Failed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1570"/>
+        <location filename="mainwindow.cpp" line="1572"/>
+        <source>No scenario loaded yet : nothing to export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="1580"/>
         <source>Text Files (*.txt *.TXT *.csv *.CSV)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1571"/>
+        <location filename="mainwindow.cpp" line="1581"/>
         <source>Select a File</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1585"/>
+        <location filename="mainwindow.cpp" line="1595"/>
         <source>Cannot open the file for writing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1612"/>
+        <location filename="mainwindow.cpp" line="1621"/>
         <source>Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1612"/>
+        <location filename="mainwindow.cpp" line="1621"/>
         <source>Total Daily Incomes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1612"/>
+        <location filename="mainwindow.cpp" line="1621"/>
         <source>Total Daily Expenses</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1612"/>
+        <location filename="mainwindow.cpp" line="1621"/>
         <source>Total Delta</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1612"/>
+        <location filename="mainwindow.cpp" line="1621"/>
         <source>Cumulative Total</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1755"/>
+        <location filename="mainwindow.cpp" line="1795"/>
         <source>Scenario Properties Failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3153,30 +3162,30 @@ Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="592"/>
-        <location filename="optionsdialog.ui" line="655"/>
-        <location filename="optionsdialog.ui" line="718"/>
-        <location filename="optionsdialog.ui" line="786"/>
-        <location filename="optionsdialog.ui" line="849"/>
-        <location filename="optionsdialog.ui" line="912"/>
+        <location filename="optionsdialog.ui" line="613"/>
+        <location filename="optionsdialog.ui" line="676"/>
+        <location filename="optionsdialog.ui" line="739"/>
+        <location filename="optionsdialog.ui" line="807"/>
+        <location filename="optionsdialog.ui" line="870"/>
+        <location filename="optionsdialog.ui" line="933"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="294"/>
-        <source>Exported text - Amounts are localized :</source>
-        <oldsource>Exported Text - Amounts are localized :</oldsource>
+        <source>Export to CSV - Amounts are localized :</source>
+        <oldsource>Exported to CSV - Amounts are localized :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="939"/>
+        <location filename="optionsdialog.ui" line="960"/>
         <source>Overscaling for main chart :</source>
         <oldsource>Overscaling percentage for main chart :</oldsource>
         <translation></translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="406"/>
-        <location filename="optionsdialog.ui" line="957"/>
+        <location filename="optionsdialog.ui" line="978"/>
         <source>%</source>
         <translation></translation>
     </message>
@@ -3272,121 +3281,131 @@ Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="442"/>
+        <location filename="optionsdialog.ui" line="437"/>
+        <source>Export to CSV - Dates are localized :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="446"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Any date used in any CSV export process is localized, that is, it obeys the convention of &amp;quot;short format&amp;quot; of the default language used on the computer. &lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : Format &amp;quot;YYYY-MM-DD&amp;quot; is used&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="optionsdialog.ui" line="463"/>
         <source>Charts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="461"/>
+        <location filename="optionsdialog.ui" line="482"/>
         <source>Point Size in Pixels :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="470"/>
+        <location filename="optionsdialog.ui" line="491"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Size in pixels of the diameter of each disk representing data points on curve.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Size in pixels of the diameter of each circle representing data points on curve.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="506"/>
+        <location filename="optionsdialog.ui" line="527"/>
         <source>Use Dark Mode :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="521"/>
+        <location filename="optionsdialog.ui" line="542"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : For all charts, use a theme that fits a dark mode, that is dark background and light font colors.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : For all charts, use a theme that fits a light mode, that is light background and dark font colors.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="551"/>
+        <location filename="optionsdialog.ui" line="572"/>
         <source>Dark Mode Curve Color :</source>
         <oldsource>Dark Mode curve color :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="566"/>
+        <location filename="optionsdialog.ui" line="587"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve to be used when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="629"/>
+        <location filename="optionsdialog.ui" line="650"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the data points of the cash balance curve when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="692"/>
+        <location filename="optionsdialog.ui" line="713"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the selected point of the cash balance curve when Charts Dark Mode is enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="745"/>
+        <location filename="optionsdialog.ui" line="766"/>
         <source>Light Mode Curve Color :</source>
         <oldsource>Light Mode curve color :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="614"/>
+        <location filename="optionsdialog.ui" line="635"/>
         <source>Dark Mode Point Color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="677"/>
+        <location filename="optionsdialog.ui" line="698"/>
         <source>Dark Mode Selected Point Color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="760"/>
+        <location filename="optionsdialog.ui" line="781"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the cash balance curve when Charts Dark Mode is disabled (hence &amp;quot;Light Mode&amp;quot; in On).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="808"/>
+        <location filename="optionsdialog.ui" line="829"/>
         <source>Light Mode Point Color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="823"/>
+        <location filename="optionsdialog.ui" line="844"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the data points of the cash balance curve when Charts Dark Mode is disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="871"/>
+        <location filename="optionsdialog.ui" line="892"/>
         <source>Light Mode Selected Point Color :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="886"/>
+        <location filename="optionsdialog.ui" line="907"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color of the selected data point of the cash balance curve when Charts Dark Mode is disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="954"/>
+        <location filename="optionsdialog.ui" line="975"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the level of &amp;quot;overscaling” to be applied on the Cash Balance Chart X and Y axis. It basically unzooms a bit the Chart, so that it is easier to see data points located at the extreme corners. 0% means no overscaling,&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="982"/>
+        <location filename="optionsdialog.ui" line="1003"/>
         <source>Mouse wheel rotated away from user will :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="991"/>
+        <location filename="optionsdialog.ui" line="1012"/>
         <source>Zoom In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="1001"/>
+        <location filename="optionsdialog.ui" line="1022"/>
         <source>Zoom Out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="1058"/>
+        <location filename="optionsdialog.ui" line="1079"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.ui" line="1065"/>
+        <location filename="optionsdialog.ui" line="1086"/>
         <source>Save</source>
         <translation></translation>
     </message>
@@ -3397,62 +3416,62 @@ Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="98"/>
+        <location filename="optionsdialog.cpp" line="100"/>
         <source>None defined</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="213"/>
+        <location filename="optionsdialog.cpp" line="215"/>
         <source>Font Unselected</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="214"/>
+        <location filename="optionsdialog.cpp" line="216"/>
         <source>You must choose a custom font if you don&apos;t use the default system font</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="223"/>
+        <location filename="optionsdialog.cpp" line="225"/>
         <source>Font Changed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="224"/>
+        <location filename="optionsdialog.cpp" line="226"/>
         <source>Application must be restarted for font changes to take effect</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="236"/>
+        <location filename="optionsdialog.cpp" line="238"/>
         <source>Today&apos;s Determination Changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="237"/>
+        <location filename="optionsdialog.cpp" line="239"/>
         <source>Today&apos;s date determination mechanism changed. Application must be restarted for changes to take effect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="242"/>
+        <location filename="optionsdialog.cpp" line="244"/>
         <source>Today&apos;s Custom Date Changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="243"/>
+        <location filename="optionsdialog.cpp" line="245"/>
         <source>Today&apos;s replacement date has changed from %1 to %2. Application must be restarted for changes to take effect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="471"/>
+        <location filename="optionsdialog.cpp" line="478"/>
         <source>Custom : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="optionsdialog.cpp" line="546"/>
-        <location filename="optionsdialog.cpp" line="559"/>
-        <location filename="optionsdialog.cpp" line="572"/>
-        <location filename="optionsdialog.cpp" line="585"/>
-        <location filename="optionsdialog.cpp" line="598"/>
-        <location filename="optionsdialog.cpp" line="611"/>
+        <location filename="optionsdialog.cpp" line="553"/>
+        <location filename="optionsdialog.cpp" line="566"/>
+        <location filename="optionsdialog.cpp" line="579"/>
+        <location filename="optionsdialog.cpp" line="592"/>
+        <location filename="optionsdialog.cpp" line="605"/>
+        <location filename="optionsdialog.cpp" line="618"/>
         <source>Color Chooser</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4299,117 +4318,152 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.ui" line="68"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="367"/>
+        <location filename="visualizeoccurrencesdialog.ui" line="52"/>
+        <source>Export to CSV...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.ui" line="75"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="369"/>
         <source>Selected Point :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.ui" line="105"/>
+        <location filename="visualizeoccurrencesdialog.ui" line="112"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="201"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="203"/>
         <source>Using constant adjusted annual inflation of %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="203"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="205"/>
         <source>Using variable inflation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="210"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="212"/>
         <source>Using custom constant growth of %1 percent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="214"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="216"/>
         <source>Using custom variable growth.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="219"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="221"/>
         <source>No growth of any kind is applied.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="224"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="226"/>
         <source>Converting Future Values to Present Values using an annual discount  rate of %1 percent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="288"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="290"/>
         <source>Converting Future Values to Present Values using an annual discount rate of %1 percent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="298"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="300"/>
         <source>No event will be generated before tomorrow %1 and past %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="375"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="377"/>
         <source>Financial Events</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="229"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="293"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="631"/>
+        <source>Text Files (*.txt *.TXT *.csv *.CSV)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="632"/>
+        <source>Select a File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="648"/>
+        <source>Export Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="648"/>
+        <source>Cannot open the file for writing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="657"/>
+        <source>Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="657"/>
+        <source>Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="visualizeoccurrencesdialog.cpp" line="231"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="295"/>
         <source>Amount was too big %1 times and have been capped to %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="114"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="116"/>
         <source>Selected Point :  Date=%1  Amount=%2</source>
         <oldsource>Selected point :  Date=%1  Value=%2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="234"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="236"/>
         <source>No event will be generated before tomorrow %1 and past %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="239"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="303"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="241"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="305"/>
         <source>income</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="239"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="303"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="241"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="305"/>
         <source>expense</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="247"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="312"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="249"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="314"/>
         <source>Amount is bigger than the maximum allowed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="253"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="319"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="255"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="321"/>
         <source>Error during amount conversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="260"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="326"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="262"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="328"/>
         <source>%1 : %2 (cummul=%3)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="266"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="331"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="268"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="333"/>
         <source>  *** PAST -&gt; discarded ***</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="238"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="302"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="240"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="304"/>
         <source>%1 %2 event(s) have been generated.
 </source>
         <translation type="unfinished"></translation>
