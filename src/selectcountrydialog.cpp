@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,9 @@ SelectCountryDialog::SelectCountryDialog(QLocale theLocale, QWidget *parent) :
     ui(new Ui::SelectCountryDialog)
 {
     ui->setupUi(this);
+
+    // "pack" the dialog to fit the font. This is required when there is no "expanding" widgets
+    this->adjustSize();
 
     // fill combobox
     QList<QString> list = CurrencyHelper::getCountries(locale).values();

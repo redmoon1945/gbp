@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -45,12 +45,18 @@ public:
         quint8 mouseWheelZoom;
         // effect on charts' theme (OPTIONS_IMPACT_CHARTS_THEME)
         quint8 charts_theme;
+        // effect on Y=0 line (visibility or color changed)
+        quint8 yzeroLine;
+        // effect on X axis Date Format
+        quint8 xaxisDateFormat;
     };
     enum OPTIONS_IMPACT_DATA {DATA_UNCHANGED=0, DATA_RECALCULATE=1};
     enum OPTIONS_IMPACT_CHART_SCALING {CHART_SCALING_NONE=0, CHART_SCALING_RESCALE=1};
     enum OPTIONS_IMPACT_DECORATION_COLOR {DECO_NONE=0, DECO_REFRESH=1 };
     enum OPTIONS_IMPACT_CHARTS_THEME {CHARTS_THEME_NONE=0, CHARTS_THEME_REFRESH=1 };
     enum OPTIONS_IMPACT_WHEEL_ZOOM {WHEEL_ZOOM_NONE=0, WHEEL_ZOOM_REFRESH=1 };
+    enum OPTIONS_IMPACT_Y_ZERO_LINE {Y_ZERO_LINE_NONE=0, Y_ZERO_LINE_REFRESH=1 };
+    enum OPTIONS_IMPACT_XAXIS_DATE_FORMAT {XAXIS_DATE_FORMAT_NONE=0, XAXIS_DATE_FORMAT_REFRESH=1 };
 
     explicit OptionsDialog(QWidget *parent = nullptr);
     ~OptionsDialog();
@@ -78,12 +84,15 @@ private slots:
     void on_lightModeCurveColorPushButton_clicked();
     void on_lightModePointColorPushButton_clicked();
     void on_lightModeSelectedPointColorPushButton_clicked();
+    void on_darkModeYzeroLineColorPushButton_clicked();
+    void on_lightModeYzeroLineColorPushButton_clicked();
 
 private:
     Ui::OptionsDialog *ui;
 
-    enum ColorItem {CI_CURVE=1, CI_POINT=2, CI_SELECTED_POINT=3};
-    enum ColorTheme {CT_DARK_MODE=1, CT_LIGHT_MODE=2};
+    // For button used to represent color
+    enum ColorItem {CI_CURVE, CI_POINT, CI_SELECTED_POINT, CI_YZERO_LINE};
+    enum ColorTheme {CT_DARK_MODE, CT_LIGHT_MODE};
 
     // variables
     QColor darkModeCurveColor;
@@ -93,6 +102,8 @@ private:
     QColor lightModePointColor;
     QColor lightModeSelectedPointColor;
     QString newCustomFontString;
+    QColor yZeroLineDarkModeColor;
+    QColor yZeroLineLightModeColor;
 
     // methods
     void setColorInfo(ColorTheme theme, ColorItem item);

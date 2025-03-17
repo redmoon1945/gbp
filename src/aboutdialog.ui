@@ -63,7 +63,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="movable">
         <bool>false</bool>
@@ -214,15 +214,15 @@ GBP is all about CASH BALANCE FORECASTING : the key principle adopted is to take
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <layout class="QVBoxLayout" name="verticalLayout_Licence">
            <item>
             <widget class="QPlainTextEdit" name="plainTextEdit_3">
              <property name="plainText">
               <string>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It's Free Software. See https://www.gnu.org/licenses/#AGPL/  for the details of the licence.
 
-graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY, ACCURACY, CORRECTNESS or FITNESS FOR A PARTICULAR PURPOSE. 
 
-(c) Copyright 2024, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</string>
+(c) Copyright 2024-2025, Claude Dumas &lt;claudedumas63@protonmail.com&gt;</string>
              </property>
             </widget>
            </item>
@@ -255,9 +255,9 @@ https://codeberg.org/claude_dumas/gbp</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
+          <layout class="QVBoxLayout" name="verticalLayout_Credits">
            <item>
-            <widget class="QPlainTextEdit" name="plainTextEdit_2">
+            <widget class="QPlainTextEdit" name="creditsPlainTextEdit">
              <property name="plainText">
               <string>Special thanks to : 
 
@@ -270,6 +270,27 @@ https://codeberg.org/claude_dumas/gbp</string>
             </widget>
            </item>
           </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="authors">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <attribute name="title">
+         <string>Authors</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QPlainTextEdit" name="contactsPlainTextEdit">
+           <property name="plainText">
+            <string>Claude Dumas
+redmoon1945@protonmail.com</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -26,25 +26,40 @@
 #include "gbpcontroller.h"
 
 
-EditVariableGrowthDialog::EditVariableGrowthDialog(QString newGrowthName, QLocale locale, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::EditVariableGrowthDialog)
+EditVariableGrowthDialog::EditVariableGrowthDialog(QString newGrowthName, QLocale locale,
+    QWidget *parent) : QDialog(parent), ui(new Ui::EditVariableGrowthDialog)
 {
     this->locale = locale;
     ui->setupUi(this);
+
     // set the model (no internal data for now)
     tableModel = new EditVariableGrowthModel(newGrowthName, this->locale);
     ui->growthTableView->setModel(tableModel);
     // force equal with of columns
     ui->growthTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // Makes note characters smaller and italic
+    QFont noteFont = ui->noteLabel->font();
+    uint oldFontSize = noteFont.pointSize();
+    uint newFontSize = Util::changeFontSize(1,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("EdityVariableGrowth - Note : Font size set from %1 to %2")
+        .arg(oldFontSize).arg(newFontSize));
+    noteFont.setPointSize(newFontSize);
+    ui->noteLabel->setFont(noteFont);
+
     // the edit add element dialog
     ege = new EditGrowthElementDialog(newGrowthName,locale,this);        // auto-destroyed by Qt
     ege->setModal(true);
+
     // connections with edition of growth element
-    QObject::connect(this, &EditVariableGrowthDialog::signalEditElementPrepareContent, ege, &EditGrowthElementDialog::slotPrepareContent);
-    QObject::connect(ege, &EditGrowthElementDialog::signalEditElementResult, this, &EditVariableGrowthDialog::slotEditElementResult);
-    QObject::connect(ege, &EditGrowthElementDialog::signalEditElementCompleted, this, &EditVariableGrowthDialog::slotEditElementCompleted);
+    QObject::connect(this, &EditVariableGrowthDialog::signalEditElementPrepareContent, ege,
+        &EditGrowthElementDialog::slotPrepareContent);
+    QObject::connect(ege, &EditGrowthElementDialog::signalEditElementResult, this,
+        &EditVariableGrowthDialog::slotEditElementResult);
+    QObject::connect(ege, &EditGrowthElementDialog::signalEditElementCompleted, this,
+        &EditVariableGrowthDialog::slotEditElementCompleted);
 }
+
 
 EditVariableGrowthDialog::~EditVariableGrowthDialog()
 {
@@ -52,12 +67,19 @@ EditVariableGrowthDialog::~EditVariableGrowthDialog()
     delete tableModel; // dont forget, because we have not set "parent" !
 }
 
+
 // Prepare for a new editing session.
 // To be called before displaying the EditComplexGrowthDialog window, to setup content
 void EditVariableGrowthDialog::slotPrepareContent(Growth newGrowth)
 {
-    this->setWindowTitle(QString(tr("Edit Variable %1")).arg(tableModel->getGrowthName()));
-    ui->noteLabel->setText(QString(tr("%1 : Value is 0 before the oldest transition date is defined. It is always applied on a monthly basis, even if defined on an annual basis (for convenience purpose). Value stays the same until a new transition date + value is defined.")).arg(tableModel->getGrowthName()));
+    QString tmp = Util::wordCapitalize(true,QString(tr("Edit variable %1"))
+        .arg(tableModel->getGrowthName()));
+    this->setWindowTitle(tmp);
+
+    ui->noteLabel->setText(QString(tr("%1 : Value is 0 before the oldest transition date is "
+        "defined. It is always applied on a monthly basis, even if defined on an annual basis "
+        "(for convenience purpose). Value stays the same until a new transition date + value is "
+        "defined.")).arg(tableModel->getGrowthName()));
     tableModel->setGrowthName(tableModel->getGrowthName());
     // update model (the view will be automatically updated)
     tableModel->setGrowthData(newGrowth);
@@ -65,7 +87,8 @@ void EditVariableGrowthDialog::slotPrepareContent(Growth newGrowth)
 
 
 // This can be for an edition of existing element or the definition of a new element
-void EditVariableGrowthDialog::slotEditElementResult(bool isEdition, QDate oldDate, QDate newDate, double growthInPercentage)
+void EditVariableGrowthDialog::slotEditElementResult(bool isEdition, QDate oldDate,
+    QDate newDate, double growthInPercentage)
 {
     // get the current data from the model
     Growth ag = tableModel->getGrowthData();   // necessarily a Variable type
@@ -119,7 +142,8 @@ void EditVariableGrowthDialog::on_cancelPushButton_clicked()
 void EditVariableGrowthDialog::on_addPushButton_clicked()
 {
     QList<QDate> existingDates = tableModel->getGrowthData().getAnnualVariableGrowth().keys();
-    emit signalEditElementPrepareContent(false,existingDates,GbpController::getInstance().getTomorrow(),0); // last 2 values are dummy
+    emit signalEditElementPrepareContent(false,existingDates,GbpController::getInstance()
+        .getTomorrow(),0); // last 2 values are dummy
     ege->show();
 }
 
@@ -130,7 +154,7 @@ void EditVariableGrowthDialog::on_editPushButton_clicked()
     QList<QDate> existingDates = factors.keys();
     QList<int> selectedRows = getSelectedRows();
     if (selectedRows.size()!=1){
-        QMessageBox::critical(this,tr("Invalid Selection"),tr("Select exactly one row"));
+        QMessageBox::critical(this,tr("Error"),tr("Select exactly one row"));
         ui->growthTableView->setFocus(); // fix strange behavior
         return;
     }
@@ -148,7 +172,7 @@ void EditVariableGrowthDialog::on_deletePushButton_clicked()
     QList<QDate> existingDates = factors.keys();
     QList<int> selectedRows = getSelectedRows();
     if (selectedRows.size()==0){
-        QMessageBox::critical(this,tr("Invalid Selection"),tr("Select at least one row"));
+        QMessageBox::critical(this,tr("Error"),tr("Select at least one row"));
         ui->growthTableView->setFocus(); // fix strange behavior
         return;
     }

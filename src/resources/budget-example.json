@@ -7,7 +7,7 @@
             "AmountSet": {
                 "2026-02-26": {
                     "Amount": 60000,
-                    "Notes": ""
+                    "Notes": "Look for alternatives"
                 }
             },
             "DecorationColor": "#5555ff",
@@ -22,7 +22,7 @@
             "AmountSet": {
                 "2024-07-10": {
                     "Amount": 200000,
-                    "Notes": ""
+                    "Notes": "Can be less expensive"
                 }
             },
             "DecorationColor": "#b5835a",
@@ -37,7 +37,7 @@
             "AmountSet": {
                 "2032-08-15": {
                     "Amount": 2400000,
-                    "Notes": ""
+                    "Notes": "Will probably be less expensive"
                 }
             },
             "Description": "",
@@ -51,7 +51,7 @@
             "AmountSet": {
                 "2024-09-15": {
                     "Amount": 24565,
-                    "Notes": ""
+                    "Notes": "This is for item xyz from last year tax return"
                 }
             },
             "Description": "",
@@ -79,7 +79,7 @@
             "AmountSet": {
                 "2024-04-15": {
                     "Amount": 712400,
-                    "Notes": ""
+                    "Notes": "Must not miss this payment"
                 }
             },
             "Description": "",
@@ -97,7 +97,7 @@
                 }
             },
             "DecorationColor": "#5555ff",
-            "Description": "",
+            "Description": "See hypothesis in document abcdef.odt",
             "Id": "e822942a-5d74-49d6-86e8-02db7b79422f",
             "IsIncome": false,
             "Name": "Car - one-time payment",
@@ -108,7 +108,7 @@
             "AmountSet": {
                 "2028-04-15": {
                     "Amount": 341254,
-                    "Notes": ""
+                    "Notes": "Expect more since tax rate should decrease"
                 }
             },
             "DecorationColor": "#f8e45c",
@@ -369,6 +369,7 @@
         "79384a30-8124-4fbe-927e-1d974aebba59": {
             "Active": true,
             "Amount": 875000,
+            "DecorationColor": "#aaaa7f",
             "Description": "",
             "EndDate": "2099-12-31",
             "Growth": {
@@ -418,6 +419,7 @@
         "8fe98b50-b73e-4ec0-ad1c-0c60ad496762": {
             "Active": true,
             "Amount": 12300,
+            "DecorationColor": "#ff55ff",
             "Description": "Cadeaux de toute sorte aux arrières-grand-mères",
             "EndDate": "2099-12-31",
             "Growth": {
@@ -491,6 +493,7 @@
         "a237fe47-e91d-44c5-b0f0-d75b280f1e17": {
             "Active": true,
             "Amount": 1200,
+            "DecorationColor": "#ff55ff",
             "Description": "",
             "EndDate": "2099-12-31",
             "Growth": {
@@ -515,6 +518,7 @@
         "a30a3701-a7b7-4a20-b679-ea918cec7267": {
             "Active": true,
             "Amount": 80000,
+            "DecorationColor": "#aa0000",
             "Description": "",
             "EndDate": "2099-12-31",
             "Growth": {
@@ -587,6 +591,7 @@
         "b0079057-6a42-4270-9341-e381fd41aee1": {
             "Active": true,
             "Amount": 225000,
+            "DecorationColor": "#aaaa7f",
             "Description": "",
             "EndDate": "2099-12-31",
             "Growth": {
@@ -734,6 +739,7 @@
         "e26bdb7d-9f84-4d40-a421-a927b0778ff6": {
             "Active": true,
             "Amount": 3400,
+            "DecorationColor": "#ff55ff",
             "Description": "",
             "EndDate": "2099-12-31",
             "Growth": {
@@ -861,7 +867,7 @@
             "AmountSet": {
                 "2026-03-10": {
                     "Amount": 123456,
-                    "Notes": ""
+                    "Notes": "Finally, getting rid of it..."
                 }
             },
             "Description": "",
@@ -4534,7 +4540,7 @@
             "AmountSet": {
                 "2026-07-01": {
                     "Amount": 3500000,
-                    "Notes": ""
+                    "Notes": "50% chance to get it"
                 }
             },
             "Description": "",
@@ -4562,30 +4568,30 @@
             "AmountSet": {
                 "2024-12-15": {
                     "Amount": 750000,
-                    "Notes": "net, moins impot"
+                    "Notes": "net"
                 },
                 "2025-12-15": {
                     "Amount": 750000,
-                    "Notes": "net, moins impot"
+                    "Notes": "net"
                 },
                 "2026-12-15": {
                     "Amount": 750000,
-                    "Notes": "net, moins impot"
+                    "Notes": "net"
                 },
                 "2027-12-15": {
                     "Amount": 750000,
-                    "Notes": "net, moins impot"
+                    "Notes": "net, but tax rate should decrease"
                 },
                 "2028-12-15": {
                     "Amount": 750000,
-                    "Notes": "net, moins impot"
+                    "Notes": ""
                 },
                 "2029-12-15": {
-                    "Amount": 750000,
-                    "Notes": "net, moins impot"
+                    "Amount": 900000,
+                    "Notes": ""
                 },
                 "2030-12-15": {
-                    "Amount": 375000,
+                    "Amount": 700000,
                     "Notes": "net, moins impot"
                 }
             },
@@ -8859,31 +8865,31 @@
             "AmountSet": {
                 "2024-12-15": {
                     "Amount": 375000,
-                    "Notes": "net, moins impot"
+                    "Notes": "net"
                 },
                 "2025-12-15": {
-                    "Amount": 375000,
-                    "Notes": "net, moins impot"
+                    "Amount": 300000,
+                    "Notes": "probaly safe"
                 },
                 "2026-12-15": {
                     "Amount": 375000,
-                    "Notes": "net, moins impot"
+                    "Notes": "possibly 1000 more"
                 },
                 "2027-12-15": {
-                    "Amount": 375000,
-                    "Notes": "net, moins impot"
+                    "Amount": 400000,
+                    "Notes": "confirmed"
                 },
                 "2028-12-15": {
                     "Amount": 375000,
-                    "Notes": "5000.00"
+                    "Notes": "Not sure about his one"
                 },
                 "2029-12-15": {
                     "Amount": 375000,
-                    "Notes": "net, moins impot"
+                    "Notes": ""
                 },
                 "2030-12-15": {
                     "Amount": 225000,
-                    "Notes": "net, moins impot"
+                    "Notes": "projection"
                 }
             },
             "Description": "",
@@ -9101,5 +9107,338 @@
         "Type": 0
     },
     "Name": "Budget Example",
+    "TagRelationships": {
+        "Set": [
+            {
+                "CsdId": "2cae4f8e-500d-448c-81f1-f598673682b8",
+                "TagId": "8fdef600-9f71-4e7b-a81b-936906d0c86e"
+            },
+            {
+                "CsdId": "806dfc80-1f26-49c3-90a8-853e70a99bf9",
+                "TagId": "5e0cb9eb-6e81-4ccc-a1b4-ef21511aef3f"
+            },
+            {
+                "CsdId": "0add5000-fc30-49e3-a5d9-94a18680f9cd",
+                "TagId": "5e0cb9eb-6e81-4ccc-a1b4-ef21511aef3f"
+            },
+            {
+                "CsdId": "5a7388bd-dd3c-40dc-8247-7778d45ce8e2",
+                "TagId": "2fb75c8e-bfef-4bc8-8095-37e6e4163afb"
+            },
+            {
+                "CsdId": "ca42dac6-c5c5-492a-a140-54e4061dceff",
+                "TagId": "2fb75c8e-bfef-4bc8-8095-37e6e4163afb"
+            },
+            {
+                "CsdId": "a0a08014-f556-45e5-b0dd-e6d1e34913fb",
+                "TagId": "84edd351-5b5b-4bf4-97a1-b780ccca0bfb"
+            },
+            {
+                "CsdId": "fc55569c-d1c4-40a1-bc3b-9edc44a3ee3e",
+                "TagId": "e0240c30-ce5a-42ca-8ac9-2b3ab5c2a632"
+            },
+            {
+                "CsdId": "26e065e6-9e6d-4b2f-82af-9c942efabe46",
+                "TagId": "84edd351-5b5b-4bf4-97a1-b780ccca0bfb"
+            },
+            {
+                "CsdId": "26e065e6-9e6d-4b2f-82af-9c942efabe46",
+                "TagId": "6df26a39-f4d4-4068-a125-39e35ec77c32"
+            },
+            {
+                "CsdId": "6767b32d-165b-46a1-bc01-565a0d3afad9",
+                "TagId": "2fb75c8e-bfef-4bc8-8095-37e6e4163afb"
+            },
+            {
+                "CsdId": "bdd7afed-c7d3-4536-917f-47669492b73b",
+                "TagId": "79a02fcf-c969-4e73-a412-84b0df6c8def"
+            },
+            {
+                "CsdId": "4d6ac8b3-f9e1-42f4-ac03-87b49a3a3362",
+                "TagId": "8fdef600-9f71-4e7b-a81b-936906d0c86e"
+            },
+            {
+                "CsdId": "fc55569c-d1c4-40a1-bc3b-9edc44a3ee3e",
+                "TagId": "af071e12-cb1b-450d-a3a4-c29bdde1bbe1"
+            },
+            {
+                "CsdId": "e8df1b1f-4c17-47fe-844b-a9b034eaad8e",
+                "TagId": "84edd351-5b5b-4bf4-97a1-b780ccca0bfb"
+            },
+            {
+                "CsdId": "de34a4fd-f95d-4fe9-99bb-e696191e8d73",
+                "TagId": "1b40f383-e388-41c2-9519-4072be008f50"
+            },
+            {
+                "CsdId": "2cae4f8e-500d-448c-81f1-f598673682b8",
+                "TagId": "ef1ce5cb-ff4b-43bb-abc0-0341b9b5cbc7"
+            },
+            {
+                "CsdId": "908e4972-eb42-4372-a705-f5eea30c692d",
+                "TagId": "e0240c30-ce5a-42ca-8ac9-2b3ab5c2a632"
+            },
+            {
+                "CsdId": "79384a30-8124-4fbe-927e-1d974aebba59",
+                "TagId": "af6404ce-aa80-47d6-bb21-971ee887963d"
+            },
+            {
+                "CsdId": "a0a08014-f556-45e5-b0dd-e6d1e34913fb",
+                "TagId": "8fdef600-9f71-4e7b-a81b-936906d0c86e"
+            },
+            {
+                "CsdId": "5f64884c-c713-4663-ae65-cf5c3cea2e19",
+                "TagId": "5e0cb9eb-6e81-4ccc-a1b4-ef21511aef3f"
+            },
+            {
+                "CsdId": "1f15b1a4-6be6-4d71-8069-5498def29653",
+                "TagId": "6df26a39-f4d4-4068-a125-39e35ec77c32"
+            },
+            {
+                "CsdId": "e9c8d49a-72d6-4803-989e-bc4cf9332754",
+                "TagId": "8fdef600-9f71-4e7b-a81b-936906d0c86e"
+            },
+            {
+                "CsdId": "1f15b1a4-6be6-4d71-8069-5498def29653",
+                "TagId": "ef1ce5cb-ff4b-43bb-abc0-0341b9b5cbc7"
+            },
+            {
+                "CsdId": "238c37b4-739b-4705-bbe3-d0bd35033661",
+                "TagId": "1b40f383-e388-41c2-9519-4072be008f50"
+            },
+            {
+                "CsdId": "a2f445d6-5400-45aa-a4f3-713b164d2a93",
+                "TagId": "ef1ce5cb-ff4b-43bb-abc0-0341b9b5cbc7"
+            },
+            {
+                "CsdId": "e9c8d49a-72d6-4803-989e-bc4cf9332754",
+                "TagId": "37ad72b1-3d43-4bb7-8dd3-1d9450463e16"
+            },
+            {
+                "CsdId": "a71584ed-e47e-448d-bbae-780fa2918262",
+                "TagId": "84edd351-5b5b-4bf4-97a1-b780ccca0bfb"
+            },
+            {
+                "CsdId": "5a7388bd-dd3c-40dc-8247-7778d45ce8e2",
+                "TagId": "79a02fcf-c969-4e73-a412-84b0df6c8def"
+            },
+            {
+                "CsdId": "a6a0e88b-cfce-45a5-a644-83465b8e7dc6",
+                "TagId": "af6404ce-aa80-47d6-bb21-971ee887963d"
+            },
+            {
+                "CsdId": "a6a0e88b-cfce-45a5-a644-83465b8e7dc6",
+                "TagId": "2fb75c8e-bfef-4bc8-8095-37e6e4163afb"
+            },
+            {
+                "CsdId": "77bbfd93-7665-4bf8-ac06-6ea77e3a9022",
+                "TagId": "af071e12-cb1b-450d-a3a4-c29bdde1bbe1"
+            },
+            {
+                "CsdId": "ed8be49c-db99-4d47-9e28-4044ea286fa7",
+                "TagId": "5e0cb9eb-6e81-4ccc-a1b4-ef21511aef3f"
+            },
+            {
+                "CsdId": "3fde59b7-8a6e-4d53-941d-8fce534d2572",
+                "TagId": "af071e12-cb1b-450d-a3a4-c29bdde1bbe1"
+            },
+            {
+                "CsdId": "a3571547-fc69-411a-8c9e-d38f908fc93c",
+                "TagId": "af6404ce-aa80-47d6-bb21-971ee887963d"
+            },
+            {
+                "CsdId": "ffea2684-5404-4966-886d-8f0760bbd0ad",
+                "TagId": "5a7ce1a0-4a72-44b2-aed7-218c5be9dada"
+            },
+            {
+                "CsdId": "d38036e2-7be4-406c-8fbc-bac8a18ea01d",
+                "TagId": "6df26a39-f4d4-4068-a125-39e35ec77c32"
+            },
+            {
+                "CsdId": "3b79966a-d81d-4213-8f92-9b2456c18af4",
+                "TagId": "1b40f383-e388-41c2-9519-4072be008f50"
+            },
+            {
+                "CsdId": "e822942a-5d74-49d6-86e8-02db7b79422f",
+                "TagId": "1b40f383-e388-41c2-9519-4072be008f50"
+            },
+            {
+                "CsdId": "3f32bc1c-d99a-48df-8de2-035834f2a71a",
+                "TagId": "5e0cb9eb-6e81-4ccc-a1b4-ef21511aef3f"
+            },
+            {
+                "CsdId": "6767b32d-165b-46a1-bc01-565a0d3afad9",
+                "TagId": "5a7ce1a0-4a72-44b2-aed7-218c5be9dada"
+            },
+            {
+                "CsdId": "c2d23a04-9c97-42a2-810f-f80b96a55891",
+                "TagId": "37ad72b1-3d43-4bb7-8dd3-1d9450463e16"
+            },
+            {
+                "CsdId": "ef508bd8-d297-46db-b365-9b0f0267cc88",
+                "TagId": "84edd351-5b5b-4bf4-97a1-b780ccca0bfb"
+            },
+            {
+                "CsdId": "6bd95c8d-41a6-4587-9a82-7fae2c89af68",
+                "TagId": "37ad72b1-3d43-4bb7-8dd3-1d9450463e16"
+            },
+            {
+                "CsdId": "908e4972-eb42-4372-a705-f5eea30c692d",
+                "TagId": "8fdef600-9f71-4e7b-a81b-936906d0c86e"
+            },
+            {
+                "CsdId": "73c3649f-1916-48e6-8c5d-ee6be19c6814",
+                "TagId": "8fdef600-9f71-4e7b-a81b-936906d0c86e"
+            },
+            {
+                "CsdId": "73c3649f-1916-48e6-8c5d-ee6be19c6814",
+                "TagId": "37ad72b1-3d43-4bb7-8dd3-1d9450463e16"
+            },
+            {
+                "CsdId": "908e4972-eb42-4372-a705-f5eea30c692d",
+                "TagId": "37ad72b1-3d43-4bb7-8dd3-1d9450463e16"
+            },
+            {
+                "CsdId": "e9c8d49a-72d6-4803-989e-bc4cf9332754",
+                "TagId": "e0240c30-ce5a-42ca-8ac9-2b3ab5c2a632"
+            },
+            {
+                "CsdId": "b0079057-6a42-4270-9341-e381fd41aee1",
+                "TagId": "af6404ce-aa80-47d6-bb21-971ee887963d"
+            },
+            {
+                "CsdId": "a0a08014-f556-45e5-b0dd-e6d1e34913fb",
+                "TagId": "e0240c30-ce5a-42ca-8ac9-2b3ab5c2a632"
+            },
+            {
+                "CsdId": "5e492c7c-ca3f-48a0-9472-c381bcedaf5d",
+                "TagId": "5e0cb9eb-6e81-4ccc-a1b4-ef21511aef3f"
+            },
+            {
+                "CsdId": "1cf870cb-a13d-4c23-a106-6346108c3ee6",
+                "TagId": "1b40f383-e388-41c2-9519-4072be008f50"
+            },
+            {
+                "CsdId": "3fde59b7-8a6e-4d53-941d-8fce534d2572",
+                "TagId": "e0240c30-ce5a-42ca-8ac9-2b3ab5c2a632"
+            },
+            {
+                "CsdId": "c2d23a04-9c97-42a2-810f-f80b96a55891",
+                "TagId": "6df26a39-f4d4-4068-a125-39e35ec77c32"
+            },
+            {
+                "CsdId": "33c5d876-b02b-4643-8eda-2f96b91b9040",
+                "TagId": "84edd351-5b5b-4bf4-97a1-b780ccca0bfb"
+            },
+            {
+                "CsdId": "b308dd93-f421-4d0e-b141-db9a6054015c",
+                "TagId": "1b40f383-e388-41c2-9519-4072be008f50"
+            },
+            {
+                "CsdId": "8fe98b50-b73e-4ec0-ad1c-0c60ad496762",
+                "TagId": "2fb75c8e-bfef-4bc8-8095-37e6e4163afb"
+            },
+            {
+                "CsdId": "d38036e2-7be4-406c-8fbc-bac8a18ea01d",
+                "TagId": "37ad72b1-3d43-4bb7-8dd3-1d9450463e16"
+            },
+            {
+                "CsdId": "ef508bd8-d297-46db-b365-9b0f0267cc88",
+                "TagId": "8fdef600-9f71-4e7b-a81b-936906d0c86e"
+            },
+            {
+                "CsdId": "1f15b1a4-6be6-4d71-8069-5498def29653",
+                "TagId": "e0240c30-ce5a-42ca-8ac9-2b3ab5c2a632"
+            },
+            {
+                "CsdId": "4d6ac8b3-f9e1-42f4-ac03-87b49a3a3362",
+                "TagId": "84edd351-5b5b-4bf4-97a1-b780ccca0bfb"
+            },
+            {
+                "CsdId": "227d4831-6b70-4465-86c9-825bbea4b35e",
+                "TagId": "2fb75c8e-bfef-4bc8-8095-37e6e4163afb"
+            },
+            {
+                "CsdId": "4e5f7cd0-7b34-4deb-abf3-68f46f53239b",
+                "TagId": "79a02fcf-c969-4e73-a412-84b0df6c8def"
+            },
+            {
+                "CsdId": "77bbfd93-7665-4bf8-ac06-6ea77e3a9022",
+                "TagId": "84edd351-5b5b-4bf4-97a1-b780ccca0bfb"
+            },
+            {
+                "CsdId": "fc55569c-d1c4-40a1-bc3b-9edc44a3ee3e",
+                "TagId": "37ad72b1-3d43-4bb7-8dd3-1d9450463e16"
+            }
+        ]
+    },
+    "Tags": {
+        "Set": [
+            {
+                "Description": "Rent, Mortgage, property taxes, maintenance, renovations, repairs, operation",
+                "Id": "5e0cb9eb-6e81-4ccc-a1b4-ef21511aef3f",
+                "Name": "Housing"
+            },
+            {
+                "Description": "Dividends, interest, taxable income, non-taxable income",
+                "Id": "8fdef600-9f71-4e7b-a81b-936906d0c86e",
+                "Name": "Investments"
+            },
+            {
+                "Description": "",
+                "Id": "37ad72b1-3d43-4bb7-8dd3-1d9450463e16",
+                "Name": "John related"
+            },
+            {
+                "Description": "",
+                "Id": "84edd351-5b5b-4bf4-97a1-b780ccca0bfb",
+                "Name": "Anne related"
+            },
+            {
+                "Description": "All earnings from employment, whether full-time or part-time.",
+                "Id": "af071e12-cb1b-450d-a3a4-c29bdde1bbe1",
+                "Name": "Salary/Wages"
+            },
+            {
+                "Description": "",
+                "Id": "2fb75c8e-bfef-4bc8-8095-37e6e4163afb",
+                "Name": "Extra that can be cut"
+            },
+            {
+                "Description": "Doctors, dentals, prescriptions, glasses, eye tests, dental costs, gym membership, surgery, hospital fees",
+                "Id": "79a02fcf-c969-4e73-a412-84b0df6c8def",
+                "Name": "Healthcare"
+            },
+            {
+                "Description": "",
+                "Id": "e0240c30-ce5a-42ca-8ac9-2b3ab5c2a632",
+                "Name": "Important incomes"
+            },
+            {
+                "Description": "",
+                "Id": "af6404ce-aa80-47d6-bb21-971ee887963d",
+                "Name": "Vacation"
+            },
+            {
+                "Description": "Encompasses income from pensions, retirement accounts, or Social Security benefits",
+                "Id": "6df26a39-f4d4-4068-a125-39e35ec77c32",
+                "Name": "Pension/Retirement"
+            },
+            {
+                "Description": "Petrol, maintenance, repairs, rent, insurance, loan payments, parking",
+                "Id": "1b40f383-e388-41c2-9519-4072be008f50",
+                "Name": "Car"
+            },
+            {
+                "Description": "Subscriptions. streaming service, cinema, restaurants, concerts, social events, hobbies",
+                "Id": "5a7ce1a0-4a72-44b2-aed7-218c5be9dada",
+                "Name": "Entertainment"
+            },
+            {
+                "Description": "",
+                "Id": "ef1ce5cb-ff4b-43bb-abc0-0341b9b5cbc7",
+                "Name": "Alejandra"
+            }
+        ]
+    },
     "Version": "2.0.0"
 }

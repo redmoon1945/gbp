@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/#AGPL/>.
  */
 
+#include "globaltooltipfilter.h"
 #include "mainwindow.h"
 
 #include <QApplication>
@@ -30,7 +31,7 @@ void showWelcomeScreen(bool french);
 
 
 #define APP_NAME "graphical-budget-planner"
-#define APP_VERSION "1.5.1"
+#define APP_VERSION "1.6.0"
 
 int main(int argc, char *argv[])
 {
@@ -99,8 +100,6 @@ int main(int argc, char *argv[])
             "Default system font forced to be used as the application font");
     }
 
-
-
     // Useful info to log
     GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
         "Application's current directory : " + QDir::currentPath());
@@ -134,10 +133,17 @@ int main(int argc, char *argv[])
             "Translation file found and loaded");
     } else {
         QString langString = QString(
-            "No Translation file found for this language \"%1\", English will be used.")
+            "No translation file found for this language \"%1\", English will be used.")
             .arg(sysLocale.languageToCode(sysLocale.language()));
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Warning,
             langString);
+    }
+
+
+    // Block all tooltips if required in the Options
+    GlobalTooltipFilter filter;
+    if (GbpController::getInstance().getShowTooltips() == false ){
+        a.installEventFilter(&filter);
     }
 
     // init some Classes before starting
@@ -174,7 +180,7 @@ void showWelcomeScreen(bool french)
         arg((french)?("fr"):("en")));
     if(welcomeFile.exists()==false){
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
-            QString("Viewing Welcome : %1 does not exist in the resource file").arg(
+            QString("Viewing welcome : %1 does not exist in the resource file").arg(
             welcomeFile.fileName()));
         return;
     }
@@ -183,19 +189,19 @@ void showWelcomeScreen(bool french)
     bool success;
     if (tempFile.exists()==true) {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            "Viewing Welcome : File already exists in temp directory, not copied");
+            "Viewing welcome : File already exists in temp directory, not copied");
     } else {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Viewing Welcome : Ready to copy Change Log in tmp directory : %1").arg(
+            QString("Viewing welcome : Ready to copy change log in tmp directory : %1").arg(
             tempFileFullName));
         success = welcomeFile.copy(tempFileFullName);
         if (success==true) {
             GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-                QString("Viewing Welcome : Copy succeeded"));
+                QString("Viewing welcome : Copy succeeded"));
 
         } else {
             GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
-                QString("Viewing Welcome : Copy failed"));
+                QString("Viewing welcome : Copy failed"));
             return;
         }
     }
@@ -204,10 +210,10 @@ void showWelcomeScreen(bool french)
     success = QDesktopServices::openUrl(QUrl::fromLocalFile(tempFileFullName));
     if (success==true) {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Viewing Welcome : PDF Viewer Launch succeeded"));
+            QString("Viewing welcome : PDF viewer launch succeeded"));
     } else {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
-            QString("Viewing Welcome : PDF Viewer Launch failed"));
+            QString("Viewing welcome : PDF viewer launch failed"));
     }
 }
 

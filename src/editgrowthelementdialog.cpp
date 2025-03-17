@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -24,13 +24,26 @@
 #include <QMessageBox>
 #include <QCoreApplication>
 
-EditGrowthElementDialog::EditGrowthElementDialog(QString newGrowthName, QLocale aLocale, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::EditGrowthElementDialog)
+EditGrowthElementDialog::EditGrowthElementDialog(QString newGrowthName,QLocale aLocale,
+    QWidget *parent) :
+    QDialog(parent), ui(new Ui::EditGrowthElementDialog)
 {
     growthName = newGrowthName;
     locale = aLocale;
     ui->setupUi(this);
+
+    // Makes note characters smaller and italic
+    QFont noteFont = ui->notesLabel->font();
+    uint oldFontSize = noteFont.pointSize();
+    uint newFontSize = Util::changeFontSize(1,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("EdityGrowthElement - Notes : Font size set from %1 to %2")
+        .arg(oldFontSize).arg(newFontSize));
+    noteFont.setPointSize(newFontSize);
+    ui->notesLabel->setFont(noteFont);
+
+    // "pack" the dialog to fit the font. This is required when there is no "expanding" widgets
+    this->adjustSize();
 
     // reset programmatically min, max and precision for growth value. We stay with Monthly value
     ui->growthDoubleSpinBox->setMinimum(Growth::MIN_GROWTH_DOUBLE);
@@ -41,9 +54,12 @@ EditGrowthElementDialog::EditGrowthElementDialog(QString newGrowthName, QLocale 
     fillMonthComboBox();
 
     // set some text labels
-    ui->growthLabel->setText(QString(tr("%1 on annual basis :")).arg(growthName));
-    ui->monthlyLabel->setText(QString(tr("Monthly %1 equivalent :")).arg(growthName));
+    ui->growthLabel->setText(Util::wordCapitalize(true,QString(tr("%1 on annual basis :"))
+        .arg(growthName)));
+    ui->monthlyLabel->setText(Util::wordCapitalize(true,QString(tr("Monthly %1 equivalent :"))
+        .arg(growthName)));
 }
+
 
 EditGrowthElementDialog::~EditGrowthElementDialog()
 {
@@ -52,19 +68,22 @@ EditGrowthElementDialog::~EditGrowthElementDialog()
 
 
 // growthInPercentage is monthly growth in percentage, but expressed on an annual basis
-void EditGrowthElementDialog::slotPrepareContent(bool newEditMode, QList<QDate> newExistingDates, QDate currentDate, double growthInPercentage)
+void EditGrowthElementDialog::slotPrepareContent(bool newEditMode, QList<QDate> newExistingDates,
+    QDate currentDate, double growthInPercentage)
 {
     editMode = newEditMode;
     existingDates = newExistingDates;
 
-    latestOldDate = currentDate;      // date may or may not change during an edit, so remember the "old" one
+    // date may or may not change during an edit, so remember the "old" one
+    latestOldDate = currentDate;
 
     QDate theDate = QDate(currentDate.year(), currentDate.month(),1); // reset day to 1, to be sure
 
     if(editMode){
         // *** existing ***
-        this->setWindowTitle(QString(tr("Edit A Monthly %1 Value")).arg(growthName));
-        ui->applyPushButton->setText(QString(tr("Apply Changes")));
+        QString tmp = Util::wordCapitalize(true,QString(tr("Edit %1 value")).arg(growthName));
+        this->setWindowTitle(tmp);
+        ui->applyPushButton->setText(QString(tr("Apply changes")));
         ui->closePushButton->setText(QString(tr("Cancel")));
         ui->monthComboBox->setCurrentIndex(theDate.month()-1);
         ui->yearSpinBox->setValue(theDate.year());
@@ -73,7 +92,8 @@ void EditGrowthElementDialog::slotPrepareContent(bool newEditMode, QList<QDate> 
 
     } else{
         // *** new ***
-        this->setWindowTitle(QString(tr("Add a New Monthly %1 Value")).arg(growthName));
+        QString tmp = Util::wordCapitalize(true,QString(tr("Add %1 value")).arg(growthName));
+        this->setWindowTitle(tmp);
         ui->applyPushButton->setText(QString(tr("Create")));
         ui->closePushButton->setText(QString(tr("Close")));
         QDate newDate;
@@ -108,24 +128,27 @@ void EditGrowthElementDialog::on_applyPushButton_clicked(){
 
     // validate date
     if ( !newDate.isValid() ){
-        QMessageBox::critical(this,tr("Invalid Date"),QString(tr("Date entered is invalid")));
+        QMessageBox::critical(this,tr("Error"),QString(tr("Date entered is invalid")));
         return;
     }
     // validate growth
     if (growthValueAnnualBasis<Growth::MIN_GROWTH_DOUBLE){
-        QMessageBox::critical(this,tr("Invalid Value"),QString(tr("%1 value is smaller than the minimum allowed of %2")).arg(growthName).arg(Growth::MIN_GROWTH_DOUBLE));
+        QMessageBox::critical(this,tr("Error"),QString(tr("%1 value is smaller "
+            "than the minimum allowed of %2")).arg(growthName).arg(Growth::MIN_GROWTH_DOUBLE));
         return;
     }
     if (growthValueAnnualBasis>Growth::MAX_GROWTH_DOUBLE){
-        QMessageBox::critical(this,tr("Invalid Value"),QString(tr("%1 value is bigger than the maximum allowed of %2")).arg(growthName).arg(Growth::MAX_GROWTH_DOUBLE));
+        QMessageBox::critical(this,tr("Error"),QString(tr("%1 value is bigger "
+            "than the maximum allowed of %2")).arg(growthName).arg(Growth::MAX_GROWTH_DOUBLE));
         return;
     }
     // date must not exist for Element Creation
     if(!editMode){
         // *** CREATION ***
         if(existingDates.contains(newDate)){
-            QString errorString = QString(tr("A %1 value is already defined for that date")).arg(growthName);
-            QMessageBox::critical(this,tr("Invalid Date"),errorString);
+            QString errorString = QString(tr("A %1 value is already defined for that date"))
+                .arg(growthName);
+            QMessageBox::critical(this,tr("Error"),errorString);
             return;
         } else {
             // add to the list of existing years

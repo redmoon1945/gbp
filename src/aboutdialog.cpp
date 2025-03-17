@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -76,10 +76,10 @@ void AboutDialog::on_viewLogPushButton_clicked()
     bool success = QDesktopServices::openUrl(QUrl::fromLocalFile(ui->logFilePlainTextEdit->toPlainText()));
     if (success==true) {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal,
-            GbpController::Info, QString("Viewing Log File : Viewer Launch succeeded"));
+            GbpController::Info, QString("Viewing log file : Viewer launch succeeded"));
     } else {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal,
-            GbpController::Error, QString("Viewing Log File : Viewer Launch failed"));
+            GbpController::Error, QString("Viewing log file : Viewer launch failed"));
     }
 }
 

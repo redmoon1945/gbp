@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 #include "float.h"
 #include <QRandomGenerator64>
 #include <iomanip>
+#include <qmessagebox.h>
 
 
 
@@ -57,7 +58,8 @@ Util::Util()
 // must be called as soon as possible after the applicaiton starts
 void Util::init()
 {
-    // init Period Names. We initialize static variables in a non-static context (cannot do otherwise because of translation)
+    // init Period Names. We initialize static variables in a non-static context (cannot do
+    // otherwise because of translation)
 
     strDaily = tr("Day");
     strWeekly = tr("Week");
@@ -471,7 +473,7 @@ int Util::noOfMonthDifference(QDate from, QDate to)
 // Argument format must be : -locale=<L>-<T> where <L> is a 2 or 3 char string representing ISO 639
 // code and <T> is a 2 or 3 char string representing ISO 3166 code. E.g. : en-US, fr-CA
 // Return values :
-//   systemLocale : false if argument has been passed and is all valid
+//   systemLocale : false if argument has been passed and is fully valid
 //   QLocale :the final QLocale to use
 QLocale Util::getLocale(QStringList arguments, bool& systemLocale){
     // get the system Locale, which will be used in case of any error or if no argument is passed
@@ -496,7 +498,7 @@ QLocale Util::getLocale(QStringList arguments, bool& systemLocale){
                 break; // unknown
             }
             systemLocale = false;
-            return QLocale(lang,territory);
+            return QLocale(lang,territory); // See Qt doc for Qlocale for behavior
         }
     }
 
@@ -606,4 +608,75 @@ bool Util::findMinMaxInYvalues(const QList<QPointF> ptList, double from, double 
         }
     }
     return found;
+}
+
+
+// Change the first character to upper or lower case, and make sure the other
+// characters are all lower case
+QString Util::wordCapitalize(bool upper, QString s)
+{
+    if(s.size()==0){
+        return s;
+    }
+
+    QString res = s.toLower();
+    if (upper==true) {
+        if (s.size()==1) {
+            return ( res.left(1).toUpper() );
+        } else {
+            return ( res.left(1).toUpper()+res.mid(1) );
+        }
+    } else {
+        return res;
+    }
+}
+
+
+// Version of "Question" QMessageBox with localized buttons texts.
+// Return index of the button selected (0 being the first) or -1 if cancel
+int Util::messageBoxQuestion(QWidget *parent, QString title, QString message, QStringList buttonsText,
+    uint defaultButtonIndex, uint escapeButtonIndex)
+{
+    // check integrity of parameters
+    if (buttonsText.size() < 1) {
+        throw std::invalid_argument("Custom Message Box : buttonsText "
+            "must contain at least one item");
+    }
+    if (buttonsText.size() > 5) {
+        throw std::invalid_argument("Custom Message Box : buttonsText "
+            "exceeds the max no of buttons supported (5)");
+    }
+    if (buttonsText.size() <= defaultButtonIndex) {
+        throw std::invalid_argument("Custom Message Box : invalid defaultButtonIndex");
+    }
+    if (buttonsText.size() <= escapeButtonIndex) {
+        throw std::invalid_argument("Custom Message Box : invalid escapeButtonIndex");
+    }
+    // Display the messagebox
+    QMessageBox msgBox(parent);
+    msgBox.setWindowTitle(title);
+    msgBox.setText(message);
+
+    QList<QPushButton *> buttons; // the custom buttons we are going to create, in order
+    for (int var = 0; var < buttonsText.size(); ++var) {
+        QPushButton* b = msgBox.addButton(buttonsText.at(var), QMessageBox::ActionRole);
+        buttons.append(b);
+    }
+    msgBox.setDefaultButton(buttons.at(defaultButtonIndex));
+    msgBox.setEscapeButton((QAbstractButton *)(buttons.at(escapeButtonIndex)));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.exec();
+
+    // process the answer
+    QAbstractButton *clickedButton = msgBox.clickedButton(); // bad QT design...should be PushButton
+    if (clickedButton == nullptr){
+        return -1;  // user escape the dialog
+    }
+    for (int var = 0; var < buttons.size(); ++var) {
+        if (clickedButton == (QAbstractButton *)(buttons.at(var)) ) {
+            return var;
+        }
+    }
+    // should never happen
+    return -1;
 }

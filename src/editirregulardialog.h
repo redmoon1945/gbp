@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 #define EDITIRREGULARDIALOG_H
 
 #include <QDialog>
+#include <QUuid>
 #include <QLocale>
 #include "irregularfestreamdef.h"
 #include "currencyhelper.h"
@@ -27,7 +28,8 @@
 #include "editirregularmodel.h"
 #include "editirregularelementdialog.h"
 #include "loadirregulartextfiledialog.h"
-
+#include "tags.h"
+#include "visualizeoccurrencesdialog.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -45,10 +47,11 @@ public:
 
 signals:
     // For client of EditIrregularDialog : send result and edition completion notification
-    void signalEditIrregularStreamDefResult(bool isIncome, IrregularFeStreamDef irStreamDef); // result of the edition
+    void signalEditIrregularStreamDefResult(bool isIncome, IrregularFeStreamDef irStreamDef);
     void signalEditIrregularStreamDefCompleted();
     // For irregular element edition : Prepare dialog before edition
-    void signalEditElementPrepareContent(bool isIncome, bool newEditMode, CurrencyInfo cInfo, QList<QDate> newExistingDates, QDate aDate, double amount, QString notes);
+    void signalEditElementPrepareContent(bool isIncome, bool newEditMode, CurrencyInfo cInfo,
+        QList<QDate> newExistingDates, QDate aDate, double amount, QString notes);
     // For irregular import : Prepare dialog before edition
     void signalImportPrepareContent(CurrencyInfo cInfo);
     // edition of description : prepare Dialog before edition
@@ -56,22 +59,28 @@ signals:
     // show result : prepare Dialog before edition
     void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
     // Visualize occurrences : prepare Dialog before edition
-    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation, QDate maxDateScenarioFeGeneration, FeStreamDef *streamDef);
+    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation,
+        QDate maxDateScenarioFeGeneration, FeStreamDef *streamDef);
+
 
 public slots:
     // From client of EditPeriodicDialog : Prepare edition
-    void slotPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef psStreamDef, CurrencyInfo newCurrInfo, QDate maxDateScenarioFeGeneration);  // call this before show()
+    void slotPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef psStreamDef,
+        CurrencyInfo newCurrInfo, QDate maxDateScenarioFeGeneration,
+        QSet<QUuid> associatedTagIds, Tags availTags);
     // PlainTextEdition child Dialog : receive result and edition completion notification
     void slotPlainTextEditionResult(QString result);
     void slotPlainTextEditionCompleted();
     // For irregular element edition : getting result and completion notification
-    void slotEditElementResult(bool isEdition, QDate oldDate, QDate newDate, double editedAmount, QString editedNotes);// Edit element result
+    void slotEditElementResult(bool isEdition, QDate oldDate, QDate newDate, double editedAmount,
+        QString editedNotes);// Edit element result
     void slotEditElementCompleted();    // Edit Element process is completed
     // For irregular import : getting result and completion notification
     void slotImportResult(QMap<QDate,IrregularFeStreamDef::AmountInfo> amountSet);
     void slotImportCompleted();
     // Visualize occurrences child Dialog : receive completion notification
     void slotVisualizeOccurrencesCompleted();
+
 
 private slots:
     void on_loadPushButton_clicked();
@@ -90,6 +99,7 @@ private slots:
     void on_visualizeOccurrencesPushButton_clicked();
 
 private:
+    Ui::EditIrregularDialog *ui;
 
     QLocale locale;
     CurrencyInfo currInfo;
@@ -98,9 +108,10 @@ private:
     QUuid initialId;
     QColor decorationColor;
     QDate maxDateFeGeneration;  // max date for Fe generation, come from scenario
+    QSet<QUuid> tagIdSet;   // list of Tag ids this CSD is associated to
+    Tags availableTags;     // set of ALL scenario tags available
 
     // children dialogs
-    Ui::EditIrregularDialog *ui;
     PlainTextEditionDialog* editDescriptionDialog;
     EditIrregularElementDialog* eie;
     LoadIrregularTextFileDialog* importDlg;
@@ -113,7 +124,8 @@ private:
     QList<int> getSelectedRows();
     void cleanUpForNewStreamDef();
     void setDecorationColorInfo();
-
+    QString convertTagIDSetToString();
+    void updateTagListTextBox();
 };
 
 #endif // EDITIRREGULARDIALOG_H

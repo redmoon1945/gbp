@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -47,6 +47,7 @@ public:
     bool isScenarioLoaded() const;
     void loadSettings();
     void saveSettings();
+    void resetSettings();
     void recentFilenamesAdd(QString newFilename, int maxNoOfEntries);
     void recentFilenamesClear();
     void log(LogLevel level, LogType type, QString message);
@@ -106,6 +107,16 @@ public:
     void setScenario(QSharedPointer<Scenario> newScenario);
     bool getWheelRotatedAwayZoomIn() const;
     void setWheelRotatedAwayZoomIn(bool newWheelRotatedAwayZoomIn);
+    bool getShowYzeroLine() const;
+    void setShowYzeroLine(bool newShowYzeroLine);
+    QColor getYZeroLineLightModeColor() const;
+    void setYZeroLineLightModeColor(const QColor &newYZeroLineLightModeColor);
+    QColor getYZeroLineDarkModeColor() const;
+    void setYZeroLineDarkModeColor(const QColor &newYZeroLineDarkModeColor);
+    uint getXAxisDateFormat() const;
+    void setXAxisDateFormat(uint newXAxisDateFormat);
+    bool getShowTooltips() const;
+    void setShowTooltips(bool newShowTooltips);
 
     // Getters only
     bool getNoSettingsFileAtStartup() const;
@@ -117,10 +128,12 @@ public:
     LogLevel getLogLevel() const;
 
 
+
 private:
 
     // ************* data stored in the settings, in .ini file ****************
     // ************* Required getters / setters                ****************
+
     // List of recent full file names used for scenario (open, save as)
     QStringList recentFilenames;
     // charts characteristics
@@ -156,7 +169,17 @@ private:
     // If true : vertical wheel rotating AWAY from the user will ZOOM IN
     // If False : vertical wheel rotating TOWARD the user will ZOOM IN
     bool wheelRotatedAwayZoomIn;
-
+    // If true : show Y=0 line on the chart as grey dash line
+    // If False : don't show
+    bool showYzeroLine;
+    // If showYzeroLine==true, this is the color of the line drawn.
+    // If false, value is irrelevant
+    QColor yZeroLineLightModeColor;
+    QColor yZeroLineDarkModeColor;
+    // X-Axis Date format. 0=Locale  1=ISO  2=ISO with 2-digits year
+    uint xAxisDateFormat;
+    // Show or hide tooltips for the application
+    bool showTooltips;
 
     // ****** Variables with getter/setters ******
     // path+file name for current scenario. Empty means no file yet assigned (e.g. for new)

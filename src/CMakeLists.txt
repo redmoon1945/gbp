@@ -53,6 +53,9 @@ set(PROJECT_SOURCES
     editscenariodialog.cpp
     editscenariodialog.h
     editscenariodialog.ui
+    edittagdialog.h
+    edittagdialog.cpp
+    edittagdialog.ui
     editvariablegrowthdialog.cpp
     editvariablegrowthdialog.h
     editvariablegrowthdialog.ui
@@ -62,8 +65,12 @@ set(PROJECT_SOURCES
     fe.h
     festreamdef.cpp
     festreamdef.h
+    filtertags.h
+    filtertags.cpp
     gbpcontroller.cpp
     gbpcontroller.h
+    globaltooltipfilter.h
+    globaltooltipfilter.cpp
     growth.cpp
     growth.h
     irregularfestreamdef.cpp
@@ -75,6 +82,19 @@ set(PROJECT_SOURCES
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+    managetagsdialog.h
+    managetagsdialog.cpp
+    managetagsdialog.ui
+    managetagschoosecsddialog.h
+    managetagschoosecsddialog.cpp
+    managetagschoosecsddialog.ui
+    managetagschoosetagsdialog.h
+    managetagschoosetagsdialog.cpp
+    managetagschoosetagsdialog.ui
+    managetagscsdinfo.h
+    managetagscsdinfo.cpp
+    managetagstagsdefmodel.h
+    managetagstagsdefmodel.cpp
     optionsdialog.cpp
     optionsdialog.h
     optionsdialog.ui
@@ -85,14 +105,23 @@ set(PROJECT_SOURCES
     plaintexteditiondialog.ui
     scenario.cpp
     scenario.h
-    scenariofetablemodel.cpp
-    scenariofetablemodel.h
+    scenariocsdtablemodel.cpp
+    scenariocsdtablemodel.h
     scenariopropertiesdialog.h
     scenariopropertiesdialog.cpp
     scenariopropertiesdialog.ui
     selectcountrydialog.cpp
     selectcountrydialog.h
     selectcountrydialog.ui
+    setfiltertagsdialog.h
+    setfiltertagsdialog.cpp
+    setfiltertagsdialog.ui
+    tag.h
+    tag.cpp
+    tagcsdrelationships.h
+    tagcsdrelationships.cpp
+    tags.h
+    tags.cpp
     util.cpp
     util.h
     visualizeoccurrencesdialog.h
@@ -125,6 +154,9 @@ qt6_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 qt6_add_executable(gbp MANUAL_FINALIZATION ${PROJECT_SOURCES} ${QM_FILES}
     gbp_resources.qrc
+
+
+
 )
 
 

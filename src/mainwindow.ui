@@ -265,7 +265,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Baseline amount from which starts the cash balance curve. As the curve always begins from &lt;span style=&quot; font-weight:700;&quot;&gt;tomorrow&lt;/span&gt;, the baseline amount is the total cash balance you have, as determined by your own means, as of &lt;span style=&quot; font-weight:700;&quot;&gt;today&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Baseline amount from which starts the Cash Balance curve. As the curve always begins from &lt;span style=&quot; font-weight:700;&quot;&gt;tomorrow&lt;/span&gt;, the baseline amount is the total cash balance you have, as determined by your own means, as of &lt;span style=&quot; font-weight:700;&quot;&gt;today&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="buttonSymbols">
              <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
@@ -323,7 +323,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt;, show data points on Cash Balance curve as big color-filled disks&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt;, don't show data points.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Show Points</string>
+             <string>Show points</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -349,10 +349,10 @@
           <item>
            <widget class="QPushButton" name="exportTextFilePushButton">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all the data points of the cash balance curve (not just those displayed) into a CSV file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all the data points of the Cash Balance curve (not just those displayed) into a CSV file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>CSV Export...</string>
+             <string>Export to CSV...</string>
             </property>
            </widget>
           </item>
@@ -367,6 +367,18 @@
         </property>
         <property name="sizeConstraint">
          <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+        </property>
+        <property name="leftMargin">
+         <number>10</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>10</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
         </property>
         <item>
          <widget class="QGroupBox" name="CiGB">
@@ -586,7 +598,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Days With Events :</string>
+                  <string>Eventful days :</string>
                  </property>
                 </widget>
                </item>
@@ -623,7 +635,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>No of Events :</string>
+                  <string>No of events :</string>
                  </property>
                 </widget>
                </item>
@@ -670,7 +682,7 @@
            </font>
           </property>
           <property name="title">
-           <string>Displayed Date Range</string>
+           <string>Date Range</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
@@ -795,6 +807,12 @@
      <height>27</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>Scenario</string>
@@ -835,9 +853,9 @@
     <addaction name="actionQuick_Tutorial"/>
     <addaction name="actionUser_Manual"/>
     <addaction name="actionChange_Log"/>
+    <addaction name="separator"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
-    <addaction name="separator"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>

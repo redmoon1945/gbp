@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -35,6 +35,7 @@ FeStreamDef::FeStreamDef()
     this->decorationColor = QColor(); // invalid color, so it means not used
 }
 
+
 FeStreamDef::FeStreamDef(const FeStreamDef& o )
 {
     this->id = o.getId();
@@ -47,7 +48,9 @@ FeStreamDef::FeStreamDef(const FeStreamDef& o )
 }
 
 
-FeStreamDef::FeStreamDef(const QUuid &id, const QString &name, const QString &desc, FeStreamDef::FeStreamType streamType, bool active, bool isIncome, const QColor &decorationColor) :
+FeStreamDef::FeStreamDef(const QUuid &id, const QString &name, const QString &desc,
+    FeStreamDef::FeStreamType streamType, bool active, bool isIncome,
+    const QColor &decorationColor) :
     id(id),
     name(name.left(NAME_MAX_LEN)),
     desc(desc.left(DESC_MAX_LEN)),
@@ -134,8 +137,9 @@ bool FeStreamDef::evaluateIfSameFeList(const FeStreamDef &o) const
 
 
 // From JsonObject, get the data required to build later an object of this class
-void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedStreamType, QUuid &id, QString &name, QString &desc,
-                           bool &active, bool &isIncome, QColor& decorationColor, Util::OperationResult &result)
+void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedStreamType,
+    QUuid &id, QString &name, QString &desc, bool &active, bool &isIncome, QColor& decorationColor,
+    Util::OperationResult &result)
 {
     QJsonValue jsonValue;
     FeStreamType streamType;
@@ -170,6 +174,7 @@ void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedS
         result.errorStringLog = QString("Id is not a valid UUID");
         return;
     }
+
     // Name
     jsonValue = jsonObject.value("Name");
     if (jsonValue == QJsonValue::Undefined){
@@ -188,6 +193,7 @@ void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedS
         result.errorStringLog = QString("Name is too long (max length is %1)").arg(NAME_MAX_LEN);
         return;
     }
+
     // Description
     jsonValue = jsonObject.value("Description");
     if (jsonValue == QJsonValue::Undefined){
@@ -203,9 +209,11 @@ void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedS
     desc = jsonValue.toString();
     if(desc.length()>DESC_MAX_LEN){
         result.errorStringUI = tr("Description is too long (max length is %1)").arg(NAME_MAX_LEN);
-        result.errorStringLog = QString("Description is too long (max length is %1)").arg(NAME_MAX_LEN);
+        result.errorStringLog = QString("Description is too long (max length is %1)")
+            .arg(NAME_MAX_LEN);
         return;
     }
+
     // Stream Type
     jsonValue = jsonObject.value("StreamType");
     if (jsonValue == QJsonValue::Undefined){
@@ -234,16 +242,20 @@ void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedS
     case 0: // PERIODIC_SIMPLE
         streamType = PERIODIC;
         if (streamType != expectedStreamType){
-            result.errorStringUI = tr("Incorrect Stream, should be type=%1").arg(expectedStreamType);
-            result.errorStringLog = QString("Incorrect Stream, should be type=%1").arg(expectedStreamType);
+            result.errorStringUI = tr("Incorrect Stream, should be type=%1")
+                .arg(expectedStreamType);
+            result.errorStringLog = QString("Incorrect Stream, should be type=%1")
+                .arg(expectedStreamType);
             return;
         }
         break;
     case 1: // IRREGULAR
         streamType = IRREGULAR;
         if (streamType != expectedStreamType){
-            result.errorStringUI = tr("Incorrect Stream, should be type=%1").arg(expectedStreamType);
-            result.errorStringLog = QString("Incorrect Stream, should be type=%1").arg(expectedStreamType);
+            result.errorStringUI = tr("Incorrect Stream, should be type=%1")
+                .arg(expectedStreamType);
+            result.errorStringLog = QString("Incorrect Stream, should be type=%1")
+                .arg(expectedStreamType);
             return;
         }
         break;
@@ -252,6 +264,7 @@ void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedS
         result.errorStringLog = QString("Unknown Stream Type %1").arg(sType);
         return;
     }
+
     // Active
     jsonValue = jsonObject.value("Active");
     if (jsonValue == QJsonValue::Undefined){
@@ -265,6 +278,7 @@ void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedS
         return;
     }
     active = jsonValue.toBool();
+
     // isIncome
     jsonValue = jsonObject.value("IsIncome");
     if (jsonValue == QJsonValue::Undefined){
@@ -278,6 +292,7 @@ void FeStreamDef::fromJson(const QJsonObject &jsonObject, FeStreamType expectedS
         return;
     }
     isIncome = jsonValue.toBool();
+
     // decoration color (optional)
     jsonValue = jsonObject.value("DecorationColor");
     if (jsonValue == QJsonValue::Undefined){

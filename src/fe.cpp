@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,8 @@ QString Fe::toString() const {
 
 
 // for the amount , a "loose" comparison is performed. 2 double are declared equal if
-// the difference is less than the smallest unit of all the currency available (3 decimals + 1 spare for rounding)
+// the difference is less than the smallest unit of all the currency available
+// (3 decimals + 1 spare for rounding)
 bool FeDisplay::operator==(const FeDisplay& o) const {
     if( fabs(amount - o.amount) >= 0.0001 ){
         return false;
@@ -70,7 +71,8 @@ FeDisplay &FeDisplay::operator=(const FeDisplay &o)
 
 
 
-QString FeDisplay::toString(QString streamDefName, const CurrencyInfo& currInfo, const QLocale& locale) const {
+QString FeDisplay::toString(QString streamDefName, const CurrencyInfo& currInfo,
+    const QLocale& locale) const {
     QString amountString = locale.toString(amount,'f', currInfo.noOfDecimal);
     QString s = QString("%1 : %2").arg(amountString).arg(streamDefName);
     return s;

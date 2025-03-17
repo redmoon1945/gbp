@@ -1,4 +1,50 @@
 # Change logs
+## 1.5.3 to 1.6.0
+### New Features
+- **Introducing the notion of tags**, which is a way to implement categories of incomes/expenses, but in a much more flexible and powerful way.
+  - In Edit Scenario Dialog, add a **Manage Tags** buttons in the bottom left, which pops up a Dialog allowing to edit tags and their relationships with Cash Stream Definitions
+  - In Edit Scenario Dialog, add a new filter "**Tag Filtered**", allowing to see only Cash Stream Definitions that are linked to a modifiable user-defined set of tags
+  - In Edit Periodic and Irregular Cash Stream Definitions, show the associated tags (read only)
+- In About Dialog, add a new Contact tab for those who wish to know how to contact directly the author(s) of this software.
+- In MainWindow,
+  -  Add a line at value Y=0, with user-specified color. This helps to identify rapidly if a point is above or below 0. Can be turned off in Options Dialog.
+  - Add the file name of the scenario file opened in the top window title (chopped to 50 char max)
+- In Options Dialog,
+  - Reformat the Chart tab layout for better clarity
+  - Add an option to show or hide the line at value Y=0. Default = Yes.
+  - Add options to select the color of the Y=0 line, both in Dark and Light mode
+  - Add an option to control how the X-Axis Dates for charts are formatted (Locale, ISO 8601, ISO 8601 with 2-digits year)
+  - Add an option to show or hide tooltips for the whole application. Default is "Show"
+  - Make the Dialog modal
+- In Edit Scenario Dialog
+  - Rework the filters controls, so it is easier to
+ undertand and it takes less visual space.
+  - It is now possible to select several Cash Stream Definitions and in one shot set the color of theirs names ("Set Color" button)
+- In several Dialogs, optimize the spacing and position of the UI components to provide more space to the list of incomes/expenses, while maintaining the same window size.
+- In all Dialogs, use short format for dates, because the long one takes up too much space when big fonts are used.
+
+
+### Fixes
+- When no scenario is loaded and a change is made on the Start Amount, the program crashes.
+
+### Known Issues
+- On Ubuntu systems (tested on 22.04 and 24.04), secondary windows (e.g. popup dialogs) are tied by default to the Main Window and cannot be moved. To be able to move them (which is recommended as it adds flexibility), you can use the Gnome Tweaks application : go to Windows->Attach Modal Dialog and toggle to OFF. Another approach is to type the following command in a terminal : gsettings set org.gnome.mutter attach-modal-dialogs false
+- When a very large font is used as the application font (e.g. size 24), the menu in the Main Window is not wide enough to show the menu items texts. This is an issue with Qt itself and no solution has been found at the moment.
+- In extreme scenarios (meaning that do not correspond to expected use cases of GBP), where really extremely large data set is generated (e.g. generate many events per day, every day, for 100 years), there could be a noticeable lag between the moment you click on a point of the Cash Balance curve and the relevant info is displayed in the right panel. This depends heavily on the speed of your computer. There is no easy way to speed up things internally, so I do not expect any improvement on this behavior.
+- GBP is a Qt 6 application. Unfortunately, at the time of this writing, theme setting in some Gnome-based distributions (like Ubuntu 22.04) cannot be understood by Qt 6 application (they wont react to the change made to the theme). You can alleviate the problem by using the "Dark/light mode" settings in GBP Options menu : this will affect the rendering of all the charts in the application.
+
+## 1.5.2 to 1.5.3
+### Fixes
+- Minor UI adjustments to better support very big fonts
+- Improve the way GBP detects the default system font on Linux
+- When no scenario is loaded, trying to launch the Analysis Module craches the application
+
+
+## 1.5.1 to 1.5.2
+### Fixes
+- When a new scenario is created right after the launch of the program (without loading first an existing scenario), trying to see the occurences
+for a new income/expense would crash the program.
+
 ## 1.5.0 to 1.5.1
 ### Fixes
 - In MainWindow, set limits to zoom in/out operations for the Cash Balance curve, in order to prevent insane levels (like zooming out 10000 years)

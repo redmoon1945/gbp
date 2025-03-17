@@ -1,0 +1,22 @@
+Housing	Rent, Mortgage, property taxes, maintenance, renovations, repairs, operation
+Utilities	Water, gas, electricity, TV licence, council tax
+Phone/Internet  Cable, Fiber, Streaming, subscription, telecom
+Food/dining	Groceries, dining out, takeout and delivery, cleaning supplies, household items, takeaways
+Public transit	Train, bus fare, metro, taxi, Uber, plane
+Car	Petrol, maintenance, repairs, rent, insurance, loan payments, parking
+Insurance	Health, life, house, car, disability, long-term care
+Debt	Student Loan, credit card, personal loan, mortgage
+Entertainment	Subscriptions. streaming service, cinema, restaurants, concerts, social events, hobbies
+Travel	Hotel, plane, car renting, 
+Gifts	Birthdays, anniversaries, holidays, Christmas, special events
+Donations	Charity, church, fundraising, crowdfunding
+Childcare	Nursery, babysitting, daycare, school trips/meals/uniform
+Pets	Food, vet bills, treats, toys, flea/tick treatment
+Healthcare	Doctors, dentals, prescriptions, glasses, eye tests, dental costs, gym membership, surgery, hospital fees
+Personal care	Haircut, waxing, nails, beauty products, wellness, complementary therapies
+Fitness
+Tax	Tax on good and services, tax on salary, tax on capital gain, tax on dividends, tax on properties
+Clothes
+Education	Tuition Fees, books and Supplies, online Courses
+Furniture and Appliances	Purchases and replacements of furniture, appliances, and other household items
+Vacation

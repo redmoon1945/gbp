@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -54,11 +54,12 @@ public:
 
 signals:
     // For Edit Scenario : prepare content before edition
-    void signalEditScenarioPrepareContent(bool isNewScenario,QString countryCode, CurrencyInfo currInfo);
+    void signalEditScenarioPrepareContent(QString countryCode, CurrencyInfo currInfo);
     // For Options Edition : prepare content before edition
     void signalOptionsPrepareContent();
     // For Analysis Dialog : prepare content before edition
-    void signalAnalysisPrepareContent(QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData, CurrencyInfo currInfo);
+    void signalAnalysisPrepareContent(QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData,
+        CurrencyInfo currInfo);
     // For DateInterval Dialog : prepare content before edition
     void signalDateIntervalPrepareContent(QDate from, QDate to);
     //
@@ -73,7 +74,7 @@ public slots:
     void slotSelectCountryResult(QString countryCode, CurrencyInfo currInfo);
     void slotSelectCountryCompleted();
     // From Edit Scenario : result and edition completion notification
-    void slotEditScenarioResult(bool currentlyEditingNewScenario, bool regenerateData);
+    void slotEditScenarioResult(bool regenerateData);
     void slotEditScenarioCompleted();
     // From Options Edit : result and edition completion notification
     void slotOptionsResult(OptionsDialog::OptionsChangesImpact impact);
@@ -138,13 +139,17 @@ private:
 
     Ui::MainWindow *ui;
 
-    enum class X_RESCALE {X_RESCALE_NONE=0, X_RESCALE_CUSTOM=1, X_RESCALE_DATA_MAX=2,
-        X_RESCALE_SCENARIO_MAX=3};
+    enum class X_RESCALE {X_RESCALE_NONE, X_RESCALE_CUSTOM, X_RESCALE_DATA_MAX,
+        X_RESCALE_SCENARIO_MAX};
     struct xAxisRescale{
         X_RESCALE mode;
         QDateTime from; // used only when mode = X_RESCALE_CUSTOM=1
         QDateTime to;   // used only when mode = X_RESCALE_CUSTOM=1
     };
+
+    // Used when comparing scenario in memory with counter part on disk
+    enum CompareWithScenarioFileResult {CONTENT_IDENTICAL, CONTENT_DIFFER,
+        NOT_SAVED, NO_SCENARIO_LOADED, ERROR_LOADING_SCENARIO};
 
     // Dialogs
     EditScenarioDialog* editScenarioDlg;
@@ -164,8 +169,9 @@ private:
     // variables for the chart
     CustomQChartView *chartView;
     QChart *chart ;
-    QLineSeries *shadowSeries;      // shadow the points just to trace line between them
-    QScatterSeries* scatterSeries;  // contains only the real points
+    QLineSeries *shadowSeries;          // shadow the points just to trace line between them
+    QScatterSeries* scatterSeries;      // contains only the real points
+    QLineSeries *zeroYvalueLineSeries;  // line at y value = 0
     QDateTimeAxis *axisX;
     QValueAxis *axisY;
     QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData;
@@ -188,6 +194,7 @@ private:
     void reduceAxisFontSize();
     void setXaxisFontSize(uint fontSize);
     void setYaxisFontSize(uint fontSize);
+    void setXaxisDateFormat();
     void initChart();
 
     // misc
@@ -197,14 +204,16 @@ private:
     void recentFilesMenuInit();
     void recentFilesMenuUpdate();
     bool eventFilter(QObject *object, QEvent *event) override;
-    void fillDailyInfoSection(const QDate& date, double amount, const CombinedFeStreams::DailyInfo& di);
+    void fillDailyInfoSection(const QDate& date, double amount,
+        const CombinedFeStreams::DailyInfo& di);
     void emptyDailyInfoSection();
     void fillGeneralInfoSection();
     void emptyGeneralInfoSection();
     void resetBaselineWidgets();
-    void checkIfCurrentScenarioMatchesDiskVersion(bool& match, bool &oldVersion) const;
-    bool checkIfCurrentScenarioNeedsToBeSavedBeforeProceeding();
+    CompareWithScenarioFileResult compareCurrentScenarioWithFile();
+    bool aboutToSwitchScenario();
     void changeYaxisLabelFormat();
     uint calculateTotalNoOfEvents();
+    void setWindowTopTitle();
 };
 #endif // MAINWINDOW_H

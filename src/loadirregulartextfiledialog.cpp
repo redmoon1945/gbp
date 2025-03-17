@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -64,15 +64,15 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
     int lineNo = 0;
 
     GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
-        QString("Attempting to import a text file containing values for an Irregular "
-            "income/expense : file name=\"%1\"").arg(fileName));
+        QString("Attempting to import a text file containing values for an irregular "
+            "cash stream definition : file name=\"%1\"").arg(fileName));
 
     // open the file
     QFile file(fileName);   // file is closed automatically by Qt
     if (!file.exists()){
         errorStringUI = QString(tr("File %1 does not exist")).arg(fileName);
         errorStringLog = QString("File %1 does not exist").arg(fileName);
-        QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
         GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Error,
             QString("Import failed : %1").arg(errorStringLog));
         return;
@@ -97,7 +97,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             " but %2).").arg(lineNo).arg(tokens.size());
                         errorStringLog = QString("Bad format for line no %1 (no of tokens is not 3"
                             " or 2, but %2).").arg(lineNo).arg(tokens.size());
-                        QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
                         GbpController::getInstance().log(
                             GbpController::LogLevel::Debug,GbpController::Error,
                             QString("Import failed : %1").arg(errorStringLog));
@@ -110,7 +110,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             .arg(tokens[0]).arg(lineNo);
                         errorStringLog = QString("Date \"%1\" is invalid at line no %2.")
                             .arg(tokens[0]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
                         GbpController::getInstance().log(
                             GbpController::LogLevel::Debug,GbpController::Error,
                             QString("Import failed : %1").arg(errorStringLog));
@@ -124,7 +124,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             .arg(tokens[1]).arg(lineNo);
                         errorStringLog = QString("Amount \"%1\" is not a valid number "
                             "at line no %2.").arg(tokens[1]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
                         GbpController::getInstance().log(
                             GbpController::LogLevel::Debug,GbpController::Error,
                             QString("Import failed : %1").arg(errorStringLog));
@@ -135,7 +135,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             .arg(tokens[1]).arg(lineNo);
                         errorStringLog = QString("Amount \"%1\" is smaller than 0 at line %2.")
                             .arg(tokens[1]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
                         GbpController::getInstance().log(
                             GbpController::LogLevel::Debug,GbpController::Error,
                             QString("Import failed : %1").arg(errorStringLog));
@@ -152,7 +152,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                         errorStringLog = QString("Amount \"%1\" is bigger than the maximum"
                             " allowed of %2 at line %3.").arg(tokens[1]).arg(maxAllowedString)
                             .arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
                         GbpController::getInstance().log(
                             GbpController::LogLevel::Debug,GbpController::Error,
                             QString("Import failed : %1").arg(errorStringLog));
@@ -166,7 +166,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             .arg(tokens[1]).arg(lineNo);
                         errorStringLog = QString("Amount \"%1\" cannot be processed at line %2.")
                             .arg(tokens[1]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
                         GbpController::getInstance().log(
                             GbpController::LogLevel::Debug,GbpController::Error,
                             QString("Import failed : %1").arg(errorStringLog));
@@ -183,7 +183,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             errorStringLog = QString("Notes length (%1 char.) is longer than"
                                 " the max allowed of %2 at line %3.").arg(notes.length())
                                 .arg(IrregularFeStreamDef::AmountInfo::NOTES_MAX_LEN).arg(lineNo);
-                            QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+                            QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
                             GbpController::getInstance().log(
                                 GbpController::LogLevel::Debug,GbpController::Error,
                                 QString("Import failed : %1").arg(errorStringLog));
@@ -199,18 +199,18 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
             }
 
             // send back the result and close the window
-            QMessageBox::information(nullptr,tr("Import succeeded"),QString(
-                tr("%1 entry(ies) have been imported.")).arg(data.size()));
+            QMessageBox::information(nullptr,tr("Information"),QString(
+                tr("Import succeeded, %1 entries have been imported.")).arg(data.size()));
             emit signalImportResult(data);
             this->hide();
             GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
-                QString("Import succeededfailed : %1"));
+                QString("Import succeeded : %1"));
 
         } catch (const std::exception& e) {
             errorStringUI = tr("An unexpected error has occured.\n\nDetails : %1").arg(e.what());
             errorStringLog = QString("An unexpected error has occured.\n\nDetails : %1")
                 .arg(e.what());
-            QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+            QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
             GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Error,
                 QString("Import failed : %1").arg(errorStringLog));
             return;
@@ -219,7 +219,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
     } else {
         errorStringUI = tr("Cannot open file %1 in read-only mode").arg(fileName);
         errorStringLog = QString("Cannot open file %1 in read-only mode").arg(fileName);
-        QMessageBox::critical(nullptr,tr("Import failed"), errorStringUI);
+        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
         GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Error,
             QString("Import failed : %1").arg(errorStringLog));
         return ;
@@ -237,7 +237,7 @@ void LoadIrregularTextFileDialog::on_browsePushButton_clicked()
         QFile file(fileName);
         if (!file.exists()){
             errorString = tr("File %1 does not exist").arg(fileName);
-            QMessageBox::critical(nullptr,tr("Import failed"), errorString);
+            QMessageBox::critical(nullptr,tr("Error"), errorString);
             return;
         } else {
             ui->fileNameLineEdit->setText(file.fileName());

@@ -1,5 +1,5 @@
 ﻿/*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,9 @@
 
 
 
-// Abstract base class for all Financial Event Stream Definitions. Each one has a unique id (UUID, independant of the name).
+// Abstract base class for all Cash Stream Definitions (CSDs). It was called previously
+// "Financial Event Stream Definition", hence the name of the class.
+// Each one has a unique id (UUID, independant of the name).
 class FeStreamDef
 {
     Q_DECLARE_TR_FUNCTIONS(FeStreamDef)
@@ -78,10 +80,11 @@ protected:
     QUuid id;                   // this is the unique key of this FeStreamDef, but created by the parent class
     QString name;
     QString desc;
-    FeStreamType streamType;    // type of Financial Event Stream
-    bool active;                // do not generate any Financial Event Stream if set to False
+    FeStreamType streamType;    // type of CSD
+    bool active;                // do not generate any Financial Events if set to False
     bool isIncome;
-    QColor decorationColor;    // to differentiate this Stream Def from others in scenario data display. QColor is invalid if not used.
+    QColor decorationColor; // Color of the name, for display purpose. Help to classify and
+                            // identify CSD. If invalid, then use system's default
 
 };
 

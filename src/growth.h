@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -80,9 +80,9 @@ public:
 
     enum Type {CONSTANT,VARIABLE, NONE};
 
-    static uint NO_OF_DECIMALS;                       // To convert decimal to double. Should always be in the range [0..7]
-    static double MAX_GROWTH_DOUBLE;                  // per year, in percentage
-    static double MIN_GROWTH_DOUBLE;                  // per year, in percentage.
+    static uint NO_OF_DECIMALS;        // To convert decimal to double. Should always be in the range [0..7]
+    static double MAX_GROWTH_DOUBLE;   // per year, in percentage
+    static double MIN_GROWTH_DOUBLE;   // per year, in percentage.
     static qint64 MAX_GROWTH_DECIMAL;
     static qint64 MIN_GROWTH_DECIMAL ;
 

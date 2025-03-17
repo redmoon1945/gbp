@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,9 @@ EditIrregularElementDialog::~EditIrregularElementDialog()
 
 
 // For "Create", currentDate is not used
-void EditIrregularElementDialog::slotPrepareContent(bool isIncome, bool newEditMode, CurrencyInfo cInfo, QList<QDate> newExistingDates, QDate currentDate, double amount, QString notes)
+void EditIrregularElementDialog::slotPrepareContent(bool isIncome, bool newEditMode,
+    CurrencyInfo cInfo, QList<QDate> newExistingDates, QDate currentDate, double amount,
+    QString notes)
 {
 
     editMode = newEditMode;
@@ -55,20 +57,23 @@ void EditIrregularElementDialog::slotPrepareContent(bool isIncome, bool newEditM
     ui->currencyLabel->setText(currInfo.isoCode);
     ui->amountDoubleSpinBox->setDecimals(currInfo.noOfDecimal);
     ui->amountDoubleSpinBox->setMinimum(0);
-    ui->amountDoubleSpinBox->setMaximum(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal));
+    ui->amountDoubleSpinBox->setMaximum(CurrencyHelper::maxValueAllowedForAmountInDouble(
+        currInfo.noOfDecimal));
 
     if (editMode) {
         // *** existing ***
-        QString title = QString(tr("Editing an Irregular %1")).arg((isIncome)?(tr("Income")):(tr("Expense")));
+        QString title = QString(tr("Editing an irregular item (%1)"))
+            .arg((isIncome)?(tr("Income")):(tr("Expense")));
         this->setWindowTitle(title);
-        ui->applyPushButton->setText(tr("Apply Changes"));
+        ui->applyPushButton->setText(tr("Apply changes"));
         ui->closePushButton->setText(tr("Cancel"));
         ui->dateEdit->setDate(currentDate);
         ui->amountDoubleSpinBox->setValue(amount);
         ui->notesLineEdit->setText(notes);
     } else {
         // *** new ***
-        QString title = QString(tr("Creating an Irregular %1")).arg((isIncome)?(tr("Income")):(tr("Expense")));
+        QString title = QString(tr("Creating an irregular item (%1)"))
+            .arg((isIncome)?(tr("Income")):(tr("Expense")));
         this->setWindowTitle(title);
         ui->applyPushButton->setText(tr("Create"));
         ui->closePushButton->setText(tr("Close"));
@@ -94,16 +99,18 @@ void EditIrregularElementDialog::on_applyPushButton_clicked()
 
     // validate the new date
     if ( !newDate.isValid() ){
-        QMessageBox::critical(this,tr("Invalid Date"),tr("Date entered is invalid"));
+        QMessageBox::critical(this,tr("Error"),tr("Date entered is invalid"));
         return;
     }
     // validate amount
     if (amount<0){
-        QMessageBox::critical(this,tr("Invalid Value"),tr("Amount cannot be smaller than 0"));
+        QMessageBox::critical(this,tr("Error"),tr("Amount cannot be smaller than 0"));
         return;
     }
     if (amount>CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal) ) {
-        QMessageBox::critical(this,tr("Invalid Value"),QString(tr("Amount is bigger than the maximum allowed of %1")).arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)));
+        QMessageBox::critical(this,tr("Error"),QString(tr("Amount is bigger than the "
+            "maximum allowed of %1"))
+            .arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)));
         return;
     }
 
@@ -112,7 +119,7 @@ void EditIrregularElementDialog::on_applyPushButton_clicked()
         // date must not exist for Element Creation
         if(existingDates.contains(newDate)){
             QString errorString = tr("This date has already an amount defined");
-            QMessageBox::critical(this,tr("Invalid Date"),errorString);
+            QMessageBox::critical(this,tr("Error"),errorString);
             return;
         } else{
             // add to the list of existing dates
@@ -133,8 +140,10 @@ void EditIrregularElementDialog::on_applyPushButton_clicked()
         }
     }
 
-    // send result back to caller. For "Create", latestOldDate can be anything because it will not be used by caller.
-    emit signalEditElementResult(editMode, latestOldDate, newDate, amount, ui->notesLineEdit->text());
+    // send result back to caller. For "Create", latestOldDate can be anything because
+    // it will not be used by caller.
+    emit signalEditElementResult(editMode, latestOldDate, newDate, amount,
+        ui->notesLineEdit->text());
     if (editMode){
         hide();
         emit signalEditElementCompleted();

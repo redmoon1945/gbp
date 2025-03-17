@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -63,9 +63,9 @@ PeriodicFeStreamDef::PeriodicFeStreamDef(const PeriodicFeStreamDef &o) :
 
 
 PeriodicFeStreamDef::PeriodicFeStreamDef(PeriodicFeStreamDef::PeriodType periodicType,  quint16 periodMultiplier,  qint64 amount,
-                                         const Growth &growth, const GrowthStrategy &growthStrategy,  quint16 growthApplicationPeriod, const QUuid &id,
-                                         const QString &name, const QString &desc, bool active, bool isIncome, const QColor& decorationColor,
-                                         const QDate &startDate, const QDate &endDate, bool useScenarioForEndDate, double inflationAdjustmentFactor)
+    const Growth &growth, const GrowthStrategy &growthStrategy,  quint16 growthApplicationPeriod, const QUuid &id,
+    const QString &name, const QString &desc, bool active, bool isIncome, const QColor& decorationColor,
+    const QDate &startDate, const QDate &endDate, bool useScenarioForEndDate, double inflationAdjustmentFactor)
     : FeStreamDef(id, name,desc,FeStreamType::PERIODIC,active,isIncome, decorationColor)
 {
     if (amount<0){
@@ -87,10 +87,10 @@ PeriodicFeStreamDef::PeriodicFeStreamDef(PeriodicFeStreamDef::PeriodType periodi
         throw std::invalid_argument("periodMultiplier too big");
     }
     if (startDate.isValid()==false){
-        throw std::invalid_argument("Start Date is invalid");
+        throw std::invalid_argument("Start date is invalid");
     }
     if (endDate.isValid()==false){
-        throw std::invalid_argument("End Date is invalid");
+        throw std::invalid_argument("End date is invalid");
     }
     if (inflationAdjustmentFactor<0){
         throw std::invalid_argument("inflationAdjustmentFactor must not be negative");
@@ -739,10 +739,12 @@ QString PeriodicFeStreamDef::toStringForDisplay(CurrencyInfo currInfo, QLocale l
     QString periodName = Util::getPeriodName(utilPeriodType, false, periodMultiplier>1);
     QString valRangeString;
     if (useScenarioForEndDate==true) {
-        QString endString = tr("Scenario Defined");
-        valRangeString = tr("Every %1 %2 in [%3,%4]").arg(periodMultiplier).arg(periodName).arg(startDate.toString(Qt::ISODate)).arg(endString);
+        QString endString = tr("Scenario defined");
+        valRangeString = tr("Every %1 %2 in [%3,%4]").arg(periodMultiplier).arg(periodName)
+            .arg(startDate.toString(Qt::ISODate)).arg(endString);
     } else {
-        valRangeString = tr("Every %1 %2 in [%3,%4]").arg(periodMultiplier).arg(periodName).arg(startDate.toString(Qt::ISODate)).arg(endDate.toString(Qt::ISODate));
+        valRangeString = tr("Every %1 %2 in [%3,%4]").arg(periodMultiplier).arg(periodName)
+            .arg(startDate.toString(Qt::ISODate)).arg(endDate.toString(Qt::ISODate));
     }
     l.append(valRangeString);
 
@@ -764,7 +766,8 @@ QString PeriodicFeStreamDef::toStringForDisplay(CurrencyInfo currInfo, QLocale l
 }
 
 
-Util::PeriodType PeriodicFeStreamDef::convertPeriodTypeToUtil(PeriodicFeStreamDef::PeriodType periodType) const
+Util::PeriodType PeriodicFeStreamDef::convertPeriodTypeToUtil(
+    PeriodicFeStreamDef::PeriodType periodType) const
 {
     switch (periodType) {
         case PeriodicFeStreamDef::PeriodType::DAILY:

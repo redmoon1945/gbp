@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -26,14 +26,20 @@
 #include "util.h"
 #include "currencyhelper.h"
 
-
+// Precision of stored value for growth percentage, expressed as no of decimals. E.g., if 5,
+// then 1% is stored as 100000 int value, which allow a precision of 0.00001 for growth percentage.
 uint Growth::NO_OF_DECIMALS = 5;
 
 // this is for ANNUAL growth
-double Growth::MIN_GROWTH_DOUBLE = -100;    // min annual percentage, -100% per year, give also -100% a month.
-double Growth::MAX_GROWTH_DOUBLE = 10000;   // max annual percentage, +10,000 % a year is going from 1 to 101, give 46.901686 % a month
-qint64 Growth::MIN_GROWTH_DECIMAL = static_cast<qint64>(Growth::MIN_GROWTH_DOUBLE*(pow(10,Growth::NO_OF_DECIMALS)));
-qint64 Growth::MAX_GROWTH_DECIMAL = static_cast<qint64>(Growth::MAX_GROWTH_DOUBLE*(pow(10,Growth::NO_OF_DECIMALS)));
+
+// min annual percentage, -100% per year, give also -100% a month.
+double Growth::MIN_GROWTH_DOUBLE = -100;
+// max annual percentage, +10,000 % a year is going from 1 to 101, give 46.901686 % a month
+double Growth::MAX_GROWTH_DOUBLE = 10000;
+qint64 Growth::MIN_GROWTH_DECIMAL = static_cast<qint64>(Growth::MIN_GROWTH_DOUBLE*(
+    pow(10,Growth::NO_OF_DECIMALS)));
+qint64 Growth::MAX_GROWTH_DECIMAL = static_cast<qint64>(Growth::MAX_GROWTH_DOUBLE*(
+    pow(10,Growth::NO_OF_DECIMALS)));
 
 
 
@@ -163,50 +169,6 @@ QJsonObject Growth::toJson() const
     }
     jobject["AnnualVariableGrowth"] = jobjectFactors;
     return jobject;
-}
-
-
-// adjust all the growth values by multiplying by the factor, which must not be negative.
-// Resulting growth value(s) are capped to the max allowed (MAX_GROWTH_DECIMAL) and
-// if this happens at least once, capped is set to true.
-void Growth::changeByFactor(double factor, bool& capped)
-{
-    if (factor < 0){
-        throw std::domain_error("Factor cannot be negative");
-    }
-
-    long double ld;
-    capped = false;
-    switch (type) {
-        case Type::NONE:
-            // nothing to do
-            break;
-        case Type::CONSTANT:
-            ld = std::round(annualConstantGrowth * factor);
-            if( ld > MAX_GROWTH_DECIMAL){
-                ld = MAX_GROWTH_DECIMAL;
-                capped = true;
-            }
-            annualConstantGrowth = static_cast<qint64>(ld);
-            break;
-        case Type::VARIABLE:
-            foreach(QDate date, annualVariableGrowth.keys()){
-                qint64 value = annualVariableGrowth.value(date);
-                ld = std::round(value * factor);
-                if( ld > MAX_GROWTH_DECIMAL){
-                    ld = MAX_GROWTH_DECIMAL;
-                    capped = true;
-                }
-                value = static_cast<qint64>(ld);
-                annualVariableGrowth.insert(date, value);
-            }
-            break;
-        default:
-            throw std::domain_error("Unknown type");
-            break;
-    }
-
-    recalculateMonthlyData();
 }
 
 
@@ -385,6 +347,50 @@ Growth Growth::fromJson(const QJsonObject &jsonObject, Util::OperationResult &re
 
     result.success = true;
     return g;
+}
+
+
+// adjust all the growth values by multiplying by the factor, which must not be negative.
+// Resulting growth value(s) are capped to the max allowed (MAX_GROWTH_DECIMAL) and
+// if this happens at least once, capped is set to true.
+void Growth::changeByFactor(double factor, bool& capped)
+{
+    if (factor < 0){
+        throw std::domain_error("Factor cannot be negative");
+    }
+
+    long double ld;
+    capped = false;
+    switch (type) {
+    case Type::NONE:
+        // nothing to do
+        break;
+    case Type::CONSTANT:
+        ld = std::round(annualConstantGrowth * factor);
+        if( ld > MAX_GROWTH_DECIMAL){
+            ld = MAX_GROWTH_DECIMAL;
+            capped = true;
+        }
+        annualConstantGrowth = static_cast<qint64>(ld);
+        break;
+    case Type::VARIABLE:
+        foreach(QDate date, annualVariableGrowth.keys()){
+            qint64 value = annualVariableGrowth.value(date);
+            ld = std::round(value * factor);
+            if( ld > MAX_GROWTH_DECIMAL){
+                ld = MAX_GROWTH_DECIMAL;
+                capped = true;
+            }
+            value = static_cast<qint64>(ld);
+            annualVariableGrowth.insert(date, value);
+        }
+        break;
+    default:
+        throw std::domain_error("Unknown type");
+        break;
+    }
+
+    recalculateMonthlyData();
 }
 
 
@@ -633,7 +639,7 @@ QSharedPointer<long double> Growth::buildPvMonthlyMultiplierVector(double annual
         throw std::domain_error("noOfMonth must be > 0");
     }
     if (pvPresent.isValid()==false){
-        throw std::domain_error("PV Date is invalid");
+        throw std::domain_error("PV date is invalid");
     }
     if (firstOccurrence.isValid()==false){
         throw std::domain_error("First occurrence date is invalid");

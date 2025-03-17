@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -69,7 +69,7 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     }
     ui->tabWidget->setCurrentIndex(0);  // make sure Relative Weight Pie chart is shown first
     // other settings
-    ui->titleLabel->setText(tr("Relative Weight of Incomes For That Period"));
+    ui->titleLabel->setText(tr("Relative weight of incomes for that period"));
     ui->noElementsLabel->setText(tr("No of most significant incomes to use :"));
     ui->fromDateEdit->setDate(GbpController::getInstance().getTomorrow());
     ui->toDateEdit->setDate(GbpController::getInstance().getTomorrow().addYears(1).addDays(-1));
@@ -94,7 +94,7 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     uint oldFontSize = font.pointSize();
     uint newFontSize = Util::changeFontSize(1, true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Analysis Dialog - Monthly and Yearly Chart - Selected Bar Info font "
+        QString("Analysis dialog - Monthly and yearly chart - Selected bar info font "
         "size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     font.setPointSize(newFontSize);
     ui->monthlyReportChartSelectedTextLabel->setFont(font);
@@ -162,7 +162,7 @@ void AnalysisDialog::slotAnalysisPrepareContent(
     ui->monthlyReportChartSelectedTextLabel->setText("");
 
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Analysis Dialog invoked"));
+        QString("Analysis dialog invoked"));
 }
 
 
@@ -210,24 +210,24 @@ void AnalysisDialog::updateRelativeWeightChart()
     QDate tomorrow = GbpController::getInstance().getTomorrow();
 
     if(!from.isValid()){
-        QMessageBox::critical(nullptr,tr("Invalid Dates"),tr("From Date is invalid"));
+        QMessageBox::critical(nullptr,tr("Error"),tr("\"From\" date is invalid"));
         return;
     } else if (!to.isValid()) {
-        QMessageBox::critical(nullptr,tr("Invalid Dates"),tr("To Date is invalid"));
+        QMessageBox::critical(nullptr,tr("Error"),tr("\"To\" date is invalid"));
         return;
     } else if (to<from){
         QString fromString = from.toString(Qt::ISODate);
         QString toString = to.toString(Qt::ISODate);
-        QString s = QString(tr("\"To\" Date %1 cannot occur before \"From\" Date %2"))
+        QString s = QString(tr("\"To\" date %1 cannot occur before \"From\" date %2"))
             .arg(toString).arg(fromString);
-        QMessageBox::critical(nullptr,"Invalid Dates",s.toLocal8Bit().data());
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
         return;
     } else if (from<tomorrow){
         QString fromString = from.toString(Qt::ISODate);
         QString tomorrowString = tomorrow.toString(Qt::ISODate);
-        QString s = QString(tr("\"From\" Date %1 cannot be smaller than \"tomorrow\" %2"))
+        QString s = QString(tr("\"From\" date %1 cannot be smaller than \"tomorrow\" %2"))
             .arg(fromString).arg(tomorrowString);
-        QMessageBox::critical(nullptr,tr("Invalid Dates"),s.toLocal8Bit().data());
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
         return;
     }
 
@@ -708,10 +708,10 @@ uint AnalysisDialog::noOfYearDifference(const QDate &from, const QDate &to) cons
 void AnalysisDialog::on_incomesRelativeWeigthRadioButton_toggled(bool checked)
 {
     if(ui->incomesRelativeWeigthRadioButton->isChecked()==true){
-        ui->titleLabel->setText(tr("Relative Weight of Incomes For That Period"));
+        ui->titleLabel->setText(tr("Relative weight of incomes for that period"));
         ui->noElementsLabel->setText(tr("No of most significant incomes to use :"));
     } else {
-        ui->titleLabel->setText(tr("Relative Weight of Expenses For That Period"));
+        ui->titleLabel->setText(tr("Relative weight of expenses for that period"));
         ui->noElementsLabel->setText(tr("No of most significant expenses to use :"));
     }
     updateRelativeWeightChart();
@@ -730,7 +730,7 @@ void AnalysisDialog::on_closePushButton_clicked()
     binsYearly = {};    // now useless
 
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Analysis Dialog closed"));
+        QString("Analysis dialog closed"));
 }
 
 
@@ -787,17 +787,17 @@ void AnalysisDialog::on_exportYearlyReportToTextPushButton_clicked()
 
 void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Initiating Report type \"%1\" export").arg(rType));
+        QString("Initiating report type \"%1\" export").arg(rType));
 
     QString defaultExtension = ".csv";
     QString defaultExtensionUsed = ".csv";
-    QString filter = tr("Text Files (*.txt *.TXT *.csv *.CSV)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a File"),
+    QString filter = tr("Text files (*.txt *.TXT *.csv *.CSV)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a file"),
         GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
     if (fileName == ""){
         // User has canceled
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            "Yearly Report export canceled");
+            "Yearly report export canceled");
         return;
     }
 
@@ -809,9 +809,10 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
 
     QFile file(fileName);
     if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
-        QMessageBox::critical(nullptr,tr("Export Failed"),tr("Cannot open the file for saving"));
+        QMessageBox::critical(nullptr,tr("Error"),tr("Export process failed. Cannot open the "
+            "file for saving"));
         GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("Yearly Report export failed : Cannot open file %1").arg(fileName));
+            QString("Yearly report export failed : Cannot open file %1").arg(fileName));
         return;
     }
 
@@ -861,7 +862,7 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
     }
 
     // write header
-    s = QString("%1\t%2\t%3\t%4\n").arg(tr("Period"),tr("Total Incomes"),tr("Total Expenses"),
+    s = QString("%1\t%2\t%3\t%4\n").arg(tr("Period"),tr("Total incomes"),tr("Total expenses"),
         tr("Delta"));
     file.write(s.toUtf8());
 
@@ -892,7 +893,7 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
     }
     file.close();
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        "Success of Yearly Report export");
+        "Success of yearly report export");
 
 }
 
@@ -902,8 +903,8 @@ void AnalysisDialog::exportChartAsImage(QWidget* chartWidget)
     // get file name
     QString defaultExtension = ".png";
     QString defaultExtensionUsed = ".png";
-    QString filter = tr("PNG Files (*.png *.PNG)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select an Image File"),
+    QString filter = tr("PNG files (*.png *.PNG)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select an image file"),
         GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
     if (fileName != ""){
         // fix the filename to add the proper suffix
@@ -914,12 +915,12 @@ void AnalysisDialog::exportChartAsImage(QWidget* chartWidget)
         bool successful;
         successful = chartWidget->grab().save(fileName,"PNG", 100) ;  // max quality
         if(successful == false){
-            QMessageBox::critical(nullptr,tr("Export Failed"),
-                tr("The creation of the image file did not succeed"));
+            QMessageBox::critical(nullptr,tr("Error"),
+                tr("Export process failed. The creation of the image file did not succeed"));
             return;
         }
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            "Success of Chart export");
+            "Success of chart export");
     } else{
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
             "Chart export canceled");
@@ -964,14 +965,14 @@ void AnalysisDialog::initReportChart(ReportType type)
         xAxisPtr = &chartMonthlyReportAxisX;
         yAxisPtr = &chartMonthlyReportAxisY;
         widgetPtr = &(ui->monthlyReportChartWidget);
-        chartTitle = tr("Monthly Incomes and Expenses");
+        chartTitle = tr("Monthly incomes and expenses");
     } else {
         chartPtr = &chartYearlyReport;
         chartViewPtr = &chartViewYearlyReport;
         xAxisPtr = &chartYearlyReportAxisX;
         yAxisPtr = &chartYearlyReportAxisY;
         widgetPtr = &(ui->yearlyReportChartWidget);
-        chartTitle = tr("Yearly Incomes and Expenses");
+        chartTitle = tr("Yearly incomes and expenses");
     }
 
     // Data (sets) will be discarded and rebuild whe the dialog is re-shown (Prepare slot)
@@ -1003,11 +1004,11 @@ void AnalysisDialog::initReportChart(ReportType type)
     uint newFontSize = Util::changeFontSize(2, true, fontX.pointSize());
     if (type == ReportType::MONTHLY) {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis Dialog - Monthly Chart - X axis - Font size set from %1 to %2")
+            QString("Analysis dialog - Monthly chart - X axis - Font size set from %1 to %2")
             .arg(oldFontSize).arg(newFontSize));
     } else {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis Dialog - Yearly Chart - X axis - Font size set from %1 to %2")
+            QString("Analysis dialog - Yearly chart - X axis - Font size set from %1 to %2")
             .arg(oldFontSize).arg(newFontSize));
     }
     fontX.setPointSize(newFontSize);
@@ -1024,11 +1025,11 @@ void AnalysisDialog::initReportChart(ReportType type)
     newFontSize = Util::changeFontSize(2, true, fontY.pointSize());
     if (type == ReportType::MONTHLY) {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis Dialog - Monthly Chart - X axis font size set from %1 to %2")
+            QString("Analysis dialog - Monthly chart - X axis font size set from %1 to %2")
             .arg(oldFontSize).arg(newFontSize));
     } else {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis Dialog - Yearly Chart - X axis - Font size set from %1 to %2")
+            QString("Analysis dialog - Yearly chart - X axis - Font size set from %1 to %2")
             .arg(oldFontSize).arg(newFontSize));
     }
     fontY.setPointSize(newFontSize);
@@ -1155,7 +1156,7 @@ void AnalysisDialog::setMonthlyYearlyChartTitle(QChart* chartPtr, bool useIncome
     bool useDeltas)
 {
     if (useIncomes && useExpenses) {
-        chartPtr->setTitle(tr("Incomes and Expenses"));
+        chartPtr->setTitle(tr("Incomes and expenses"));
     } else if(useIncomes){
         chartPtr->setTitle(tr("Incomes"));
     } else if(useExpenses){

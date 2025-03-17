@@ -6,6 +6,10 @@
         <file>resources/Graphical Budget Planner - CHANGELOG.pdf</file>
         <file>resources/Graphical Budget Planner - Welcome-en.pdf</file>
         <file>resources/Graphical Budget Planner - Welcome-fr.pdf</file>
+        <file>resources/tag_suggestions_expenses_en.txt</file>
+        <file>resources/tag_suggestions_incomes_en.txt</file>
+        <file>resources/tag_suggestions_incomes_fr.txt</file>
+        <file>resources/tag_suggestions_expenses_fr.txt</file>
     </qresource>
     <qresource prefix="/Samples">
         <file>resources/budget-example.json</file>

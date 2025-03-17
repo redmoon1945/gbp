@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -102,6 +102,9 @@ public:
     static void calculateZoomXaxis( QDateTime &min, QDateTime &max, double expansionFactor);
     static void calculateZoomYaxis(double &min, double &max, double expansionFactor);
     static bool findMinMaxInYvalues(const QList<QPointF> ptList, double from, double to, double &min, double &max);
+    static QString wordCapitalize(bool upper, QString s);
+    int static messageBoxQuestion(QWidget *parent, QString title, QString message, QStringList buttonsText,
+        uint defaultButtonIndex, uint escapeButtonIndex);
 
 private:
 

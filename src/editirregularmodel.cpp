@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -29,9 +29,12 @@ EditIrregularModel::EditIrregularModel(QLocale aLocale, QObject *parent)
     this->theLocale = aLocale;
 
     // *** WARNING ***
-    // CurrencyInfo must be set before using the model (it changes with the scenario loaded)
+    // CurrencyInfo & fonts must be set before using the model (it changes with the scenario loaded)
     // we initialize it with dummy value so nothing crash
     this->currInfo = {.name="US Dollar", .symbol="$", .isoCode="USD", .noOfDecimal=2, };
+    defaultTableFont = QFont(); // app default font
+    monoTableFont = defaultTableFont;
+    italicTableFont = defaultTableFont;
 }
 
 
@@ -80,12 +83,13 @@ QVariant EditIrregularModel::data(const QModelIndex &index, int role) const
         if ( row <= (listKeys.size()-1) ){
             QDate key = listKeys.at(row);
             if (col==0){    // *** date ***
-                return theLocale.toString(key);
+                return theLocale.toString(key,QLocale::FormatType::ShortFormat);
                 //return theLocale.toString(key,"yyyy-MMM-dd (ddd)");
             } else if (col==1){ //*** Amount ***
                 IrregularFeStreamDef::AmountInfo ai = items.value(key);
                 int result;
-                QString vStr = CurrencyHelper::quint64ToDoubleString(ai.amount,currInfo,theLocale,false,result);
+                QString vStr = CurrencyHelper::quint64ToDoubleString(ai.amount,currInfo,theLocale,
+                    false,result);
                 if(result!=0){
                     // should never happen...
                     return "";
@@ -104,8 +108,10 @@ QVariant EditIrregularModel::data(const QModelIndex &index, int role) const
         }
     } else if (role==Qt::FontRole){
 
-        if (col==1) {
+        if (col==1) { // amount
             return monoTableFont;
+        } else if (col==2){ // description
+            return italicTableFont;
         } else {
             return defaultTableFont;
         }
@@ -139,6 +145,7 @@ QMap<QDate, IrregularFeStreamDef::AmountInfo> EditIrregularModel::getItems() con
 {
     return items;
 }
+
 
 void EditIrregularModel::setItems(const QMap<QDate, IrregularFeStreamDef::AmountInfo> &newItems)
 {
@@ -187,4 +194,14 @@ QFont EditIrregularModel::getMonoTableFont() const
 void EditIrregularModel::setMonoTableFont(const QFont &newMonoTableFont)
 {
     monoTableFont = newMonoTableFont;
+}
+
+QFont EditIrregularModel::getItalicTableFont() const
+{
+    return italicTableFont;
+}
+
+void EditIrregularModel::setItalicTableFont(const QFont &newItalicTableFont)
+{
+    italicTableFont = newItalicTableFont;
 }

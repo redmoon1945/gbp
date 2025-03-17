@@ -1,0 +1,11 @@
+Savings	Regular payment to a savings account, emergency fund, retirement, other goals
+Salary/Wages	All earnings from employment, whether full-time or part-time.
+Investments	Dividends, interest, taxable income, non-taxable income
+Bonuses and Commissions	Additional earnings that come from performance incentives or sales commissions.
+Self-Employment Income	For freelancers or business owners, includes all income generated from self-employment activities
+Rental
+Pension/Retirement	Encompasses income from pensions, retirement accounts, or Social Security benefits
+Government Assistance	Any income received from government programs, such as unemployment benefits, food assistance, or disability payments
+Side Hustles	Income generated from part-time jobs or gigs outside of primary employment, such as ride-sharing or online freelancing.
+Inheritances
+Gift

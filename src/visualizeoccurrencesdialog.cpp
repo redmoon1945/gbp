@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -57,11 +57,11 @@ void VisualizeOccurrencesDialog::slotPrepareContent(CurrencyInfo currInfo, Growt
         minMax);
 
     // build the search vector to accelerate search when a point is clicked
-    searchVector.resize(feList.count());
-    QTime zero = QTime(0,0,0);
-    for(int i=0;i<searchVector.size();i++){
-        searchVector[i] = QDateTime(feList.at(i).occurrence,zero).toMSecsSinceEpoch();
-    }
+    // searchVector.resize(feList.count());
+    // QTime zero = QTime(0,0,0);
+    // for(int i=0;i<searchVector.size();i++){
+    //     searchVector[i] = QDateTime(feList.at(i).occurrence,zero).toMSecsSinceEpoch();
+    // }
 
     // 50% of the space for each widget
     ui->splitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
@@ -113,7 +113,7 @@ void VisualizeOccurrencesDialog::mypoint_clicked(const QPointF pt)
 
     // display
     QDate date = dt.date();
-    QString s = tr("Selected Point :  Date=%1  Amount=%2").
+    QString s = tr("Selected point :  Date=%1  Amount=%2").
         arg(locale.toString(date, locale.dateFormat(QLocale::ShortFormat))).
         arg(locale.toString(pt.y(),'f',currInfo.noOfDecimal));
     ui->selectedPointLabel->setText(s);
@@ -366,7 +366,7 @@ void VisualizeOccurrencesDialog::updateChartTab(QList<Fe> feList, uint saturatio
     rescaleChart();
     changeYaxisLabelFormat();
 
-    ui->selectedPointLabel->setText(tr("Selected Point :"));
+    ui->selectedPointLabel->setText(tr("Selected point :"));
 }
 
 void VisualizeOccurrencesDialog::initChart()
@@ -374,7 +374,7 @@ void VisualizeOccurrencesDialog::initChart()
     // Step 1 : Create the chart
     chart = new QChart();
     chart->legend()->hide();
-    chart->setTitle(tr("Financial Events"));
+    chart->setTitle(tr("Financial events"));
     //chart->layout()->setContentsMargins(1, 1, 1, 1);
     //chart->setBackgroundRoundness(0);
     chart->setLocale(locale);
@@ -553,15 +553,6 @@ void VisualizeOccurrencesDialog::rescaleChart()
     // Get chart raw data
     QList<QPointF> timeData = series->points();
 
-    // Get current currency
-    bool found;
-    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario();
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale,
-        scenario->getCountryCode(), found);
-    if(!found){
-        return; // should never happen
-    }
-
     // *** Rescale X axis. Data can be empty. ***
     QDateTime xFrom;
     QDateTime xTo;    // required also for Y axis re-scaling
@@ -611,13 +602,6 @@ void VisualizeOccurrencesDialog::rescaleChart()
 
 void VisualizeOccurrencesDialog::changeYaxisLabelFormat()
 {
-    QString countryCode = GbpController::getInstance().getScenario()->getCountryCode();
-    bool found;
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, countryCode,
-        found);
-    if(!found){
-        return;// should never happen
-    }
     QString yValFormat = QString("\%.%1f").arg(currInfo.noOfDecimal);
     axisY->setLabelFormat(yValFormat);
 }
@@ -628,8 +612,8 @@ void VisualizeOccurrencesDialog::on_exportPushButton_clicked()
     // *** get a file name ***
     QString defaultExtension = ".csv";
     QString defaultExtensionUsed = ".csv";
-    QString filter = tr("Text Files (*.txt *.TXT *.csv *.CSV)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a File"),
+    QString filter = tr("Text files (*.txt *.TXT *.csv *.CSV)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a file"),
         GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
     if (fileName == ""){
         return;
@@ -645,7 +629,7 @@ void VisualizeOccurrencesDialog::on_exportPushButton_clicked()
 
     QFile file(fileName);
     if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
-        QMessageBox::critical(nullptr,tr("Export Failed"),tr("Cannot open the file for writing"));
+        QMessageBox::critical(nullptr,tr("Error"),tr("Cannot open the file for writing"));
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
             QString("Export failed : Cannot open the file for saving"));
         return;

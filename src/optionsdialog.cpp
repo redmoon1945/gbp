@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -32,6 +32,9 @@ OptionsDialog::OptionsDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // "pack" the dialog to fit the font. This is required when there is no "expanding" widgets
+    this->adjustSize();
+
     // init default system application font text
     QString s = GbpController::getInstance().getInitialSystemApplicationFont();
     QFont f;
@@ -54,6 +57,7 @@ OptionsDialog::~OptionsDialog()
 }
 
 
+// Dialog is about to be displayed with new data
 void OptionsDialog::slotPrepareContent()
 {
     // load settings and init controls
@@ -152,9 +156,47 @@ void OptionsDialog::slotPrepareContent()
         ui->wheelZoomInRadioButton->setChecked(false);
     }
 
+    // show Y=0 line
+    if (GbpController::getInstance().getShowYzeroLine()==true) {
+        ui->showYzeroLineCheckBox->setChecked(true);
+    } else {
+        ui->showYzeroLineCheckBox->setChecked(false);
+    }
+
+    // Y zero line color - dark mode
+    yZeroLineDarkModeColor = GbpController::getInstance().getYZeroLineDarkModeColor();
+    setColorInfo(CT_DARK_MODE,CI_YZERO_LINE);
+
+    // Y zero line color - light mode
+    yZeroLineLightModeColor = GbpController::getInstance().getYZeroLineLightModeColor();
+    setColorInfo(CT_LIGHT_MODE,CI_YZERO_LINE);
+
+    // X-Axis Date Format
+    switch (GbpController::getInstance().getXAxisDateFormat()) {
+        case 0:
+            ui->xAxisDateLocaleRadioButton->setChecked(true);
+            break;
+        case 1:
+            ui->xAxisDateIsoRadioButton->setChecked(true);
+            break;
+        case 2:
+            ui->xAxisDateIsoTwoDigitsRadioButton->setChecked(true);
+            break;
+        default:
+            ui->xAxisDateLocaleRadioButton->setChecked(true); // should never happen
+            break;
+    }
+
+    // Show Tooltips
+    if (GbpController::getInstance().getShowTooltips()==true) {
+        ui->tooltipsCheckBox->setChecked(true);
+    } else {
+        ui->tooltipsCheckBox->setChecked(false);
+    }
 }
 
 
+// Apply the changes made to the options.
 // It is this Dialog that determines the impacts of the settings changes on the application
 void OptionsDialog::on_applyPushButton_clicked()
 {
@@ -164,8 +206,23 @@ void OptionsDialog::on_applyPushButton_clicked()
     double discountrate = ui->pvDiscountRateDoubleSpinBox->value();
     uint chartPointSize = ui->pointSizeSpinBox->value();
 
+    // x-Axis Date format
+    uint xAxisDateFormat = 0;
+    if( ui->xAxisDateLocaleRadioButton->isChecked()==true){
+        xAxisDateFormat = 0;
+    } else if (ui->xAxisDateIsoRadioButton->isChecked()==true){
+        xAxisDateFormat = 1;
+    } else if (ui->xAxisDateIsoTwoDigitsRadioButton->isChecked()==true){
+        xAxisDateFormat = 2;
+    }
+
+    // *** DETERMINE IMPACTS OF CHOICE MADE ***
+
+    // init the impact structure to "no impact"
     OptionsChangesImpact impact = {.data=DATA_UNCHANGED, .chart_scaling=CHART_SCALING_NONE,
-        .decorationColorStreamDef=DECO_NONE, .mouseWheelZoom=WHEEL_ZOOM_NONE,.charts_theme=CHARTS_THEME_NONE};
+        .decorationColorStreamDef=DECO_NONE, .mouseWheelZoom=WHEEL_ZOOM_NONE,
+        .charts_theme=CHARTS_THEME_NONE, .yzeroLine = Y_ZERO_LINE_NONE,
+        .xaxisDateFormat=XAXIS_DATE_FORMAT_NONE};
 
     // determine impact of options changes for data. All data have to be recalculated if PV changes
     if ( (usePV != GbpController::getInstance().getUsePresentValue()) ||
@@ -209,23 +266,48 @@ void OptionsDialog::on_applyPushButton_clicked()
         impact.mouseWheelZoom = WHEEL_ZOOM_REFRESH;
     }
 
+    // determine impact for "show line at Y=0"
+    if (ui->showYzeroLineCheckBox->isChecked() !=
+        GbpController::getInstance().getShowYzeroLine()){
+        impact.yzeroLine = Y_ZERO_LINE_REFRESH;
+    }
+
+    // determine impact for "Y=0 line color"
+    if (yZeroLineDarkModeColor != GbpController::getInstance().getYZeroLineDarkModeColor()){
+        impact.yzeroLine = Y_ZERO_LINE_REFRESH;
+    }
+    if (yZeroLineLightModeColor != GbpController::getInstance().getYZeroLineLightModeColor()){
+        impact.yzeroLine = Y_ZERO_LINE_REFRESH;
+    }
+
+    // determine impact for "x-Axis Date Format"
+    if (xAxisDateFormat != GbpController::getInstance().getXAxisDateFormat()){
+        impact.xaxisDateFormat = XAXIS_DATE_FORMAT_REFRESH;
+    }
+
+    // *** WARN USER SECTION ***
+
     // if custom font selected, a choice must have been made
     if ( ui->customFontRadioButton->isChecked() == true) {
         if ( newCustomFontString.length() == 0 ){
-            QMessageBox::warning(nullptr,tr("Font Unselected"),
+            QMessageBox::critical(nullptr,tr("Error"),
                 tr("You must choose a custom font if you don't use the default system font"));
             return;
         }
     }
 
+    bool warnUserAppRestartRequired = false;
+    QStringList changesRequiringStart;
+
     // if application font has changed, warn user the app has to be restarted
     if ( (GbpController::getInstance().getUseDefaultSystemFont() !=
          ui->systemFontRadioButton->isChecked()) ||
         (GbpController::getInstance().getCustomApplicationFont() != newCustomFontString) ) {
-        QMessageBox::warning(nullptr,tr("Font Changed"),
-            tr("Application must be restarted for font changes to take effect"));
+
+        warnUserAppRestartRequired = true;
+        changesRequiringStart.append(tr("* Application font have changed."));
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            "Font Setting changed");
+            "Font Setting have changed");
     }
 
     // if today's date determination mechanism or custom date have changed,
@@ -235,20 +317,41 @@ void OptionsDialog::on_applyPushButton_clicked()
     QString newCustomDateString = ui->todayDateEdit->date().toString(Qt::DateFormat::ISODate);
     if ( GbpController::getInstance().getTodayUseSystemDate() !=
         ui->todaySystemRadioButton->isChecked() ) {
-        QMessageBox::warning(nullptr,tr("Today's Determination Changed"),
-            tr("Today's date determination mechanism changed. Application must be restarted for changes to take effect"));
+
+        warnUserAppRestartRequired = true;
+        changesRequiringStart.append(tr("* Today's date settings have changed."));
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Today's date determination mechanism changed : new settings -> System Date=%1").arg(ui->todaySystemRadioButton->isChecked()) );
+            QString("Today's date determination mechanism have been modified : new settings -> System date=%1")
+            .arg(ui->todaySystemRadioButton->isChecked()) );
+
     } else if ( (ui->todaySpecificRadioButton->isChecked()) &&
-               (GbpController::getInstance().getTodayCustomDate() != ui->todayDateEdit->date()) ){
-        QMessageBox::warning(nullptr,tr("Today's Custom Date Changed"),
-            tr("Today's replacement date has changed from %1 to %2. Application must be restarted for changes to take effect").arg(oldCustomDateString).arg(newCustomDateString));
+        (GbpController::getInstance().getTodayCustomDate() != ui->todayDateEdit->date()) ){
+
+        warnUserAppRestartRequired = true;
+        changesRequiringStart.append(tr("* Today's replacement date have changed"));
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Today's custom date has changed from %1 to %2").arg(oldCustomDateString).arg
+            QString("Today's custom date has been modified from %1 to %2").arg(oldCustomDateString).arg
                 (newCustomDateString));
+
     }
 
-    // set settings new values
+    // check tooltips show status
+    if ( GbpController::getInstance().getShowTooltips() != ui->tooltipsCheckBox->isChecked() ) {
+
+        warnUserAppRestartRequired = true;
+        changesRequiringStart.append(tr("* Show tooltips have changed."));
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            "Show tooltips have been modified");
+    }
+
+
+    if (warnUserAppRestartRequired == true) {
+        QMessageBox::warning(nullptr,tr("Warning"),
+            tr("Application must be restarted due to the following changes made :\n%1")
+            .arg(changesRequiringStart.join("\n")));
+    }
+
+    // *** RECORDING NEW VALUES IN THE SETTING ***
 
     GbpController::getInstance().setIsDarkModeSet(chartDarkMode);
     GbpController::getInstance().setChartPointSize(chartPointSize);
@@ -275,13 +378,17 @@ void OptionsDialog::on_applyPushButton_clicked()
     }
     GbpController::getInstance().setPvDiscountRate(ui->pvDiscountRateDoubleSpinBox->value());
     GbpController::getInstance().setUsePresentValue(ui->usePresentValueCheckBox->isChecked());
-    GbpController::getInstance().setWheelRotatedAwayZoomIn(
-        ui->wheelZoomInRadioButton->isChecked());
-
+    GbpController::getInstance().setWheelRotatedAwayZoomIn(ui->wheelZoomInRadioButton->isChecked());
+    GbpController::getInstance().setShowYzeroLine(ui->showYzeroLineCheckBox->isChecked());
+    GbpController::getInstance().setYZeroLineDarkModeColor(yZeroLineDarkModeColor);
+    GbpController::getInstance().setYZeroLineLightModeColor(yZeroLineLightModeColor);
+    GbpController::getInstance().setXAxisDateFormat(xAxisDateFormat);
+    GbpController::getInstance().setShowTooltips(ui->tooltipsCheckBox->isChecked());
 
     GbpController::getInstance().saveSettings();
 
-    // Log the new values
+    // *** LOGGING THE NEW VALUES ***
+
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
         "Options have been changed"));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
@@ -324,10 +431,23 @@ void OptionsDialog::on_applyPushButton_clicked()
         "    UsePresentValue = %1").arg(ui->usePresentValueCheckBox->isChecked()));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
         "    pvDiscountrate = %1").arg(ui->pvDiscountRateDoubleSpinBox->value()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    WheelRotatedAwayZoomIn = %1").arg(ui->wheelZoomInRadioButton->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    ShowYzeroLine = %1").arg(ui->showYzeroLineCheckBox->isChecked()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    yZeroLineDarkModeColor = %1").arg(yZeroLineDarkModeColor.rgba()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    yZeroLineLightModeColor = %1").arg(yZeroLineLightModeColor.rgba()));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    XAxis Date Format = %1").arg(xAxisDateFormat));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString(
+        "    ShowTooltips = %1").arg(ui->tooltipsCheckBox->isChecked()));
 
+    // Send to caller for action and hide
     emit signalOptionsResult(impact);
-    this->hide();
     emit signalOptionsCompleted();
+    this->hide();
 }
 
 
@@ -363,8 +483,12 @@ void OptionsDialog::setColorInfo(ColorTheme theme, ColorItem item)
         } else if (item==CI_SELECTED_POINT){
             label = ui->darkModeSelectedPointColorLabel;
             pushButton = ui->darkModeSelectedPointColorPushButton;
-            color = darkModeSelectedPointColor;        }
-        else {
+            color = darkModeSelectedPointColor;
+        } else if (item==CI_YZERO_LINE){
+            label = ui->darkModeYzeroLineColorLabel;
+            pushButton = ui->darkModeYzeroLineColorPushButton;
+            color = yZeroLineDarkModeColor;
+        } else {
             throw std::invalid_argument("Unknown color item");
         }
     } else if (theme==CT_LIGHT_MODE){
@@ -380,6 +504,10 @@ void OptionsDialog::setColorInfo(ColorTheme theme, ColorItem item)
             label = ui->lightModeSelectedPointColorLabel;
             pushButton = ui->lightModeSelectedPointColorPushButton;
             color = lightModeSelectedPointColor;
+        } else if (item==CI_YZERO_LINE){
+            label = ui->lightModeYzeroLineColorLabel;
+            pushButton = ui->lightModeYzeroLineColorPushButton;
+            color = yZeroLineLightModeColor;
         } else {
             throw std::invalid_argument("Unknown color item");
         }
@@ -550,7 +678,7 @@ void OptionsDialog::on_usePresentValueCheckBox_toggled(bool checked)
 void OptionsDialog::on_darkModeCurveColorPushButton_clicked()
 {
     //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
-    QColor color = QColorDialog::getColor(darkModeCurveColor, this, tr("Color Chooser"));
+    QColor color = QColorDialog::getColor(darkModeCurveColor, this, tr("Color chooser"));
     if (color.isValid()==false) {
         return;
     } else {
@@ -563,7 +691,7 @@ void OptionsDialog::on_darkModeCurveColorPushButton_clicked()
 void OptionsDialog::on_darkModePointColorPushButton_clicked()
 {
     //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
-    QColor color = QColorDialog::getColor(darkModePointColor, this, tr("Color Chooser"));
+    QColor color = QColorDialog::getColor(darkModePointColor, this, tr("Color chooser"));
     if (color.isValid()==false) {
         return;
     } else {
@@ -576,7 +704,7 @@ void OptionsDialog::on_darkModePointColorPushButton_clicked()
 void OptionsDialog::on_darkModeSelectedPointColorPushButton_clicked()
 {
     //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
-    QColor color = QColorDialog::getColor(darkModeSelectedPointColor, this, tr("Color Chooser"));
+    QColor color = QColorDialog::getColor(darkModeSelectedPointColor, this, tr("Color chooser"));
     if (color.isValid()==false) {
         return;
     } else {
@@ -589,7 +717,7 @@ void OptionsDialog::on_darkModeSelectedPointColorPushButton_clicked()
 void OptionsDialog::on_lightModeCurveColorPushButton_clicked()
 {
     //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
-    QColor color = QColorDialog::getColor(lightModeCurveColor, this, tr("Color Chooser"));
+    QColor color = QColorDialog::getColor(lightModeCurveColor, this, tr("Color chooser"));
     if (color.isValid()==false) {
         return;
     } else {
@@ -602,7 +730,7 @@ void OptionsDialog::on_lightModeCurveColorPushButton_clicked()
 void OptionsDialog::on_lightModePointColorPushButton_clicked()
 {
     //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
-    QColor color = QColorDialog::getColor(lightModePointColor, this, tr("Color Chooser"));
+    QColor color = QColorDialog::getColor(lightModePointColor, this, tr("Color chooser"));
     if (color.isValid()==false) {
         return;
     } else {
@@ -615,7 +743,7 @@ void OptionsDialog::on_lightModePointColorPushButton_clicked()
 void OptionsDialog::on_lightModeSelectedPointColorPushButton_clicked()
 {
     //QColorDialog::ColorDialogOptions opt = QColorDialog::ColorDialogOptions();
-    QColor color = QColorDialog::getColor(lightModeSelectedPointColor, this, tr("Color Chooser"));
+    QColor color = QColorDialog::getColor(lightModeSelectedPointColor, this, tr("Color chooser"));
     if (color.isValid()==false) {
         return;
     } else {
@@ -623,4 +751,29 @@ void OptionsDialog::on_lightModeSelectedPointColorPushButton_clicked()
         setColorInfo(CT_LIGHT_MODE, CI_SELECTED_POINT);
     }
 }
+
+
+void OptionsDialog::on_darkModeYzeroLineColorPushButton_clicked()
+{
+    QColor color = QColorDialog::getColor(yZeroLineDarkModeColor, this, tr("Color chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        yZeroLineDarkModeColor = color;
+        setColorInfo(CT_DARK_MODE, CI_YZERO_LINE);
+    }
+}
+
+
+void OptionsDialog::on_lightModeYzeroLineColorPushButton_clicked()
+{
+    QColor color = QColorDialog::getColor(yZeroLineLightModeColor, this, tr("Color chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        yZeroLineLightModeColor = color;
+        setColorInfo(CT_LIGHT_MODE, CI_YZERO_LINE);
+    }
+}
+
 

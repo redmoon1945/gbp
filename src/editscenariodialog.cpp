@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,23 +22,19 @@
 #include "currencyhelper.h"
 #include <QMessageBox>
 #include <QFontDatabase>
+#include <QColorDialog>
 #include <QCoreApplication>
+#include "setfiltertagsdialog.h"
 
 
 EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
-    QDialog(parent),
+//    QDialog(parent),
+    QDialog(NULL),  // By passing NULL, we make this window independant, but MainWindow must close
+                    // it before exiting
     ui(new Ui::EditScenarioDialog)
 {
     // Qt UI build-up
     ui->setupUi(this);
-
-    // force description widget to be small (cant do it in Qt Designer...)
-    QFontMetrics fm(ui->DescPlainTextEdit->font());
-    ui->DescPlainTextEdit->setFixedHeight(fm.height()*4); // 4 lines
-
-    // initial states of filter buttons (display everything except Expenses)
-    // init filter hint string :  checked means filtering is OFF (items are shown)
-    setFilterString();
 
     // reset min max of constant inflation spinbox programmatically (annual value !!)
     ui->inflationConstantDoubleSpinBox->setMinimum(Growth::MIN_GROWTH_DOUBLE);
@@ -46,9 +42,11 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     ui->inflationConstantDoubleSpinBox->setDecimals(Growth::NO_OF_DECIMALS);
 
     // init variables
-    currentlyEditingExistingScenario = false;
     displayLocale = locale;
     tempVariableInflation = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>());
+
+    // set max size for name (description lack s a max value)
+    ui->scenarioNameLineEdit->setMaxLength(Scenario::NAME_MAX_LEN);
 
     // set constraints for end date calculation
     ui->maxDurationSpinBox->setMaximum(Scenario::MAX_DURATION_FE_GENERATION);
@@ -76,7 +74,9 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     infoActiveTableFont.setItalic(true);
     oldFontSize = infoActiveTableFont.pointSize();
     newFontSize = Util::changeFontSize(1, true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - infoActiveTable - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Edit scenario - infoActiveTable - Font size set from %1 to %2")
+        .arg(oldFontSize).arg(newFontSize));
     infoActiveTableFont.setPointSize(newFontSize);
     //
     QFont infoInactiveTableFont = ui->itemsTableView->font();
@@ -84,75 +84,161 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     infoInactiveTableFont.setItalic(true);
     oldFontSize = infoInactiveTableFont.pointSize();
     newFontSize = Util::changeFontSize(1, true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - infoInactiveTable - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Edit scenario - infoInactiveTable - Font size set from %1 to %2")
+        .arg(oldFontSize).arg(newFontSize));
     infoInactiveTableFont.setPointSize(newFontSize);
 
-    // set up list model for items ListView : filtering buttons must have been set according to model's default
-    itemTableModel = new ScenarioFeTableModel(  locale, defaultTableFont, strikeOutTableFont, monoTableFont,
-                                                monoInactiveTableFont, infoActiveTableFont, infoInactiveTableFont,
-                                                GbpController::getInstance().getAllowDecorationColor());
+    // set up the list model for items ListView : in UI form, filtering buttons must have been set
+    // according to model's default
+    itemTableModel = new ScenarioCsdTableModel(
+        locale, defaultTableFont, strikeOutTableFont, monoTableFont, monoInactiveTableFont,
+        infoActiveTableFont, infoInactiveTableFont,
+        GbpController::getInstance().getAllowDecorationColor());
     ui->itemsTableView->setModel(itemTableModel);
 
     // it appears this must be done AFTER setting the model (don't know why...)
     QFontMetrics fm2 = ui->itemsTableView->fontMetrics();
-    ui->itemsTableView->setColumnWidth(0,fm2.averageCharWidth()*12);     // type
-    ui->itemsTableView->setColumnWidth(1,fm2.averageCharWidth()*50);    // name
+    ui->itemsTableView->setColumnWidth(0,fm2.averageCharWidth()*12);    // type
+    ui->itemsTableView->setColumnWidth(1,fm2.averageCharWidth()*40);    // name
     ui->itemsTableView->setColumnWidth(2,fm2.averageCharWidth()*18);    // amount
 
-    // use smaller font for description list
+    // use smaller font for description text
     QFont descFont = ui->DescPlainTextEdit->font();
     oldFontSize = descFont.pointSize();
-    newFontSize = Util::changeFontSize(1,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - Description - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    newFontSize = Util::changeFontSize(2,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Edit scenario - Description - Font size set from %1 to %2")
+        .arg(oldFontSize).arg(newFontSize));
     descFont.setPointSize(newFontSize);
     ui->DescPlainTextEdit->setFont(descFont);
 
-    // use smaller font for filter buttons
-    QFont filterButtonFont = ui->periodicFilterPushButton->font();
+    // force description widget to be small (cant do it in Qt Designer...)
+    QFontMetrics fm(ui->DescPlainTextEdit->font());
+    ui->DescPlainTextEdit->setFixedHeight(fm.height()*(3*1.2)); // 3 lines
+
+    // use much smaller font for filter controls
+    QFont filterButtonFont = ui->filterPeriodicsCheckBox->font();
     oldFontSize = filterButtonFont.pointSize();
     newFontSize =Util::changeFontSize(2,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info, QString("Edit Scenario - Filter Buttons - Font size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Edit scenario - Filter buttons - Font size set from %1 to %2")
+        .arg(oldFontSize).arg(newFontSize));
     filterButtonFont.setPointSize(newFontSize);
-    ui->periodicFilterPushButton->setFont(filterButtonFont);
-    ui->irregularFilterPushButton->setFont(filterButtonFont);
-    ui->activeFilterPushButton->setFont(filterButtonFont);
-    ui->inactiveFilterPushButton->setFont(filterButtonFont);
+    ui->filterPeriodicsCheckBox->setFont(filterButtonFont);
+    ui->filterIrregularsCheckBox->setFont(filterButtonFont);
+    ui->filterEnabledCheckBox->setFont(filterButtonFont);
+    ui->filterDisabledCheckBox->setFont(filterButtonFont);
+    ui->filterLabel->setFont(filterButtonFont);
+    ui->incomesRadioButton->setFont(filterButtonFont);
+    ui->expensesRadioButton->setFont(filterButtonFont);
+    ui->filterTagsCheckBox->setFont(filterButtonFont);
+    ui->filterTagsPushButton->setFont(filterButtonFont);
+    ui->filterTagsPushButton->setVisible(false);
 
-    // Plain Text Edition Dialog
-    editDescriptionDialog = new PlainTextEditionDialog(this);     // auto-destroyed by Qt because it is a child
+    // Set color of "incomes" and "expenses" filter
+    ui->incomesRadioButton->setStyleSheet("color: rgb(0,255,0);");
+    ui->expensesRadioButton->setStyleSheet("color: rgb(255,0,0);");
+
+    // Update text for "new" buttons
+    updateNewButtonsText();
+
+    // use smaller font for action buttons
+    QFont actionButtonFont = ui->addPeriodicPushButton->font();
+    oldFontSize = actionButtonFont.pointSize();
+    newFontSize =Util::changeFontSize(1,true, oldFontSize);
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Edit scenario - Action buttons - Font size set from %1 to %2")
+        .arg(oldFontSize).arg(newFontSize));
+    actionButtonFont.setPointSize(newFontSize);
+    ui->addPeriodicPushButton->setFont(actionButtonFont);
+    ui->addIrregularPushButton->setFont(actionButtonFont);
+    ui->deletePushButton->setFont(actionButtonFont);
+    ui->editPushButton->setFont(actionButtonFont);
+    ui->duplicatePushButton->setFont(actionButtonFont);
+    ui->setColorPushButton->setFont(actionButtonFont);
+    ui->enablePushButton->setFont(actionButtonFont);
+    ui->disablePushButton->setFont(actionButtonFont);
+    ui->selectAllPushButton->setFont(actionButtonFont);
+    ui->unselectAllPushButton->setFont(actionButtonFont);
+
+    // Filter tags are disabled
+    filterTags.clear();
+    ui->filterTagsCheckBox->setChecked(false);
+    ui->filterTagsPushButton->setVisible(false);
+
+    // Plain Text Edition Dialog, auto-destroyed by Qt
+    editDescriptionDialog = new PlainTextEditionDialog(this);
     editDescriptionDialog->setModal(true);
 
-    // Scenario Inflation edit dialog
-    ecInflation = new EditVariableGrowthDialog(tr("Inflation"), locale, this);                // auto-destroyed by Qt because it is a child
+    // Scenario Inflation edit dialog, auto-destroyed by Qt
+    ecInflation = new EditVariableGrowthDialog(tr("Inflation"), locale, this);
     ecInflation->setModal(true);
 
-    // Periodic Stream Def Edit dialog
-    psStreamDefDialog = new EditPeriodicDialog(locale, this);     // auto-destroyed by Qt because it is a child
+    // Periodic Stream Def Edit dialog, auto-destroyed by Qt
+    psStreamDefDialog = new EditPeriodicDialog(locale, this);
     psStreamDefDialog->setModal(true);
 
-    // Irregular Stream Def Edit dialog
-    irStreamDefDialog = new EditIrregularDialog(locale, this);     // auto-destroyed by Qt because it is a child
+    // Irregular Stream Def Edit dialog, auto-destroyed by Qt
+    irStreamDefDialog = new EditIrregularDialog(locale, this);
     irStreamDefDialog->setModal(true);
 
+    // Manage Tags dialog, auto-destroyed by Qt
+    manageTagsDlg = new ManageTagsDialog(locale, this);
+    manageTagsDlg->setModal(true);
+
+    // Edit Filter Tags, auto-destroyed by Qt
+    setFilterTagsDlg = new SetFilterTagsDialog(this);
+    setFilterTagsDlg->setModal(true);
+
     // connect emitters & receivers for Dialogs : Variable Inflation Edition
-    QObject::connect(this, &EditScenarioDialog::signalEditVariableInflationPrepareContent, ecInflation, &EditVariableGrowthDialog::slotPrepareContent);
-    QObject::connect(ecInflation, &EditVariableGrowthDialog::signalEditVariableGrowthResult, this, &EditScenarioDialog::slotEditVariableInflationResult);
-    QObject::connect(ecInflation, &EditVariableGrowthDialog::signalEditVariableGrowthCompleted, this, &EditScenarioDialog::slotEditVariableInflationCompleted);
+    QObject::connect(this, &EditScenarioDialog::signalEditVariableInflationPrepareContent,
+        ecInflation, &EditVariableGrowthDialog::slotPrepareContent);
+    QObject::connect(ecInflation, &EditVariableGrowthDialog::signalEditVariableGrowthResult,
+        this, &EditScenarioDialog::slotEditVariableInflationResult);
+    QObject::connect(ecInflation, &EditVariableGrowthDialog::signalEditVariableGrowthCompleted,
+        this, &EditScenarioDialog::slotEditVariableInflationCompleted);
 
     // connect emitters & receivers for Dialogs : Periodic Stream Def Edition
-    QObject::connect(this, &EditScenarioDialog::signalEditPeriodicStreamDefPrepareContent, psStreamDefDialog, &EditPeriodicDialog::slotPrepareContent);
-    QObject::connect(psStreamDefDialog, &EditPeriodicDialog::signalEditPeriodicStreamDefResult, this, &EditScenarioDialog::slotEditPeriodicStreamDefResult);
-    QObject::connect(psStreamDefDialog, &EditPeriodicDialog::signalEditPeriodicStreamDefCompleted, this, &EditScenarioDialog::slotEditPeriodicStreamDefCompleted);
+    QObject::connect(this, &EditScenarioDialog::signalEditPeriodicStreamDefPrepareContent,
+        psStreamDefDialog, &EditPeriodicDialog::slotPrepareContent);
+    QObject::connect(psStreamDefDialog, &EditPeriodicDialog::signalEditPeriodicStreamDefResult,
+        this, &EditScenarioDialog::slotEditPeriodicStreamDefResult);
+    QObject::connect(psStreamDefDialog, &EditPeriodicDialog::signalEditPeriodicStreamDefCompleted,
+        this, &EditScenarioDialog::slotEditPeriodicStreamDefCompleted);
 
     // connect emitters & receivers for Dialogs : Irregular Stream Def Edition
-    QObject::connect(this, &EditScenarioDialog::signalEditIrregularStreamDefPrepareContent, irStreamDefDialog, &EditIrregularDialog::slotPrepareContent);
-    QObject::connect(irStreamDefDialog, &EditIrregularDialog::signalEditIrregularStreamDefResult, this, &EditScenarioDialog::slotEditIrregularStreamDefResult);
-    QObject::connect(irStreamDefDialog, &EditIrregularDialog::signalEditIrregularStreamDefCompleted, this, &EditScenarioDialog::slotEditIrregularStreamDefCompleted);
+    QObject::connect(this, &EditScenarioDialog::signalEditIrregularStreamDefPrepareContent,
+        irStreamDefDialog, &EditIrregularDialog::slotPrepareContent);
+    QObject::connect(irStreamDefDialog, &EditIrregularDialog::signalEditIrregularStreamDefResult,
+        this, &EditScenarioDialog::slotEditIrregularStreamDefResult);
+    QObject::connect(irStreamDefDialog, &EditIrregularDialog::signalEditIrregularStreamDefCompleted,
+        this, &EditScenarioDialog::slotEditIrregularStreamDefCompleted);
 
     // connect emitters & receivers for Dialogs : Plain Text Edition
-    QObject::connect(this, &EditScenarioDialog::signalPlainTextDialogPrepareContent, editDescriptionDialog, &PlainTextEditionDialog::slotPrepareContent);
-    QObject::connect(editDescriptionDialog, &PlainTextEditionDialog::signalPlainTextEditionResult, this, &EditScenarioDialog::slotPlainTextEditionResult);
-    QObject::connect(editDescriptionDialog, &PlainTextEditionDialog::signalPlainTextEditionCompleted, this, &EditScenarioDialog::slotPlainTextEditionCompleted);
+    QObject::connect(this, &EditScenarioDialog::signalPlainTextDialogPrepareContent,
+        editDescriptionDialog, &PlainTextEditionDialog::slotPrepareContent);
+    QObject::connect(editDescriptionDialog, &PlainTextEditionDialog::signalPlainTextEditionResult,
+       this, &EditScenarioDialog::slotPlainTextEditionResult);
+    QObject::connect(editDescriptionDialog,
+        &PlainTextEditionDialog::signalPlainTextEditionCompleted,
+        this, &EditScenarioDialog::slotPlainTextEditionCompleted);
+
+    // connect emitters & receivers for Dialogs : ManageTags Edition
+    QObject::connect(this, &EditScenarioDialog::signalManageTagsPrepareContent,
+        manageTagsDlg, &ManageTagsDialog::slotPrepareContent);
+    QObject::connect(manageTagsDlg, &ManageTagsDialog::signalManageTagsResult,
+        this, &EditScenarioDialog::slotManageTagsResult);
+    QObject::connect(manageTagsDlg, &ManageTagsDialog::signalManageTagsCompleted,
+        this, &EditScenarioDialog::slotManageTagsCompleted);
+
+    // connect emitters & receivers for Dialogs : SetFilterTags Edition
+    QObject::connect(this, &EditScenarioDialog::signalSetFilterTagsPrepareContent,
+        setFilterTagsDlg, &SetFilterTagsDialog::slotPrepareContent);
+    QObject::connect(setFilterTagsDlg, &SetFilterTagsDialog::signalResult,
+        this, &EditScenarioDialog::slotSetFilterTagsResult);
+    QObject::connect(setFilterTagsDlg, &SetFilterTagsDialog::signalCompleted,
+        this, &EditScenarioDialog::slotSetFilterTagsCompleted);
 
 }
 
@@ -163,84 +249,70 @@ EditScenarioDialog::~EditScenarioDialog()
 }
 
 
-void EditScenarioDialog::allowDecorationColor(bool value)
+void EditScenarioDialog::allowColoredCsdNames(bool value)
 {
-    itemTableModel->setAllowDecorationColor(value);
+    itemTableModel->setAllowColoredCsdNames(value); // table will update itself
 }
 
 
-// We are about to start a new editing session of the current existing scenario or create a new one.
-// if isNewScenario==true, it indicates we are going to edit a new scenario even if there could be one already loaded
-void EditScenarioDialog::slotPrepareContent(bool isNewScenario, QString countryCode, CurrencyInfo newCurrInfo)
+// We are about to start the process of editing the content of the current scenario
+void EditScenarioDialog::slotPrepareContent(QString countryCode,
+    CurrencyInfo newCurrInfo)
 {
-    // remember some variables
+    // remember/init some variables
     this->countryCode = countryCode;
     this->currInfo = newCurrInfo;
-    this->currentlyEditingExistingScenario = !isNewScenario;
-    tempVariableInflation = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>()); // empty
+    tempVariableInflation = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>());
 
-    // fill Currency section
-    ui->currencyInfoLabel->setText(QString("%1 (%2)").arg(currInfo.name,currInfo.isoCode));
+    QDate maxDate = GbpController::getInstance().getToday()
+        .addYears(Scenario::DEFAULT_DURATION_FE_GENERATION);
 
-    // // set contents of some components
-    if ( !currentlyEditingExistingScenario ){
-        // *** NEW SCENARIO ***
+    // fill fields from current scenario
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario() ;
+    ui->scenarioNameLineEdit->setText(scenario->getName());
+    ui->DescPlainTextEdit->setPlainText(scenario->getDescription());
+    ui->maxDurationSpinBox->setValue(scenario->getFeGenerationDuration());
 
-        // init ListView model
-        QDate maxDate = GbpController::getInstance().getToday().addYears(Scenario::DEFAULT_DURATION_FE_GENERATION);
-        itemTableModel->newScenario(currInfo, QMap<QUuid,PeriodicFeStreamDef>(),QMap<QUuid,IrregularFeStreamDef>(),
-                                   QMap<QUuid,PeriodicFeStreamDef>(),QMap<QUuid,IrregularFeStreamDef>());
+    // Set Csds
+    incomesDefPeriodic = scenario->getIncomesDefPeriodic();
+    incomesDefIrregular = scenario->getIncomesDefIrregular();
+    expensesDefPeriodic = scenario->getExpensesDefPeriodic();
+    expensesDefIrregular = scenario->getExpensesDefIrregular();
 
-        // fill fields with empty stuff
-        ui->scenarioNameLineEdit->setText(tr("Unnamed"));
-        ui->DescPlainTextEdit->setPlainText("");
-        ui->maxDurationSpinBox->setValue(Scenario::DEFAULT_DURATION_FE_GENERATION);
-
+    // manage scenario inflation
+    if (scenario->getInflation().getType()==Growth::CONSTANT){
         ui->inflationConstantRadioButton->setChecked(true);
-        ui->inflationConstantDoubleSpinBox->setValue(0);
-        ui->inflationConstantDoubleSpinBox->setEnabled(true);
-
-        ui->applyPushButton->setText(tr("Create Scenario"));
-        ui->cancelPushButton->setText(tr("Cancel"));
+        qint64 intInf = scenario->getInflation().getAnnualConstantGrowth();
+        double inf = Growth::fromDecimalToDouble(intInf);
+        ui->inflationConstantDoubleSpinBox->setValue(inf);
         ui->editGrowthPushButton->setEnabled(false);
-        this->setWindowTitle(tr("Create a new Scenario"));
-    } else {
-        // ***EDITING EXISTING SCENARIO ***
-
-        // fill fields from current scenario
-        QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario() ;
-        ui->scenarioNameLineEdit->setText(scenario->getName());
-        ui->DescPlainTextEdit->setPlainText(scenario->getDescription());
-        ui->maxDurationSpinBox->setValue(scenario->getFeGenerationDuration());
-
-        // manage scenario inflation
-        if (scenario->getInflation().getType()==Growth::CONSTANT){
-            ui->inflationConstantRadioButton->setChecked(true);
-            qint64 intInf = scenario->getInflation().getAnnualConstantGrowth();
-            double inf = Growth::fromDecimalToDouble(intInf);
-            ui->inflationConstantDoubleSpinBox->setValue(inf);
-            ui->editGrowthPushButton->setEnabled(false);
-            ui->inflationConstantDoubleSpinBox->setEnabled(true);
-        } else{
-            ui->inflationVariableRadioButton->setChecked(true);
-            tempVariableInflation = scenario->getInflation();
-            ui->inflationConstantDoubleSpinBox->setValue(0);
-            ui->inflationConstantDoubleSpinBox->setEnabled(false);
-            ui->editGrowthPushButton->setEnabled(true);
-        }
-        // init ListView model
-        QDate maxDate = GbpController::getInstance().getToday().addYears(scenario->getFeGenerationDuration());
-        itemTableModel->newScenario(currInfo, scenario->getIncomesDefPeriodic(), scenario->getIncomesDefIrregular(),
-                                    scenario->getExpensesDefPeriodic(), scenario->getExpensesDefIrregular());
-
-        // set some buttons and titles
-        ui->applyPushButton->setText(tr("Apply Changes"));
-        ui->cancelPushButton->setText(tr("Hide"));
-        this->setWindowTitle(tr("Edit Current Scenario"));
+        ui->inflationConstantDoubleSpinBox->setEnabled(true);
+    } else{
+        ui->inflationVariableRadioButton->setChecked(true);
+        tempVariableInflation = scenario->getInflation();
+        ui->inflationConstantDoubleSpinBox->setValue(0);
+        ui->inflationConstantDoubleSpinBox->setEnabled(false);
+        ui->editGrowthPushButton->setEnabled(true);
     }
 
-    updateNoItemsLabel();
+    // copy current tags and relationships
+    tags = scenario->getTags();
+    tagCsdRelationships = scenario->getTagCsdRelationships();
+
+    // Filter Tags : we try to keep the previous tag filters, in case this is the same scenario
+    // that we edited last time. checkAndAdjustFilterTags will take care to preserve the filter
+    // tags if possible, removing what does not exist anymore. UI components are adjusted.
+    checkAndAdjustFilterTags() ;
+
+    // set some buttons and titles
+    ui->applyPushButton->setText(tr("Apply changes"));
+    ui->cancelPushButton->setText(tr("Hide"));
+    this->setWindowTitle(tr("Edit current scenario"));
+
+    // refresh the table content
+    refreshCsdTableContent();
 }
+
 
 void EditScenarioDialog::slotPlainTextEditionResult(QString result)
 {
@@ -251,7 +323,6 @@ void EditScenarioDialog::slotPlainTextEditionResult(QString result)
 
 void EditScenarioDialog::slotPlainTextEditionCompleted()
 {
-    //ui->incExpTableView->setFocus();    // fix strange behavior
 }
 
 
@@ -265,56 +336,145 @@ void EditScenarioDialog::slotEditVariableInflationResult(Growth growthOut)
 
 void EditScenarioDialog::slotEditVariableInflationCompleted()
 {
-    //ui->incExpTableView->setFocus();    // fix strange behavior
 }
 
 
-void EditScenarioDialog::slotEditPeriodicStreamDefResult(bool isIncome, PeriodicFeStreamDef psStreamDef)
+void EditScenarioDialog::slotEditPeriodicStreamDefResult(bool isIncome,
+    PeriodicFeStreamDef psStreamDef)
 {
-    itemTableModel->addModifyPeriodicItem(psStreamDef);
+    // add the new or edited csd
+    if (psStreamDef.getIsIncome()==true) {
+        incomesDefPeriodic.insert(psStreamDef.getId(), psStreamDef);
+    } else {
+        expensesDefPeriodic.insert(psStreamDef.getId(), psStreamDef);
+    }
+
+    // update table content
+    refreshCsdTableContent();
+
+    // select the new/edited item
     QList<QUuid> list = QList<QUuid>();
     list.append(psStreamDef.getId());
-    // select the new/edited item
     selectRowsInTableView(list); // select if displayed
+
     // make sure it is visible in the viewport of the table
     bool found;
     int row = itemTableModel->getRow(psStreamDef.getId(),found);
     if (found){
         QModelIndex index = itemTableModel->index(row,0);
-        ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter); // does not always work...
+        // does not always work...
+        ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);
     }
-    updateNoItemsLabel();
+
+    // Log the operation
+    if (GbpController::getInstance().getLogLevel()==GbpController::Debug) {
+        GbpController::getInstance().log(GbpController::LogLevel::Debug,
+            GbpController::Info, QString("A periodic csd has been edited "
+            ". Income=%1 , name=%2")
+            .arg(isIncome).arg(psStreamDef.getName()));
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
+            GbpController::Info, QString("A periodic csd has been edited "
+            ". Income=%1").arg(isIncome) );
+    }
+
 }
 
 
 // the edit/creation process of PeriodocSimpleStreamDef has completed
 void EditScenarioDialog::slotEditPeriodicStreamDefCompleted()
 {
-    //ui->incExpTableView->setFocus();    // fix a strange bug or behavior (selected row stay highlighted "in reverse")
 }
 
 
-void EditScenarioDialog::slotEditIrregularStreamDefResult(bool isIncome, IrregularFeStreamDef irStreamDef)
+void EditScenarioDialog::slotEditIrregularStreamDefResult(bool isIncome,
+    IrregularFeStreamDef irStreamDef)
 {
-    itemTableModel->addModifyIrregularItem(irStreamDef);
+    // add the new or edited csd
+    if (irStreamDef.getIsIncome()==true) {
+        incomesDefIrregular.insert(irStreamDef.getId(), irStreamDef);
+    } else {
+        expensesDefIrregular.insert(irStreamDef.getId(), irStreamDef);
+    }
+
+    // update table content
+    refreshCsdTableContent();
+
+    // select the edited/new item
     QList<QUuid> list = QList<QUuid>();
     list.append(irStreamDef.getId());
-    // select the edited/new item
     selectRowsInTableView(list);
+
     // make sure it is visible in the viewport of the table
     bool found;
     int row = itemTableModel->getRow(irStreamDef.getId(),found);
     if (found){
         QModelIndex index = itemTableModel->index(row,0);
-        ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);// does not always work...
+        // does not always work...
+        ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);
     }
-    updateNoItemsLabel();
+
+    // Log the operation
+    if (GbpController::getInstance().getLogLevel()==GbpController::Debug) {
+        GbpController::getInstance().log(GbpController::LogLevel::Debug,
+            GbpController::Info, QString("An irregular csd has been edited. "
+            "Income = %1 , name = %2").arg(isIncome).
+            arg(irStreamDef.getName()));
+    } else {
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+            QString("An irregular csd has been edited. Income = %1").arg(isIncome));
+    }
 }
 
 
 void EditScenarioDialog::slotEditIrregularStreamDefCompleted()
 {
+}
 
+
+void EditScenarioDialog::slotManageTagsResult(Tags newTags, TagCsdRelationships newRelationships)
+{
+    // first, update the tags & relationships
+    tags = newTags;
+    tagCsdRelationships = newRelationships;
+
+    // Some tags may have been deleted : remove them from filter tags, adjust UI components
+    checkAndAdjustFilterTags();
+
+    // In any case, links may have been changed and there is no simple way to know it.
+    // Refresh the table's content.
+    refreshCsdTableContent();
+}
+
+
+void EditScenarioDialog::slotManageTagsCompleted()
+{
+}
+
+
+void EditScenarioDialog::slotSetFilterTagsResult(FilterTags::Mode mode, QSet<QUuid> filterTagIdSet)
+{
+    // we dont touch the AnyTags (which should be anyway set to false)
+    filterTags.setMode(mode);
+    filterTags.setFilterTagIdSet(filterTagIdSet);
+
+    // update table's content
+    refreshCsdTableContent();
+}
+
+
+void EditScenarioDialog::slotSetFilterTagsCompleted(bool canceled)
+{
+    // If user canceled, filterTags may stay empty while "EnableFilterTag" is ON.
+    // This is not a normal situation, so in that case force EnableFilterTag to OFF
+    if ( (canceled==true) && (filterTags.getEnableFilterByTags()==true) &&
+        (filterTags.getFilterTagIdSet().size()==0) ) {
+        filterTags.clear();
+        ui->filterTagsCheckBox->setChecked(false);
+        ui->filterTagsPushButton->setVisible(false);
+        // update table's content
+        refreshCsdTableContent();
+    }
 }
 
 
@@ -331,12 +491,16 @@ void EditScenarioDialog::on_editGrowthPushButton_clicked()
 }
 
 
+// Create a new Period FSD
 void EditScenarioDialog::on_addPeriodicPushButton_clicked()
 {
     bool isIncome = ui->incomesRadioButton->isChecked();
     PeriodicFeStreamDef psStreamDef;  // useless
-    QDate maxDate = GbpController::getInstance().getToday().addYears(ui->maxDurationSpinBox->value());
-    emit signalEditPeriodicStreamDefPrepareContent(true, isIncome, psStreamDef, currInfo, getInflationCurrentlyDefined(), maxDate);
+    QDate maxDate = GbpController::getInstance().getToday().addYears(
+        ui->maxDurationSpinBox->value());
+    // launch the edit dialog to create a new Periodic FSD
+    emit signalEditPeriodicStreamDefPrepareContent(true, isIncome, psStreamDef, currInfo,
+        getInflationCurrentlyDefined(), maxDate,{},tags);
     psStreamDefDialog->show();
 }
 
@@ -345,8 +509,10 @@ void EditScenarioDialog::on_addIrregularPushButton_clicked()
 {
     bool isIncome = ui->incomesRadioButton->isChecked();
     IrregularFeStreamDef irStreamDef;  // useless
-    QDate maxDate = GbpController::getInstance().getToday().addYears(ui->maxDurationSpinBox->value());
-    emit signalEditIrregularStreamDefPrepareContent(true, isIncome, irStreamDef, currInfo, maxDate);
+    QDate maxDate = GbpController::getInstance().getToday().addYears(
+        ui->maxDurationSpinBox->value());
+    emit signalEditIrregularStreamDefPrepareContent(true, isIncome, irStreamDef, currInfo,
+        maxDate,{},tags);
     irStreamDefDialog->show();
 }
 
@@ -391,40 +557,11 @@ QList<QUuid> EditScenarioDialog::getSelection()
 }
 
 
-// we dont display this anymore, keep it around in case we change idea
-void EditScenarioDialog::setFilterString()
-{
-    // QStringList buf;
-    // bool atLeastOne = false;
-    // buf.append(tr("Filters : "));
-    // if (true == ui->periodicFilterPushButton->isChecked()){
-    //     buf.append(tr("<Periodics Hidden>"));
-    //     atLeastOne = true;
-    // }
-    // if (true == ui->irregularFilterPushButton->isChecked()){
-    //     buf.append(tr("<Irregulars Hidden>"));
-    //     atLeastOne = true;
-    // }
-    // if (true == ui->activeFilterPushButton->isChecked()){
-    //     buf.append(tr("<Enabled Hidden>"));
-    //     atLeastOne = true;
-    // }
-    // if (true == ui->inactiveFilterPushButton->isChecked()){
-    //     buf.append(tr("<Disabled Hidden>"));
-    //     atLeastOne = true;
-    // }
-
-    // if (atLeastOne==false){
-    //     buf.append(tr("None"));
-    // }
-    //ui->filterLabel->setText(buf.join(" "));
-}
-
-
 Growth EditScenarioDialog::getInflationCurrentlyDefined()
 {
     if (ui->inflationConstantRadioButton->isChecked()) {
-        double annualInflationDouble = ui->inflationConstantDoubleSpinBox->value(); // we assume the value is constrained, thus always valid
+        // we assume the value is constrained, thus always valid
+        double annualInflationDouble = ui->inflationConstantDoubleSpinBox->value();
         return Growth::fromConstantAnnualPercentageDouble(annualInflationDouble);
     } else {
         return tempVariableInflation;
@@ -432,71 +569,19 @@ Growth EditScenarioDialog::getInflationCurrentlyDefined()
 }
 
 
-void EditScenarioDialog::on_periodicFilterPushButton_toggled(bool checked)
-{
-    if(checked){
-        ui->periodicFilterPushButton->setText(tr("Show Periodics"));
-    } else {
-        ui->periodicFilterPushButton->setText(tr("Hide Periodics"));
-    }
-    setFilterString();
-    itemTableModel->filtersChanged(ui->incomesRadioButton->isChecked(), !ui->periodicFilterPushButton->isChecked(),
-                                   !ui->irregularFilterPushButton->isChecked(), !ui->activeFilterPushButton->isChecked(), !ui->inactiveFilterPushButton->isChecked());
-}
-
-
-void EditScenarioDialog::on_irregularFilterPushButton_toggled(bool checked)
-{
-    if(checked){
-        ui->irregularFilterPushButton->setText(tr("Show Irregulars"));
-    } else {
-        ui->irregularFilterPushButton->setText(tr("Hide Irregulars"));
-    }
-    setFilterString();
-    itemTableModel->filtersChanged(ui->incomesRadioButton->isChecked(), !ui->periodicFilterPushButton->isChecked(),
-                                   !ui->irregularFilterPushButton->isChecked(), !ui->activeFilterPushButton->isChecked(), !ui->inactiveFilterPushButton->isChecked());
-}
-
-
-void EditScenarioDialog::on_activeFilterPushButton_toggled(bool checked)
-{
-    if(checked){
-        ui->activeFilterPushButton->setText(tr("Show Enabled"));
-    } else {
-        ui->activeFilterPushButton->setText(tr("Hide Enabled"));
-    }
-    setFilterString();
-    itemTableModel->filtersChanged(ui->incomesRadioButton->isChecked(), !ui->periodicFilterPushButton->isChecked(),
-                                   !ui->irregularFilterPushButton->isChecked(), !ui->activeFilterPushButton->isChecked(), !ui->inactiveFilterPushButton->isChecked());
-}
-
-
-void EditScenarioDialog::on_inactiveFilterPushButton_toggled(bool checked)
-{
-    if(checked){
-        ui->inactiveFilterPushButton->setText(tr("Show Disabled"));
-    } else {
-        ui->inactiveFilterPushButton->setText(tr("Hide Disabled"));
-    }
-    setFilterString();
-    itemTableModel->filtersChanged(ui->incomesRadioButton->isChecked(), !ui->periodicFilterPushButton->isChecked(),
-                                   !ui->irregularFilterPushButton->isChecked(), !ui->activeFilterPushButton->isChecked(), !ui->inactiveFilterPushButton->isChecked());
-}
-
-
 void EditScenarioDialog::on_fullViewPushButton_clicked()
 {
-    emit signalPlainTextDialogPrepareContent(tr("Edit Description"), ui->DescPlainTextEdit->toPlainText(), false);
+    emit signalPlainTextDialogPrepareContent(tr("Edit description"),
+        ui->DescPlainTextEdit->toPlainText(), false);
     editDescriptionDialog->show();
 }
 
 
-
 void EditScenarioDialog::on_applyPushButton_clicked()
 {
-    // *** gather & validate data to create a new Scenario ***
+    // *** gather & validate some data to create a new Scenario ***
 
-    QString name = ui->scenarioNameLineEdit->text();
+    QString name = ui->scenarioNameLineEdit->text().trimmed();
     QString desc = ui->DescPlainTextEdit->toPlainText();
     quint16 maxDuration = ui->maxDurationSpinBox->value();
     // inflation
@@ -507,35 +592,24 @@ void EditScenarioDialog::on_applyPushButton_clicked()
     } else{
         inflation = tempVariableInflation;
     }
-    QMap<QUuid,PeriodicFeStreamDef> incomesDefPeriodic = itemTableModel->getIncomesDefPeriodic();
-    QMap<QUuid,IrregularFeStreamDef> incomesDefIrregular = itemTableModel->getIncomesDefIrregular();
-    QMap<QUuid,PeriodicFeStreamDef> expensesDefPeriodic = itemTableModel->getExpensesDefPeriodic();
-    QMap<QUuid,IrregularFeStreamDef> expensesDefIrregular =
-        itemTableModel->getExpensesDefIrregular();
 
-    // *** Create a new scenario from the edit dialog data
+    // *** Create a new scenario from the edit dialog data.
     QSharedPointer<Scenario> scenario;
     try {
         scenario = QSharedPointer<Scenario>(new Scenario(
             Scenario::LATEST_VERSION, name, desc, maxDuration, inflation, countryCode,
-            incomesDefPeriodic, incomesDefIrregular, expensesDefPeriodic, expensesDefIrregular));
+            incomesDefPeriodic, incomesDefIrregular, expensesDefPeriodic, expensesDefIrregular,
+            tags, tagCsdRelationships));
     } catch (const std::exception& e) {
         // we should not get any exception...but plan for the worst
-        QString errorString = QString(tr("An unexpected error has occured.\n\nDetails : %1"))
+        QString errorString = QString(tr("An unexpected error has occured while creating a "
+            "scenario.\n\nDetails : %1"))
             .arg(e.what());
-        if (currentlyEditingExistingScenario) {
-            QMessageBox::critical(nullptr,tr("Error modifying an existing scenario"), errorString);
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal,
-                GbpController::Warning, QString(
-                "Modifying an existing scenario failed, unexpected exception occured : %1")
-                .arg(e.what()));
-        } else {
-            QMessageBox::critical(nullptr,tr("Error creating scenario"), errorString);
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal,
-                GbpController::Warning, QString(
-                "Creating a new scenario failed, unexpected exception occured : %1")
-                .arg(e.what()));
-        }
+        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
+            GbpController::Warning, QString(
+            "Modifying an existing scenario failed, unexpected exception occured : %1")
+            .arg(e.what()));
         return;
     }
 
@@ -553,66 +627,34 @@ void EditScenarioDialog::on_applyPushButton_clicked()
     GbpController::getInstance().setScenario(scenario);
 
     // *** log the changes
-    if (currentlyEditingExistingScenario){
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Modifications to the existing scenario have been applied (but not saved yet"));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    Name = %1").arg(scenario->getName()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug,
-            GbpController::Info, QString("    Country ISO code = %1")
-            .arg(scenario->getCountryCode()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    Version = %1").arg(scenario->getVersion()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    Fe Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic()
-            .size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular()
-            .size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic()
-            .size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular()
-            .size()));
-    } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Creation of a new scenario have succeeded (but not saved yet"));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    Name = %1").arg(scenario->getName()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    Country ISO code = %1").arg(scenario->getCountryCode()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    Version = %1").arg(scenario->getVersion()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    F Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic()
-            .size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular()
-            .size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic()
-            .size()));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular()
-            .size()));
-    }
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
+        QString("Modifications to the existing scenario have been applied (but not saved yet"));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    Name = %1").arg(scenario->getName()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug,
+        GbpController::Info, QString("    Country ISO code = %1")
+        .arg(scenario->getCountryCode()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    Version = %1").arg(scenario->getVersion()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    Fe Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic()
+        .size()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular()
+        .size()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic()
+        .size()));
+    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
+        QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular()
+        .size()));
 
     // *** Provide the editing result to caller
     // Retrieve New/edited scenario using GbpController::getInstance()
-    emit signalEditScenarioResult(!currentlyEditingExistingScenario, regenerateData);
+    emit signalEditScenarioResult(regenerateData);
 
-    // *** If it was a new scenario that we were editing, close the window.
-    // *** For existing scenario being edited, keep the window opened for convenience.
-    if (!currentlyEditingExistingScenario){
-        GbpController::getInstance().setFullFileName("");  // new scenario has not been saved yet
-        this->hide();
-        emit signalEditScenarioCompleted();
-    }
     // remove focus from apply button (it is also an indication that processing is completed)
     ui->itemsTableView->setFocus();
 }
@@ -628,6 +670,7 @@ void EditScenarioDialog::on_EditScenarioDialog_rejected()
 void EditScenarioDialog::selectRowsInTableView(QList<QUuid> idList) {
     // first clear current selection
     ui->itemsTableView->clearSelection();
+
     // then select one by one item that can be found
     bool found;
     QItemSelection selection;
@@ -652,53 +695,214 @@ void EditScenarioDialog::updateNoItemsLabel()
     int noItems = itemTableModel->getNoItems();
     QString s;
     if (noItems==0){
-        s = QString(tr("No items"));
-    } else if (noItems==1){
-        s = QString(tr("1 item"));
+        s = QString(tr("Cash stream definitions"));
     } else {
-        s = QString(tr("%1 items")).arg(noItems);
+        s = QString(tr("Cash stream definitions (%1)").arg(noItems));
     }
-    ui->noItemsLabel->setText(s);
+    ui->groupBox->setTitle(s);
+    //ui->noItemsLabel->setText(s);
 }
 
 
+// When Incomes or Expenses filters change, we want the "New Periodic" and "New Irregular"
+// buttons have their text change accordingly
+void EditScenarioDialog::updateNewButtonsText()
+{
+    if(ui->incomesRadioButton->isChecked()==true){
+        ui->addPeriodicPushButton->setText(tr("New periodic income..."));
+        ui->addIrregularPushButton->setText(tr("New irregular income..."));
+    } else {
+        ui->addPeriodicPushButton->setText(tr("New periodic expense..."));
+        ui->addIrregularPushButton->setText(tr("New irregular expense..."));
+    }
+}
+
+
+// Check if each tag in Filter Tags set is still exist in the current Tags set.
+// If not, remove it.  Return true if a change has been made, false otherwise.
+bool EditScenarioDialog::checkAndAdjustFilterTags()
+{
+    bool changed = false;
+
+    // In filterTags, remove tags that do not exist anymore, whatever
+    // if EnableFilterTagging is true or not.
+    QSet<QUuid> fTags = filterTags.getFilterTagIdSet();
+    QSet<QUuid> iterationCopySet = fTags;
+    foreach(QUuid filterTagId, iterationCopySet){
+        if (tags.containsTagId(filterTagId)==false) {
+            fTags.remove(filterTagId);
+            changed = true;
+        }
+    }
+    if(changed==true){
+        filterTags.setFilterTagIdSet(fTags); // refresh
+    }
+
+    // if EnableFilterByTags is true and there is no tag left in filtertags, then
+    // we consider it is abnormal (why filter by tag when no tag is specified ?)
+    // and reset filterTags
+    if ( (filterTags.getEnableFilterByTags()==true) && (fTags.size()==0) ) {
+        filterTags.clear();
+        ui->filterTagsCheckBox->setChecked(false);
+        ui->filterTagsPushButton->setVisible(false);
+        changed = true;
+    }
+
+    return changed;
+}
+
+
+void EditScenarioDialog::refreshCsdTableContent()
+{
+    itemTableModel->refresh(currInfo, incomesDefPeriodic, incomesDefIrregular,
+        expensesDefPeriodic, expensesDefIrregular, tags, tagCsdRelationships,
+        ui->incomesRadioButton->isChecked(), ui->expensesRadioButton->isChecked(),
+        ui->filterPeriodicsCheckBox->isChecked(), ui->filterIrregularsCheckBox->isChecked(),
+        ui->filterEnabledCheckBox->isChecked(), ui->filterDisabledCheckBox->isChecked(),
+        filterTags);
+
+    // refresh indicator of the no of items in the table
+    updateNoItemsLabel();
+}
+
+
+// Duplicate the selected Csd, add it to the proper set and return its ID.
+// If the csd "id" cannot be found, set "found" to false, otherwise set it to true.
+QUuid EditScenarioDialog::duplicateCsd(QUuid id, bool &found)
+{
+    found = false;
+    QUuid newId;
+
+    // find the Csd and duplicate
+    if (incomesDefPeriodic.contains(id)) {
+        found = true;
+        PeriodicFeStreamDef p = incomesDefPeriodic.value(id);
+        PeriodicFeStreamDef p2 = p.duplicate();
+        incomesDefPeriodic.insert(p2.getId(),p2);
+        newId = p2.getId();
+    } else if (incomesDefIrregular.contains(id)) {
+        found = true;
+        IrregularFeStreamDef p = incomesDefIrregular.value(id);
+        IrregularFeStreamDef p2 = p.duplicate();
+        incomesDefIrregular.insert(p2.getId(),p2);
+        newId = p2.getId();
+    } else if (expensesDefPeriodic.contains(id)) {
+        found = true;
+        PeriodicFeStreamDef p = expensesDefPeriodic.value(id);
+        PeriodicFeStreamDef p2 = p.duplicate();
+        expensesDefPeriodic.insert(p2.getId(),p2);
+        newId = p2.getId();
+    } else if (expensesDefIrregular.contains(id)) {
+        found = true;
+        IrregularFeStreamDef p = expensesDefIrregular.value(id);
+        IrregularFeStreamDef p2 = p.duplicate();
+        expensesDefIrregular.insert(p2.getId(),p2);
+        newId = p2.getId();
+    } else{
+        // not found !
+        return id;
+    }
+
+    return newId;
+}
+
+
+// Remove a list of Csds from the global list of Csds
+void EditScenarioDialog::removeCsds(QList<QUuid> toRemove)
+{
+    foreach(QUuid id, toRemove){
+        if (incomesDefPeriodic.contains(id)) {
+            incomesDefPeriodic.remove(id);
+        }
+        if (incomesDefIrregular.contains(id)) {
+            incomesDefIrregular.remove(id);
+        }
+        if (expensesDefPeriodic.contains(id)) {
+            expensesDefPeriodic.remove(id);
+        }
+        if (expensesDefIrregular.contains(id)) {
+            expensesDefIrregular.remove(id);
+        }
+    }
+}
+
+
+// Change the "enabled" status of a list of Csds.
+void EditScenarioDialog::enableDisableCsds(QList<QUuid> idList, bool enable)
+{
+    foreach(QUuid id, idList){
+        if (incomesDefPeriodic.contains(id)) {
+            PeriodicFeStreamDef p = incomesDefPeriodic.value(id);
+            p.setActive(enable);
+            incomesDefPeriodic.insert(p.getId(),p);
+        }
+        if (incomesDefIrregular.contains(id)) {
+            IrregularFeStreamDef p = incomesDefIrregular.value(id);
+            p.setActive(enable);
+            incomesDefIrregular.insert(p.getId(),p);
+        }
+        if (expensesDefPeriodic.contains(id)) {
+            PeriodicFeStreamDef p = expensesDefPeriodic.value(id);
+            p.setActive(enable);
+            expensesDefPeriodic.insert(p.getId(),p);
+        }
+        if (expensesDefIrregular.contains(id)) {
+            IrregularFeStreamDef p = expensesDefIrregular.value(id);
+            p.setActive(enable);
+            expensesDefIrregular.insert(p.getId(),p);
+        }
+    }
+}
+
+
+// Edition requested of the selected Csd
 void EditScenarioDialog::on_editPushButton_clicked()
 {
         bool found;
 
-        // make sure exactly 1 row is selected
+        // make sure exactly 1 row is selected and get the ID of the seleted Csd
         QList<QUuid> selectedIdList = getSelection();
         if (selectedIdList.size()!=1){
-            QMessageBox::critical(this,tr("Invalid Selection"),tr("Select exactly one row"));
+            QMessageBox::critical(this,tr("Error"),tr("Select exactly one row"));
             ui->itemsTableView->setFocus();    // fix the strange behavior
             return;
         }
-        // get type of StreamDef
-        FeStreamDef::FeStreamType type = itemTableModel->getTypeOfFeStreamDef(selectedIdList.at(0),found);
+        // get the associated Csd type
+        FeStreamDef::FeStreamType type = getCsdTypeFromId(selectedIdList.at(0),found);
         if (found==false) {
-            // should not happen
-            return;
+            return; // should not happen
         }
-        QDate maxDate = GbpController::getInstance().getToday().addYears(ui->maxDurationSpinBox->value());
-        if (type == FeStreamDef::PERIODIC){
-            PeriodicFeStreamDef ps = itemTableModel->getPeriodicFeStreamDef(selectedIdList.at(0),found) ;
+        QDate maxDate = GbpController::getInstance().getToday().addYears(
+            ui->maxDurationSpinBox->value());
+        if (type == FeStreamDef::FeStreamType::PERIODIC){
+            PeriodicFeStreamDef ps = getPeriodicCsdFromId(selectedIdList.at(0),found);
             if (found==false) {
-                return;  // should never happen
+                return; // should not happen
             }
-            emit signalEditPeriodicStreamDefPrepareContent(false, ui->incomesRadioButton->isChecked(), ps, currInfo, getInflationCurrentlyDefined(), maxDate);
+            // Gather the tag id set this csd is associated with
+            QSet<QUuid> tSet = tagCsdRelationships.getRelationshipsForCsd(ps.getId());
+            // Launch the edit dialog
+            emit signalEditPeriodicStreamDefPrepareContent(false,
+                ui->incomesRadioButton->isChecked(), ps, currInfo, getInflationCurrentlyDefined(),
+                maxDate, tSet, tags);
             psStreamDefDialog->show();
         } else {
-            IrregularFeStreamDef is = itemTableModel->getIrregularFeStreamDef(selectedIdList.at(0),found) ;
+            IrregularFeStreamDef is =  getIrregularCsdFromId(selectedIdList.at(0),found);;
             if (found==false) {
-                return;  // should never happen
+                return; // should not happen
             }
-            emit signalEditIrregularStreamDefPrepareContent(false, ui->incomesRadioButton->isChecked(), is, currInfo, maxDate);
+            // Gather the tag id set this fsd is associated with
+            QSet<QUuid> tSet = tagCsdRelationships.getRelationshipsForCsd(is.getId());
+            // Launch the edit dialog
+            emit signalEditIrregularStreamDefPrepareContent(false,
+                ui->incomesRadioButton->isChecked(), is, currInfo, maxDate, tSet, tags);
             irStreamDefDialog->show();
         }
 
 }
 
 
+// Duplicate the selected Csds, along with all their respective tag relationships
 void EditScenarioDialog::on_duplicatePushButton_clicked()
 {
     bool found;
@@ -706,31 +910,38 @@ void EditScenarioDialog::on_duplicatePushButton_clicked()
     // make sure exactly 1 row is selected
     QList<QUuid> selectedIdList = getSelection();
     if (selectedIdList.size()==0){
-        QMessageBox::critical(this,tr("Invalid Selection"),tr("Select at least 1 item"));
+        QMessageBox::critical(this,tr("Error"),tr("Select at least 1 item"));
         ui->itemsTableView->setFocus();    // fix the strange behavior
         return;
     }
 
-    QList<QUuid> list =  QList<QUuid>();
+    // duplicate the selected Csds
+    QList<QUuid> list = QList<QUuid>();
     QUuid newId ;
     foreach(QUuid id, selectedIdList){
-        newId = itemTableModel->duplicateItem(id,found);
+        newId = duplicateCsd(id,found);
         if (found==false) {
             // should not happen
             return;
         }
         list.append(newId);
+        // add the same tag relationships for the cloned elements
+        tagCsdRelationships.cloneTagRelationshipsForCsd(id,newId);
     }
-    // select the new duplicated item
+
+    // update table content
+    refreshCsdTableContent();
+
+    // select the new duplicated Csds
     selectRowsInTableView(list);
-    // make sure it is visible in the viewport of the table
+
+    // make sure the last selection is visible in the viewport of the table
     int row = itemTableModel->getRow(newId,found);
     if (found){
         QModelIndex index = itemTableModel->index(row,0);
-        ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter); // does not always work...
+        // does not always work...
+        ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);
     }
-
-    updateNoItemsLabel();
 }
 
 
@@ -739,13 +950,21 @@ void EditScenarioDialog::on_deletePushButton_clicked()
     // make sure at least 1 row is selected
     QList<QUuid> selectedIdList = getSelection();
     if (selectedIdList.size()==0){
-        QMessageBox::critical(this,tr("Invalid Selection"),tr("Select at least one item"));
+        QMessageBox::critical(this,tr("Error"),tr("Select at least one item"));
         ui->itemsTableView->setFocus();    // fix the strange behavior
         return;
     }
 
-    itemTableModel->removeItems(selectedIdList);
-    updateNoItemsLabel();
+    // remove all associated tags with the deleted Csds
+    foreach (QUuid id, selectedIdList) {
+        tagCsdRelationships.deleteRelationshipsForCsd(id);
+    }
+
+    // Remove the Csds
+    removeCsds(selectedIdList);
+
+    // Last thing to do : update the table
+    refreshCsdTableContent();
 }
 
 
@@ -766,12 +985,18 @@ void EditScenarioDialog::on_enablePushButton_clicked()
     // make sure at least 1 row is selected
     QList<QUuid> selectedIdList = getSelection();
     if (selectedIdList.size()==0){
-        QMessageBox::critical(this,tr("Invalid Selection"),tr("Select at least one item"));
+        QMessageBox::critical(this,tr("Error"),tr("Select at least one item"));
         ui->itemsTableView->setFocus();    // fix the strange behavior
         return;
     }
 
-    itemTableModel->changeActiveStatusItems(selectedIdList, true);
+    // change status of selected items
+    enableDisableCsds(selectedIdList, true);
+
+
+    // update table's content
+    refreshCsdTableContent();
+
     // reselect the items
     selectRowsInTableView(selectedIdList);
 }
@@ -782,23 +1007,87 @@ void EditScenarioDialog::on_disablePushButton_clicked()
     // make sure at least 1 row is selected
     QList<QUuid> selectedIdList = getSelection();
     if (selectedIdList.size()==0){
-        QMessageBox::critical(this,tr("Invalid Selection"),tr("Select at least one item"));
+        QMessageBox::critical(this,tr("Error"),tr("Select at least one item"));
         ui->itemsTableView->setFocus();    // fix the strange behavior
         return;
     }
 
-    itemTableModel->changeActiveStatusItems(selectedIdList, false);
+    // change status of selected items
+    enableDisableCsds(selectedIdList, false);
+
+    // update table's content
+    refreshCsdTableContent();
+
     // reselect the items
     selectRowsInTableView(selectedIdList);
 }
 
 
+// Set the color of the names of the selected Csds
+void EditScenarioDialog::on_setColorPushButton_clicked()
+{
+    // make sure at least 1 row is selected
+    QList<QUuid> selectedIdList = getSelection();
+    if (selectedIdList.size()==0){
+        QMessageBox::critical(this,tr("Error"),tr("Select at least one item"));
+        ui->itemsTableView->setFocus();    // fix the strange behavior
+        return;
+    }
+
+    // This is the custom color that will be choosen, if custom selection is requested.
+    QColor color;
+
+    // Ask if we have to revert to default system color or rather custom one
+    int choice = Util::messageBoxQuestion(this, tr("Question"),
+        tr("Do you want to revert back to the default system color or choose a custom one ?"),
+        {tr("Cancel"),tr("System's default"),tr("Custom color")},2,0 );
+    if(choice==-1){
+        // ESC pressed
+        return ;
+    } else if (choice==0){
+        // Cancel button pressed
+        return ;
+    } else if (choice==1){
+        // revert back to system default : set color to "invalid"
+        color = QColor();
+    } else {
+        // Pick a custom color
+        color = QColorDialog::getColor(Qt::gray ,this, tr("Color chooser"));
+        if (color.isValid()==false) {
+            return; // user cancelled
+        }
+    }
+
+    // Apply to all selected Csds
+    foreach (QUuid id, selectedIdList) {
+        if (incomesDefPeriodic.contains(id)==true) {
+            PeriodicFeStreamDef ps = incomesDefPeriodic.value(id);
+            ps.setDecorationColor(color);
+            incomesDefPeriodic.insert(id,ps);
+        } else if (incomesDefIrregular.contains(id)==true) {
+            IrregularFeStreamDef is = incomesDefIrregular.value(id);
+            is.setDecorationColor(color);
+            incomesDefIrregular.insert(id,is);
+        } else if (expensesDefPeriodic.contains(id)==true) {
+            PeriodicFeStreamDef ps = expensesDefPeriodic.value(id);
+            ps.setDecorationColor(color);
+            expensesDefPeriodic.insert(id,ps);
+        } else if (expensesDefIrregular.contains(id)==true) {
+            IrregularFeStreamDef is = expensesDefIrregular.value(id);
+            is.setDecorationColor(color);
+            expensesDefIrregular.insert(id,is);
+        }
+    }
+
+    // update table
+    refreshCsdTableContent();
+}
+
+
 void EditScenarioDialog::on_incomesRadioButton_toggled(bool checked)
 {
-    itemTableModel->filtersChanged(ui->incomesRadioButton->isChecked(), !ui->periodicFilterPushButton->isChecked(),
-                                   !ui->irregularFilterPushButton->isChecked(), !ui->activeFilterPushButton->isChecked(), !ui->inactiveFilterPushButton->isChecked());
-    updateNoItemsLabel();
-
+    updateNewButtonsText();
+    refreshCsdTableContent();
 }
 
 
@@ -812,4 +1101,162 @@ void EditScenarioDialog::on_itemsTableView_doubleClicked(const QModelIndex &inde
 void EditScenarioDialog::on_maxDurationSpinBox_valueChanged(int arg1)
 {
 }
+
+
+void EditScenarioDialog::on_manageTagsPushButton_clicked()
+{
+    // Build the info structure for all currently defined Csds of the scenario
+    QHash<QUuid, managetags::CsdItem> newCsdItems;
+    foreach (PeriodicFeStreamDef f, incomesDefPeriodic) {
+        newCsdItems.insert(f.getId(),{.id=f.getId(),.name=f.getName(),.isIncome=f.getIsIncome(),
+            .color=f.getDecorationColor()});
+    }
+    foreach (IrregularFeStreamDef f, incomesDefIrregular) {
+        newCsdItems.insert(f.getId(), {.id=f.getId(),.name=f.getName(),.isIncome=f.getIsIncome(),
+            .color=f.getDecorationColor()});
+    }
+    foreach (PeriodicFeStreamDef f, expensesDefPeriodic) {
+        newCsdItems.insert(f.getId(),{.id=f.getId(),.name=f.getName(),.isIncome=f.getIsIncome(),
+            .color=f.getDecorationColor()});
+    }
+    foreach (IrregularFeStreamDef f, expensesDefIrregular) {
+        newCsdItems.insert(f.getId(),{.id=f.getId(),.name=f.getName(),.isIncome=f.getIsIncome(),
+            .color=f.getDecorationColor()});
+    }
+
+    // send for display
+    emit signalManageTagsPrepareContent(tags, tagCsdRelationships, newCsdItems);
+    manageTagsDlg->show();
+}
+
+
+void EditScenarioDialog::on_filterPeriodicsCheckBox_checkStateChanged(const Qt::CheckState &arg1)
+{
+    refreshCsdTableContent();
+}
+
+
+void EditScenarioDialog::on_filterIrregularsCheckBox_checkStateChanged(const Qt::CheckState &arg1)
+{
+    refreshCsdTableContent();
+}
+
+
+void EditScenarioDialog::on_filterEnabledCheckBox_checkStateChanged(const Qt::CheckState &arg1)
+{
+    refreshCsdTableContent();
+}
+
+
+void EditScenarioDialog::on_filterDisabledCheckBox_checkStateChanged(const Qt::CheckState &arg1)
+{
+    refreshCsdTableContent();
+
+}
+
+
+void EditScenarioDialog::on_filterTagsCheckBox_checkStateChanged(const Qt::CheckState &arg1)
+{
+    if (arg1==Qt::CheckState::Unchecked){
+        // *** FILTER BY TAGS IS NOW DISABLED ***
+        filterTags.setEnableFilterByTags(false);
+        ui->filterTagsPushButton->setVisible(false);
+        // Refresh table
+        refreshCsdTableContent();
+    } else if (arg1==Qt::CheckState::Checked) {
+        // *** FILTER BY TAGS IS NOW ENABLED ***
+        // *** Current filterTag is re-used ***
+        // *** There must be at least one tag defined ***
+        if (tags.size()==0) {
+            QMessageBox::critical(nullptr,tr("Warning"),
+                tr("There are no tag defined for this scenario, so you cannot "
+                    "use Tag-based filtering."));
+            // revert the state of the checkbox, a new state signal will be emitted and received
+            // by this function. Use setCheckState because setChecked does not work as expected
+            ui->filterTagsCheckBox->setCheckState(Qt::CheckState::Unchecked);
+
+            return;
+        }
+
+        filterTags.setEnableFilterByTags(true);
+        ui->filterTagsPushButton->setVisible(true);
+        if ( (filterTags.getFilterTagIdSet().size()==0) ) {
+            // if no tag have been added to the filter set, this is "legal", but weird.
+            // So help user by forwarding him to the tag selection dialog.
+            on_filterTagsPushButton_clicked();
+            return;
+        } else {
+            // Refresh table
+            refreshCsdTableContent();
+        }
+    }
+
+}
+
+
+void EditScenarioDialog::on_filterTagsPushButton_clicked()
+{
+    emit signalSetFilterTagsPrepareContent(tags, filterTags.getFilterTagIdSet(),
+        filterTags.getMode());
+    setFilterTagsDlg->show();
+}
+
+
+// Return the type of Csd having "id" as ID. Check value of "found" upon return to be sure
+// return value is meaningful.
+FeStreamDef::FeStreamType EditScenarioDialog::getCsdTypeFromId(QUuid id, bool &found)
+{
+    found = false;
+    if (incomesDefPeriodic.contains(id)) {
+        found = true;
+        return FeStreamDef::FeStreamType::PERIODIC;
+    } else if (incomesDefIrregular.contains(id)) {
+        found = true;
+        return FeStreamDef::FeStreamType::IRREGULAR;
+    } else if (expensesDefPeriodic.contains(id)) {
+        found = true;
+        return FeStreamDef::FeStreamType::PERIODIC;
+    } else if (expensesDefIrregular.contains(id)) {
+        found = true;
+        return FeStreamDef::FeStreamType::IRREGULAR;
+    }
+    return FeStreamDef::FeStreamType::PERIODIC; // dummy value since not found
+}
+
+
+// Return a Periodic Csd (income or expense) having "id" as ID. Check value of "found"
+// upon return to be sure return value is meaningful.
+PeriodicFeStreamDef EditScenarioDialog::getPeriodicCsdFromId(QUuid id, bool &found)
+{
+    found = false;
+    if (incomesDefPeriodic.contains(id)) {
+        found = true;
+        PeriodicFeStreamDef p = incomesDefPeriodic.value(id);
+        return p;
+    } else if (expensesDefPeriodic.contains(id)) {
+        found = true;
+        PeriodicFeStreamDef p = expensesDefPeriodic.value(id);
+        return p;
+    }
+    return PeriodicFeStreamDef(); // dummy value since not found
+}
+
+
+// Return an Irregular Csd (income or expense) having "id" as ID. Check value of "found" upon
+// return to be sure return value is meaningful.
+IrregularFeStreamDef EditScenarioDialog::getIrregularCsdFromId(QUuid id, bool &found)
+{
+    found = false;
+    if (incomesDefIrregular.contains(id)) {
+        found = true;
+        IrregularFeStreamDef i = incomesDefIrregular.value(id);
+        return i;
+    } else if (expensesDefIrregular.contains(id)) {
+        found = true;
+        IrregularFeStreamDef i = expensesDefIrregular.value(id);
+        return i;
+    }
+    return IrregularFeStreamDef(); // dummy value since not found
+}
+
 

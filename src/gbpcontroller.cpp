@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -48,6 +48,9 @@ GbpController::GbpController()
     exportTextDateLocalized = false;
     chartPointSize = 10;
     wheelRotatedAwayZoomIn = false;
+    showYzeroLine = true;
+    xAxisDateFormat = 0;
+    showTooltips = true;
 
     QStringList argList = QCoreApplication::arguments();
 
@@ -144,7 +147,6 @@ GbpController::GbpController()
 
     QString configFileString = QString("Configuration file is : %1").arg(settingsFullFileName);
     qInfo().noquote() << configFileString;
-
 }
 
 
@@ -175,7 +177,8 @@ bool GbpController::isScenarioLoaded() const
 }
 
 
-// This should be done only ONCE, as EARLY AS possible after the applicationis started
+// Load the application settings from the config file.
+// This should be done only ONCE, as EARLY AS possible after the application is started
 void GbpController::loadSettings()
 {
     // Ensure loading has not been already done
@@ -229,10 +232,10 @@ void GbpController::loadSettings()
         QString s = v.toString();
         darkModeCurveColor = QColor(s);
         if (darkModeCurveColor.isValid()==false) {
-            darkModeCurveColor = QColor(192, 0, 0);
+            darkModeCurveColor = QColor(128, 0, 0);
         }
     } else{
-        darkModeCurveColor = QColor(192, 0, 0);
+        darkModeCurveColor = QColor(128, 0, 0);
     }
 
     // curve color for light mode for chart
@@ -241,10 +244,10 @@ void GbpController::loadSettings()
         QString s = v.toString();
         lightModeCurveColor = QColor(s);
         if (lightModeCurveColor.isValid()==false) {
-            lightModeCurveColor = QColor(0, 0, 192);
+            lightModeCurveColor = QColor(0, 0, 128);
         }
     } else{
-        lightModeCurveColor = QColor(0, 0, 192);
+        lightModeCurveColor = QColor(0, 0, 128);
     }
 
     // point color for dark mode for chart
@@ -289,10 +292,10 @@ void GbpController::loadSettings()
         QString s = v.toString();
         lightModeSelectedPointColor = QColor(s);
         if (lightModeSelectedPointColor.isValid()==false) {
-            lightModeSelectedPointColor = QColor(0, 192, 0);
+            lightModeSelectedPointColor = QColor(0, 128, 0);
         }
     } else{
-        lightModeSelectedPointColor = QColor(0, 192, 0);
+        lightModeSelectedPointColor = QColor(0, 128, 0);
     }
 
     // Amounts in exported text are localized or not (in which case format is : no thousand
@@ -473,6 +476,75 @@ void GbpController::loadSettings()
         wheelRotatedAwayZoomIn = false;
     }
 
+    // show Y zero line
+    if (settingsPtr->contains("show_y_zero_line")){
+        v = settingsPtr->value("show_y_zero_line");
+        bool ok = Util::isValidBoolString(v.toString());
+        if (ok){
+            showYzeroLine = v.toBool();
+        } else {
+            showYzeroLine = true;    // default if data is invalid
+        }
+    } else{
+        showYzeroLine = true;
+    }
+
+    // Yzero line Dark color
+    if (settingsPtr->contains("y_zero_line_dark_mode_color")){
+        v = settingsPtr->value("y_zero_line_dark_mode_color");
+        QString s = v.toString();
+        yZeroLineDarkModeColor = QColor(s);
+        if (yZeroLineDarkModeColor.isValid()==false) {
+            yZeroLineDarkModeColor = QColor(0, 128, 128);
+        }
+    } else{
+        // Default color
+        yZeroLineDarkModeColor = QColor(0, 128, 128);
+    }
+
+    // Yzero line Light color
+    if (settingsPtr->contains("y_zero_line_light_mode_color")){
+        v = settingsPtr->value("y_zero_line_light_mode_color");
+        QString s = v.toString();
+        yZeroLineLightModeColor = QColor(s);
+        if (yZeroLineLightModeColor.isValid()==false) {
+            yZeroLineLightModeColor = QColor(0, 128,128);
+        }
+    } else{
+        // Default color
+        yZeroLineLightModeColor = QColor(0, 128, 128);
+    }
+
+    // X-Axis Date Format
+    if (settingsPtr->contains("xaxis_date_format")){
+        bool ok;
+        v = settingsPtr->value("xaxis_date_format");
+        int anInt = v.toInt(&ok);
+        if ( (!ok) || (anInt<0) || (anInt>2) )  {
+            // settings is invalid
+            xAxisDateFormat = 0;
+        } else {
+            xAxisDateFormat = anInt;
+        }
+    } else{
+        // support old version of scenario file
+        xAxisDateFormat = 0; // Locale
+    }
+
+    // show tooltips
+    if (settingsPtr->contains("show_tooltips")){
+        v = settingsPtr->value("show_tooltips");
+        bool ok = Util::isValidBoolString(v.toString());
+        if (ok){
+            showTooltips = v.toBool();
+        } else {
+            showTooltips = true;    // default if data is invalid
+        }
+    } else{
+        showTooltips = true;
+    }
+
+
      // loaded is completed and successful
     settingsLoaded = true;
 
@@ -526,7 +598,18 @@ void GbpController::loadSettings()
         QString("    pv_discount_rate = %1").arg(pvDiscountRate));
     GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
         QString("    wheel_rotated_away_zoom_in = %1").arg(wheelRotatedAwayZoomIn));
-
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    show_y_zero_line = %1").arg(showYzeroLine));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    y_zero_line_dark_mode_color = %1").arg(yZeroLineDarkModeColor
+        .name(QColor::HexRgb)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    y_zero_line_light_mode_color = %1").arg(yZeroLineLightModeColor
+        .name(QColor::HexRgb)));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    xaxis_date_format = %1").arg(xAxisDateFormat));
+    GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Info,
+        QString("    show_tooltips = %1").arg(showTooltips));
 }
 
 
@@ -557,6 +640,20 @@ void GbpController::saveSettings()
     settingsPtr->setValue("use_present_value",usePresentValue);
     settingsPtr->setValue("pv_discount_rate",pvDiscountRate);
     settingsPtr->setValue("wheel_rotated_away_zoom_in",wheelRotatedAwayZoomIn);
+    settingsPtr->setValue("show_y_zero_line",showYzeroLine);
+    settingsPtr->setValue("y_zero_line_dark_mode_color", yZeroLineDarkModeColor
+        .name(QColor::HexRgb));
+    settingsPtr->setValue("y_zero_line_light_mode_color", yZeroLineLightModeColor
+        .name(QColor::HexRgb));
+    settingsPtr->setValue("xaxis_date_format",xAxisDateFormat);
+    settingsPtr->setValue("show_tooltips",showTooltips);
+}
+
+
+// Completely empty the config file
+void GbpController::resetSettings()
+{
+    settingsPtr->clear();
 }
 
 
@@ -870,9 +967,59 @@ QString GbpController::getSettingsFullFileName() const
     return settingsFullFileName;
 }
 
+QColor GbpController::getYZeroLineLightModeColor() const
+{
+    return yZeroLineLightModeColor;
+}
+
+void GbpController::setYZeroLineLightModeColor(const QColor &newYZeroLineLightModeColor)
+{
+    yZeroLineLightModeColor = newYZeroLineLightModeColor;
+}
+
+QColor GbpController::getYZeroLineDarkModeColor() const
+{
+    return yZeroLineDarkModeColor;
+}
+
+void GbpController::setYZeroLineDarkModeColor(const QColor &newYZeroLineDarkModeColor)
+{
+    yZeroLineDarkModeColor = newYZeroLineDarkModeColor;
+}
+
+bool GbpController::getShowTooltips() const
+{
+    return showTooltips;
+}
+
+void GbpController::setShowTooltips(bool newShowTooltips)
+{
+    showTooltips = newShowTooltips;
+}
+
+uint GbpController::getXAxisDateFormat() const
+{
+    return xAxisDateFormat;
+}
+
+void GbpController::setXAxisDateFormat(uint newXAxisDateFormat)
+{
+    xAxisDateFormat = newXAxisDateFormat;
+}
+
 GbpController::LogLevel GbpController::getLogLevel() const
 {
     return logLevel;
+}
+
+bool GbpController::getShowYzeroLine() const
+{
+    return showYzeroLine;
+}
+
+void GbpController::setShowYzeroLine(bool newShowYzeroLine)
+{
+    showYzeroLine = newShowYzeroLine;
 }
 
 bool GbpController::getExportTextDateLocalized() const

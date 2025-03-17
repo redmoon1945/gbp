@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,9 @@
 #include "combinedfestreams.h"
 #include "irregularfestreamdef.h"
 #include "periodicfestreamdef.h"
+#include "tag.h"
+#include "tags.h"
+#include "tagcsdrelationships.h"
 
 // Set of declarative statements representing incomes, expenses and different contextual information.
 // It is used to create a flow of financial events (called "flow data") in time.
@@ -39,26 +42,27 @@ public:
     static QString VERSION_1;
 
     // max length of the version
-    static int VERSION_MAX_LEN;
+    static quint16 VERSION_MAX_LEN;
     // max length of the scenario name
-    static int NAME_MAX_LEN;
+    static quint16 NAME_MAX_LEN;
     // max length of the scenario description
-    static int DESC_MAX_LEN;
+    static quint16 DESC_MAX_LEN;
     // max no of Stream Definition per type
-    static int MAX_NO_STREAM_DEF;
-    // no Financial Events can ever be generated past this date. Min value in years from "tomorow"
+    static quint16 MAX_NO_STREAM_DEF;
+    // no Financial Events can ever be generated past this date. Min value in years from "tomorrow"
     static quint16 MIN_DURATION_FE_GENERATION;
-    // no Financial Events can ever be generated past this date. Max value in years from "tomorow"
+    // no Financial Events can ever be generated past this date. Max value in years from "tomorrow"
     static quint16 MAX_DURATION_FE_GENERATION;
     // default value for computation duration when creating a new scenario
     static quint16 DEFAULT_DURATION_FE_GENERATION;
+    // max no of tag
+    static quint16 MAX_NO_TAGS;
 
-
-    enum FileResultCode { SUCCESS=1, ERROR_OTHER=2,
-        SAVE_ERROR_CREATING_FILE_FOR_WRITING=3, SAVE_ERROR_OPENING_FILE_FOR_WRITING=4,
-        SAVE_ERROR_WRITING_TO_FILE=5, SAVE_ERROR_INTERNAL_JSON_CREATION=6,
-        LOAD_FILE_DOES_NOT_EXIST=7, LOAD_CANNOT_OPEN_FILE=8, LOAD_JSON_PARSING_ERROR=9,
-        LOAD_JSON_SEMANTIC_ERROR=10};
+    enum FileResultCode { SUCCESS, ERROR_OTHER,
+        SAVE_ERROR_CREATING_FILE_FOR_WRITING, SAVE_ERROR_OPENING_FILE_FOR_WRITING,
+        SAVE_ERROR_WRITING_TO_FILE, SAVE_ERROR_INTERNAL_JSON_CREATION,
+        LOAD_FILE_DOES_NOT_EXIST, LOAD_CANNOT_OPEN_FILE, LOAD_JSON_PARSING_ERROR,
+        LOAD_JSON_SEMANTIC_ERROR, LOAD_CANNOT_UPGRADE};
     struct FileResult{
         // Error code
         FileResultCode code;
@@ -73,14 +77,15 @@ public:
         QSharedPointer<Scenario> scenarioPtr;
     };
 
-    // Constructors and destructor
+    // Constructors and destructors
     Scenario(const Scenario& o);
     Scenario(const QString version, const QString name, const QString description,
         const quint16 feGenerationDuration, const Growth inflation, QString countryCode,
         const QMap<QUuid,PeriodicFeStreamDef> incomesDefPeriodicSet,
         const QMap<QUuid,IrregularFeStreamDef> incomesDefIrregularSet,
         const QMap<QUuid,PeriodicFeStreamDef> expensesDefPeriodicSet,
-        const QMap<QUuid,IrregularFeStreamDef> expensesDefIrregularSet);
+        const QMap<QUuid,IrregularFeStreamDef> expensesDefIrregularSet,
+        const Tags newTags, const TagCsdRelationships newTagFsdRelationships);
     virtual ~Scenario();
 
     // operators
@@ -92,9 +97,11 @@ public:
         QLocale systemLocale, DateRange fromto, double pvAnnualDiscountRate, QDate pvPresent,
         uint &saturationCount) const;
     void getStreamDefNameAndColorFromId(QUuid id,  QString& name, QColor& color, bool& found) const;
+    bool fsdIdExists(QUuid id) const;
     bool evaluateIfSameFlowData(QSharedPointer<Scenario> o) const;
     FileResult saveToFile(QString fullFileName) const;
     static FileResult loadFromFile(QString fullFileName);
+    static QSharedPointer<Scenario> createBlankScenario(QString countryCode);
     int getNoOfPeriodicIncomes(bool activeOnly);
     int getNoOfIrregularIncomes(bool activeOnly);
     int getNoOfPeriodicExpenses(bool activeOnly);
@@ -121,6 +128,10 @@ public:
     void setExpensesDefIrregular(const QMap<QUuid, IrregularFeStreamDef> &newExpensesDefIrregular);
     quint16 getFeGenerationDuration() const;
     void setFeGenerationDuration(quint16 newFeGenerationDuration);
+    Tags getTags() const;
+    void setTags(const Tags &newTags);
+    TagCsdRelationships getTagCsdRelationships() const;
+    void setTagCsdRelationships(const TagCsdRelationships &newTagCsdRelationships);
 
 private:
     QString version;
@@ -138,6 +149,14 @@ private:
     QMap<QUuid,IrregularFeStreamDef> incomesDefIrregular;     // key is Stream Def ID
     QMap<QUuid,PeriodicFeStreamDef> expensesDefPeriodic;      // key is Stream Def ID
     QMap<QUuid,IrregularFeStreamDef> expensesDefIrregular;    // key is Stream Def ID
+    // Set of tags defined in the scenario
+    Tags tags;
+    // Relationships between tags and Cash Stream Definition for this scenario (N-N)
+    TagCsdRelationships tagCsdRelationships;
+
+    // Methods
+    bool checkTagCsdRelationshipsIntegrity();
+
 };
 
 #endif // SCENARIO_H

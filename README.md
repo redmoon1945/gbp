@@ -1,4 +1,23 @@
 # graphical-budget-planner
+## What's new ?
+Version 1.6.0 is out (April 2025) ! Here are the main changes :
+
+- Introducing the notion of **tags**, which is a way to implement categories of incomes/expenses, but in a much more flexible and powerful way.
+- In About Dialog, add a new Contact tab for those who wish to know how to contact directly the author(s) of this software.
+- In Main Window,
+  - Add a line at value Y=0, with user-specified color. This helps to identify rapidly if a point is above or below 0. Can be turned off in Options Dialog.
+  - Add the file name of the scenario file opened in the top window title
+- Options Dialog has been updated for more clarity
+  - Reformat the Chart tab layout for better clarity
+  - Add an option to control how the X-Axis Dates for charts are formatted (Locale, ISO 8601, ISO 8601 with 2-digits year)
+  - Add an option to show or hide tooltips for the whole application.
+- In Edit Scenario Dialog
+  - Rework the filters controls, so it is easier to undertand and it takes less visual space.
+  - It is now possible to select several Cash Stream Definitions and in one shot set the color of theirs names ("Set Color" button)
+- In several Dialogs, optimize the spacing and position of the UI components to provide more space to the list of incomes/expenses, while maintaining the same window size.
+- In all Dialogs, use short format for dates, because the long one takes up too much space when big fonts are used.
+
+
 
 ## Screenshots
 
@@ -28,7 +47,8 @@ Analysis - Monthy Report Chart
 
 ## Installation
 
-GBP is distributed as an “AppImage” on Linux platform, which is a single-file executable packaging format allowing a program to run on many Linux distributions. There is nothing else to install. After downloading the most recent AppImage application from  [Releases - claude_dumas/gbp - Codeberg.org](https://codeberg.org/claude_dumas/gbp/releases) ,  user just has to enable “executable” permission on the file and it is ready to be launched. 
+### On Linux
+GBP is distributed as an “AppImage” on Linux platform, which is a single-file executable packaging format allowing a program to run on many Linux distributions. There is nothing else to install. After downloading the most recent AppImage application from  [Releases - claude_dumas/gbp - Codeberg.org](https://codeberg.org/claude_dumas/gbp/releases) ,  user has to enable “executable” permission on the file and it is ready to be launched. 
 
 On Ubuntu (tested on v 22.04, 24.04), additional steps must be performed. In order to run an AppImage, some packages are missing from the default distribution. Ubuntu needs the FUSE library to run AppImage like GBP. Otherwise, when launched, you will get the following error : 
 
@@ -38,35 +58,29 @@ AppImages require FUSE to run. To solve this, do :
 
 `sudo apt install libfuse2`
 
+### On Windows®
+Download the ".zip" file binary from the repository   [Releases - claude_dumas/gbp - Codeberg.org](https://codeberg.org/claude_dumas/gbp/releases) ,   and unzip it in the folder of your choice. Launch gpb.exe to execute GBP.
+
 ## Supported Platforms and Languages, System Requirements
 
 GBP is intended to be run first and foremost on the Linux Operating System. But since it is built using the Qt cross platform toolkit, a version of GBP for the Windows® Operating System have also been produced. Tests have been conducted on Windows® 10 only.
 
 GBP does not use a lot of RAM (the absolute worst case ever seen is 175 MB for an extremely demanding testing scenario) and necessitate roughly 50 MB of disk space (not taken into account the scenario files that you will create and GBP log files, which are all pretty small anyways).
 
-As of October 2024, GBP has been successfully tested on the following Linux platforms : 
+As of April 2025, GBP has been extensively tested on the following Linux platforms :
 
-* Ubuntu 24.04, Gnome 46, Wayland, kernel 6.8.0
-* Ubuntu 22.04.4, Gnome 42.9, X11, kernel 6.5.0-21
-* Ubuntu 22.04.4, Gnome 42.9, Wayland, kernel 6.5.0-21
-* Linux Mint 22, X11, Cinnamon 6.2.7, Kernel 6.8.0
-* Linux Mint 21.3 X11 , Cinnamon 6.0.4, Kernel 6.5.0-41
-* LMDE 5, X11, Cinnamon 5.6.8, kernel 5.10.0
-* LMDE 6, X11, Cinnamon 6.2.7, kernel 6.1.0-23
-* OpenSUSE Leap 15.5, KDE Plasma 5.27.9, X11, kernel 5.14.21
-* OpenSUSE Leap 15.5, KDE Plasma 5.27.9, Wayland, kernel 5.14.21
-* Debian 12 , Plasma-X11, KDE 5.27.5  qt 5.15.18 kernel 6.1.0.23
-* Debian 12, Plasma-Wayland, KDE 5.27.5  qt 5.15.18 kernel 6.1.0.23
-* Debian 12, XFCE 4.18, kernel 6.1.0.23
-* Debian 12, Gnome classic 43.9 on Xorg, kernel 6.1.0.23
-* Debian 12, Gnome classic 43.9 on Wayland, kernel 6.1.0.23
-* Fedora 40, KDE Plasma 6.1.3, Wayland, Kernel 6.9.11
-* Fedora 40, Gnome 46, Wayland, Kernel 6.11.3
-* MX linux 23.2  XFCE 4.18.1 (Debian 12.4)  kernel 6.9.11
-* MX linux 23.2  KDE Plasma, X11, kernel 6.1.0
-* MX linux 23.2  KDE Plasma, Wayland, kernel 6.1.0
-* Manjaro Plasma, KDE Plasma 6.0.5, X11, Qt 6.7.2, Kernel 6.6.41
-* Manjaro Plasma, KDE Plasma 6.0.5, Wayland, Qt 6.7.2, Kernel 6.6.41
+* Fedora 41, KDE Plasma 6.3.2, Wayland, Kernel 6.13.5
+* Ubuntu 24.04.02 LTS, Gnome 46, Wayland, Kernel 6.11.0-19
+* Linux Mint 22.1, X11 , Cinnamon 6.4.8, Kernel 6.8.0-55
+
+It has also been tested, but not extensively, on the following platforms :
+
+* Windows® 10
+* OpenMandriva Lx 5.0, X11, KDE Plasma 5.27.9, kernel 6.6.2
+* MX linux 23.5, XFCE 4.20.0, X11, Kernel 6.1.0-29
+* Ubuntu 22.04.5 LTS, Gnome 42.9, X11, Kernel 6.8.0-52
+* Ubuntu 22.04.5 LTS, Gnome 42.9, Wayland, Kernel 6.8.0-52
+
 
 GBP supports English and French languages. By default, English is used, but if the host Operating System is in French (whatever the country), then GBP will switch to French. More languages will hopefully be added in the future, if resources to translate are available.
 
@@ -87,7 +101,7 @@ Being built with the Qt toolkit, GBP is subject to the Qt terms and conditions :
 Credits : 
 
 * Tobias Leupold : code to calculate difference between 2 dates -> see https://nasauber.de/blog/2019/calculating-the-difference-between-two-qdates/
-* QCustomPlot : A Qt C++ widget for plotting and data visualization -> see https://www.qcustomplot.com/
+
 
 ## Usage
 

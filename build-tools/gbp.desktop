@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Categories=Utility;
+Name=graphical-budget-planner
+Exec=gbp %F
+Icon=gbp
+Comment=
+Terminal=false

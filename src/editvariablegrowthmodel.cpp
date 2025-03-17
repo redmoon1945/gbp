@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -20,24 +20,25 @@
 #include <QCoreApplication>
 
 
-EditVariableGrowthModel::EditVariableGrowthModel(QString newGrowthName, QLocale aLocale, QObject *parent)
-    : QAbstractTableModel(parent)
+EditVariableGrowthModel::EditVariableGrowthModel(QString newGrowthName, QLocale aLocale,
+    QObject *parent) : QAbstractTableModel(parent)
 {
     this->growthName = newGrowthName;
     this->theLocale = aLocale;
 }
 
 
-QVariant EditVariableGrowthModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant EditVariableGrowthModel::headerData(int section, Qt::Orientation orientation,
+    int role) const
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
         case 0:
-            return QString(tr("Transition Date"));
+            return QString(tr("Transition date"));
         case 1:
-            return QString(tr("%1 (annual basis)")).arg(growthName);
+            return QString(tr("%1 (annual)")).arg(growthName);
         case 2:
-            return QString(tr("%1 (monthly basis)")).arg(growthName);
+            return QString(tr("%1 (monthly)")).arg(growthName);
         }
     }
     return QVariant();
@@ -73,7 +74,7 @@ QVariant EditVariableGrowthModel::data(const QModelIndex &index, int role) const
         if ( row <= (listKeys.size()-1) ){
             QDate key = listKeys.at(row);
             if (col==0){
-                return theLocale.toString(key);
+                return theLocale.toString(key, QLocale::ShortFormat);
             } else if (col==1){
                 double d = Growth::fromDecimalToDouble(factors.value(key));
                 int noDec = Growth::NO_OF_DECIMALS;
@@ -82,7 +83,7 @@ QVariant EditVariableGrowthModel::data(const QModelIndex &index, int role) const
             } else if (col==2){
                 double d = Growth::fromDecimalToDouble(factors.value(key));
                 double monthlyBasis = Util::annualToMonthlyGrowth(d);
-                QString vStr = theLocale.toString(monthlyBasis,'f');    // display as much decimal as possible
+                QString vStr = theLocale.toString(monthlyBasis,'f');// display as much decimal as possible
                 return vStr+ QString(" %") ;
             }
         }
@@ -116,7 +117,7 @@ void EditVariableGrowthModel::setGrowthData(const Growth &newGrowthData)
 {
     // Must be variable type
     if (newGrowthData.getType()!=Growth::VARIABLE){
-        throw std::invalid_argument("Growth must be of type Complex");
+        throw std::invalid_argument("Growth must be of type \"complex\"");
     }
     // we assume model has completely changed (easier that way)
     emit beginResetModel();

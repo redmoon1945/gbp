@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ DateIntervalDialog::~DateIntervalDialog()
 void DateIntervalDialog::slotPrepareContent(QDate from, QDate to)
 {
     if (to<=from) {
-        QMessageBox::critical(nullptr,tr("Data Invalid"),
+        QMessageBox::critical(nullptr,tr("Error"),
             tr("\"To\" date must occur after \"From\" date"));
         return;
     }
@@ -62,7 +62,7 @@ void DateIntervalDialog::on_applyPushButton_clicked()
     QDate from = ui->fromDateEdit->date();
     QDate to = ui->toDateEdit->date();
     if (to<=from) {
-        QMessageBox::critical(nullptr,tr("Data Invalid"),
+        QMessageBox::critical(nullptr,tr("Error"),
             tr("\"To\" date must occur after \"From\" date"));
         return;
     }
