@@ -959,6 +959,9 @@
    <property name="text">
     <string>Analysis...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
   </action>
   <action name="actionUser_Manual">
    <property name="text">

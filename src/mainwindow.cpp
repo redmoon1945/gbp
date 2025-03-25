@@ -159,6 +159,9 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     // Build the QChart
     initChart();
 
+    // Widen the menu items (Not clear why Qt is not doing that automatically)
+    adjustMenuItemLength();
+
     //
     // connect MainWindow and edit scenario dialog
     QObject::connect(this, &MainWindow::signalEditScenarioPrepareContent, editScenarioDlg,
@@ -2134,6 +2137,30 @@ void MainWindow::setWindowTopTitle()
         }
     }
 
+}
+
+
+void MainWindow::adjustMenuItemLength()
+{
+    int maxLen;
+    QFontMetrics metrics =ui->menuTools->fontMetrics();  // assuming all menus have the same fonts
+
+    QList<QAction *> menubarActions = ui->menubar->actions();
+    for (QAction *action : menubarActions){
+        if (QMenu *menu = action->menu()) {
+            // Iterate through each action to find the widest text
+            int maxLen = 0;
+            QList<QAction*> menuActions = menu->actions();
+            for (QAction *menuAction : menuActions) {
+                QString fullText = QString("%1...  Ctrl+W").arg(menuAction->text());
+                int width = metrics.horizontalAdvance(fullText);
+                if (width>=maxLen) {
+                    maxLen = width;
+                }
+            }
+            menu->setMinimumWidth(maxLen*1.1); // padding for icon placement (set experimentally...)
+        }
+    }
 }
 
 

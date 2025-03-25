@@ -1,6 +1,6 @@
 # graphical-budget-planner
 ## What's new ?
-Version 1.6.1 is out (April 2025) ! Here are the main changes compared to 1.5.3 :
+Version 1.6.2 is out (April 2025) ! Here are the main changes compared to 1.5.3 :
 
 - Introducing the notion of **tags**, which is a way to implement categories of incomes/expenses, but in a much more flexible and powerful way.
 - In About Dialog, add a new Contact tab for those who wish to know how to contact directly the author(s) of this software.

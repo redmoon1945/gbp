@@ -1,6 +1,10 @@
 # Change logs
+## 1.6.1 to 1.6.2
+### Fixes
+- Correct the "too-small" width of menu items when a very big font is used. The problem was due to Qt, but a workaround has been found.
+
 ## 1.6.0 to 1.6.1
-## New features
+### New features
 - Analysis - Annual and monthly graphical report
   - Add Statiscal Info (Mean, Standard deviation and Sum) to the displayed data
   - Change slightly the layout to add more vertical space for the graph, which is useful when large font are used (Y axis label have more space to extend and show the labels)

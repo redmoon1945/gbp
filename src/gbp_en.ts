@@ -2841,7 +2841,7 @@ Details : %1</source>
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="20"/>
-        <location filename="mainwindow.cpp" line="2121"/>
+        <location filename="mainwindow.cpp" line="2124"/>
         <source>Graphical Budget Planner</source>
         <translation></translation>
     </message>
@@ -3198,32 +3198,37 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="965"/>
+        <location filename="mainwindow.ui" line="963"/>
+        <source>Ctrl+A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="968"/>
         <source>User Manual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="970"/>
+        <location filename="mainwindow.ui" line="973"/>
         <source>Open Example</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="975"/>
+        <location filename="mainwindow.ui" line="978"/>
         <source>Properties...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="980"/>
+        <location filename="mainwindow.ui" line="983"/>
         <source>Quick Tutorial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="985"/>
+        <location filename="mainwindow.ui" line="988"/>
         <source>Duplicate...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="990"/>
+        <location filename="mainwindow.ui" line="993"/>
         <source>Change Log</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3234,234 +3239,234 @@ Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="550"/>
+        <location filename="mainwindow.cpp" line="553"/>
         <source>Current scenario has been modified, but changes have not been saved yet on disk. Do you want to SAVE IT before going forward ? If you answer &quot;No&quot;, the changes will be lost. </source>
         <oldsource>Current scenario has been modified, but it is not saved yet on disk. Do you want to SAVE THE CHANGES before going forward ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="679"/>
+        <location filename="mainwindow.cpp" line="682"/>
         <source>Do you really want to quit the application ?</source>
         <oldsource>Do you really want to terminate the application ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="789"/>
+        <location filename="mainwindow.cpp" line="792"/>
         <source>No scenario loaded yet, so nothing to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="839"/>
+        <location filename="mainwindow.cpp" line="842"/>
         <source>No scenario loaded yet, so nothing to save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1006"/>
+        <location filename="mainwindow.cpp" line="1009"/>
         <source>No scenario loaded yet, so nothing to edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1750"/>
+        <location filename="mainwindow.cpp" line="1753"/>
         <source>No scenario loaded yet, so nothing to export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2013"/>
+        <location filename="mainwindow.cpp" line="2016"/>
         <source>No scenario loaded yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="818"/>
-        <location filename="mainwindow.cpp" line="852"/>
+        <location filename="mainwindow.cpp" line="821"/>
+        <location filename="mainwindow.cpp" line="855"/>
         <source>Scenario saved successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="880"/>
+        <location filename="mainwindow.cpp" line="883"/>
         <source>Error found in the file content.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="897"/>
+        <location filename="mainwindow.cpp" line="900"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="932"/>
+        <location filename="mainwindow.cpp" line="935"/>
         <source>Scenario opened successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="934"/>
+        <location filename="mainwindow.cpp" line="937"/>
         <source>Scenario opened successfully (converted from version 1 to 2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="623"/>
+        <location filename="mainwindow.cpp" line="626"/>
         <source>No scenario loaded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1329"/>
+        <location filename="mainwindow.cpp" line="1332"/>
         <source>A new scenario has been created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1541"/>
+        <location filename="mainwindow.cpp" line="1544"/>
         <source>Clear list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1759"/>
+        <location filename="mainwindow.cpp" line="1762"/>
         <source>Text files (*.txt *.TXT *.csv *.CSV)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1760"/>
+        <location filename="mainwindow.cpp" line="1763"/>
         <source>Select a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1806"/>
+        <location filename="mainwindow.cpp" line="1809"/>
         <source>Total daily expenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1806"/>
+        <location filename="mainwindow.cpp" line="1809"/>
         <source>Total delta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1806"/>
+        <location filename="mainwindow.cpp" line="1809"/>
         <source>Cumulative total</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2127"/>
+        <location filename="mainwindow.cpp" line="2130"/>
         <source>Not saved yet %1 GBP</source>
         <oldsource>Not saved yet - GBP</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2132"/>
+        <location filename="mainwindow.cpp" line="2135"/>
         <source>%1 %2 GBP</source>
         <oldsource>%1 - GBP</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1296"/>
+        <location filename="mainwindow.cpp" line="1299"/>
         <source>Current scenario has been modified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="549"/>
-        <location filename="mainwindow.cpp" line="571"/>
-        <location filename="mainwindow.cpp" line="679"/>
-        <location filename="mainwindow.cpp" line="789"/>
-        <location filename="mainwindow.cpp" line="839"/>
-        <location filename="mainwindow.cpp" line="1006"/>
-        <location filename="mainwindow.cpp" line="1750"/>
-        <location filename="mainwindow.cpp" line="2013"/>
+        <location filename="mainwindow.cpp" line="552"/>
+        <location filename="mainwindow.cpp" line="574"/>
+        <location filename="mainwindow.cpp" line="682"/>
+        <location filename="mainwindow.cpp" line="792"/>
+        <location filename="mainwindow.cpp" line="842"/>
+        <location filename="mainwindow.cpp" line="1009"/>
+        <location filename="mainwindow.cpp" line="1753"/>
+        <location filename="mainwindow.cpp" line="2016"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="552"/>
-        <location filename="mainwindow.cpp" line="574"/>
-        <location filename="mainwindow.cpp" line="680"/>
+        <location filename="mainwindow.cpp" line="555"/>
+        <location filename="mainwindow.cpp" line="577"/>
+        <location filename="mainwindow.cpp" line="683"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="552"/>
-        <location filename="mainwindow.cpp" line="574"/>
-        <location filename="mainwindow.cpp" line="680"/>
+        <location filename="mainwindow.cpp" line="555"/>
+        <location filename="mainwindow.cpp" line="577"/>
+        <location filename="mainwindow.cpp" line="683"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="552"/>
-        <location filename="mainwindow.cpp" line="574"/>
+        <location filename="mainwindow.cpp" line="555"/>
+        <location filename="mainwindow.cpp" line="577"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="572"/>
+        <location filename="mainwindow.cpp" line="575"/>
         <source>The new scenario has not been saved yet on disk. Do you want to SAVE IT in a file before going forward ? If you answer &quot;No&quot;, the new scenario will be lost.</source>
         <oldsource>The new scenario has not been saved yet on disk. Do you want to SAVE IT in a file before going forward ? If you answer &quot;No&quot;, the data will be lost.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="722"/>
+        <location filename="mainwindow.cpp" line="725"/>
         <source>Open an existing scenario</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="799"/>
+        <location filename="mainwindow.cpp" line="802"/>
         <source>Choose a filename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1416"/>
+        <location filename="mainwindow.cpp" line="1419"/>
         <source>Options changes have been successfully saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1504"/>
+        <location filename="mainwindow.cpp" line="1507"/>
         <source>y</source>
         <translation>y</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1505"/>
+        <location filename="mainwindow.cpp" line="1508"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1506"/>
+        <location filename="mainwindow.cpp" line="1509"/>
         <source>d</source>
         <translation>d</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="825"/>
-        <location filename="mainwindow.cpp" line="854"/>
-        <location filename="mainwindow.cpp" line="890"/>
-        <location filename="mainwindow.cpp" line="899"/>
-        <location filename="mainwindow.cpp" line="1720"/>
-        <location filename="mainwindow.cpp" line="1776"/>
-        <location filename="mainwindow.cpp" line="1933"/>
-        <location filename="mainwindow.cpp" line="2001"/>
-        <location filename="mainwindow.cpp" line="2079"/>
+        <location filename="mainwindow.cpp" line="828"/>
+        <location filename="mainwindow.cpp" line="857"/>
+        <location filename="mainwindow.cpp" line="893"/>
+        <location filename="mainwindow.cpp" line="902"/>
+        <location filename="mainwindow.cpp" line="1723"/>
+        <location filename="mainwindow.cpp" line="1779"/>
+        <location filename="mainwindow.cpp" line="1936"/>
+        <location filename="mainwindow.cpp" line="2004"/>
+        <location filename="mainwindow.cpp" line="2082"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1720"/>
+        <location filename="mainwindow.cpp" line="1723"/>
         <source>No scenario loaded yet : nothing to analyse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1776"/>
+        <location filename="mainwindow.cpp" line="1779"/>
         <source>Cannot open the file for writing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1805"/>
+        <location filename="mainwindow.cpp" line="1808"/>
         <source>Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1805"/>
+        <location filename="mainwindow.cpp" line="1808"/>
         <source>Total daily incomes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1933"/>
-        <location filename="mainwindow.cpp" line="2001"/>
-        <location filename="mainwindow.cpp" line="2079"/>
+        <location filename="mainwindow.cpp" line="1936"/>
+        <location filename="mainwindow.cpp" line="2004"/>
+        <location filename="mainwindow.cpp" line="2082"/>
         <source>The system&apos;s default PDF viewer failed to launch. You can try to open the file manually at %1</source>
         <translation type="unfinished"></translation>
     </message>

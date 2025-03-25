@@ -215,5 +215,6 @@ private:
     void changeYaxisLabelFormat();
     uint calculateTotalNoOfEvents();
     void setWindowTopTitle();
+    void adjustMenuItemLength();
 };
 #endif // MAINWINDOW_H
