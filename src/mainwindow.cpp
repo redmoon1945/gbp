@@ -33,6 +33,7 @@
 #include <cfloat>
 #include <qfontdatabase.h>
 #include <qforeach.h>
+#include <QSizePolicy>
 
 
 
@@ -76,7 +77,6 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
 
     // display todays's date in bottom startAmountLabel
     ui->startAmountLabel->setText(tr("Start amount as of today %1 :").arg(
-//        locale.toString(GbpController::getInstance().getToday(),"yyyy-MMM-dd")));
         locale.toString(GbpController::getInstance().getToday(),QLocale::FormatType::ShortFormat)));
 
     // set scaling factor from settings
@@ -120,7 +120,7 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     ui->toolButton_Max->setFont(resizeToolbarFont);
     ui->customToolButton->setFont(resizeToolbarFont);
 
-    // Use smaller fonts for botton widgets
+    // Use smaller fonts for button widgets
     QFont bottomFont = ui->startAmountLabel->font();
     oldFontSize = bottomFont.pointSize();
     newFontSize = Util::changeFontSize(1,true, oldFontSize);
@@ -1341,7 +1341,8 @@ void MainWindow::slotSelectCountryResult(QString countryCode, CurrencyInfo currI
 
 void MainWindow::slotEditScenarioCompleted()
 {
-    // do nothing
+    // make sure this Main Window is shown and has the focus
+    this->activateWindow();
 }
 
 

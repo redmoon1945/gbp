@@ -92,13 +92,17 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     // make smaller selected bar info
     QFont font = ui->monthlyReportChartSelectedLabel->font();
     uint oldFontSize = font.pointSize();
-    uint newFontSize = Util::changeFontSize(1, true, oldFontSize);
+    uint newFontSize = Util::changeFontSize(2, true, oldFontSize);
     GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
         QString("Analysis dialog - Monthly and yearly chart - Selected bar info font "
         "size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
     font.setPointSize(newFontSize);
     ui->monthlyReportChartSelectedTextLabel->setFont(font);
     ui->monthlyReportChartSelectedLabel->setFont(font);
+    // Make stats areas using smaller font
+    ui->monthlyReportStatsLabel->setFont(font);
+    // Make Export button smaller
+    ui->exportImageMonthlyReportChartPushButton->setFont(font);
 
     // *** Yearly REPORT - CHART ***
     initReportChart(ReportType::YEARLY);
@@ -109,6 +113,10 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     // make smaller selected bar info
     ui->yearlyReportChartSelectedTextLabel->setFont(font);
     ui->yearlyReportChartSelectedLabel->setFont(font);
+    // Make stats areas using smaller font
+    ui->annualReportStatsLabel->setFont(font);
+    // Make Export button smaller
+    ui->exportImageYearlyReportChartPushButton->setFont(font);
 
     // *** MONTHLY REPORT - TABLE CONTROLS ***
     ui->monthlyReportTableWidget->setColumnCount(4);
@@ -352,6 +360,8 @@ void AnalysisDialog::updateRelativeWeightChart()
         c++;
     }
 
+
+
 }
 
 
@@ -533,16 +543,19 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
     QChartView** chartViewPtr = nullptr;
     QBarCategoryAxis** xAxisPtr;
     QValueAxis** yAxisPtr;
+    QLabel *statLabelPtr;
     if (type == ReportType::MONTHLY) {
         chartPtr = &chartMonthlyReport;
         chartViewPtr = &chartViewMonthlyReport;
         xAxisPtr = &chartMonthlyReportAxisX;
         yAxisPtr = &chartMonthlyReportAxisY;
+        statLabelPtr = ui->monthlyReportStatsLabel;
     } else {
         chartPtr = &chartYearlyReport;
         chartViewPtr = &chartViewYearlyReport;
         xAxisPtr = &chartYearlyReportAxisX;
         yAxisPtr = &chartYearlyReportAxisY;
+        statLabelPtr = ui->annualReportStatsLabel;
     }
 
     if (chartRawData.size()==0){
@@ -551,14 +564,12 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
         empty.append("No data");
         (*xAxisPtr)->setCategories(empty);
         (*yAxisPtr)->setRange(0,1);
+        statLabelPtr->setText("");
         return;  // nothing to do after
     }
 
-    // determine which set is to be used
-    bool useIncomes;
-    bool useExpenses;
-    bool useDeltas;
-    findWhichSetsIsToBeUsedReportChart(type, useIncomes, useExpenses, useDeltas);
+    // determine which data set is to be used
+    GraphDataSourceType dsType = findWhichSetsIsToBeUsedReportChart(type);
 
     // choose the right bins
     QMap<QDate,MonthlyYearlyReport>* binsPtr;
@@ -567,6 +578,38 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
     } else {
          binsPtr = &binsYearly;
     }
+
+    // Set subset of bin's data to use for display
+    QDate startDate, endDate ;
+    getStartEndDateReportChart(type, startDate, endDate);
+
+    // Calculate stats
+    QDate date = startDate;
+    double mean=0;
+    double stdDeviation=0;
+    double sum=0;
+    QList<double> statData;
+    while(date<=endDate){
+        MonthlyYearlyReport mr = {.income=0, .expense=0, .delta=0};
+        if (true == binsPtr->contains(date) ){
+            mr = binsPtr->value(date);
+        }
+        // record the right data
+        if (dsType==GraphDataSourceType::DST_INCOME) {
+            statData.append(mr.income);
+        } else if (dsType==GraphDataSourceType::DST_EXPENSE){
+            statData.append(-mr.expense);
+        } else if(dsType==GraphDataSourceType::DST_DELTA){
+            statData.append(mr.delta);
+        }
+        // go to next date
+        if (type==ReportType::MONTHLY) {
+            date = date.addMonths(1);
+        } else {
+            date = date.addYears(1);
+        }
+    }
+    calculateStatsForGraph(statData, mean, stdDeviation, sum);
 
     // build new set of chart data (3 sets of QBarSet) and categories
     double maxY = 1;
@@ -580,9 +623,8 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
     setDeltasPositive->setColor(QColor::fromRgb(0,170,0));
     QBarSet *setDeltasNegative = new QBarSet(tr("Deltas - Deficit"));
     setDeltasNegative->setColor(QColor::fromRgb(170,0,0));
-    QDate startDate, endDate ;
-    getStartEndDateReportChart(type, startDate, endDate);
-    QDate date= startDate;
+
+    date= startDate;
     while(date<=endDate){
         MonthlyYearlyReport mr = {.income=0, .expense=0, .delta=0};
         if (true == binsPtr->contains(date) ){
@@ -607,24 +649,27 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
     }
 
     // find min-max in all the set
-    getMinMaxReportChart(type, setIncomes, setExpenses, setDeltasPositive, setDeltasNegative, minY, maxY);
+    getMinMaxReportChart(type, setIncomes, setExpenses, setDeltasPositive, setDeltasNegative,
+        minY, maxY);
 
     // deallocate all the stuff currently in use
     (*chartPtr)->removeAllSeries(); // deallocate all the current stuff, EXCLUDING both axis
 
     // completely rebuild the series, discard set not to be used
     QBarSeries* series = new QBarSeries();
-    if( useIncomes ){
+    if( (dsType==GraphDataSourceType::DST_INCOME) ||
+        (dsType==GraphDataSourceType::DST_INCOME_EXPENSE) ){
         series->append(setIncomes); // take ownership
     } else{
         delete setIncomes;
     }
-    if( useExpenses ){
+    if( (dsType==GraphDataSourceType::DST_EXPENSE) ||
+        (dsType==GraphDataSourceType::DST_INCOME_EXPENSE) ){
         series->append(setExpenses); // take ownership
     } else{
         delete setExpenses;
     }
-    if( useDeltas ){
+    if( dsType==GraphDataSourceType::DST_DELTA ){
         series->append(setDeltasPositive); // take ownership
         series->append(setDeltasNegative); // take ownership
     } else{
@@ -632,6 +677,7 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
         delete setDeltasNegative;
     }
     (*chartPtr)->addSeries(series); // take ownership
+
     // connect a "lambda" to detect and process bar selection
     if (type==ReportType::MONTHLY) {
         QObject::connect(series, &QAbstractBarSeries::clicked, series, [=](int index, QBarSet *set) {
@@ -662,13 +708,43 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
     }
 
     // Set Chart Title
-    setMonthlyYearlyChartTitle((*chartPtr), useIncomes, useExpenses, useDeltas);
+    setMonthlyYearlyChartTitle((*chartPtr), dsType);
+
+    // Erase Selected Bar Value
+   if (type==ReportType::MONTHLY) {
+    ui->monthlyReportChartSelectedTextLabel->setText("");
+   } else {
+    ui->yearlyReportChartSelectedTextLabel->setText("");
+   }
+
+    // place legend to the right
+    QLegend *legend = (*chartPtr)->legend();
+    legend->setAlignment(Qt::AlignRight);
 
     // rebuild the 2 axes and attach
     (*xAxisPtr)->setCategories(categories);
     series->attachAxis((*xAxisPtr));
     (*yAxisPtr)->setRange(minY,maxY);
     series->attachAxis((*yAxisPtr));
+
+    // Refresh the info in stats area
+    if (dsType != GraphDataSourceType::DST_INCOME_EXPENSE) {
+        QString statText;
+        if (dsType==GraphDataSourceType::DST_EXPENSE) {
+            statText = tr("Mean:%1  StdDeviation:%2  Sum:%3")
+                .arg(CurrencyHelper::formatAmount(-mean,currInfo, locale, false))
+                .arg(CurrencyHelper::formatAmount(stdDeviation,currInfo, locale, false))
+                .arg(CurrencyHelper::formatAmount(-sum,currInfo, locale, false));
+        } else {
+            statText = tr("Mean:%1  StdDeviation:%2  Sum:%3")
+                .arg(CurrencyHelper::formatAmount(mean,currInfo, locale, false))
+                .arg(CurrencyHelper::formatAmount(stdDeviation,currInfo, locale, false))
+                .arg(CurrencyHelper::formatAmount(sum,currInfo, locale, false));
+        }
+        statLabelPtr->setText(statText);
+    } else {
+        statLabelPtr->setText("");
+    }
 }
 
 
@@ -966,6 +1042,7 @@ void AnalysisDialog::initReportChart(ReportType type)
         yAxisPtr = &chartMonthlyReportAxisY;
         widgetPtr = &(ui->monthlyReportChartWidget);
         chartTitle = tr("Monthly incomes and expenses");
+        ui->monthlyReportStatsLabel->setText("");
     } else {
         chartPtr = &chartYearlyReport;
         chartViewPtr = &chartViewYearlyReport;
@@ -973,6 +1050,7 @@ void AnalysisDialog::initReportChart(ReportType type)
         yAxisPtr = &chartYearlyReportAxisY;
         widgetPtr = &(ui->yearlyReportChartWidget);
         chartTitle = tr("Yearly incomes and expenses");
+        ui->annualReportStatsLabel->setText("");
     }
 
     // Data (sets) will be discarded and rebuild whe the dialog is re-shown (Prepare slot)
@@ -985,7 +1063,7 @@ void AnalysisDialog::initReportChart(ReportType type)
     (*chartPtr) = new QChart();
     (*chartPtr)->setLocalizeNumbers(true);
     (*chartPtr)->addSeries(series); // take ownership
-    (*chartPtr)->setTitle(chartTitle);
+    //(*chartPtr)->setTitle(chartTitle);
     (*chartPtr)->setAnimationOptions(QChart::SeriesAnimations);
     (*chartViewPtr) = new QChartView((*chartPtr), (*widgetPtr)); // take ownership
     (*chartViewPtr)->setRenderHint(QPainter::Antialiasing);
@@ -1025,11 +1103,11 @@ void AnalysisDialog::initReportChart(ReportType type)
     newFontSize = Util::changeFontSize(2, true, fontY.pointSize());
     if (type == ReportType::MONTHLY) {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis dialog - Monthly chart - X axis font size set from %1 to %2")
+            QString("Analysis dialog - Monthly chart - Y axis font size set from %1 to %2")
             .arg(oldFontSize).arg(newFontSize));
     } else {
         GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis dialog - Yearly chart - X axis - Font size set from %1 to %2")
+            QString("Analysis dialog - Yearly chart - Y axis - Font size set from %1 to %2")
             .arg(oldFontSize).arg(newFontSize));
     }
     fontY.setPointSize(newFontSize);
@@ -1067,16 +1145,14 @@ void AnalysisDialog::getStartEndDateReportChart(ReportType type, QDate &startDat
 void AnalysisDialog::getMinMaxReportChart(ReportType type, QBarSet* incomes, QBarSet* expenses,
     QBarSet* deltasPositive, QBarSet* deltasNegative, double& minY, double& maxY)
 {
-    bool useIncomes;
-    bool useExpenses;
-    bool useDeltas;
-    findWhichSetsIsToBeUsedReportChart(type, useIncomes, useExpenses, useDeltas);
+    GraphDataSourceType dsType = findWhichSetsIsToBeUsedReportChart(type);
 
     // default values : it works because we must have at least one element to search for in the sets
     minY = 0;
     maxY = 1;
 
-    if( useIncomes ){
+    if( (dsType==GraphDataSourceType::DST_INCOME) ||
+        (dsType==GraphDataSourceType::DST_INCOME_EXPENSE) ){
         // process incomes
         for(int i=0;i<incomes->count();i++){
             if ( incomes->at(i) > maxY ){
@@ -1084,7 +1160,8 @@ void AnalysisDialog::getMinMaxReportChart(ReportType type, QBarSet* incomes, QBa
             }
         }
     }
-    if( useExpenses ){
+    if( (dsType==GraphDataSourceType::DST_EXPENSE) ||
+        (dsType==GraphDataSourceType::DST_INCOME_EXPENSE) ){
         // process expenses
         for(int i=0;i<expenses->count();i++){
             if ( expenses->at(i) > maxY ){
@@ -1092,7 +1169,7 @@ void AnalysisDialog::getMinMaxReportChart(ReportType type, QBarSet* incomes, QBa
             }
         }
     }
-    if( useDeltas ){
+    if( dsType==GraphDataSourceType::DST_DELTA ){
         // process deltas - max
         for(int i=0;i<deltasPositive->count();i++){
             if ( deltasPositive->at(i) > maxY ){
@@ -1109,61 +1186,92 @@ void AnalysisDialog::getMinMaxReportChart(ReportType type, QBarSet* incomes, QBa
 }
 
 
-void AnalysisDialog::findWhichSetsIsToBeUsedReportChart(ReportType type, bool &incomesSet,
-    bool &expensesSet, bool &deltasSet)
+// Determine what data source the annual or monthly chart will use
+AnalysisDialog::GraphDataSourceType AnalysisDialog::findWhichSetsIsToBeUsedReportChart(
+    ReportType type)
 {
     if (type==ReportType::MONTHLY) {
-        if( ui->monthlyReportChartIncomesRadioButton->isChecked() ||
-            ui->monthlyReportChartIncomesExpensesRadioButton->isChecked() ){
-            incomesSet = true;;
-        } else{
-            incomesSet = false;
+        if( ui->monthlyReportChartIncomesRadioButton->isChecked() ){
+            return GraphDataSourceType::DST_INCOME;
+        } else if (ui->monthlyReportChartExpensesRadioButton->isChecked()){
+            return GraphDataSourceType::DST_EXPENSE;
+        } else if (ui->monthlyReportChartIncomesExpensesRadioButton->isChecked()){
+            return GraphDataSourceType::DST_INCOME_EXPENSE;
+        } else if (ui->monthlyReportChartDeltasRadioButton->isChecked()){
+            return GraphDataSourceType::DST_DELTA;
+        } else {
+            // should never happen
+            throw std::logic_error("No control checked for Graph Monthly Report");
         }
-        if( ui->monthlyReportChartExpensesRadioButton->isChecked() ||
-            ui->monthlyReportChartIncomesExpensesRadioButton->isChecked() ){
-            expensesSet = true;
-        } else{
-            expensesSet = false;
-        }
-        if( ui->monthlyReportChartDeltasRadioButton->isChecked() ){
-            deltasSet = true;
-        } else{
-            deltasSet = false;
+    } else if (type==ReportType::YEARLY) {
+        if( ui->yearlyReportChartIncomesRadioButton->isChecked() ){
+            return GraphDataSourceType::DST_INCOME;
+        } else if (ui->yearlyReportChartExpensesRadioButton->isChecked()){
+            return GraphDataSourceType::DST_EXPENSE;
+        } else if (ui->yearlyReportChartIncomesExpensesRadioButton->isChecked()){
+            return GraphDataSourceType::DST_INCOME_EXPENSE;
+        } else if (ui->yearlyReportChartDeltasRadioButton->isChecked()){
+            return GraphDataSourceType::DST_DELTA;
+        } else {
+            // should never happen
+            throw std::logic_error("No control checked for Graph Yearly Report");
         }
     } else {
-        if( ui->yearlyReportChartIncomesRadioButton->isChecked() ||
-            ui->yearlyReportChartIncomesExpensesRadioButton->isChecked() ){
-            incomesSet = true;;
-        } else{
-            incomesSet = false;
-        }
-        if( ui->yearlyReportChartExpensesRadioButton->isChecked() ||
-            ui->yearlyReportChartIncomesExpensesRadioButton->isChecked() ){
-            expensesSet = true;
-        } else{
-            expensesSet = false;
-        }
-        if( ui->yearlyReportChartDeltasRadioButton->isChecked() ){
-            deltasSet = true;
-        } else{
-            deltasSet = false;
-        }
+        // should never happen
+        throw std::invalid_argument("Report Type value is invalid");
     }
 }
 
 
-void AnalysisDialog::setMonthlyYearlyChartTitle(QChart* chartPtr, bool useIncomes, bool useExpenses,
-    bool useDeltas)
+void AnalysisDialog::setMonthlyYearlyChartTitle(QChart* chartPtr, GraphDataSourceType dsType)
 {
-    if (useIncomes && useExpenses) {
-        chartPtr->setTitle(tr("Incomes and expenses"));
-    } else if(useIncomes){
-        chartPtr->setTitle(tr("Incomes"));
-    } else if(useExpenses){
-        chartPtr->setTitle(tr("Expenses"));
-    } else if(useDeltas){
-        chartPtr->setTitle(tr("Deltas"));
+    // if ( dsType==GraphDataSourceType::DST_INCOME_EXPENSE ) {
+    //     chartPtr->setTitle(tr("Incomes and expenses"));
+    // } else if (dsType==GraphDataSourceType::DST_INCOME){
+    //     chartPtr->setTitle(tr("Incomes"));
+    // } else if(dsType==GraphDataSourceType::DST_EXPENSE){
+    //     chartPtr->setTitle(tr("Expenses"));
+    // } else if(dsType==GraphDataSourceType::DST_DELTA){
+    //     chartPtr->setTitle(tr("Deltas"));
+    // } else {
+    //     // should never happen
+    //     chartPtr->setTitle("");
+    // }
+}
+
+
+// Variance and standard deviation are both measures of variability in a dataset, but they differ
+// in their calculation and interpretation. Variance is the average of the squared differences
+// from the mean, while standard deviation is the square root of the variance. Standard deviation
+// is often preferred because it is expressed in the same units as the original data, making it
+// easier to interpret in the context of the data set
+void AnalysisDialog::calculateStatsForGraph(const QList<double> data, double &mean,
+    double &stdDeviation, double &sum)
+{
+    // init
+    mean = 0;
+    stdDeviation = 0;
+    sum = 0;
+
+    if (data.size()==0) {
+        return;
     }
+
+    // Calculate the mean
+    for (double value : data) {
+        sum += value;
+    }
+    mean = sum / data.size();
+
+    // Calculate the variance
+    double varianceSum = 0.0;
+    for (double value : data) {
+        varianceSum += (value - mean) * (value - mean);
+    }
+    double variance = varianceSum / data.size(); // For population standard deviation
+
+    // Calculate the standard deviation
+    stdDeviation = std::sqrt(variance);
 }
 
 

@@ -91,6 +91,8 @@ private:
         double delta;
     };
     enum ReportType { MONTHLY, YEARLY };
+    // for Monthly and Annual Chart, which data source is selected
+    enum GraphDataSourceType {DST_INCOME, DST_EXPENSE, DST_INCOME_EXPENSE, DST_DELTA};
 
     // *** variables ***
     bool ready=false; // true if init is completed
@@ -130,9 +132,12 @@ private:
     QString buildBarChartCategoryName(ReportType type, QDate date) const;
     void initReportChart(ReportType type);
     void getStartEndDateReportChart(ReportType type, QDate& startDate, QDate& endDate ) const;
-    void getMinMaxReportChart(ReportType type, QBarSet* incomes, QBarSet* expenses, QBarSet* deltasPositive, QBarSet* deltasNegative, double& minY, double& maxY) ;
-    void findWhichSetsIsToBeUsedReportChart(ReportType type, bool& incomesSet, bool& expensesSet, bool& deltasSet);
-    void setMonthlyYearlyChartTitle(QChart* chartPtr, bool useIncomes, bool useExpenses, bool useDeltas);
+    void getMinMaxReportChart(ReportType type, QBarSet* incomes, QBarSet* expenses,
+        QBarSet* deltasPositive, QBarSet* deltasNegative, double& minY, double& maxY) ;
+    AnalysisDialog::GraphDataSourceType findWhichSetsIsToBeUsedReportChart(ReportType type);
+    void setMonthlyYearlyChartTitle(QChart* chartPtr, GraphDataSourceType dsType);
+    void calculateStatsForGraph(const QList<double> data, double& mean, double& stdDeviation,
+        double& sum);
 };
 
 #endif // ANALYSISDIALOG_H

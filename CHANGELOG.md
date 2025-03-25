@@ -1,4 +1,13 @@
 # Change logs
+## 1.6.0 to 1.6.1
+## New features
+- Analysis - Annual and monthly graphical report
+  - Add Statiscal Info (Mean, Standard deviation and Sum) to the displayed data
+  - Change slightly the layout to add more vertical space for the graph, which is useful when large font are used (Y axis label have more space to extend and show the labels)
+
+### Fixes
+- A change in 1.6.0 introduced a bug that made the Main Window "inactive" when the Edit Scenario Dialog was hidden.
+
 ## 1.5.3 to 1.6.0
 ### New Features
 - **Introducing the notion of tags**, which is a way to implement categories of incomes/expenses, but in a much more flexible and powerful way.

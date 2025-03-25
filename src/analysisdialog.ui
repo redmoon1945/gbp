@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="relativeWeightTab">
       <attribute name="title">
@@ -320,19 +320,19 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <property name="spacing">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="leftMargin">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="topMargin">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="rightMargin">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="bottomMargin">
-          <number>10</number>
+          <number>5</number>
          </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -366,7 +366,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>50</width>
+               <width>20</width>
                <height>20</height>
               </size>
              </property>
@@ -395,7 +395,7 @@
            <item>
             <widget class="QLabel" name="label_4">
              <property name="text">
-              <string>month(s)</string>
+              <string>months</string>
              </property>
             </widget>
            </item>
@@ -409,7 +409,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>50</width>
+               <width>20</width>
                <height>20</height>
               </size>
              </property>
@@ -430,6 +430,22 @@
             </widget>
            </item>
            <item>
+            <spacer name="horizontalSpacer_20">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <spacer name="horizontalSpacer_11">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
@@ -442,100 +458,84 @@
              </property>
             </spacer>
            </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_9">
            <item>
-            <widget class="QRadioButton" name="monthlyReportChartIncomesRadioButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Income&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="title">
+              <string/>
              </property>
-             <property name="text">
-              <string>Incomes</string>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup_2</string>
-             </attribute>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="monthlyReportChartExpensesRadioButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Expenses</string>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup_2</string>
-             </attribute>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="monthlyReportChartIncomesExpensesRadioButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account the Cash Stream Definitions of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Incomes and Expenses</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup_2</string>
-             </attribute>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="monthlyReportChartDeltasRadioButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the differences between the Cash Stream Definition of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Deltas</string>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup_2</string>
-             </attribute>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_14">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="monthlyReportChartSelectedLabel">
-             <property name="font">
-              <font>
-               <italic>true</italic>
-              </font>
-             </property>
-             <property name="text">
-              <string>Selected Bar :</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="monthlyReportChartSelectedTextLabel">
-             <property name="font">
-              <font>
-               <italic>true</italic>
-              </font>
-             </property>
-             <property name="text">
-              <string>---</string>
-             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_14">
+              <property name="leftMargin">
+               <number>4</number>
+              </property>
+              <property name="topMargin">
+               <number>4</number>
+              </property>
+              <property name="rightMargin">
+               <number>4</number>
+              </property>
+              <property name="bottomMargin">
+               <number>4</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_13">
+                <item>
+                 <widget class="QRadioButton" name="monthlyReportChartIncomesRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Income&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Incomes</string>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_2</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="monthlyReportChartExpensesRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Expenses</string>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_2</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="monthlyReportChartIncomesExpensesRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account the Cash Stream Definitions of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Incomes and Expenses</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_2</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="monthlyReportChartDeltasRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the differences between the Cash Stream Definition of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Deltas</string>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_2</string>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -575,6 +575,53 @@
              </property>
             </spacer>
            </item>
+           <item>
+            <widget class="QLabel" name="monthlyReportChartSelectedLabel">
+             <property name="font">
+              <font>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string>Selected Bar :</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="monthlyReportChartSelectedTextLabel">
+             <property name="font">
+              <font>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string>---</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_18">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>60</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="monthlyReportStatsLabel">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>
@@ -589,19 +636,19 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_10">
          <property name="spacing">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="leftMargin">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="topMargin">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="rightMargin">
-          <number>10</number>
+          <number>5</number>
          </property>
          <property name="bottomMargin">
-          <number>10</number>
+          <number>5</number>
          </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -632,7 +679,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>50</width>
+               <width>20</width>
                <height>20</height>
               </size>
              </property>
@@ -658,7 +705,7 @@
            <item>
             <widget class="QLabel" name="label_8">
              <property name="text">
-              <string>year(s)</string>
+              <string>years</string>
              </property>
             </widget>
            </item>
@@ -672,7 +719,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>50</width>
+               <width>20</width>
                <height>20</height>
               </size>
              </property>
@@ -693,6 +740,22 @@
             </widget>
            </item>
            <item>
+            <spacer name="horizontalSpacer_14">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <spacer name="horizontalSpacer_15">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
@@ -705,67 +768,112 @@
              </property>
             </spacer>
            </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox">
+             <property name="title">
+              <string/>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <property name="leftMargin">
+               <number>4</number>
+              </property>
+              <property name="topMargin">
+               <number>4</number>
+              </property>
+              <property name="rightMargin">
+               <number>4</number>
+              </property>
+              <property name="bottomMargin">
+               <number>4</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <widget class="QRadioButton" name="yearlyReportChartIncomesRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Income&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Incomes</string>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_3</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="yearlyReportChartExpensesRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Expenses</string>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_3</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="yearlyReportChartIncomesExpensesRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the Cash Stream Definitions of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Incomes and Expenses</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_3</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="yearlyReportChartDeltasRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the differences between the Cash Stream Definition of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Deltas</string>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_3</string>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <widget class="QWidget" name="yearlyReportChartWidget" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
-            <widget class="QRadioButton" name="yearlyReportChartIncomesRadioButton">
+            <widget class="QPushButton" name="exportImageYearlyReportChartPushButton">
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Income&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the chart into a PNG file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Incomes</string>
+              <string>Export to Image File...</string>
              </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup_3</string>
-             </attribute>
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="yearlyReportChartExpensesRadioButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Expenses</string>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup_3</string>
-             </attribute>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="yearlyReportChartIncomesExpensesRadioButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the Cash Stream Definitions of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Incomes and Expenses</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup_3</string>
-             </attribute>
-            </widget>
-           </item>
-           <item>
-            <widget class="QRadioButton" name="yearlyReportChartDeltasRadioButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the differences between the Cash Stream Definition of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Deltas</string>
-             </property>
-             <attribute name="buttonGroup">
-              <string notr="true">buttonGroup_3</string>
-             </attribute>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_18">
+            <spacer name="horizontalSpacer_9">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
              </property>
@@ -801,42 +909,28 @@
              </property>
             </widget>
            </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QWidget" name="yearlyReportChartWidget" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QPushButton" name="exportImageYearlyReportChartPushButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the chart into a PNG file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Export to Image File...</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_9">
+            <spacer name="horizontalSpacer_19">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Fixed</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>60</width>
                <height>20</height>
               </size>
              </property>
             </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="annualReportStatsLabel">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -980,7 +1074,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>20</height>
+       <height>10</height>
       </size>
      </property>
     </spacer>
@@ -1014,8 +1108,8 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
