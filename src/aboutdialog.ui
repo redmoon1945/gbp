@@ -63,7 +63,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>2</number>
+        <number>4</number>
        </property>
        <property name="movable">
         <bool>false</bool>
@@ -240,8 +240,8 @@ graphical-budget-planner is distributed in the hope that it will be useful, but 
            <item>
             <widget class="QPlainTextEdit" name="plainTextEdit_4">
              <property name="plainText">
-              <string>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
-https://codeberg.org/claude_dumas/gbp</string>
+              <string>Source code of graphical-budget-planner can be found on Github at this URL : 
+https://github.com/redmoon1945/gbp</string>
              </property>
             </widget>
            </item>

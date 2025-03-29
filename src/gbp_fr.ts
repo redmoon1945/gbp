@@ -142,10 +142,11 @@ graphical-budget-planner est distribué avec l&apos;espoir qu&apos;il sera utile
     </message>
     <message>
         <location filename="aboutdialog.ui" line="243"/>
-        <source>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
-https://codeberg.org/claude_dumas/gbp</source>
-        <oldsource>Source code of graphical-budget-planner can be found on Codeberg at this URL : https://codeberg.org/claude_dumas/gbp</oldsource>
-        <translation>Le code source de graphical-budget-planner se trouve sur Codeberg à cet URL : https://codeberg.org/claude_dumas/gbp</translation>
+        <source>Source code of graphical-budget-planner can be found on Github at this URL : 
+https://github.com/redmoon1945/gbp</source>
+        <oldsource>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
+https://codeberg.org/claude_dumas/gbp</oldsource>
+        <translation type="unfinished">Le code source de graphical-budget-planner se trouve sur Codeberg à cet URL : https://codeberg.org/claude_dumas/gbp</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="254"/>
@@ -3767,7 +3768,7 @@ Details : %1</source>
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="20"/>
-        <location filename="mainwindow.cpp" line="2124"/>
+        <location filename="mainwindow.cpp" line="2130"/>
         <source>Graphical Budget Planner</source>
         <translation>Graphical Budget Planner</translation>
     </message>
@@ -4036,142 +4037,147 @@ Details : %1</source>
         <translation>Outils</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="863"/>
+        <location filename="mainwindow.ui" line="864"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="888"/>
+        <location filename="mainwindow.ui" line="889"/>
         <source>New...</source>
         <translation>Nouveau...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="891"/>
+        <location filename="mainwindow.ui" line="892"/>
         <source>Close the current scenario and create a new scenario</source>
         <translation>Fermer le scénario courant et en créer un nouveau</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="894"/>
+        <location filename="mainwindow.ui" line="895"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="899"/>
+        <location filename="mainwindow.ui" line="900"/>
         <source>Open...</source>
         <translation>Ouvrir...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="902"/>
+        <location filename="mainwindow.ui" line="903"/>
         <source>Close the current scenario and open an existing scenario</source>
         <translation>Fermer le scénario courant et en ouvrir un autre</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="905"/>
+        <location filename="mainwindow.ui" line="906"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="910"/>
+        <location filename="mainwindow.ui" line="911"/>
         <source>Edit...</source>
         <translation>Éditer...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="913"/>
+        <location filename="mainwindow.ui" line="914"/>
         <source>Edit the current scenario</source>
         <translation>Éditer le scénario courant</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="916"/>
+        <location filename="mainwindow.ui" line="917"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="921"/>
+        <location filename="mainwindow.ui" line="922"/>
         <source>Save</source>
         <translation>Sauvegarder</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="924"/>
+        <location filename="mainwindow.ui" line="925"/>
         <source>Save the current scenario</source>
         <translation>Sauvegarder le scénario courant</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="927"/>
+        <location filename="mainwindow.ui" line="928"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="932"/>
+        <location filename="mainwindow.ui" line="933"/>
         <source>Save As...</source>
         <translation>Sauvegarder sous...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="935"/>
+        <location filename="mainwindow.ui" line="936"/>
         <source>Save the current scenario under a new file</source>
         <translation>Sauvegarder le scénario courant dans un nouveau fichier</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="940"/>
+        <location filename="mainwindow.ui" line="941"/>
         <source>Quit</source>
         <translation>Quitter</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="945"/>
+        <location filename="mainwindow.ui" line="946"/>
         <source>About Graphical Budget Planner</source>
         <translation>Au sujet de Graphical Budget Planner</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="950"/>
+        <location filename="mainwindow.ui" line="951"/>
         <source>About Qt</source>
         <translation>Au sujet de Qt</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="955"/>
+        <location filename="mainwindow.ui" line="956"/>
         <source>Options...</source>
         <translation>Options...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="960"/>
+        <location filename="mainwindow.ui" line="961"/>
         <source>Analysis...</source>
         <translation>Analyse...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="963"/>
+        <location filename="mainwindow.ui" line="964"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="968"/>
+        <location filename="mainwindow.ui" line="969"/>
         <source>User Manual</source>
         <translation>Manuel de l&apos;utilisateur (anglais)</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="973"/>
+        <location filename="mainwindow.ui" line="974"/>
         <source>Open Example</source>
         <translation>Ouvrir exemple</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="978"/>
+        <location filename="mainwindow.ui" line="979"/>
         <source>Properties...</source>
         <translation>Propriétés...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="983"/>
+        <location filename="mainwindow.ui" line="984"/>
         <source>Quick Tutorial</source>
         <translation>Tutoriel rapide (anglais)</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="988"/>
+        <location filename="mainwindow.ui" line="989"/>
         <source>Duplicate...</source>
         <translation>Dupliquer...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="993"/>
+        <location filename="mainwindow.ui" line="994"/>
         <source>Change Log</source>
         <translation>Journal des changements (anglais)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="79"/>
+        <location filename="mainwindow.ui" line="999"/>
+        <source>PV Calculator...</source>
+        <translation>Calculateur Valeur actualisée...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="81"/>
         <source>Start amount as of today %1 :</source>
         <oldsource>Start Amount for Today %1 :</oldsource>
         <translation>Montant de départ au %1 :</translation>
@@ -4191,7 +4197,7 @@ Details : %1</source>
         <translation type="vanished">Le scénario courant a été modifié, mais les changements n&apos;ont pas été sauvegardés sur disque. Si vous quittez, ces modifications seront perdues. Désirez-vous quand même quitter l&apos;application ?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="553"/>
+        <location filename="mainwindow.cpp" line="558"/>
         <source>Current scenario has been modified, but changes have not been saved yet on disk. Do you want to SAVE IT before going forward ? If you answer &quot;No&quot;, the changes will be lost. </source>
         <oldsource>Current scenario has been modified, but it is not saved yet on disk. Do you want to SAVE THE CHANGES before going forward ?</oldsource>
         <translation>Le scénario courant a été modifié, mais les changements n&apos;ont pas été sauvegardés sur disque. Désirez-vous SAUVEGARDER ces modifications avant d&apos;aller de l&apos;avant ? Si vous répondez Non, les changements seront perdus. </translation>
@@ -4209,7 +4215,7 @@ Details : %1</source>
         <translation type="vanished">Quitter l&apos;application</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="682"/>
+        <location filename="mainwindow.cpp" line="687"/>
         <source>Do you really want to quit the application ?</source>
         <oldsource>Do you really want to terminate the application ?</oldsource>
         <translation>Désirez-vous vraiment quitter l&apos;application ?</translation>
@@ -4223,7 +4229,7 @@ Details : %1</source>
         <translation type="vanished">Échec de la sauvegarde</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2016"/>
+        <location filename="mainwindow.cpp" line="2022"/>
         <source>No scenario loaded yet</source>
         <translation>Aucun scénario chargé</translation>
     </message>
@@ -4232,8 +4238,8 @@ Details : %1</source>
         <translation type="vanished">Sélection du scénario</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="821"/>
-        <location filename="mainwindow.cpp" line="855"/>
+        <location filename="mainwindow.cpp" line="827"/>
+        <location filename="mainwindow.cpp" line="861"/>
         <source>Scenario saved successfully</source>
         <translation>Sauvegarde réussie du scénario</translation>
     </message>
@@ -4242,7 +4248,7 @@ Details : %1</source>
         <translation type="vanished">Aucun scénario chargé</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="883"/>
+        <location filename="mainwindow.cpp" line="889"/>
         <source>Error found in the file content.
 
 Details : %1</source>
@@ -4253,14 +4259,14 @@ Details : %1</source>
         <translation type="vanished">Échec du chargement du scénario</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="900"/>
+        <location filename="mainwindow.cpp" line="906"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation>Une erreur est survenue. Détails : %1</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1544"/>
+        <location filename="mainwindow.cpp" line="1550"/>
         <source>Clear list</source>
         <translation>Effacer la liste</translation>
     </message>
@@ -4269,32 +4275,32 @@ Details : %1</source>
         <translation type="vanished">Échec de l&apos;exportation</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1762"/>
+        <location filename="mainwindow.cpp" line="1768"/>
         <source>Text files (*.txt *.TXT *.csv *.CSV)</source>
         <translation>Fichiers texte (*.txt *.TXT *.csv *.CSV)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1763"/>
+        <location filename="mainwindow.cpp" line="1769"/>
         <source>Select a file</source>
         <translation>Choisir un fichier</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1808"/>
+        <location filename="mainwindow.cpp" line="1814"/>
         <source>Total daily incomes</source>
         <translation>Revenus totaux quotidiens</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1809"/>
+        <location filename="mainwindow.cpp" line="1815"/>
         <source>Total daily expenses</source>
         <translation>Dépenses totales quotidiennes</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1809"/>
+        <location filename="mainwindow.cpp" line="1815"/>
         <source>Total delta</source>
         <translation>Delta total</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1809"/>
+        <location filename="mainwindow.cpp" line="1815"/>
         <source>Cumulative total</source>
         <translation>Total cummulatif</translation>
     </message>
@@ -4307,13 +4313,13 @@ Details : %1</source>
         <translation type="vanished">Erreur</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2130"/>
+        <location filename="mainwindow.cpp" line="2136"/>
         <source>Not saved yet %1 GBP</source>
         <oldsource>Not saved yet - GBP</oldsource>
         <translation>Sans fichier associé %1 GBP</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2135"/>
+        <location filename="mainwindow.cpp" line="2141"/>
         <source>%1 %2 GBP</source>
         <oldsource>%1 - GBP</oldsource>
         <translation>%1 %2 GBP</translation>
@@ -4327,24 +4333,24 @@ Details : %1</source>
         <translation type="vanished">Echec de la mise à jour du format de fichier de ce scénario de v1 vers v2. Une cause potentielle serait un problème de permission d&apos;écriture.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="935"/>
+        <location filename="mainwindow.cpp" line="941"/>
         <source>Scenario opened successfully</source>
         <translation>Scénario chargé avec succès</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="937"/>
+        <location filename="mainwindow.cpp" line="943"/>
         <source>Scenario opened successfully (converted from version 1 to 2)</source>
         <translation>Ouverture réussie du scénario (conversion de la version 1 à la version 2)</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1753"/>
+        <location filename="mainwindow.cpp" line="1759"/>
         <source>No scenario loaded yet, so nothing to export</source>
         <translation>Aucun scénario chargé, donc rien à exporter</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1936"/>
-        <location filename="mainwindow.cpp" line="2004"/>
-        <location filename="mainwindow.cpp" line="2082"/>
+        <location filename="mainwindow.cpp" line="1942"/>
+        <location filename="mainwindow.cpp" line="2010"/>
+        <location filename="mainwindow.cpp" line="2088"/>
         <source>The system&apos;s default PDF viewer failed to launch. You can try to open the file manually at %1</source>
         <translation>Le visualisateur PDF système n&apos;a pas pu être démarré. Essayez de l&apos;ouvrir manuellement : %1</translation>
     </message>
@@ -4359,75 +4365,75 @@ Details : %2</source>
         <translation type="vanished">Échec de l&apos;édition du scénario</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="626"/>
+        <location filename="mainwindow.cpp" line="631"/>
         <source>No scenario loaded</source>
         <translation>Aucun scénario chargé</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="792"/>
+        <location filename="mainwindow.cpp" line="798"/>
         <source>No scenario loaded yet, so nothing to save.</source>
         <translation>Aucun scénario chargé, donc rien à sauvegarder.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="842"/>
+        <location filename="mainwindow.cpp" line="848"/>
         <source>No scenario loaded yet, so nothing to save</source>
         <translation>Aucun scénario chargé, donc rien à sauvegarder</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1009"/>
+        <location filename="mainwindow.cpp" line="1015"/>
         <source>No scenario loaded yet, so nothing to edit</source>
         <translation>Aucun scénario chargé, donc rien à éditer</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1332"/>
+        <location filename="mainwindow.cpp" line="1338"/>
         <source>A new scenario has been created</source>
         <translation>Un nouveau scénario a été créé</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1299"/>
+        <location filename="mainwindow.cpp" line="1305"/>
         <source>Current scenario has been modified</source>
         <translation>Le scénario courant a ét modifié</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="552"/>
-        <location filename="mainwindow.cpp" line="574"/>
-        <location filename="mainwindow.cpp" line="682"/>
-        <location filename="mainwindow.cpp" line="792"/>
-        <location filename="mainwindow.cpp" line="842"/>
-        <location filename="mainwindow.cpp" line="1009"/>
-        <location filename="mainwindow.cpp" line="1753"/>
-        <location filename="mainwindow.cpp" line="2016"/>
+        <location filename="mainwindow.cpp" line="557"/>
+        <location filename="mainwindow.cpp" line="579"/>
+        <location filename="mainwindow.cpp" line="687"/>
+        <location filename="mainwindow.cpp" line="798"/>
+        <location filename="mainwindow.cpp" line="848"/>
+        <location filename="mainwindow.cpp" line="1015"/>
+        <location filename="mainwindow.cpp" line="1759"/>
+        <location filename="mainwindow.cpp" line="2022"/>
         <source>Warning</source>
         <translation>Avertissement</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="555"/>
-        <location filename="mainwindow.cpp" line="577"/>
-        <location filename="mainwindow.cpp" line="683"/>
+        <location filename="mainwindow.cpp" line="560"/>
+        <location filename="mainwindow.cpp" line="582"/>
+        <location filename="mainwindow.cpp" line="688"/>
         <source>No</source>
         <translation>Non</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="555"/>
-        <location filename="mainwindow.cpp" line="577"/>
-        <location filename="mainwindow.cpp" line="683"/>
+        <location filename="mainwindow.cpp" line="560"/>
+        <location filename="mainwindow.cpp" line="582"/>
+        <location filename="mainwindow.cpp" line="688"/>
         <source>Yes</source>
         <translation>Oui</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="555"/>
-        <location filename="mainwindow.cpp" line="577"/>
+        <location filename="mainwindow.cpp" line="560"/>
+        <location filename="mainwindow.cpp" line="582"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="575"/>
+        <location filename="mainwindow.cpp" line="580"/>
         <source>The new scenario has not been saved yet on disk. Do you want to SAVE IT in a file before going forward ? If you answer &quot;No&quot;, the new scenario will be lost.</source>
         <oldsource>The new scenario has not been saved yet on disk. Do you want to SAVE IT in a file before going forward ? If you answer &quot;No&quot;, the data will be lost.</oldsource>
         <translation>Le nouveau scénario n&apos;a pas encore été sauvegardé sur disque. Voulez-vous le sauver dans un fichier avant d&apos;aller plus loin ? Si vous répondez Non, il sera perdu.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="725"/>
+        <location filename="mainwindow.cpp" line="731"/>
         <source>Open an existing scenario</source>
         <translation>Ouvrir un scénario existant</translation>
     </message>
@@ -4436,7 +4442,7 @@ Details : %2</source>
         <translation type="vanished">Erreur</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="802"/>
+        <location filename="mainwindow.cpp" line="808"/>
         <source>Choose a filename</source>
         <translation>Choisir un nom de fichier</translation>
     </message>
@@ -4449,22 +4455,22 @@ Details : %2</source>
         <translation type="vanished">Erreur</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1419"/>
+        <location filename="mainwindow.cpp" line="1425"/>
         <source>Options changes have been successfully saved</source>
         <translation>Les changements aux options ont été sauvegardés avec succès</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1507"/>
+        <location filename="mainwindow.cpp" line="1513"/>
         <source>y</source>
         <translation>a</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1508"/>
+        <location filename="mainwindow.cpp" line="1514"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1509"/>
+        <location filename="mainwindow.cpp" line="1515"/>
         <source>d</source>
         <translation>j</translation>
     </message>
@@ -4473,20 +4479,20 @@ Details : %2</source>
         <translation type="vanished">Effacer la liste</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="828"/>
-        <location filename="mainwindow.cpp" line="857"/>
-        <location filename="mainwindow.cpp" line="893"/>
-        <location filename="mainwindow.cpp" line="902"/>
-        <location filename="mainwindow.cpp" line="1723"/>
-        <location filename="mainwindow.cpp" line="1779"/>
-        <location filename="mainwindow.cpp" line="1936"/>
-        <location filename="mainwindow.cpp" line="2004"/>
-        <location filename="mainwindow.cpp" line="2082"/>
+        <location filename="mainwindow.cpp" line="834"/>
+        <location filename="mainwindow.cpp" line="863"/>
+        <location filename="mainwindow.cpp" line="899"/>
+        <location filename="mainwindow.cpp" line="908"/>
+        <location filename="mainwindow.cpp" line="1729"/>
+        <location filename="mainwindow.cpp" line="1785"/>
+        <location filename="mainwindow.cpp" line="1942"/>
+        <location filename="mainwindow.cpp" line="2010"/>
+        <location filename="mainwindow.cpp" line="2088"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1723"/>
+        <location filename="mainwindow.cpp" line="1729"/>
         <source>No scenario loaded yet : nothing to analyse</source>
         <translation>Pas de scénario chargé : rien à analyser</translation>
     </message>
@@ -4520,12 +4526,12 @@ Details : %2</source>
         <translation type="vanished">Choisir un fichier</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1779"/>
+        <location filename="mainwindow.cpp" line="1785"/>
         <source>Cannot open the file for writing</source>
         <translation>Impossible d&apos;ouvrir le fichier en mode écriture</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1808"/>
+        <location filename="mainwindow.cpp" line="1814"/>
         <source>Date</source>
         <translation>Date</translation>
     </message>
@@ -5797,6 +5803,84 @@ Details : %2</source>
     </message>
 </context>
 <context>
+    <name>PresentValueCalculatorDialog</name>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="14"/>
+        <source>PV Calculator</source>
+        <translation>Calculateur de valeur actualisée</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="29"/>
+        <source>Future value :</source>
+        <translation>Valeur future :</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="63"/>
+        <source>Discount rate :</source>
+        <translation>Taux d&apos;escompte :</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="72"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Discount rate, on an annual basis&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Taux d&apos;escompte annuel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="75"/>
+        <source>%</source>
+        <translation>%</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="106"/>
+        <source>Monthly rate :</source>
+        <translation>Taux mensuel :</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="115"/>
+        <source>---</source>
+        <translation>---</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="137"/>
+        <source>No of month :</source>
+        <translation>Nombre de mois :</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="146"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;No of months between both values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nombre de mois entre les deux valeurs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="179"/>
+        <source>Present value :</source>
+        <translation>Valeur actualisée :</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="235"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Convert the future value into a present value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Convertit la valeur future en valeur actualisée.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="245"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Convert the present value into a future value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Convertit la valeur actualisée en valeur future.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="248"/>
+        <source>PV -&gt; FV</source>
+        <translation>VA -&gt; VF</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="238"/>
+        <source>FV -&gt; PV</source>
+        <translation>VF -&gt; VA</translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="268"/>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+</context>
+<context>
     <name>Scenario</name>
     <message>
         <location filename="scenario.cpp" line="197"/>
@@ -6641,7 +6725,7 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation>années</translation>
     </message>
     <message>
-        <location filename="util.cpp" line="413"/>
+        <location filename="util.cpp" line="428"/>
         <source>Red:%1  Green:%2  Blue:%3</source>
         <translation>Rouge:%1  Vert:%2  Bleu:%3</translation>
     </message>

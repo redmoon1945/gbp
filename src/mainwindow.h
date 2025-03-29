@@ -20,6 +20,7 @@
 #define MAINWINDOW_H
 
 #include "editscenariodialog.h"
+#include "presentvaluecalculatordialog.h"
 #include "scenariopropertiesdialog.h"
 #include "selectcountrydialog.h"
 #include "optionsdialog.h"
@@ -135,6 +136,8 @@ private slots:
     void on_actionChange_Log_triggered();
 
 
+    void on_actionPV_Calculator_triggered();
+
 private:
 
     Ui::MainWindow *ui;
@@ -159,6 +162,7 @@ private:
     AnalysisDialog* analysisDlg;
     DateIntervalDialog* dateIntervalDlg;
     ScenarioPropertiesDialog* scenarioPropertiesDlg;
+    PresentValueCalculatorDialog* pvCalculatorDlg;
 
     // variables
     int maxRecentFiles = 10;

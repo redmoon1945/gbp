@@ -258,7 +258,8 @@ quint16 Util::extractQuint16FromDoubleWithNoFracPart(double amount, quint16 maxV
 QString Util::longDoubleToQString(long double value)
 {
     std::stringstream stream;
-    stream << std::fixed << std::setprecision(std::numeric_limits<long double>::digits10 + 1) << value;
+    stream << std::fixed << std::setprecision(
+        std::numeric_limits<long double>::digits10 + 1) << value;
     return QString::fromStdString(stream.str());
 }
 
@@ -290,6 +291,20 @@ long double Util::presentValue(long double futureValue, double discountRate, int
         return futureValue;
     }
     return futureValue / powl((1 + 0.01L*discountRate), period);
+}
+
+
+
+// Calculate future value of a present value using F = P * (1 + r)^n
+// P = future value
+// r = interest rate per period, in percentage
+// n = number of period
+long double Util::futureValue(long double presentValue, double discountRate, int period)
+{
+    if (discountRate==0){
+        return presentValue;
+    }
+    return presentValue * powl((1 + 0.01L*discountRate), period);
 }
 
 

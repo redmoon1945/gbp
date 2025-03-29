@@ -88,6 +88,7 @@ public:
     static QList<double> doubleArrayToQlist(double* data, uint noElements);
     static QDateTime dateToDateTimeLocal(const QDate& date, const QTimeZone& tz);
     static long double presentValue(long double futureValue, double discountRate, int period);
+    static long double futureValue(long double presentValue, double discountRate, int period);
     static long double presentValueConversionFactor(long double discountRate, int period);
     static bool isValidBoolString(const QString& input);
     static uint changeFontSize(int intensity, bool decreaseSize, uint originalSize);

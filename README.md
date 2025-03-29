@@ -1,7 +1,9 @@
 # graphical-budget-planner
 ## What's new ?
-Version 1.6.2 is out (April 2025) ! Here are the main changes compared to 1.5.3 :
 
+Version 1.6.3 is out (April 2025) ! Here are the main changes compared to 1.5.3 :
+
+- Switched to Github for the repository
 - Introducing the notion of **tags**, which is a way to implement categories of incomes/expenses, but in a much more flexible and powerful way.
 - In About Dialog, add a new Contact tab for those who wish to know how to contact directly the author(s) of this software.
 - In Main Window,
@@ -48,7 +50,7 @@ Analysis - Monthy Report Chart
 ## Installation
 
 ### On Linux
-GBP is distributed as an “AppImage” on Linux platform, which is a single-file executable packaging format allowing a program to run on many Linux distributions. There is nothing else to install. After downloading the most recent AppImage application from  [Releases - claude_dumas/gbp - Codeberg.org](https://codeberg.org/claude_dumas/gbp/releases) ,  user has to enable “executable” permission on the file and it is ready to be launched. 
+GBP is distributed as an “AppImage” on Linux platform, which is a single-file executable packaging format allowing a program to run on many Linux distributions. There is nothing else to install. After downloading the most recent AppImage application from https://github.com/redmoon1945/gbp ,  user has to enable “executable” permission on the file and it is ready to be launched. 
 
 On Ubuntu (tested on v 22.04, 24.04), additional steps must be performed. In order to run an AppImage, some packages are missing from the default distribution. Ubuntu needs the FUSE library to run AppImage like GBP. Otherwise, when launched, you will get the following error : 
 
@@ -59,13 +61,13 @@ AppImages require FUSE to run. To solve this, do :
 `sudo apt install libfuse2`
 
 ### On Windows®
-Download the ".zip" file binary from the repository   [Releases - claude_dumas/gbp - Codeberg.org](https://codeberg.org/claude_dumas/gbp/releases) ,   and unzip it in the folder of your choice. Launch gpb.exe to execute GBP.
+Download the ".zip" file binary from the repository mentionned above and unzip it in the folder of your choice. Launch gpb.exe to execute GBP.
 
 ## Supported Platforms and Languages, System Requirements
 
-GBP is intended to be run first and foremost on the Linux Operating System. But since it is built using the Qt cross platform toolkit, a version of GBP for the Windows® Operating System have also been produced. Tests have been conducted on Windows® 10 only.
+GBP is intended to be run first and foremost on the Linux Operating System. But since it is built using the Qt cross platform toolkit, a version of GBP for the Windows® Operating System is also been provided. Tests have been conducted on Windows® 10 only.
 
-GBP does not use a lot of RAM (the absolute worst case ever seen is 175 MB for an extremely demanding testing scenario) and necessitate roughly 50 MB of disk space (not taken into account the scenario files that you will create and GBP log files, which are all pretty small anyways).
+GBP does not use a lot of RAM (the absolute worst case ever seen is 200 MB for an extremely demanding testing scenario) and necessitate roughly 50 MB of disk space (not taken into account the scenario files that you will create and GBP log files, which are all pretty small anyways).
 
 As of April 2025, GBP has been extensively tested on the following Linux platforms :
 
@@ -93,8 +95,8 @@ Graphical Budget Planner (a.k.a graphical-budget-planner or GBP or gbp) is a fre
 This application and all its source code are licensed under the GNU Affero General Public License version 3 or later (AGPL-3.0-or-later). It's Free Software. See https://www.gnu.org/licenses/#AGPL/
 
 Software repository for GBP can be found at : 
+https://github.com/redmoon1945/gbp
 
-https://codeberg.org/claude_dumas/gbp
 
 Being built with the Qt toolkit, GBP is subject to the Qt terms and conditions : see qt.io/licensing
 
@@ -105,7 +107,7 @@ Credits :
 
 ## Usage
 
-See the detailed User Manual to get in depth information about this application : [gbp/doc/Graphical Budget Planner - User Manual.pdf at master - claude_dumas/gbp - Codeberg.org](https://codeberg.org/claude_dumas/gbp/src/branch/master/doc/Graphical%20Budget%20Planner%20-%20User%20Manual.pdf)
+See the detailed User Manual to get in depth information about this application : gbp/doc/Graphical Budget Planner - User Manual.pdf 
 
 Graphical Budget Planner (GBP) is an open source Qt desktop application intended to ease significantly the process of creating, maintaining and analyzing a personal budget. It allows the following :
 

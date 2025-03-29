@@ -118,9 +118,10 @@ graphical-budget-planner is distributed in the hope that it will be useful, but 
     </message>
     <message>
         <location filename="aboutdialog.ui" line="243"/>
-        <source>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
-https://codeberg.org/claude_dumas/gbp</source>
-        <oldsource>Source code of graphical-budget-planner can be found on Codeberg at this URL : https://codeberg.org/claude_dumas/gbp</oldsource>
+        <source>Source code of graphical-budget-planner can be found on Github at this URL : 
+https://github.com/redmoon1945/gbp</source>
+        <oldsource>Source code of graphical-budget-planner can be found on Codeberg at this URL : 
+https://codeberg.org/claude_dumas/gbp</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2841,7 +2842,7 @@ Details : %1</source>
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="20"/>
-        <location filename="mainwindow.cpp" line="2124"/>
+        <location filename="mainwindow.cpp" line="2130"/>
         <source>Graphical Budget Planner</source>
         <translation></translation>
     </message>
@@ -3098,375 +3099,380 @@ Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="863"/>
+        <location filename="mainwindow.ui" line="864"/>
         <source>Help</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="888"/>
+        <location filename="mainwindow.ui" line="889"/>
         <source>New...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="891"/>
+        <location filename="mainwindow.ui" line="892"/>
         <source>Close the current scenario and create a new scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="894"/>
+        <location filename="mainwindow.ui" line="895"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="899"/>
+        <location filename="mainwindow.ui" line="900"/>
         <source>Open...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="902"/>
+        <location filename="mainwindow.ui" line="903"/>
         <source>Close the current scenario and open an existing scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="905"/>
+        <location filename="mainwindow.ui" line="906"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="910"/>
+        <location filename="mainwindow.ui" line="911"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="913"/>
+        <location filename="mainwindow.ui" line="914"/>
         <source>Edit the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="916"/>
+        <location filename="mainwindow.ui" line="917"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="921"/>
+        <location filename="mainwindow.ui" line="922"/>
         <source>Save</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="924"/>
+        <location filename="mainwindow.ui" line="925"/>
         <source>Save the current scenario</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="927"/>
+        <location filename="mainwindow.ui" line="928"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="932"/>
+        <location filename="mainwindow.ui" line="933"/>
         <source>Save As...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="935"/>
+        <location filename="mainwindow.ui" line="936"/>
         <source>Save the current scenario under a new file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="940"/>
+        <location filename="mainwindow.ui" line="941"/>
         <source>Quit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="945"/>
+        <location filename="mainwindow.ui" line="946"/>
         <source>About Graphical Budget Planner</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="950"/>
+        <location filename="mainwindow.ui" line="951"/>
         <source>About Qt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="955"/>
+        <location filename="mainwindow.ui" line="956"/>
         <source>Options...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="960"/>
+        <location filename="mainwindow.ui" line="961"/>
         <source>Analysis...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="963"/>
+        <location filename="mainwindow.ui" line="964"/>
         <source>Ctrl+A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="968"/>
+        <location filename="mainwindow.ui" line="969"/>
         <source>User Manual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="973"/>
+        <location filename="mainwindow.ui" line="974"/>
         <source>Open Example</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="978"/>
+        <location filename="mainwindow.ui" line="979"/>
         <source>Properties...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="983"/>
+        <location filename="mainwindow.ui" line="984"/>
         <source>Quick Tutorial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="988"/>
+        <location filename="mainwindow.ui" line="989"/>
         <source>Duplicate...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="993"/>
+        <location filename="mainwindow.ui" line="994"/>
         <source>Change Log</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="79"/>
+        <location filename="mainwindow.ui" line="999"/>
+        <source>PV Calculator...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="81"/>
         <source>Start amount as of today %1 :</source>
         <oldsource>Start Amount for Today %1 :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="553"/>
+        <location filename="mainwindow.cpp" line="558"/>
         <source>Current scenario has been modified, but changes have not been saved yet on disk. Do you want to SAVE IT before going forward ? If you answer &quot;No&quot;, the changes will be lost. </source>
         <oldsource>Current scenario has been modified, but it is not saved yet on disk. Do you want to SAVE THE CHANGES before going forward ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="682"/>
+        <location filename="mainwindow.cpp" line="687"/>
         <source>Do you really want to quit the application ?</source>
         <oldsource>Do you really want to terminate the application ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="792"/>
+        <location filename="mainwindow.cpp" line="798"/>
         <source>No scenario loaded yet, so nothing to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="842"/>
+        <location filename="mainwindow.cpp" line="848"/>
         <source>No scenario loaded yet, so nothing to save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1009"/>
+        <location filename="mainwindow.cpp" line="1015"/>
         <source>No scenario loaded yet, so nothing to edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1753"/>
+        <location filename="mainwindow.cpp" line="1759"/>
         <source>No scenario loaded yet, so nothing to export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2016"/>
+        <location filename="mainwindow.cpp" line="2022"/>
         <source>No scenario loaded yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="821"/>
-        <location filename="mainwindow.cpp" line="855"/>
+        <location filename="mainwindow.cpp" line="827"/>
+        <location filename="mainwindow.cpp" line="861"/>
         <source>Scenario saved successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="883"/>
+        <location filename="mainwindow.cpp" line="889"/>
         <source>Error found in the file content.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="900"/>
+        <location filename="mainwindow.cpp" line="906"/>
         <source>An unexpected error has occured.
 
 Details : %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="935"/>
+        <location filename="mainwindow.cpp" line="941"/>
         <source>Scenario opened successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="937"/>
+        <location filename="mainwindow.cpp" line="943"/>
         <source>Scenario opened successfully (converted from version 1 to 2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="626"/>
+        <location filename="mainwindow.cpp" line="631"/>
         <source>No scenario loaded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1332"/>
+        <location filename="mainwindow.cpp" line="1338"/>
         <source>A new scenario has been created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1544"/>
+        <location filename="mainwindow.cpp" line="1550"/>
         <source>Clear list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1762"/>
+        <location filename="mainwindow.cpp" line="1768"/>
         <source>Text files (*.txt *.TXT *.csv *.CSV)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1763"/>
+        <location filename="mainwindow.cpp" line="1769"/>
         <source>Select a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1809"/>
+        <location filename="mainwindow.cpp" line="1815"/>
         <source>Total daily expenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1809"/>
+        <location filename="mainwindow.cpp" line="1815"/>
         <source>Total delta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1809"/>
+        <location filename="mainwindow.cpp" line="1815"/>
         <source>Cumulative total</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2130"/>
+        <location filename="mainwindow.cpp" line="2136"/>
         <source>Not saved yet %1 GBP</source>
         <oldsource>Not saved yet - GBP</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2135"/>
+        <location filename="mainwindow.cpp" line="2141"/>
         <source>%1 %2 GBP</source>
         <oldsource>%1 - GBP</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1299"/>
+        <location filename="mainwindow.cpp" line="1305"/>
         <source>Current scenario has been modified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="552"/>
-        <location filename="mainwindow.cpp" line="574"/>
-        <location filename="mainwindow.cpp" line="682"/>
-        <location filename="mainwindow.cpp" line="792"/>
-        <location filename="mainwindow.cpp" line="842"/>
-        <location filename="mainwindow.cpp" line="1009"/>
-        <location filename="mainwindow.cpp" line="1753"/>
-        <location filename="mainwindow.cpp" line="2016"/>
+        <location filename="mainwindow.cpp" line="557"/>
+        <location filename="mainwindow.cpp" line="579"/>
+        <location filename="mainwindow.cpp" line="687"/>
+        <location filename="mainwindow.cpp" line="798"/>
+        <location filename="mainwindow.cpp" line="848"/>
+        <location filename="mainwindow.cpp" line="1015"/>
+        <location filename="mainwindow.cpp" line="1759"/>
+        <location filename="mainwindow.cpp" line="2022"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="555"/>
-        <location filename="mainwindow.cpp" line="577"/>
-        <location filename="mainwindow.cpp" line="683"/>
+        <location filename="mainwindow.cpp" line="560"/>
+        <location filename="mainwindow.cpp" line="582"/>
+        <location filename="mainwindow.cpp" line="688"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="555"/>
-        <location filename="mainwindow.cpp" line="577"/>
-        <location filename="mainwindow.cpp" line="683"/>
+        <location filename="mainwindow.cpp" line="560"/>
+        <location filename="mainwindow.cpp" line="582"/>
+        <location filename="mainwindow.cpp" line="688"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="555"/>
-        <location filename="mainwindow.cpp" line="577"/>
+        <location filename="mainwindow.cpp" line="560"/>
+        <location filename="mainwindow.cpp" line="582"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="575"/>
+        <location filename="mainwindow.cpp" line="580"/>
         <source>The new scenario has not been saved yet on disk. Do you want to SAVE IT in a file before going forward ? If you answer &quot;No&quot;, the new scenario will be lost.</source>
         <oldsource>The new scenario has not been saved yet on disk. Do you want to SAVE IT in a file before going forward ? If you answer &quot;No&quot;, the data will be lost.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="725"/>
+        <location filename="mainwindow.cpp" line="731"/>
         <source>Open an existing scenario</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="802"/>
+        <location filename="mainwindow.cpp" line="808"/>
         <source>Choose a filename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1419"/>
+        <location filename="mainwindow.cpp" line="1425"/>
         <source>Options changes have been successfully saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1507"/>
+        <location filename="mainwindow.cpp" line="1513"/>
         <source>y</source>
         <translation>y</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1508"/>
+        <location filename="mainwindow.cpp" line="1514"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1509"/>
+        <location filename="mainwindow.cpp" line="1515"/>
         <source>d</source>
         <translation>d</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="828"/>
-        <location filename="mainwindow.cpp" line="857"/>
-        <location filename="mainwindow.cpp" line="893"/>
-        <location filename="mainwindow.cpp" line="902"/>
-        <location filename="mainwindow.cpp" line="1723"/>
-        <location filename="mainwindow.cpp" line="1779"/>
-        <location filename="mainwindow.cpp" line="1936"/>
-        <location filename="mainwindow.cpp" line="2004"/>
-        <location filename="mainwindow.cpp" line="2082"/>
+        <location filename="mainwindow.cpp" line="834"/>
+        <location filename="mainwindow.cpp" line="863"/>
+        <location filename="mainwindow.cpp" line="899"/>
+        <location filename="mainwindow.cpp" line="908"/>
+        <location filename="mainwindow.cpp" line="1729"/>
+        <location filename="mainwindow.cpp" line="1785"/>
+        <location filename="mainwindow.cpp" line="1942"/>
+        <location filename="mainwindow.cpp" line="2010"/>
+        <location filename="mainwindow.cpp" line="2088"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1723"/>
+        <location filename="mainwindow.cpp" line="1729"/>
         <source>No scenario loaded yet : nothing to analyse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1779"/>
+        <location filename="mainwindow.cpp" line="1785"/>
         <source>Cannot open the file for writing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1808"/>
+        <location filename="mainwindow.cpp" line="1814"/>
         <source>Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1808"/>
+        <location filename="mainwindow.cpp" line="1814"/>
         <source>Total daily incomes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1936"/>
-        <location filename="mainwindow.cpp" line="2004"/>
-        <location filename="mainwindow.cpp" line="2082"/>
+        <location filename="mainwindow.cpp" line="1942"/>
+        <location filename="mainwindow.cpp" line="2010"/>
+        <location filename="mainwindow.cpp" line="2088"/>
         <source>The system&apos;s default PDF viewer failed to launch. You can try to open the file manually at %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4492,6 +4498,84 @@ Details : %1</source>
     </message>
 </context>
 <context>
+    <name>PresentValueCalculatorDialog</name>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="14"/>
+        <source>PV Calculator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="29"/>
+        <source>Future value :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="63"/>
+        <source>Discount rate :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="72"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Discount rate, on an annual basis&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="75"/>
+        <source>%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="106"/>
+        <source>Monthly rate :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="115"/>
+        <source>---</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="137"/>
+        <source>No of month :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="146"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;No of months between both values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="179"/>
+        <source>Present value :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="235"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Convert the future value into a present value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="245"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Convert the present value into a future value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="248"/>
+        <source>PV -&gt; FV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="238"/>
+        <source>FV -&gt; PV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="presentvaluecalculatordialog.ui" line="268"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Scenario</name>
     <message>
         <location filename="scenario.cpp" line="197"/>
@@ -5297,7 +5381,7 @@ Details : Error code = %2 ,offset = %3, error message = %4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="util.cpp" line="413"/>
+        <location filename="util.cpp" line="428"/>
         <source>Red:%1  Green:%2  Blue:%3</source>
         <translation type="unfinished"></translation>
     </message>

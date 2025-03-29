@@ -1,4 +1,9 @@
 # Change logs
+## 1.6.2 to 1.6.3
+### New features
+- Change reference to the new repo site (now on Github : https://github.com/redmoon1945/gbp)
+- Add a Present Value Calculator in "Tools" menu"
+
 ## 1.6.1 to 1.6.2
 ### Fixes
 - Correct the "too-small" width of menu items when a very big font is used. The problem was due to Qt, but a workaround has been found.

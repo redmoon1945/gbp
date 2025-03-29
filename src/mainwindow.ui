@@ -857,6 +857,7 @@
     </property>
     <addaction name="actionOptions"/>
     <addaction name="actionAnalysis"/>
+    <addaction name="actionPV_Calculator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -991,6 +992,11 @@
   <action name="actionChange_Log">
    <property name="text">
     <string>Change Log</string>
+   </property>
+  </action>
+  <action name="actionPV_Calculator">
+   <property name="text">
+    <string>PV Calculator...</string>
    </property>
   </action>
  </widget>

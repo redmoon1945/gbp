@@ -47,6 +47,8 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     // create child dialogs
     editScenarioDlg = new EditScenarioDialog(locale,this); //  NOT auto destroyed by Qt
     editScenarioDlg->setModal(false);
+    pvCalculatorDlg = new PresentValueCalculatorDialog(locale,this); //  NOT auto destroyed by Qt
+    pvCalculatorDlg->setModal(false);
     selectCountryDialog = new SelectCountryDialog(locale, this); // auto destroyed by Qt
     selectCountryDialog->setModal(true);
     optionsDlg = new OptionsDialog(this); //  auto destroyed by Qt
@@ -208,7 +210,10 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+
+
     delete editScenarioDlg; // we have not set parent
+    delete pvCalculatorDlg; // we have not set parent
     delete ui;
 }
 
@@ -694,6 +699,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     // proceed with quitting the application
     editScenarioDlg->close(); // because it has no parent
+    pvCalculatorDlg->close(); // we have not set parent
     GbpController::getInstance().saveSettings();
     event->accept();
 }
@@ -2164,4 +2170,10 @@ void MainWindow::adjustMenuItemLength()
 }
 
 
+
+
+void MainWindow::on_actionPV_Calculator_triggered()
+{
+    pvCalculatorDlg->show();
+}
 
