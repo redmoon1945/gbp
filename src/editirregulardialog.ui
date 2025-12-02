@@ -42,7 +42,7 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="nameLineEdit">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Can be unique or not, although it is recommanded that each Cash Stream Definition have its own name. Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Can be unique or not, although it is recommended that each Cash Stream Definition have its own name. Limited to 100 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -92,6 +92,9 @@
           <widget class="QPushButton" name="fullViewPushButton">
            <property name="text">
             <string>Full view...</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -172,6 +175,9 @@
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
            </property>
            <property name="flat">
             <bool>false</bool>
@@ -343,7 +349,7 @@
         </font>
        </property>
        <property name="text">
-        <string>List of Financial Events</string>
+        <string>List of financial events</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -353,7 +359,7 @@
      <item>
       <widget class="QTableView" name="itemsTableView">
        <property name="alternatingRowColors">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
@@ -386,6 +392,9 @@
          <property name="text">
           <string>Add...</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -395,6 +404,9 @@
          </property>
          <property name="text">
           <string>Edit...</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -406,6 +418,9 @@
          <property name="text">
           <string>Delete</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -413,12 +428,18 @@
          <property name="text">
           <string>Select all</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="unselectAllPushButton">
          <property name="text">
           <string>Unselect all</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -510,6 +531,9 @@
          <property name="text">
           <string>Visualize occurrences...</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -518,7 +542,23 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Get all the financial event definitions from a CSV file. The current list is first cleared.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Load from file...</string>
+          <string>Import...</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="exportPushButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all the financial event definitions into a CSV file. The current list is not affected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Export...</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -540,12 +580,24 @@
          <property name="text">
           <string>Cancel</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="applyPushButton">
          <property name="text">
           <string>Apply</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

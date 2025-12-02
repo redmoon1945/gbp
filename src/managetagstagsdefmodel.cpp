@@ -33,7 +33,8 @@ ManageTagsTagsDefModel::~ManageTagsTagsDefModel()
 }
 
 
-QVariant ManageTagsTagsDefModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ManageTagsTagsDefModel::headerData(int section, Qt::Orientation orientation,
+    int role) const
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {

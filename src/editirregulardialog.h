@@ -22,7 +22,7 @@
 #include <QDialog>
 #include <QUuid>
 #include <QLocale>
-#include "irregularfestreamdef.h"
+#include "irregularcsd.h"
 #include "currencyhelper.h"
 #include "plaintexteditiondialog.h"
 #include "editirregularmodel.h"
@@ -47,8 +47,8 @@ public:
 
 signals:
     // For client of EditIrregularDialog : send result and edition completion notification
-    void signalEditIrregularStreamDefResult(bool isIncome, IrregularFeStreamDef irStreamDef);
-    void signalEditIrregularStreamDefCompleted();
+    void signalEditIrregularCsdResult(bool isIncome, QSharedPointer<IrregularCsd> irCsd);
+    void signalEditIrregularCsdCompleted();
     // For irregular element edition : Prepare dialog before edition
     void signalEditElementPrepareContent(bool isIncome, bool newEditMode, CurrencyInfo cInfo,
         QList<QDate> newExistingDates, QDate aDate, double amount, QString notes);
@@ -60,23 +60,46 @@ signals:
     void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
     // Visualize occurrences : prepare Dialog before edition
     void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation,
-        QDate maxDateScenarioFeGeneration, FeStreamDef *streamDef);
+        QDate maxDateScenarioFeGeneration, QWeakPointer<Csd> iCsd);
 
 
 public slots:
-    // From client of EditPeriodicDialog : Prepare edition
-    void slotPrepareContent(bool isNewStreamDef, bool isIncome, IrregularFeStreamDef psStreamDef,
+
+    /**
+     * @brief From client of EditPeriodicDialog : Prepare edition.
+     * @param isNewCsd True if we are going to create a new Csd.
+     * @param isIncome True if it is editing for an income, false otherwise.
+     * @param psCsd Weak pointer to the edited Csd. Null if we are creating a new Csd.
+     * @param newCurrInfo Currency info.
+     * @param maxDateScenarioFeGeneration Max date beyond which no finanical event will be created.
+     * @param associatedTagIds  ALl the Tags already associated to this Csd. Empty if we are
+     * going to create a new Csd.
+     * @param availTags All the Tags defined in the scenario.
+     */
+    void slotPrepareContent(bool isNewCsd, bool isIncome, QWeakPointer<IrregularCsd> psCsd,
         CurrencyInfo newCurrInfo, QDate maxDateScenarioFeGeneration,
         QSet<QUuid> associatedTagIds, Tags availTags);
+
     // PlainTextEdition child Dialog : receive result and edition completion notification
     void slotPlainTextEditionResult(QString result);
     void slotPlainTextEditionCompleted();
-    // For irregular element edition : getting result and completion notification
+
+    /**
+     * @brief For irregular element edition : this is the result from edition of an irregular
+     * date/amount pair. This can be for an edition of existing pair or the definition
+     * of a new pair.
+     * @param isEdition True if this was for editing an existing date/amount pair, false otherwise.
+     * @param oldDate The previous date.
+     * @param newDate The new date (can be the same as oldDate).
+     * @param editedAmount The new edited amount. Always >= 0 even for expense.
+     * @param editedNotes The new edited notes.
+     */
     void slotEditElementResult(bool isEdition, QDate oldDate, QDate newDate, double editedAmount,
         QString editedNotes);// Edit element result
+
     void slotEditElementCompleted();    // Edit Element process is completed
     // For irregular import : getting result and completion notification
-    void slotImportResult(QMap<QDate,IrregularFeStreamDef::AmountInfo> amountSet);
+    void slotImportResult(QMap<QDate,IrregularCsd::AmountInfo> amountSet);
     void slotImportCompleted();
     // Visualize occurrences child Dialog : receive completion notification
     void slotVisualizeOccurrencesCompleted();
@@ -97,6 +120,7 @@ private slots:
     void on_decorationColorPushButton_clicked();
     void on_decorationColorCheckBox_clicked();
     void on_visualizeOccurrencesPushButton_clicked();
+    void on_exportPushButton_clicked();
 
 private:
     Ui::EditIrregularDialog *ui;
@@ -104,7 +128,7 @@ private:
     QLocale locale;
     CurrencyInfo currInfo;
     bool isIncome;
-    bool editingExistingStreamDef;
+    bool editingExistingCsd;
     QUuid initialId;
     QColor decorationColor;
     QDate maxDateFeGeneration;  // max date for Fe generation, come from scenario
@@ -122,7 +146,7 @@ private:
 
     // private methods
     QList<int> getSelectedRows();
-    void cleanUpForNewStreamDef();
+    void cleanUpForNewCsd();
     void setDecorationColorInfo();
     QString convertTagIDSetToString();
     void updateTagListTextBox();

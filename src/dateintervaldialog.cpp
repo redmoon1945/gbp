@@ -33,6 +33,12 @@ DateIntervalDialog::DateIntervalDialog(QWidget *parent)
     QDate to = from.addYears(1).addDays(-1);
     ui->fromDateEdit->setDate(from);
     ui->toDateEdit->setDate(to);
+
+    // Make buttons' font smaller
+    QFont font = ui->setEoyPushButton->font();
+    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true);
+    ui->setEoyPushButton->setFont(font);
+    ui->setTomorrowPushButton->setFont(font);
 }
 
 
@@ -82,5 +88,19 @@ void DateIntervalDialog::on_cancelPushButton_clicked()
 void DateIntervalDialog::on_DateIntervalDialog_rejected()
 {
     on_cancelPushButton_clicked();
+}
+
+
+void DateIntervalDialog::on_setTomorrowPushButton_clicked()
+{
+    QDate from = GbpController::getInstance().getTomorrow();
+    ui->fromDateEdit->setDate(from);
+}
+
+
+void DateIntervalDialog::on_setEoyPushButton_clicked()
+{
+    QDate to = ui->toDateEdit->date();
+    ui->toDateEdit->setDate(QDate(to.year(),12,31));
 }
 

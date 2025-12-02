@@ -21,13 +21,12 @@
 
 
 FilterTags::FilterTags() {
-    clear();
+    reset();
 }
 
 
 FilterTags::FilterTags(const FilterTags &o)
 {
-    this->enableFilterByTags = o.enableFilterByTags;
     this->filterTagIdSet = o.filterTagIdSet;
     this->mode = o.mode;
 }
@@ -40,8 +39,7 @@ FilterTags::~FilterTags()
 
 bool FilterTags::operator==(const FilterTags &o) const
 {
-    if ( (this->enableFilterByTags != o.enableFilterByTags) ||
-        (this->filterTagIdSet != o.filterTagIdSet) || (this->mode != o.mode) ) {
+    if ( (this->filterTagIdSet != o.filterTagIdSet) || (this->mode != o.mode) ) {
         return false;
     }
     return true;
@@ -56,7 +54,6 @@ bool FilterTags::operator!=(const FilterTags &o) const
 
 FilterTags &FilterTags::operator=(const FilterTags &o)
 {
-    this->enableFilterByTags = o.enableFilterByTags;
     this->filterTagIdSet = o.filterTagIdSet;
     this->mode = o.mode;
     return *this;
@@ -65,14 +62,30 @@ FilterTags &FilterTags::operator=(const FilterTags &o)
 
 void FilterTags::clear()
 {
-    enableFilterByTags = false;
+    filterTagIdSet = {};
+}
+
+
+void FilterTags::reset()
+{
     filterTagIdSet = {};
     mode = Mode::ANY;
 }
 
 
-// Getters / Setters
+qsizetype FilterTags::size()
+{
+    return filterTagIdSet.size();
+}
 
+
+bool FilterTags::containsTagId(const QUuid tagId)
+{
+    return filterTagIdSet.contains(tagId);
+}
+
+
+// Getters / Setters
 
 
 QSet<QUuid> FilterTags::getFilterTagIdSet() const
@@ -95,12 +108,3 @@ void FilterTags::setMode(FilterTags::Mode newMode)
     mode = newMode;
 }
 
-bool FilterTags::getEnableFilterByTags() const
-{
-    return enableFilterByTags;
-}
-
-void FilterTags::setEnableFilterByTags(bool newEnableFilterByTags)
-{
-    enableFilterByTags = newEnableFilterByTags;
-}

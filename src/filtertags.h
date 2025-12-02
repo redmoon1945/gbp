@@ -24,19 +24,25 @@
 #include <QSet>
 #include "qcoreapplication.h"
 
-// Convenient container representing the filter tags used for displaying CSDs
-// in the EditScenarioDialog.
-
+/** @brief Convenient container representing a set of tag IDs used as filter.
+ *  @details Only the Tags Ids are collected in this object. This class optionally supports a
+ *  "combination mode" for tags, that is if tags should be used
+ *  in "AND", "OR", "NOT".
+ */
 class FilterTags
 {
     Q_DECLARE_TR_FUNCTIONS(FilterTags);
 
 public:
 
-    // ALL : to be displayed, csd must be linked to ALL of the selected tags
-    // ANY : to be displayed, csd must be linked to AT LEAST ONE of the selected tags (default)
-    // NONE : to be displayed, csd must be linked to NONE of the selected tags
-    enum Mode {ALL=0, ANY=1, NONE=2};
+    /**
+     * @brief Represent the possible tags combination mode
+     */
+    enum Mode {
+        ALL=0,      ///< AND mode : all tags must be linked to the CSD.
+        ANY=1,      ///< OR mode : at least one tag must be linked the CSD.
+        NOT=2       ///< NOT mode : none of the tag must be linked to the CSD.
+    };
 
     FilterTags();
     FilterTags(const FilterTags& o);
@@ -48,26 +54,39 @@ public:
     FilterTags& operator=(const FilterTags& o) ;
 
     // Methods
+
+    /**
+     * @brief Remove all tag ids contained in this object. Combination mode is NOT affected.
+     */
     void clear();
 
-    // Getters / Setters
-    bool getEnableFilterByTags() const;
-    void setEnableFilterByTags(bool newEnableFilterByTags);
+    /**
+     * @brief Re-initialize the whole object, emptying the tags list and setting
+     *  combination mode to Mode::ANY.
+     */
+    void reset();
+
+    /**
+     * @brief Get the number of elements (tag's ID) in this object.
+     * @return The number of elements in this object.
+     */
+    qsizetype size();
+    /**
+     * @brief Check if this tag id is contained in this object.
+     * @param tagId The Tag id to check.
+     * @return True if this tag id is contained in this object, else false.
+     */
+    bool containsTagId(const QUuid tagId );
+
     QSet<QUuid> getFilterTagIdSet() const;
     void setFilterTagIdSet(const QSet<QUuid> &newFilterTagIdSet);
     Mode getMode() const;
     void setMode(Mode newMode);
 
 private:
-    // If false, Csds are displayed without considering the tags they are or are not linked to
-    // and in that case, values of filterTagIdSet and mode are irrelevant
-    bool enableFilterByTags;
 
-    // Set of Tag Id used for filtering.
-    QSet<QUuid> filterTagIdSet;
-
-    //  Filter Tags Mode (how selected tags are combined for filtering)
-    Mode mode;
+    QSet<QUuid> filterTagIdSet;///< Set of Tag Id used for filtering. Unordered.
+    Mode mode;///< Filter Tags Mode (how selected tags are combined for filtering).
 };
 
 #endif // FILTERTAGS_H

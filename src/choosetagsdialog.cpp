@@ -1,48 +1,45 @@
-#include "setfiltertagsdialog.h"
-#include "ui_setfiltertagsdialog.h"
+#include "choosetagsdialog.h"
+#include "ui_choosetagsdialog.h"
 #include <QMessageBox>
 
 
-SetFilterTagsDialog::SetFilterTagsDialog(QWidget *parent)
+ChooseTagsDialog::ChooseTagsDialog(QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::SetFilterTagsDialog)
+    , ui(new Ui::ChooseTagsDialog)
 {
     ui->setupUi(this);
 }
 
 
-SetFilterTagsDialog::~SetFilterTagsDialog()
+ChooseTagsDialog::~ChooseTagsDialog()
 {
     delete ui;
 }
 
 
-void SetFilterTagsDialog::slotPrepareContent(Tags tags, QSet<QUuid> preSelectedTags,
-    FilterTags::Mode mode)
+// Prepare the dialog before it is displayed
+// Input parameters :
+//  tags : the set of all tags available for selection
+//  preSelectedTags : list of Tags that must be pre-selected when the Dialog is displayed
+void ChooseTagsDialog::slotPrepareContent(Tags tags, QSet<QUuid> preSelectedTags)
 {
     this->tags = tags;
 
-    // display choosen mode
-    if (mode==FilterTags::Mode::ALL) {
-        ui->allRadioButton->setChecked(true);
-    } else if (mode==FilterTags::Mode::ANY) {
-        ui->anyRadioButton->setChecked(true);
-    } else {
-        ui->noneRadioButton->setChecked(true);
-    }
-
     updateList(preSelectedTags);
+
+    // Set focus on Apply
+    ui->applyPushButton->setFocus();
 }
 
 
-void SetFilterTagsDialog::on_SetFilterTagsDialog_rejected()
+void ChooseTagsDialog::on_ChooseTagsDialog_rejected()
 {
     on_cancelPushButton_clicked();
 }
 
 
 // Update the content of the listbox
-void SetFilterTagsDialog::updateList(QSet<QUuid> preSelectedTags)
+void ChooseTagsDialog::updateList(QSet<QUuid> preSelectedTags)
 {
     ui->listWidget->clear();
 
@@ -69,7 +66,7 @@ void SetFilterTagsDialog::updateList(QSet<QUuid> preSelectedTags)
 }
 
 
-void SetFilterTagsDialog::on_cancelPushButton_clicked()
+void ChooseTagsDialog::on_cancelPushButton_clicked()
 {
     emit signalCompleted(true);
     hide();
@@ -78,7 +75,7 @@ void SetFilterTagsDialog::on_cancelPushButton_clicked()
 
 // At least one tag must be selected, this is mandatory. It is expected by the caller of this
 // Dialog.
-void SetFilterTagsDialog::on_applyPushButton_clicked()
+void ChooseTagsDialog::on_applyPushButton_clicked()
 {
     // Get selected items and make sure at least one tag is selected
     QList<QListWidgetItem *> selection = ui->listWidget->selectedItems();
@@ -88,7 +85,6 @@ void SetFilterTagsDialog::on_applyPushButton_clicked()
         return;
     }
 
-
     // extract the QUuid of all the selected items
     QSet<QUuid> result;
     foreach (QListWidgetItem *item, selection) {
@@ -96,30 +92,20 @@ void SetFilterTagsDialog::on_applyPushButton_clicked()
         result.insert(cItem.id);
     }
 
-    // Get mode
-    FilterTags::Mode mode;
-    if (ui->allRadioButton->isChecked()==true) {
-        mode = FilterTags::Mode::ALL;
-    } else if (ui->anyRadioButton->isChecked()==true){
-        mode = FilterTags::Mode::ANY;
-    } else {
-        mode = FilterTags::Mode::NONE;
-    }
-
     // notify the parent and quit
-    emit signalResult(mode, result);
+    emit signalResult(result);
     emit signalCompleted(false);
     hide();
 }
 
 
-void SetFilterTagsDialog::on_selectAllPushButton_clicked()
+void ChooseTagsDialog::on_selectAllPushButton_clicked()
 {
     ui->listWidget->selectAll();
 }
 
 
-void SetFilterTagsDialog::on_unselectAllPushButton_clicked()
+void ChooseTagsDialog::on_unselectAllPushButton_clicked()
 {
     ui->listWidget->clearSelection();
 }

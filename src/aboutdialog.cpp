@@ -19,6 +19,7 @@
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 #include "gbpcontroller.h"
+#include "gbplogger.h"
 #include <QDesktopServices>
 
 AboutDialog::AboutDialog(QWidget *parent)
@@ -26,7 +27,8 @@ AboutDialog::AboutDialog(QWidget *parent)
     , ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
-    ui->appLabel->setText(QCoreApplication::applicationName() + "  " + QCoreApplication::applicationVersion());
+    ui->appLabel->setText(QCoreApplication::applicationName() + "  " +
+        QCoreApplication::applicationVersion());
     QString builtOn = QString(tr("Built on : %1 %2")).arg(__DATE__).arg(__TIME__);
     ui->buildOnLabel->setText(builtOn);
 
@@ -46,8 +48,10 @@ AboutDialog::~AboutDialog()
 
 void AboutDialog::slotAboutDialogPrepareContent(QLocale theLocale)
 {
-    ui->configFilePlainTextEdit->setPlainText(GbpController::getInstance().getSettingsFullFileName());
-    ui->logFilePlainTextEdit->setPlainText(GbpController::getInstance().getLogFullFileName());
+    ui->configFilePlainTextEdit->setPlainText(
+        GbpController::getInstance().getSettingsFullFileName());
+    ui->logFilePlainTextEdit->setPlainText(
+        GbpLogger::getInstance().getLogFullFileName());
 
     // Locale
     QString locString = QString("%1 (%2 %3)").
@@ -55,6 +59,9 @@ void AboutDialog::slotAboutDialogPrepareContent(QLocale theLocale)
         arg(theLocale.nativeLanguageName()).
         arg(theLocale.nativeTerritoryName());
     ui->localeLineEdit->setText(locString);
+
+    ui->closePushButton->setFocus();
+
 }
 
 
@@ -73,13 +80,12 @@ void AboutDialog::on_closePushButton_clicked()
 void AboutDialog::on_viewLogPushButton_clicked()
 {
     // then, use the system defaut application to read the file
-    bool success = QDesktopServices::openUrl(QUrl::fromLocalFile(ui->logFilePlainTextEdit->toPlainText()));
+    bool success = QDesktopServices::openUrl(QUrl::fromLocalFile(
+        ui->logFilePlainTextEdit->toPlainText()));
     if (success==true) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
-            GbpController::Info, QString("Viewing log file : Viewer launch succeeded"));
+        LOG_INFO(QString("Viewing log file : Viewer launch succeeded"));
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
-            GbpController::Error, QString("Viewing log file : Viewer launch failed"));
+        LOG_ERROR(QString("Viewing log file : Viewer launch failed"));
     }
 }
 

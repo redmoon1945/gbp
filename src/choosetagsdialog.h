@@ -1,42 +1,46 @@
-#ifndef SETFILTERTAGSDIALOG_H
-#define SETFILTERTAGSDIALOG_H
+#ifndef CHOOSETAGSDIALOG_H
+#define CHOOSETAGSDIALOG_H
 
 #include <QDialog>
 #include <qlistwidget.h>
 #include "tags.h"
-#include "filtertags.h"
 
 namespace Ui {
-class SetFilterTagsDialog;
+class ChooseTagsDialog;
 }
 
-class SetFilterTagsDialog : public QDialog
+
+/**
+ * @brief Dialog used to choose tags in a list of available tags. The Ids of the
+ * selected tags are returned in a Qset
+ */
+class ChooseTagsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
 
-    explicit SetFilterTagsDialog(QWidget *parent = nullptr);
-    ~SetFilterTagsDialog();
+    explicit ChooseTagsDialog(QWidget *parent = nullptr);
+    ~ChooseTagsDialog();
 
 signals:
-    // For client of ManageTagsChooseTagsDialog : send result and edition completion notification
-    void signalResult(FilterTags::Mode mode, QSet<QUuid> filterTagIdSet);
+    // For client of ChooseTagsDialog : send result and edition completion notification
+    void signalResult(QSet<QUuid> selectedTagsIds);
     void signalCompleted(bool canceled);
 
 public slots:
-    // From client of SetFilterTagsDialog: Prepare edition. Call this before show()
-    void slotPrepareContent(Tags tags, QSet<QUuid> preSelectedTags, FilterTags::Mode mode);
+    // From client of ChooseTagsDialog: Prepare edition. Call this before show()
+    void slotPrepareContent(Tags tags, QSet<QUuid> preSelectedTags);
 
 private slots:
-    void on_SetFilterTagsDialog_rejected();
+    void on_ChooseTagsDialog_rejected();
     void on_cancelPushButton_clicked();
     void on_applyPushButton_clicked();
     void on_selectAllPushButton_clicked();
     void on_unselectAllPushButton_clicked();
 
 private:
-    Ui::SetFilterTagsDialog *ui;
+    Ui::ChooseTagsDialog *ui;
 
     // for lists
     struct CustomItem{
@@ -70,4 +74,4 @@ private:
 
 };
 
-#endif // SETFILTERTAGSDIALOG_H
+#endif // CHOOSETAGSDIALOG_H

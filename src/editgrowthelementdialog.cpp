@@ -34,12 +34,8 @@ EditGrowthElementDialog::EditGrowthElementDialog(QString newGrowthName,QLocale a
 
     // Makes note characters smaller and italic
     QFont noteFont = ui->notesLabel->font();
-    uint oldFontSize = noteFont.pointSize();
-    uint newFontSize = Util::changeFontSize(1,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("EdityGrowthElement - Notes : Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    noteFont.setPointSize(newFontSize);
+    Util::changeFontSize(noteFont, Util::FontResizeIntensity::WEAK,true);
+    noteFont.setItalic(true);
     ui->notesLabel->setFont(noteFont);
 
     // "pack" the dialog to fit the font. This is required when there is no "expanding" widgets
@@ -110,6 +106,9 @@ void EditGrowthElementDialog::slotPrepareContent(bool newEditMode, QList<QDate> 
         ui->growthDoubleSpinBox->setValue(0);
         updateMonthlyGrowthEquivalentValue();
     }
+
+    //  set focus on Apply
+    ui->applyPushButton->setFocus();
 }
 
 

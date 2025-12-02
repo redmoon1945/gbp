@@ -75,7 +75,7 @@
           </font>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Descritive text for the scenario. Limited to 4000 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Descriptive text for the scenario. Limited to 4000 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -99,6 +99,9 @@
         <widget class="QPushButton" name="fullViewPushButton">
          <property name="text">
           <string>Full View...</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -195,6 +198,9 @@
          </property>
          <property name="text">
           <string>View/Edit...</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -308,7 +314,7 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string>Cash Stream Definitions</string>
+        <string>Cash stream definitions</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -479,10 +485,10 @@
           <item>
            <widget class="QCheckBox" name="filterTagsCheckBox">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : It enables &amp;quot;Tags Filtering&amp;quot; : Use tags links to further limit which Cash Stream Definitions are displayed (click the button to the right to select these tags)&lt;/p&gt;&lt;p&gt;if &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : It disables &amp;quot;Tag Filtering&amp;quot; : links with tags are &lt;span style=&quot; text-decoration: underline;&quot;&gt;not&lt;/span&gt; considered when determining which Cash Stream Definitions are displayed&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : It enables &amp;quot;Tags Filtering&amp;quot; : Use tags links to further limit which Cash Stream Definitions are displayed below (click the button to the right to select these tags)&lt;/p&gt;&lt;p&gt;if &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : It disables &amp;quot;Tag Filtering&amp;quot; : links with tags are &lt;span style=&quot; text-decoration: underline;&quot;&gt;not&lt;/span&gt; considered when determining which Cash Stream Definitions are displayed below&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Filter by tags</string>
+             <string>By tags</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -492,10 +498,20 @@
           <item>
            <widget class="QPushButton" name="filterTagsPushButton">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show a dialog where one can choose tags to be used as filters to limit which Csds are displayed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show a dialog where one can choose tags to be used as filters to limit which Csds are displayed below.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>Set...</string>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="filterTagsCombinationComboBox">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set how the selected tags are combined to affect the display of CSD.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;All required :&lt;/span&gt; Any CSD displayed must be linked to &lt;span style=&quot; text-decoration: underline;&quot;&gt;ALL&lt;/span&gt; these tags&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;At least one : &lt;/span&gt;Any CSD displayed must be linked to &lt;span style=&quot; text-decoration: underline;&quot;&gt;AT LEAST ONE&lt;/span&gt; of these tags&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;None of those : &lt;/span&gt;Any CSD displayed must&lt;span style=&quot; font-weight:700;&quot;/&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;NOT&lt;/span&gt; be linked to &lt;span style=&quot; text-decoration: underline;&quot;&gt;ANY&lt;/span&gt; of these tags&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
@@ -519,7 +535,7 @@
           <item>
            <widget class="QTableView" name="itemsTableView">
             <property name="alternatingRowColors">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="selectionMode">
              <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
@@ -543,7 +559,7 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
+              <width>20</width>
               <height>20</height>
              </size>
             </property>
@@ -557,6 +573,9 @@
             <property name="text">
              <string>New periodic ...</string>
             </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -566,6 +585,9 @@
             </property>
             <property name="text">
              <string>New irregular...</string>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -577,6 +599,9 @@
             <property name="text">
              <string>Edit...</string>
             </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -587,6 +612,9 @@
             <property name="text">
              <string>Duplicate</string>
             </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -596,6 +624,9 @@
             </property>
             <property name="text">
              <string>Delete</string>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -620,6 +651,9 @@
             <property name="text">
              <string>Enable</string>
             </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -630,6 +664,9 @@
             <property name="text">
              <string>Disable</string>
             </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -638,7 +675,10 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a color and use it to colorize the name of each Cash Stream Definition selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Set color...</string>
+             <string>Color...</string>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -647,12 +687,18 @@
             <property name="text">
              <string>Select all</string>
             </property>
+            <property name="autoDefault">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="unselectAllPushButton">
             <property name="text">
              <string>Unselect all</string>
+            </property>
+            <property name="autoDefault">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -663,7 +709,7 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
+              <width>20</width>
               <height>20</height>
              </size>
             </property>
@@ -702,6 +748,9 @@
        <property name="text">
         <string>Manage tags...</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -719,8 +768,17 @@
      </item>
      <item>
       <widget class="QPushButton" name="cancelPushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Discard the changes made since last &amp;quot;Apply&amp;quot; and close the window.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
-        <string>Hide</string>
+        <string>Cancel</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -733,10 +791,16 @@
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply to the current scenario all the modifications made in this form and update all the curves, charts and related information. The modified current scenario is NOT saved to disk (use explicitely the &amp;quot;Scenario-&amp;gt;Save&amp;quot; menu item).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply to the current scenario all the modifications made in this form and update all the curves, charts and related information. The modified current scenario is NOT saved to disk (use explicitly the &amp;quot;Scenario-&amp;gt;Save&amp;quot; menu item).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Apply</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -747,7 +811,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

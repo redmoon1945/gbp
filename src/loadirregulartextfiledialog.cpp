@@ -23,9 +23,10 @@
 #include <QDate>
 #include <QCoreApplication>
 #include "loadirregulartextfiledialog.h"
+#include "gbpcontroller.h"
 #include "ui_loadirregulartextfiledialog.h"
 #include "currencyhelper.h"
-#include "gbpcontroller.h"
+#include "gbplogger.h"
 
 
 LoadIrregularTextFileDialog::LoadIrregularTextFileDialog(QLocale aLocale, QWidget *parent)
@@ -58,23 +59,21 @@ void LoadIrregularTextFileDialog::on_cancelPushButton_clicked()
 
 void LoadIrregularTextFileDialog::on_importPushButton_clicked()
 {
-    QString errorStringUI, errorStringLog, line, lineTrimmed;
+    QString userErrorMessage, logErrorMessage, line, lineTrimmed;
     QStringList tokens;
     QString fileName = ui->fileNameLineEdit->text();
     int lineNo = 0;
 
-    GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
-        QString("Attempting to import a text file containing values for an irregular "
-            "cash stream definition : file name=\"%1\"").arg(fileName));
+    LOG_INFO( QString("Attempting to import a text file containing values for an irregular "
+        "cash stream definition : file name=\"%1\"").arg(REDACT(fileName)));
 
     // open the file
     QFile file(fileName);   // file is closed automatically by Qt
     if (!file.exists()){
-        errorStringUI = QString(tr("File %1 does not exist")).arg(fileName);
-        errorStringLog = QString("File %1 does not exist").arg(fileName);
-        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-        GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Error,
-            QString("Import failed : %1").arg(errorStringLog));
+        userErrorMessage = QString(tr("File %1 does not exist")).arg(fileName);
+        logErrorMessage = QString("File %1 does not exist").arg(fileName);
+        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
         return;
     }
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
@@ -83,7 +82,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
             // read and parse lines
             QTextStream stream(&file);
             stream.setAutoDetectUnicode(true);
-            QMap<QDate,IrregularFeStreamDef::AmountInfo> data;
+            QMap<QDate,IrregularCsd::AmountInfo> data;
             while (!stream.atEnd()){
                 line = stream.readLine();
                 lineNo++;
@@ -93,52 +92,44 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                     lineTrimmed = line.trimmed();
                     tokens = lineTrimmed.split('\t');
                     if ( (tokens.length() != 3) && (tokens.length() != 2) ) {
-                        errorStringUI = tr("Bad format for line no %1 (no of tokens is not 3 or 2,"
-                            " but %2).").arg(lineNo).arg(tokens.size());
-                        errorStringLog = QString("Bad format for line no %1 (no of tokens is not 3"
-                            " or 2, but %2).").arg(lineNo).arg(tokens.size());
-                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-                        GbpController::getInstance().log(
-                            GbpController::LogLevel::Debug,GbpController::Error,
-                            QString("Import failed : %1").arg(errorStringLog));
+                        userErrorMessage = tr("Bad format for line no %1 (no of tokens "
+                            "is not 3 or 2, but %2).").arg(lineNo).arg(tokens.size());
+                        logErrorMessage = QString("Bad format for line no %1 (no of tokens is "
+                            "not 3 or 2, but %2).").arg(lineNo).arg(tokens.size());
+                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
                     // convert the date
                     QDate date = QDate::fromString(tokens[0],Qt::ISODate);
                     if (!date.isValid()) {
-                        errorStringUI = tr("Date \"%1\" is invalid at line no %2.")
+                        userErrorMessage = tr("Date \"%1\" is invalid at line no %2.")
                             .arg(tokens[0]).arg(lineNo);
-                        errorStringLog = QString("Date \"%1\" is invalid at line no %2.")
+                        logErrorMessage = QString("Date \"%1\" is invalid at line no %2.")
                             .arg(tokens[0]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-                        GbpController::getInstance().log(
-                            GbpController::LogLevel::Debug,GbpController::Error,
-                            QString("Import failed : %1").arg(errorStringLog));
+                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
                     // convert the amount
                     bool ok;
                     double d = tokens[1].toDouble(&ok);
                     if ( ok==false ){
-                        errorStringUI = tr("Amount \"%1\" is not a valid number at line no %2.")
+                        userErrorMessage = tr("Amount \"%1\" is not a valid number at line no %2.")
                             .arg(tokens[1]).arg(lineNo);
-                        errorStringLog = QString("Amount \"%1\" is not a valid number "
+                        logErrorMessage = QString("Amount \"%1\" is not a valid number "
                             "at line no %2.").arg(tokens[1]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-                        GbpController::getInstance().log(
-                            GbpController::LogLevel::Debug,GbpController::Error,
-                            QString("Import failed : %1").arg(errorStringLog));
+                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
                     if (d<0) {
-                        errorStringUI = tr("Amount \"%1\" is smaller than 0 at line %2.")
+                        userErrorMessage = tr("Amount \"%1\" is smaller than 0 at line %2.")
                             .arg(tokens[1]).arg(lineNo);
-                        errorStringLog = QString("Amount \"%1\" is smaller than 0 at line %2.")
+                        logErrorMessage = QString("Amount \"%1\" is smaller than 0 at line %2.")
                             .arg(tokens[1]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-                        GbpController::getInstance().log(
-                            GbpController::LogLevel::Debug,GbpController::Error,
-                            QString("Import failed : %1").arg(errorStringLog));
+                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
                     if ( d > CurrencyHelper::maxValueAllowedForAmountInDouble(
@@ -147,52 +138,47 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             currInfo.noOfDecimal);
                         QString maxAllowedString = QString::number(maxAllowed, 'f',
                             currInfo.noOfDecimal);
-                        errorStringUI = tr("Amount \"%1\" is bigger than the maximum allowed of %2"
+                        userErrorMessage = tr("Amount \"%1\" is bigger than the maximum allowed of %2"
                             " at line %3.").arg(tokens[1]).arg(maxAllowedString).arg(lineNo);
-                        errorStringLog = QString("Amount \"%1\" is bigger than the maximum"
+                        logErrorMessage = QString("Amount \"%1\" is bigger than the maximum"
                             " allowed of %2 at line %3.").arg(tokens[1]).arg(maxAllowedString)
                             .arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-                        GbpController::getInstance().log(
-                            GbpController::LogLevel::Debug,GbpController::Error,
-                            QString("Import failed : %1").arg(errorStringLog));
+                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
                     int res;
                     qint64 amountDecimal = CurrencyHelper::amountDoubleToQint64(d,
                         currInfo.noOfDecimal,res);
                     if (res != 0) {
-                        errorStringUI = tr("Amount \"%1\" cannot be processed at line %2.")
+                        userErrorMessage = tr("Amount \"%1\" cannot be processed at line %2.")
                             .arg(tokens[1]).arg(lineNo);
-                        errorStringLog = QString("Amount \"%1\" cannot be processed at line %2.")
+                        logErrorMessage = QString("Amount \"%1\" cannot be processed at line %2.")
                             .arg(tokens[1]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-                        GbpController::getInstance().log(
-                            GbpController::LogLevel::Debug,GbpController::Error,
-                            QString("Import failed : %1").arg(errorStringLog));
+                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
                     // get the notes and check length. Only if there is a third token
                     QString notes;
                     if (tokens.size()==3) {
                         notes = tokens[2];
-                        if (notes.length() > IrregularFeStreamDef::AmountInfo::NOTES_MAX_LEN) {
-                            errorStringUI = tr("Notes length (%1 char.) is longer than the max"
+                        if (notes.length() > IrregularCsd::AmountInfo::NOTES_MAX_LEN) {
+                            userErrorMessage = tr("Notes length (%1 char.) is longer than the max"
                                 " allowed of %2 at line %3.").arg(notes.length()).arg(
-                                IrregularFeStreamDef::AmountInfo::NOTES_MAX_LEN).arg(lineNo);
-                            errorStringLog = QString("Notes length (%1 char.) is longer than"
+                                IrregularCsd::AmountInfo::NOTES_MAX_LEN).arg(lineNo);
+                            logErrorMessage = QString("Notes length (%1 char.) is longer than"
                                 " the max allowed of %2 at line %3.").arg(notes.length())
-                                .arg(IrregularFeStreamDef::AmountInfo::NOTES_MAX_LEN).arg(lineNo);
-                            QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-                            GbpController::getInstance().log(
-                                GbpController::LogLevel::Debug,GbpController::Error,
-                                QString("Import failed : %1").arg(errorStringLog));
+                                .arg(IrregularCsd::AmountInfo::NOTES_MAX_LEN).arg(lineNo);
+                            QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                            LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                             return;
                         }
                     }
 
-                    // record the data
-                    IrregularFeStreamDef::AmountInfo ai = {.amount=amountDecimal, .notes=notes};
+                    // record the data. we know the amount is >= 0
+                    IrregularCsd::AmountInfo ai = {.amount=static_cast<quint64>(amountDecimal),
+                        .notes=notes};
                     data.insert(date, ai);
 
                 }
@@ -203,36 +189,37 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                 tr("Import succeeded, %1 entries have been imported.")).arg(data.size()));
             emit signalImportResult(data);
             this->hide();
-            GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
-                QString("Import succeeded : %1"));
+            LOG_INFO( QString("Import succeeded") );
 
         } catch (const std::exception& e) {
-            errorStringUI = tr("An unexpected error has occured.\n\nDetails : %1").arg(e.what());
-            errorStringLog = QString("An unexpected error has occured.\n\nDetails : %1")
+            userErrorMessage = tr("An unexpected error has occurred.\n\nDetails : %1").arg(e.what());
+            logErrorMessage = QString("An unexpected error has occurred.\n\nDetails : %1")
                 .arg(e.what());
-            QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-            GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Error,
-                QString("Import failed : %1").arg(errorStringLog));
+            QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+            LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
             return;
         }
 
     } else {
-        errorStringUI = tr("Cannot open file %1 in read-only mode").arg(fileName);
-        errorStringLog = QString("Cannot open file %1 in read-only mode").arg(fileName);
-        QMessageBox::critical(nullptr,tr("Error"), errorStringUI);
-        GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Error,
-            QString("Import failed : %1").arg(errorStringLog));
+        userErrorMessage = tr("Cannot open file %1 in read-only mode").arg(fileName);
+        logErrorMessage = QString("Cannot open file %1 in read-only mode")
+            .arg(REDACT(fileName));
+        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+        LOG_ERROR(  QString("Import failed : %1").arg(logErrorMessage) );
         return ;
     }
 
 }
 
 
+// Choose the file to import
 void LoadIrregularTextFileDialog::on_browsePushButton_clicked()
 {
     QString errorString;
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select a Unicode text file"),QDir::homePath());
+    // Use "import" last directory
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select a Unicode text file"),
+        GbpController::getInstance().getLastDirImport());
     if (fileName != ""){
         QFile file(fileName);
         if (!file.exists()){
@@ -241,6 +228,9 @@ void LoadIrregularTextFileDialog::on_browsePushButton_clicked()
             return;
         } else {
             ui->fileNameLineEdit->setText(file.fileName());
+            // remember the directory
+            QString d = QFileInfo(file).absolutePath();
+            GbpController::getInstance().setLastDirImport(d);
         }
     }
 }

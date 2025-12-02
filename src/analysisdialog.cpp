@@ -20,6 +20,7 @@
 #include "qgraphicslayout.h"
 #include "ui_analysisdialog.h"
 #include "gbpcontroller.h"
+#include "gbplogger.h"
 #include "util.h"
 #include <QChart>
 #include <QPieSeries>
@@ -31,7 +32,20 @@
 #include <QBarSet>
 #include <QBarCategoryAxis>
 #include <QValueAxis>
-#include <cfloat>
+
+
+// --- For data attached to the legend list of Relative Weight ---
+// Anonymous namespace means private to this .cpp file ---
+namespace {
+    struct LegendItemInfo {
+        quint8 rank;        // position (1 = highest percentage)
+        double amount;      // always positive
+        double percentage;  // e.g. 4% => 4
+        QUuid id;           // csd ID
+    };
+}
+// so that it can be used as a QVariant, which is required by setData
+Q_DECLARE_METATYPE(LegendItemInfo)
 
 
 
@@ -42,45 +56,110 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     ui->setupUi(this);
     locale = theLocale;
 
+    QFont font ;
+
     // *** RELATIVE WEIGHT CONTROLS ***
+
     seriesRelativeWeigth = new QPieSeries;
-    chartRelativeWeigth = new QChart;
-    chartRelativeWeigth->addSeries(seriesRelativeWeigth); // take ownership
-    chartRelativeWeigth->setAnimationOptions(QChart::AllAnimations);
-    chartRelativeWeigth->legend()->show();
-    chartRelativeWeigth->legend()->setAlignment(Qt::AlignRight);
-    chartViewRelativeWeigth = new QChartView(chartRelativeWeigth, ui->chartRelativeWeigthWidget);
+    chartRelativeWeight = new QChart;
+
+    // Set margin according to font
+    // QFontMetrics fm(chartRelativeWeight->titleFont());   // or series->labelsFont()
+    // int margin = fm.height() * 2;  // two lines worth of space
+    // chartRelativeWeight->setMargins(QMargins(10, margin, 10, 10));
+
+    chartRelativeWeight->addSeries(seriesRelativeWeigth); // take ownership
+    chartRelativeWeight->setAnimationOptions(QChart::AllAnimations);
+    chartRelativeWeight->legend()->hide();
+    chartRelativeWeight->legend()->setAlignment(Qt::AlignRight);
+    chartViewRelativeWeigth = new QChartView(chartRelativeWeight, ui->chartRelativeWeigthWidget);
     chartViewRelativeWeigth->setRenderHint(QPainter::Antialiasing);
-    chartRelativeWeigth->layout()->setContentsMargins(1, 1, 1, 1);
-    chartRelativeWeigth->setBackgroundRoundness(0);
-    // Must have as many colors as max no of elements + 1. See
-    // https://www.w3.org/TR/SVG11/types.html#ColorKeywords
-    colorsRelativeWeigth = {QColor("cyan"), QColor("magenta"), QColor("red"), QColor("lightpink"),
-        QColor("darkRed"), QColor("darkCyan"), QColor("darkMagenta"), QColor("green"),
-        QColor("darkGreen"), QColor("yellow"), QColor("azure"), QColor("blueviolet"),
-        QColor("chocolate"), QColor("lightgrey"), QColor("gold"), QColor("lightcoral"),
-        QColor("firebrick"), QColor("dimgray"), QColor("darksalmon"), QColor("darkturquoise"),
-        QColor("darkolivegreen"), QColor("crimson"), QColor("blueviolet"), QColor("bisque"),
-        QColor("orchid"), QColor("palegreen")};
-    if(GbpController::getInstance().getIsDarkModeSet()==true){
-        chartRelativeWeigth->setTheme(QChart::ChartThemeDark);
+    chartRelativeWeight->layout()->setContentsMargins(1, 1, 1, 1);
+    chartRelativeWeight->setBackgroundRoundness(0);
+
+
+    // Must have as many colors as max no of elements + 1., that is *** 26 ***
+    // These colors are optimized.
+    colorsRelativeWeigth = {
+        QColor(228,26,28),    // red
+        QColor(55,126,184),   // blue
+        QColor(77,175,74),    // green
+        QColor(152,78,163),   // purple
+        QColor(255,127,0),    // orange
+        QColor(255,255,51),   // yellow
+        QColor(247,129,191),  // pink
+        QColor(0,191,255),    // deep sky blue
+        QColor(46,139,87),    // sea green
+        QColor(255,69,0),     // red-orange
+        QColor(138,43,226),   // blue violet
+        QColor(60,179,113),   // medium sea green
+        QColor(210,105,30),   // chocolate
+        QColor(0,128,128),    // teal
+        QColor(255,20,147),   // deep pink
+        QColor(70,130,180),   // steel blue
+        QColor(199,21,133),   // medium violet red
+        QColor(218,165,32),   // goldenrod
+        QColor(0,100,0),      // dark green
+        QColor(123,104,238),  // medium slate blue
+        QColor(139,69,19),    // saddle brown
+        QColor(127,255,212),  // aquamarine
+        QColor(244,164,96),   // sandy brown
+        QColor(32,178,170),   // light sea green
+        QColor(186,85,211),   // orchid
+        QColor(0,206,209)     // dark turquoise
+    };
+
+    if(GbpController::getInstance().useDarkModeForChart()==true){
+        chartRelativeWeight->setTheme(QChart::ChartThemeDark);
     } else {
-        chartRelativeWeigth->setTheme(QChart::ChartThemeLight);
+        chartRelativeWeight->setTheme(QChart::ChartThemeLight);
     }
-    ui->tabWidget->setCurrentIndex(0);  // make sure Relative Weight Pie chart is shown first
-    // other settings
-    ui->titleLabel->setText(tr("Relative weight of incomes for that period"));
-    ui->noElementsLabel->setText(tr("No of most significant incomes to use :"));
-    ui->fromDateEdit->setDate(GbpController::getInstance().getTomorrow());
-    ui->toDateEdit->setDate(GbpController::getInstance().getTomorrow().addYears(1).addDays(-1));
-    ui->noElementsSpinBox->setValue(5);
+
+    // set current tab : make sure Relative Weight Pie chart is shown first
+    ui->tabWidget->setCurrentIndex(0);
+    ui->globalExportCsvPushButton->setVisible(true);
+    ui->globalExportImagePushButton->setVisible(true);
+
+    // Set initial from/to dates
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+    ui->fromDateEdit->setDate(tomorrow);
+    rwPreviousFromDate = tomorrow;
+    ui->toDateEdit->setDate(tomorrow.addYears(1).addDays(-1));
+    rwPreviousToDate = tomorrow.addYears(1).addDays(-1);
+
+    // misc init
+    ui->noElementsLabel->setText(tr("No of most significant items :"));
+    ui->noElementsSpinBox->setValue(10);
     ui->chartRelativeWeigthWidget->installEventFilter(this);
-    // widen Date widget
+
+    // Widen Date widget
     QFontMetrics fm = ui->fromDateEdit->fontMetrics();
     ui->fromDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
     ui->toDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
 
+    // Set color of "incomes" and "expenses" radio buttons
+    ui->incomesRelativeWeigthRadioButton->setStyleSheet(Util::getStyleSheetStringForColor(
+        GbpController::getInstance().getIncomeColor()));
+    ui->expensesRelativeWeigthRadioButton->setStyleSheet(Util::getStyleSheetStringForColor(
+        GbpController::getInstance().getExpenseColor()));
+
+    // Set monospace font for list box and smaller font
+    font = ui->RW_listWidget->font();
+    QFont monoF = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    monoF.setPointSize(font.pointSize());
+    Util::changeFontSize(monoF, Util::FontResizeIntensity::AVERAGE, true);
+    ui->RW_listWidget->setFont(monoF);
+
+    // Set the amount string to be able to display max number without streching the Dialog
+    // At this time, we dont have access to a currency, so use the max amount of decimal.
+    int numChars = CurrencyHelper::maxCharForMaxAmountInDouble(
+        CurrencyHelper::maxValueAllowedForNoOfDecimalsForCurrency());
+    QFontMetrics fmAmount(ui->rwAmountLabel->font());
+    int widthAmount = fm.horizontalAdvance(QString(numChars*1.5, '8'));
+    ui->rwAmountLabel->setMinimumWidth(widthAmount);
+
     // *** MONTHLY REPORT - CHART ***
+
     initReportChart(ReportType::MONTHLY);
     // other settings
     fillMonthlyReportComboBoxWithMonthNames();
@@ -89,52 +168,124 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     ui->monthlyReportChartFromYearSpinBox->setValue(GbpController::getInstance().getTomorrow()
         .year());
     ui->monthlyReportChartDurationSpinBox->setValue(12);
-    // make smaller selected bar info
-    QFont font = ui->monthlyReportChartSelectedLabel->font();
-    uint oldFontSize = font.pointSize();
-    uint newFontSize = Util::changeFontSize(2, true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Analysis dialog - Monthly and yearly chart - Selected bar info font "
-        "size set from %1 to %2").arg(oldFontSize).arg(newFontSize));
-    font.setPointSize(newFontSize);
+    // make smaller selected bar info font
+    font = ui->monthlyReportChartSelectedLabel->font();
+    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true);
     ui->monthlyReportChartSelectedTextLabel->setFont(font);
     ui->monthlyReportChartSelectedLabel->setFont(font);
     // Make stats areas using smaller font
     ui->monthlyReportStatsLabel->setFont(font);
-    // Make Export button smaller
-    ui->exportImageMonthlyReportChartPushButton->setFont(font);
 
     // *** Yearly REPORT - CHART ***
+
     initReportChart(ReportType::YEARLY);
     // other settings
     ui->yearlyReportChartFromYearSpinBox->setValue(GbpController::getInstance().getTomorrow()
         .year());
     ui->yearlyReportChartDurationSpinBox->setValue(10);
     // make smaller selected bar info
+    font = ui->yearlyReportChartSelectedLabel->font();
+    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true);
     ui->yearlyReportChartSelectedTextLabel->setFont(font);
     ui->yearlyReportChartSelectedLabel->setFont(font);
     // Make stats areas using smaller font
     ui->annualReportStatsLabel->setFont(font);
-    // Make Export button smaller
-    ui->exportImageYearlyReportChartPushButton->setFont(font);
 
     // *** MONTHLY REPORT - TABLE CONTROLS ***
-    ui->monthlyReportTableWidget->setColumnCount(4);
+
+    ui->monthlyReportTableWidget->setColumnCount(5);
     ui->monthlyReportTableWidget->setHorizontalHeaderLabels({tr("Month"),tr("Incomes"),
-        tr("Expenses"),tr("Delta")});
+        tr("Expenses"),tr("Delta"),tr("Cash balance")});
     ui->monthlyReportTableWidget->setSortingEnabled(false);
     ui->monthlyReportTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers); // no edition
     ui->monthlyReportTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->monthlyReportTableWidget->verticalHeader()->setVisible(true);
 
     // *** YEARLY REPORT - TABLE CONTROLS ***
-    ui->yearlyReportTableWidget->setColumnCount(4);
+
+    ui->yearlyReportTableWidget->setColumnCount(5);
     ui->yearlyReportTableWidget->setHorizontalHeaderLabels({tr("Year"),tr("Incomes"),
-        tr("Expenses"),tr("Delta")});
+        tr("Expenses"),tr("Delta"),tr("Cash balance")});
     ui->yearlyReportTableWidget->setSortingEnabled(false);
     ui->yearlyReportTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);  // no edition
     ui->yearlyReportTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->yearlyReportTableWidget->verticalHeader()->setVisible(true);
+
+    // *** TAGS Table ***
+
+    ui->tagsFromDateEdit->setDate(tomorrow);
+    ui->tagsToDateEdit->setDate(tomorrow.addYears(1).addDays(-1));
+    tagsPreviousFromDate = tomorrow;
+    tagsPreviousToDate = tomorrow.addYears(1).addDays(-1);
+
+    // Widen Date widgets
+    fm = ui->tagsFromDateEdit->fontMetrics();
+    ui->tagsFromDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
+    ui->tagsToDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
+    // set some variables
+    availableTags.clear();
+    selectedTags.clear();
+    ui->tagsTableWidget->setColumnCount(3); // tag name, amount, weight in percentage
+    QStringList tagTableHeaders ={tr("Tag's name"), tr("Total amount"), tr("Weight (%1)").arg("%")};
+    QStringList tagTableHeadersTooltips = {"","",
+        tr("For this period of time, percentage of total amount for Csds associated with this tag "
+        "relative to the total amount for all Csds regardless of tags.")};
+    for (int col = 0; col < 3; ++col) {
+        QTableWidgetItem *headerItem = new QTableWidgetItem(tagTableHeaders[col]);
+        if(col==2){
+            headerItem->setToolTip(tagTableHeadersTooltips[col]);
+        }
+        ui->tagsTableWidget->setHorizontalHeaderItem(col, headerItem);
+    }
+    ui->tagsTableWidget->setSortingEnabled(true);
+
+    // Set color of "incomes" and "expenses" radio buttons
+    ui->tagsIncomesRadioButton->setStyleSheet(Util::getStyleSheetStringForColor(
+        GbpController::getInstance().getIncomeColor()));
+    ui->tagsExpensesRadioButton->setStyleSheet(Util::getStyleSheetStringForColor(
+        GbpController::getInstance().getExpenseColor()));
+
+    // resize column of tag table
+    //ui->tagsTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    QHeaderView *header = ui->tagsTableWidget->horizontalHeader();
+    header->setSectionResizeMode(0, QHeaderView::Stretch); // Column 0: stretch
+    QFontMetrics fm2 = ui->tagsTableWidget->fontMetrics();
+    header->setSectionResizeMode(1, QHeaderView::Fixed);
+    ui->tagsTableWidget->setColumnWidth(1, fm2.averageCharWidth()*20);
+    header->setSectionResizeMode(2, QHeaderView::Fixed);
+    ui->tagsTableWidget->setColumnWidth(2, fm2.averageCharWidth()*20);
+
+    // Force tag table to be initially sorted by weigth (descending)
+    ui->tagsTableWidget->sortItems(2, Qt::DescendingOrder);
+
+    // Set tags no of label to have smaller fonts and italic
+    font = ui->tags_noTagsSelectedLabel->font();
+    Util::changeFontSize(font, Util::FontResizeIntensity::WEAK, true);
+    font.setItalic(true);
+    ui->tags_noTagsSelectedLabel->setFont(font);
+
+    // Init total amount to 0
+    ui->tags_totalAmountLabel->setText("");
+
+    // Set focus on "Close" button
+    ui->closePushButton->setDefault(true);
+
+    // *** Dialog children and connections ***
+
+    // Create Dialog for selecting tags
+    selectTagsDlg = new ChooseTagsDialog(this);
+    selectTagsDlg->setModal(true);
+
+    // connect emitters & receivers for Dialogs : choose Tags
+    QObject::connect(this, &AnalysisDialog::signalChooseTagsPrepareContent, selectTagsDlg,
+        &ChooseTagsDialog::slotPrepareContent);
+    QObject::connect(selectTagsDlg, &ChooseTagsDialog::signalResult, this,
+        &AnalysisDialog::slotChooseTagsResult);
+    QObject::connect(selectTagsDlg, &ChooseTagsDialog::signalCompleted, this,
+        &::AnalysisDialog::slotChooseTagsCompleted);
+
+    adjustSize();  // Pack the dialog to fit its contents
+
 
     ready = true;
 }
@@ -146,44 +297,85 @@ AnalysisDialog::~AnalysisDialog()
 }
 
 
-void AnalysisDialog::slotAnalysisPrepareContent(
-    QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData, CurrencyInfo currencyInfo)
+void AnalysisDialog::slotAnalysisPrepareContent( QWeakPointer<CombinedFeStreams> chartRawDataRef,
+    Tags availabletags, CurrencyInfo currencyInfo, double startingAmount)
 {
-    this->chartRawData = chartRawData;
+    this->chartRawDataRef = chartRawDataRef;
     this->currInfo = currencyInfo;
+    this->startingAmount = startingAmount;
 
     // *** RELATIVE WEIGTH ***
     updateRelativeWeightChart();
 
     // *** MONTHLY AND YEARLY REPORTS ***
-    // calculate data
-    recalculate_MonthlyYearlyReportData(MONTHLY, ui->monthlyReportTableWidget);
-    recalculate_MonthlyYearlyReportData(YEARLY, ui->yearlyReportTableWidget);
+    // calculate data : will be used by tables and charts.
+    recalculate_BinsData(ReportType::MONTHLY, ui->monthlyReportTableWidget);
+    recalculate_BinsData(ReportType::YEARLY, ui->yearlyReportTableWidget);
     // update report tables accordingly
-    redisplay_MonthlyYearlyReportTableData(MONTHLY, ui->monthlyReportTableWidget);
-    redisplay_MonthlyYearlyReportTableData(YEARLY, ui->yearlyReportTableWidget);
+    redisplay_MonthlyYearlyReportTableData(ReportType::MONTHLY, ui->monthlyReportTableWidget);
+    redisplay_MonthlyYearlyReportTableData(ReportType::YEARLY, ui->yearlyReportTableWidget);
     // update monthly and yearly charts
-    redisplay_ReportChart(ReportType::MONTHLY, false);
-    redisplay_ReportChart(ReportType::YEARLY, false);
-
-    // misc suff
+    redisplay_ReportChart(ReportType::MONTHLY);
+    redisplay_ReportChart(ReportType::YEARLY);
+    //
     ui->monthlyReportChartSelectedTextLabel->setText("");
 
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Analysis dialog invoked"));
+    // *** Tags ***
+
+    this->availableTags = availabletags;
+
+    // Try to conserve the tags already selected from previous invocation of the dialog.
+    // Scenario or tags set may have changed. Otherwise, we take all the tag available
+    QSet<QUuid> formerSet = selectedTags.getFilterTagIdSet();
+    availableTags.cleanIdList(formerSet);
+    selectedTags.setFilterTagIdSet(formerSet);
+    if (formerSet.size()==0) {
+        // scenario may have changed or tags modified in the current scenario. In that case,
+        // we select all the tags for convenience.
+        selectedTags.setFilterTagIdSet(availableTags.getTagIdSetAsQset());
+    }
+
+    // Update no of tags selected
+    tags_UpdateNoTagsSelected();
+
+    // Rebuild data and update tag table
+    redisplay_TagTable();
+
+    // Set focus on Close button
+    ui->closePushButton->setFocus();
+
+    LOG_DEBUG_INFO(QString("Analysis dialog invoked"));
+}
+
+
+void AnalysisDialog::slotChooseTagsResult(QSet<QUuid> chosenTags)
+{
+    selectedTags.setFilterTagIdSet(chosenTags);
+
+    // Update no of tags selected
+    tags_UpdateNoTagsSelected();
+
+    // Rebuild the data and update the tag chart
+    redisplay_TagTable();
+}
+
+
+void AnalysisDialog::slotChooseTagsCompleted(bool canceled)
+{
+
 }
 
 
 void AnalysisDialog::themeChanged()
 {
-    if(GbpController::getInstance().getIsDarkModeSet()==true){
+    if(GbpController::getInstance().useDarkModeForChart()==true){
         chartMonthlyReport->setTheme(QChart::ChartThemeDark);
         chartYearlyReport->setTheme(QChart::ChartThemeDark);
-        chartRelativeWeigth->setTheme(QChart::ChartThemeDark);
+        chartRelativeWeight->setTheme(QChart::ChartThemeDark);
     } else {
         chartMonthlyReport->setTheme(QChart::ChartThemeLight);
         chartYearlyReport->setTheme(QChart::ChartThemeLight);
-        chartRelativeWeigth->setTheme(QChart::ChartThemeLight);
+        chartRelativeWeight->setTheme(QChart::ChartThemeLight);
     }
 }
 
@@ -199,98 +391,102 @@ bool AnalysisDialog::eventFilter(QObject *object, QEvent *event)
     if ( (event->type() == QEvent::Resize) && (object == ui->yearlyReportChartWidget)){
         chartViewYearlyReport->resize(ui->yearlyReportChartWidget->size());
     }
+
     return QObject::eventFilter(object, event);
 }
 
 
-// completely recalculate and redisplay Pie (relative weight)
 void AnalysisDialog::updateRelativeWeightChart()
 {
     if (!ready){
         return;
     }
 
-    // build pie data
+    // Get current scenario
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if(scenario.isNull()){
+        return; // if no scenario loaded (should not happen)
+    }
+
+    // Make sure the raw data is available (which should always be the case)
+    QSharedPointer<CombinedFeStreams> chartRawData = chartRawDataRef.toStrongRef();
+    if(chartRawData.isNull()){
+        return; // should never happen
+    }
+
+    // Some Init and data def
     int noOfElements= ui->noElementsSpinBox->value();
-    bool isIncome = ui->incomesRelativeWeigthRadioButton->isChecked();
     QDate from = ui->fromDateEdit->date();
     QDate to = ui->toDateEdit->date();
     QDate tomorrow = GbpController::getInstance().getTomorrow();
+    RelWeightGrouping grouping = getGroupingTypeSelected();
 
-    if(!from.isValid()){
-        QMessageBox::critical(nullptr,tr("Error"),tr("\"From\" date is invalid"));
-        return;
-    } else if (!to.isValid()) {
-        QMessageBox::critical(nullptr,tr("Error"),tr("\"To\" date is invalid"));
-        return;
-    } else if (to<from){
-        QString fromString = from.toString(Qt::ISODate);
-        QString toString = to.toString(Qt::ISODate);
-        QString s = QString(tr("\"To\" date %1 cannot occur before \"From\" date %2"))
-            .arg(toString).arg(fromString);
-        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
-        return;
-    } else if (from<tomorrow){
-        QString fromString = from.toString(Qt::ISODate);
-        QString tomorrowString = tomorrow.toString(Qt::ISODate);
-        QString s = QString(tr("\"From\" date %1 cannot be smaller than \"tomorrow\" %2"))
-            .arg(fromString).arg(tomorrowString);
-        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
-        return;
-    }
+    // Clear Legends widget
+    clearLegendWidgets();
 
-    // *** step 1 : count individual contribution of each StreamDef ***
-    // no need to sort keys. key = Stream Def UUID, value = total amount contributed by the
-    // StreamDef in the period. Positive for Income, negative for expense
-    QHash<QUuid,double> bins = {};
-    double d;
-    double minDouble = -DBL_MAX;
-    double maxDouble = DBL_MAX;
+    // *** step 1 : Build the relative weight bins for the pie chart by counting individual
+    // contributions of each CSD if grouping=INCOMES or EXPENSES or each tag if grouping=TAGS.
+    // Results : key = CSD or tag UUID, value = total amount contributed
+    // in the period (never negative)
+    QHash<QUuid,double> bins = {}; // hold the temp results, to be sorted later
     double grandTotal=0;
-    foreach(QDate date, chartRawData.keys()){
+    QList<CombinedFeStreams::DailyInfo> listDi = chartRawData->getCombinedStreams();
+    const qsizetype size = listDi.size();
+    for (int var = 0; var < size; ++var) {
+
+        // +++ Pre-processing +++
+        CombinedFeStreams::DailyInfo di = listDi[var];
+        if(di.used == false){
+            continue;
+        }
+        QDate date = tomorrow.addDays(var);
+
+        // +++ processing +++
+
         if( (date<from) || (date>to) ){
             continue;   // not in the interval
         }
-        CombinedFeStreams::DailyInfo di = chartRawData.value(date);
-        if(isIncome){
-            for( int i=0; i<di.incomesList.count(); ++i ){
-                FeDisplay fed = di.incomesList.at(i);
-                grandTotal += fed.amount;
-                d = bins.value(fed.id,minDouble);
-                if(d != minDouble){
-                    d += fed.amount; // existing entry
-                } else {
-                    d = fed.amount;
+        if( (grouping==RelWeightGrouping::RWGROUPING_INCOMES) ||
+            (grouping==RelWeightGrouping::RWGROUPING_EXPENSES)){
+            // set a generic pointer of the list of CSD (either incomes or expenses)
+            QList<Fe> *prtCsdList = ((grouping==RelWeightGrouping::RWGROUPING_INCOMES)
+                ?(&(di.incomesList)):(&(di.expensesList)));
+            // Iterate through the list of CSD of that occurrence day
+            for( int i=0; i<prtCsdList->count(); ++i ){
+                Fe fed = prtCsdList->at(i);
+                QSharedPointer<Csd> csdRef = fed.csdPtr.toStrongRef();
+                if (csdRef.isNull()) {
+                    continue; // should never happen
                 }
-                bins.insert(fed.id, d); // replace current value
-
-            }
-        } else {
-            for( int i=0; i<di.expensesList.count(); ++i ){
-                FeDisplay fed = di.expensesList.at(i);
-                grandTotal += fed.amount;
-                d = bins.value(fed.id,maxDouble);  // d is negative number
-                if(d != maxDouble){
-                    d += fed.amount;  // existing entry
-                } else {
-                    d = fed.amount;
+                grandTotal += fabs(fed.amount);
+                double binValue = bins.value(csdRef->getId(),-1);
+                if(binValue >= 0){// existing entry
+                    binValue += fabs(fed.amount);
+                } else { // new entry
+                    binValue = fabs(fed.amount);
                 }
-                bins.insert(fed.id, d);
+                bins.insert(csdRef->getId(), binValue); // replace current value or create new one
             }
+        } else{
+            // Illegal grouping : should never happen
+            throw std::logic_error("Invalid grouping value");
         }
     }
 
-    // *** step 2 : sort by amount (biggest to smallest).
-    // Make positive the neg ative no of Expenses ***
-    QList<Pair> tempList;
+    // *** step 2 : sort the bins by amount (biggest to smallest).
+    QList<LegendItemInfo> tempList; // result of the sort
     foreach(QUuid id, bins.keys()){
-        double d = fabs(bins.value(id));
-        Pair p = {.amount = d, .percentage= (100*d/grandTotal), .id = id};
+        double d = bins.value(id);
+        // rank will be set later after the sort
+        LegendItemInfo p = {.rank=0, .amount = d, .percentage= (100*d/grandTotal), .id = id};
         tempList.append(p);
     }
-    std::sort(tempList.begin(), tempList.end(), [](const Pair& p1, const Pair& p2) {
+    std::sort(tempList.begin(), tempList.end(), [](const LegendItemInfo& p1, const LegendItemInfo& p2) {
         return (p1.amount > p2.amount);
     });
+    for(int counter=0; counter<tempList.size(); counter++){
+        tempList[counter].rank = counter+1;
+    }
 
     // *** step 3 : shrink to "n" elements + 1 "others" when required ***
     int noElements = ui->noElementsSpinBox->value(); // 1 is minimum
@@ -305,133 +501,206 @@ void AnalysisDialog::updateRelativeWeightChart()
         }
         tempList.remove(noElements,noRejected);
         QUuid nullId = QUuid::fromString(QStringView()); // will be null QUuid because not valid
-        Pair othersPair = {.amount = cumulAmountRejected, .percentage = cumulPercentageRejected,
-            .id = nullId };
+        LegendItemInfo othersPair = {.amount = cumulAmountRejected,
+            .percentage = cumulPercentageRejected, .id = nullId };
         tempList.append(othersPair);
 
         // re-sort new TempList because "others" may have been created ****
-        std::sort(tempList.begin(), tempList.end(), [](const Pair& p1, const Pair& p2) {
+        std::sort(tempList.begin(), tempList.end(), [](const LegendItemInfo& p1,
+            const LegendItemInfo& p2) {
             return (p1.amount > p2.amount);
         });
+        for(int counter=0; counter<tempList.size(); counter++){
+            tempList[counter].rank = counter+1;
+        }
     }
 
     // *** step 4 : transform into pie data ***
-    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario();
-    chartRelativeWeigth->removeAllSeries();
+
+    // recreate the pie
+    chartRelativeWeight->removeAllSeries();
     seriesRelativeWeigth = new QPieSeries;
+
+    // Adjust "margin so that we can see out labels even when big fonts. This is tricky...
+    seriesRelativeWeigth->setPieSize(0.7); // smaller pie = more room for labels
+
+    // Set rotation for Pie
+    seriesRelativeWeigth->setPieStartAngle(ui->RW_horizontalSlider->value());
+    seriesRelativeWeigth->setPieEndAngle(360+ui->RW_horizontalSlider->value());
+
     bool found;
     QList<QString> originalSliceNames;
     for(int i=0;i<tempList.size();i++){
-        Pair p = tempList.at(i);
+        LegendItemInfo p = tempList.at(i);
         if (p.id.isNull()==true){
             // this is the "others" element
             seriesRelativeWeigth->append(tr("Others"), fabs(p.amount));
             originalSliceNames.append(tr("Others"));
         } else{
+            // name is CSD name
             QString name;
-            QColor color;
-            scenario->getStreamDefNameAndColorFromId(p.id, name, color,found); // always found
+            if ( (grouping==RelWeightGrouping::RWGROUPING_INCOMES) ||
+                (grouping==RelWeightGrouping::RWGROUPING_EXPENSES) ) {
+                QColor color;
+                scenario->getCsdNameAndColorFromId(p.id, name, color,found); // always found
+            } else{
+                throw std::logic_error("Invalid grouping value"); // should never happen
+            }
             originalSliceNames.append(name);
-            seriesRelativeWeigth->append(name, fabs(p.amount));
+            seriesRelativeWeigth->append(name, p.amount);
         }
 
     }
 
     // *** step 5 : labels for slices ***
     seriesRelativeWeigth->setLabelsVisible(true);
-    int c=0;
-    for(auto slice : seriesRelativeWeigth->slices()){
-        slice->setLabel(QString("#%1: %2%").arg(c+1).arg(100*slice->percentage(), 0, 'f', 1));
-        slice->setLabelArmLengthFactor(0.25);
-        slice->setBrush(colorsRelativeWeigth[c]);
-        c++;
+    int slSize = seriesRelativeWeigth->slices().size();
+    for (int i = 0; i < slSize; ++i) {
+        QPieSlice *slice = seriesRelativeWeigth->slices().at(i);
+        // change font
+        QFont f = slice->labelFont();
+        Util::changeFontSize(f, Util::FontResizeIntensity::AVERAGE,true);
+        slice->setLabelFont(f);
+        if (ui->RW_ShowLabelsCheckBox->isChecked()==true) {
+            slice->setLabelVisible(true);
+        } else {
+            slice->setLabelVisible(false);
+        }
+        // set label
+        //slice->setLabel(QString("%1").arg(i+1));
+        //slice->setLabelArmLengthFactor(0.5); // default is 15. Clipping problem (bug ?)
+        // set color
+        slice->setBrush(colorsRelativeWeigth[i]);
     }
-    chartRelativeWeigth->addSeries(seriesRelativeWeigth);
+    chartRelativeWeight->addSeries(seriesRelativeWeigth);
 
-    // *** step 6 : overwrite legend items ***
-    c = 0;
-    QList<QLegendMarker *> mList = chartRelativeWeigth->legend()->markers();
-    for(auto legendMarker : mList){
-        QString amountString = CurrencyHelper::formatAmount(tempList.at(c).amount,currInfo, locale,
-            true);
-        QString s = QString("#%1: %2 (%3)").arg(c+1).arg(Util::elideText(originalSliceNames.at(c),
-            30,true)).arg(amountString);
-        legendMarker->setLabel(s);
-        c++;
+    // *** step 6 : Update legend (items the right listbox) ***
+    ui->RW_listWidget->clear();
+    QFontMetrics fm(ui->RW_listWidget->font());
+    int sizeFontList = 0.9*fm.height();
+    for (int i = 0; i < slSize; ++i) {
+        QPieSlice *slice = seriesRelativeWeigth->slices().at(i);
+        QListWidgetItem *item = new QListWidgetItem();
+
+        //  add color marker
+        QPixmap pix(sizeFontList, sizeFontList);
+        pix.fill(slice->brush().color());
+        item->setIcon(QIcon(pix));
+
+        LegendItemInfo p = tempList.at(i);
+        QString s = QString("%1").arg(originalSliceNames.at(i));
+        item->setText(s);
+
+        // We attach a LegendItemInfo varaible to the item so that we can used the data later
+        item->setData(Qt::UserRole,QVariant::fromValue(p));
+
+        ui->RW_listWidget->addItem(item);
     }
-
-
 
 }
 
 
-// annualDiscountRate is in percentage
-void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr,
+void AnalysisDialog::clearLegendWidgets()
+{
+    ui->rwRankLabel->setText("");
+    ui->rwAmountLabel->setText("");
+    ui->rwPercentageLabel->setText("");
+    ui->rwPercentageSignLabel->setVisible(false);
+}
+
+
+void AnalysisDialog::updateLegendWidgets(int rank, double amount, double percentage)
+{
+    if (rank==-1) {
+        ui->rwRankLabel->setText("");
+    } else {
+        ui->rwRankLabel->setText(QString::number(rank));
+    }
+
+    QString amountString = CurrencyHelper::formatAmount(amount, currInfo, locale, false);
+    ui->rwAmountLabel->setText(amountString);
+    ui->rwPercentageLabel->setText(QString::number(percentage, 'f', 2));
+    ui->rwPercentageSignLabel->setVisible(true);
+}
+
+
+void AnalysisDialog::recalculate_BinsData(ReportType rTypr,
     QTableWidget* tableWidget)
 {
-    // Reset bin to empty
-    if(rTypr==MONTHLY){
-        binsMonthly = {};
+    // Get current scenario
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if(scenario.isNull()){
+        return; // if no scenario loaded (should not happen)
+    }
+
+    // Make sure the raw data is available (which should always be the case)
+    QSharedPointer<CombinedFeStreams> chartRawData = chartRawDataRef.toStrongRef();
+    if(chartRawData.isNull()){
+        return; // should never happen
+    }
+
+    // Build a generic ptr to bin set according to rTypr (less code to duplicate)
+    QMap<QDate,Bin>* binsPtr;
+    if (rTypr==ReportType::MONTHLY) {
+        binsPtr = &binsMonthly;
     } else {
-        binsYearly = {};
+        binsPtr = &binsYearly;
     }
 
-    if (chartRawData.size()==0){
-        return;  // nothing to do after
-    }
+    // Reset bin set to empty
+    (*binsPtr).clear();
 
-    QDate from = chartRawData.firstKey();
-    QDate to = chartRawData.lastKey();
-    QDate toMonthYear = QDate(to.year(), (rTypr==MONTHLY)?(to.month()):(1), 1);
-    QDate date = QDate(from.year(), (rTypr==MONTHLY)?(from.month()):(1), 1);
+    // Init and resize bins data for maximum range , that is from "tomorrow" to
+    // "max scenario limit", irrespective of the span of rawdata we have. The "key" dates
+    // corresponds to the beginning of a bin and act as an identifier for this bin.
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+    qint64 tomorrowJulianDay = tomorrow.toJulianDay();
+    QDate to = tomorrow.addYears(scenario->getFeGenerationDuration()).addDays(-1);
+    QDate toMonthYear = QDate(to.year(), (rTypr==ReportType::MONTHLY)?(to.month()):(1), 1);
+    QDate date = QDate(tomorrow.year(), (rTypr==ReportType::MONTHLY)?(tomorrow.month()):(1), 1);
     while( date <= toMonthYear ){
-        if(rTypr==MONTHLY){
-            binsMonthly.insert(date,{.income=0, .expense=0, .delta=0});
+        (*binsPtr).insert(date,{.income=0, .expense=0, .delta=0, .cashBalance=0});
+        if(rTypr==ReportType::MONTHLY){
             date = date.addMonths(1);
         } else {
-            binsYearly.insert(date,{.income=0, .expense=0, .delta=0});
             date = date.addYears(1);
         }
     }
 
-    // fill values bins
-    MonthlyYearlyReport binData;
-    QDate binDate;
-    if (rTypr==MONTHLY) {
-        foreach(QDate date, chartRawData.keys()){
-            CombinedFeStreams::DailyInfo di =  chartRawData.value(date);
-            binDate = QDate(date.year(), date.month(), 1);
-            if ( true==binsMonthly.contains(binDate) ){
-                MonthlyYearlyReport binData = binsMonthly.value(binDate);
+    double eopCashBalance = startingAmount; // cumulative cash balance at the end of a period
+
+    // For each and every bin, add the contribution of all raw data elements fitting this bin.
+    // Order of iteration must be asc. date, to correctly calculate cumulative cash balance
+    QList<QDate> binsKeys = (*binsPtr).keys(); // keys are placed in ascending order
+    QList<CombinedFeStreams::DailyInfo> listDi = chartRawData->getCombinedStreams();
+    foreach(QDate binDate, binsKeys){
+        Bin binData = {.income=0, .expense=0,
+            .delta=0, .cashBalance=eopCashBalance};
+        // Get the list of all dates included in this bin
+        QList<QDate> dateList = getListOfDatesCoveredbyBin(rTypr, binDate);
+
+        // Check if raw data exist for each date. Order of iteration must be asc. date,
+        // to correctly calculate cumulative cash balance If yes, add to contribution
+        // and update eopCashBalance
+        foreach(QDate d, dateList){
+            if (d<tomorrow) {
+                continue; // we dont have data before tomorrow
+            }
+            // Convert date to index in CombinedFeStreams
+            int index = d.toJulianDay() - tomorrowJulianDay;
+            // Get the DailyInfo concerned
+            if (index < listDi.size()) {
+                const CombinedFeStreams::DailyInfo di = listDi[index];
+                // Proceeed with calculation
                 binData.income += di.totalIncomes;
                 binData.expense += fabs(di.totalExpenses);
-                binData.delta += di.totalDelta;
-                binsMonthly.insert(binDate, binData);
-            } else {
-                MonthlyYearlyReport binData;
-                binData.income = di.totalIncomes;
-                binData.expense = fabs(di.totalExpenses);
-                binData.delta = di.totalDelta;
-                binsMonthly.insert(binDate, binData);
+                binData.delta += (di.totalIncomes + di.totalExpenses);
+                eopCashBalance += (di.totalIncomes + di.totalExpenses);
+                binData.cashBalance = eopCashBalance;
+                // write back the final value of the bin data
+                (*binsPtr).insert(binDate, binData);
             }
-        }
-    } else {
-        foreach(QDate date, chartRawData.keys()){
-            CombinedFeStreams::DailyInfo di =  chartRawData.value(date);
-            binDate = QDate(date.year(), 1, 1);
-            if ( true==binsYearly.contains(binDate) ){
-                MonthlyYearlyReport binData = binsYearly.value(binDate);
-                binData.income += di.totalIncomes;
-                binData.expense += fabs(di.totalExpenses);
-                binData.delta += di.totalDelta;
-                binsYearly.insert(binDate, binData);
-            } else {
-                MonthlyYearlyReport binData;
-                binData.income = di.totalIncomes;
-                binData.expense = fabs(di.totalExpenses);
-                binData.delta = di.totalDelta;
-                binsYearly.insert(binDate, binData);
-            }
+
         }
     }
 
@@ -442,9 +711,14 @@ void AnalysisDialog::recalculate_MonthlyYearlyReportData(ReportType rTypr,
 void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr,
     QTableWidget* tableWidget)
 {
+    // Get current scenario
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if(scenario.isNull()){
+        return; // if no scenario loaded (should not happen)
+    }
     // choose the right bins
-    QMap<QDate,MonthlyYearlyReport>* binsPtr;
-    if (rTypr==MONTHLY) {
+    QMap<QDate,Bin>* binsPtr;
+    if (rTypr==ReportType::MONTHLY) {
         binsPtr = &binsMonthly;
     } else {
         binsPtr = &binsYearly;
@@ -453,13 +727,12 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr,
     // determine how many rows in the table. We display all month/years between
     // tomorrow and max date as established by the scenario
     QDate tomorrow = GbpController::getInstance().getTomorrow();
-    QDate maxDate = tomorrow.addYears(
-        GbpController::getInstance().getScenario()->getFeGenerationDuration()).addDays(-1);
+    QDate maxDate = tomorrow.addYears(scenario->getFeGenerationDuration()).addDays(-1);
     int noRows;
     int noOfMonths = 1 + (12*maxDate.year()+maxDate.month()) -
         (12*tomorrow.year()+tomorrow.month());
     int noOfYears = 1 + (maxDate.year()) - (tomorrow.year());
-    if (rTypr==MONTHLY) {
+    if (rTypr==ReportType::MONTHLY) {
         noRows = noOfMonths;
     } else{
         noRows = noOfYears;
@@ -468,7 +741,7 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr,
     // Generate the list of dates
     QList<QDate> dateList;
     QDate date = tomorrow;
-    if (rTypr==MONTHLY) {
+    if (rTypr==ReportType::MONTHLY) {
         while(date <= maxDate){
             dateList.append(QDate(date.year(),date.month(),1));
             date = date.addMonths(1);
@@ -484,23 +757,23 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr,
     tableWidget->clearContents();
     tableWidget->setRowCount(noRows); // must be done BEFORE inserting item...
     int row = 0;
-    QString s1,s2,s3,s4;
+    QString s1,s2,s3,s4,s5; // one for each column
     QFont defaultFont = tableWidget->font();
     QFont monoTableFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monoTableFont.setPointSize(defaultFont.pointSize());
 
-    QBrush red = QBrush(QColor(210,0,0));
-    QBrush green = QBrush(QColor(0,200,0));
+    QBrush negAmountColor = QBrush(GbpController::getInstance().getExpenseColor());
+    QBrush posAmountColor = QBrush(GbpController::getInstance().getIncomeColor());
     foreach(QDate date, dateList){
-        MonthlyYearlyReport mr;
+        Bin mr;
         if ( true == binsPtr->contains(date)){
             mr = binsPtr->value(date);
         } else {
-            mr = {.income=0, .expense=0, .delta=0};
+            mr = {.income=0, .expense=0, .delta=0, .cashBalance=0};
         }
 
-        // build items
-        if (rTypr==MONTHLY) {
+        // build column items
+        if (rTypr==ReportType::MONTHLY) {
             s1 = locale.toString(date,"yyyy MMMM");
         } else {
             s1 = locale.toString(date,"yyyy");
@@ -508,10 +781,12 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr,
         s2 = CurrencyHelper::formatAmount(mr.income,currInfo,locale,false);
         s3 = CurrencyHelper::formatAmount(mr.expense,currInfo,locale,false);
         s4 = CurrencyHelper::formatAmount(mr.delta,currInfo,locale,false);
+        s5 = CurrencyHelper::formatAmount(mr.cashBalance,currInfo,locale,false);
         QTableWidgetItem* wi1 = new QTableWidgetItem(s1);
         QTableWidgetItem* wi2 = new QTableWidgetItem(s2);
         QTableWidgetItem* wi3 = new QTableWidgetItem(s3);
         QTableWidgetItem* wi4 = new QTableWidgetItem(s4);
+        QTableWidgetItem* wi5 = new QTableWidgetItem(s5);
         wi1->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
         wi2->setFont(monoTableFont);
         wi2->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -519,25 +794,41 @@ void AnalysisDialog::redisplay_MonthlyYearlyReportTableData(ReportType rTypr,
         wi3->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         wi4->setFont(monoTableFont);
         wi4->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        wi5->setFont(monoTableFont);
+        wi5->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         if(mr.delta<0){
-            wi4->setForeground(red);
+            wi4->setForeground(negAmountColor);
         } else if (mr.delta>0) {
-            wi4->setForeground(green);
+            wi4->setForeground(posAmountColor);
+        }
+        if(mr.cashBalance<0){
+            wi5->setForeground(negAmountColor);
+        } else if (mr.cashBalance>0) {
+            wi5->setForeground(posAmountColor);
         }
         // add to intrinsic table model
         tableWidget->setItem(row,0,wi1);
         tableWidget->setItem(row,1,wi2);
         tableWidget->setItem(row,2,wi3);
         tableWidget->setItem(row,3,wi4);
+        tableWidget->setItem(row,4,wi5);
         row++;
     }
 
 }
 
 
-// Using already calculated data, completely rebuid the Report Chart (eigher Monthly or Yearly)
-void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValues)
+// Using already calculated data, completely rebuild the Report Chart (eigher Monthly or Yearly)
+void AnalysisDialog::redisplay_ReportChart(ReportType type)
 {
+    // Make sure the raw data is available (which should always be the case)
+    QSharedPointer<CombinedFeStreams> chartRawData = chartRawDataRef.toStrongRef();
+    if(chartRawData.isNull()){
+        return; // should never happen
+    }
+    QList<CombinedFeStreams::DailyInfo> listDi = chartRawData->getCombinedStreams();
+    const qsizetype sizeDi = listDi.size();
+
     // Set pointers to appropriate entities depending on the value of "type"
     QChart** chartPtr;
     QChartView** chartViewPtr = nullptr;
@@ -558,7 +849,8 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
         statLabelPtr = ui->annualReportStatsLabel;
     }
 
-    if (chartRawData.size()==0){
+    // If no data to display
+    if (chartRawData->getNoOfElementsUsed()==0){
         (*chartPtr)->removeAllSeries();
         QStringList empty = QStringList();
         empty.append("No data");
@@ -572,7 +864,7 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
     GraphDataSourceType dsType = findWhichSetsIsToBeUsedReportChart(type);
 
     // choose the right bins
-    QMap<QDate,MonthlyYearlyReport>* binsPtr;
+    QMap<QDate,Bin>* binsPtr;
     if (type==ReportType::MONTHLY) {
         binsPtr = &binsMonthly;
     } else {
@@ -590,7 +882,7 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
     double sum=0;
     QList<double> statData;
     while(date<=endDate){
-        MonthlyYearlyReport mr = {.income=0, .expense=0, .delta=0};
+        Bin mr = {.income=0, .expense=0, .delta=0};
         if (true == binsPtr->contains(date) ){
             mr = binsPtr->value(date);
         }
@@ -612,21 +904,23 @@ void AnalysisDialog::redisplay_ReportChart(ReportType type, bool usePresentValue
     calculateStatsForGraph(statData, mean, stdDeviation, sum);
 
     // build new set of chart data (3 sets of QBarSet) and categories
+    QColor red = GbpController::getInstance().getExpenseColor();
+    QColor green = GbpController::getInstance().getIncomeColor();
     double maxY = 1;
     double minY = 0;
     QStringList categories;
     QBarSet *setIncomes = new QBarSet(tr("Incomes"));
-    setIncomes->setColor(QColor::fromRgb(0,200,0));
+    setIncomes->setColor(green);
     QBarSet *setExpenses = new QBarSet(tr("Expenses"));
-    setExpenses->setColor(QColor::fromRgb(200,0,0));
+    setExpenses->setColor(red);
     QBarSet *setDeltasPositive = new QBarSet(tr("Deltas - Surplus"));
-    setDeltasPositive->setColor(QColor::fromRgb(0,170,0));
+    setDeltasPositive->setColor(green);
     QBarSet *setDeltasNegative = new QBarSet(tr("Deltas - Deficit"));
-    setDeltasNegative->setColor(QColor::fromRgb(170,0,0));
+    setDeltasNegative->setColor(red);
 
     date= startDate;
     while(date<=endDate){
-        MonthlyYearlyReport mr = {.income=0, .expense=0, .delta=0};
+        Bin mr = {.income=0, .expense=0, .delta=0};
         if (true == binsPtr->contains(date) ){
             mr = binsPtr->value(date);
         }
@@ -780,33 +1074,16 @@ uint AnalysisDialog::noOfYearDifference(const QDate &from, const QDate &to) cons
 }
 
 
-
-void AnalysisDialog::on_incomesRelativeWeigthRadioButton_toggled(bool checked)
-{
-    if(ui->incomesRelativeWeigthRadioButton->isChecked()==true){
-        ui->titleLabel->setText(tr("Relative weight of incomes for that period"));
-        ui->noElementsLabel->setText(tr("No of most significant incomes to use :"));
-    } else {
-        ui->titleLabel->setText(tr("Relative weight of expenses for that period"));
-        ui->noElementsLabel->setText(tr("No of most significant expenses to use :"));
-    }
-    updateRelativeWeightChart();
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("Income radiobutton changed to %1").arg(checked));
-}
-
-
-
-
 void AnalysisDialog::on_closePushButton_clicked()
 {
     hide();
-    chartRawData = {};  // it was just a reference
-    binsMonthly = {};   // now useless
-    binsYearly = {};    // now useless
+    // clear some now useless data, since they will be rebuild when the form is shown again.
+    binsMonthly = {};
+    binsYearly = {};
+    availableTags.clear();
+    tagsTableData.clear();
 
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Analysis dialog closed"));
+    LOG_DEBUG_INFO(QString("Analysis dialog closed"));
 }
 
 
@@ -820,81 +1097,51 @@ void AnalysisDialog::on_AnalysisDialog_rejected()
 void AnalysisDialog::on_noElementsSpinBox_valueChanged(int arg1)
 {
     updateRelativeWeightChart();
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("No of elements changed to %1").arg(arg1));
-
-}
-
-
-void AnalysisDialog::on_fromDateEdit_userDateChanged(const QDate &date)
-{
-    updateRelativeWeightChart();
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("From date changed to %1").arg(date.toString()));
-}
-
-
-void AnalysisDialog::on_toDateEdit_userDateChanged(const QDate &date)
-{
-    updateRelativeWeightChart();
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("To date changed to %1").arg(date.toString()));
-}
-
-
-void AnalysisDialog::on_exportImageRelativeWeigthPushButton_clicked()
-{
-    exportChartAsImage(ui->chartRelativeWeigthWidget);
-}
-
-
-void AnalysisDialog::on_exportMonthlyReportToTextPushButton_clicked()
-{
-     exportTextMonthlyYearlyReport(ReportType::MONTHLY);
-}
-
-
-void AnalysisDialog::on_exportYearlyReportToTextPushButton_clicked()
-{
-    exportTextMonthlyYearlyReport(ReportType::YEARLY);
-
 }
 
 
 void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Initiating report type \"%1\" export").arg(rType));
 
-    QString defaultExtension = ".csv";
-    QString defaultExtensionUsed = ".csv";
-    QString filter = tr("Text files (*.txt *.TXT *.csv *.CSV)");
+    // Get current scenario
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if(scenario.isNull()){
+        return; // if no scenario loaded (should not happen)
+    }
+
+    LOG_INFO(QString("Initiating Analysis %1 Report export in CSV format with amount %2")
+        .arg((rType==ReportType::MONTHLY)?("Monthly"):("Yearly"))
+        .arg((GbpController::getInstance().getExportTextAmountLocalized()==true)?
+            ("localized"):("not localized")));
+
+    QString defaultExtensionUsed = "CSV files (*.csv *.CSV)";
+    QString filter = tr("CSV files (*.csv *.CSV);;Text files (*.txt *.TXT);;All files (*)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Select a file"),
-        GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
+        GbpController::getInstance().getLastDirExport(), filter, &defaultExtensionUsed);
     if (fileName == ""){
         // User has canceled
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            "Yearly report export canceled");
+        LOG_INFO("Export has been canceled");
         return;
     }
 
     // fix the filename to add the proper suffix
     QFileInfo fi(fileName);
     if(fi.suffix()==""){    // user has not specified an extension
-        fileName.append(defaultExtension);
+        fileName.append(".csv");
     }
+    GbpController::getInstance().setLastDirExport(fi.absolutePath());
 
     QFile file(fileName);
     if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
         QMessageBox::critical(nullptr,tr("Error"),tr("Export process failed. Cannot open the "
             "file for saving"));
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("Yearly report export failed : Cannot open file %1").arg(fileName));
+        GbpLogger::getInstance().logError(
+            QString("Export failed : Cannot open file %1").arg(REDACT(fileName)));
         return;
     }
 
-    QMap<QDate,MonthlyYearlyReport>* binsPtr;
+    QMap<QDate,Bin>* binsPtr;
     QString dateFormat;
-    if (rType == MONTHLY) {
+    if (rType == ReportType::MONTHLY) {
         dateFormat = "yyyy-MM";
         binsPtr = &binsMonthly;
     } else {
@@ -905,18 +1152,18 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
     QString inc ;
     QString exp ;
     QString total ;
+    QString cashBalance;
     QString s;
 
     // determine how many elements there are. We display all month/years between
     // tomorrow and max date as established by the scenario
     QDate tomorrow = GbpController::getInstance().getTomorrow();
-    QDate maxDate = tomorrow.addYears(
-        GbpController::getInstance().getScenario()->getFeGenerationDuration()).addDays(-1);
+    QDate maxDate = tomorrow.addYears(scenario->getFeGenerationDuration()).addDays(-1);
     int noRows;
     int noOfMonths = 1 + (12*maxDate.year()+maxDate.month()) -
         (12*tomorrow.year()+tomorrow.month());
     int noOfYears = 1 + (maxDate.year()) - (tomorrow.year());
-    if (rType==MONTHLY) {
+    if (rType==ReportType::MONTHLY) {
         noRows = noOfMonths;
     } else{
         noRows = noOfYears;
@@ -925,7 +1172,7 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
     // Generate the list of dates
     QList<QDate> dateList;
     QDate date = tomorrow;
-    if (rType==MONTHLY) {
+    if (rType==ReportType::MONTHLY) {
         while(date <= maxDate){
             dateList.append(QDate(date.year(),date.month(),1));
             date = date.addMonths(1);
@@ -938,17 +1185,19 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
     }
 
     // write header
-    s = QString("%1\t%2\t%3\t%4\n").arg(tr("Period"),tr("Total incomes"),tr("Total expenses"),
-        tr("Delta"));
+    s = QString("%1\t%2\t%3\t%4\t%5\n").arg(tr("Period"),tr("Total incomes"),tr("Total expenses"),
+        tr("Delta"),tr("Cash balance"));
     file.write(s.toUtf8());
 
     // write data
+    double lastCashBalance = startingAmount;
     foreach(QDate date, dateList){
-        MonthlyYearlyReport item;
+        Bin item;
         if ( true == binsPtr->contains(date)){
             item = binsPtr->value(date);
+            lastCashBalance = item.cashBalance;
         } else {
-            item = {.income=0, .expense=0, .delta=0};
+            item = {.income=0, .expense=0, .delta=0, .cashBalance=lastCashBalance};
         }
 
         QString dateString = locale.toString(date,dateFormat);
@@ -957,50 +1206,145 @@ void AnalysisDialog::exportTextMonthlyYearlyReport(ReportType rType) {
             inc = CurrencyHelper::formatAmount(item.income, currInfo, locale, false);
             exp = CurrencyHelper::formatAmount(item.expense, currInfo, locale, false);
             total = CurrencyHelper::formatAmount(item.delta, currInfo, locale, false);
+            cashBalance = CurrencyHelper::formatAmount(item.cashBalance, currInfo, locale, false);
         } else {
             // not localized
             inc = QString::number(item.income,'f', currInfo.noOfDecimal);
             exp = QString::number(item.expense,'f', currInfo.noOfDecimal);
             total = QString::number(item.delta,'f', currInfo.noOfDecimal);
+            cashBalance = QString::number(item.cashBalance,'f', currInfo.noOfDecimal);
         }
 
-        s = QString("%1\t%2\t%3\t%4\n").arg(dateString,inc,exp,total);
+        s = QString("%1\t%2\t%3\t%4\t%5\n").arg(dateString,inc,exp,total,cashBalance);
         file.write(s.toUtf8());
     }
     file.close();
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        "Success of yearly report export");
+    LOG_INFO("Export succeeded");
 
 }
 
 
-void AnalysisDialog::exportChartAsImage(QWidget* chartWidget)
+void AnalysisDialog::exportChartAsImage(QWidget* chartWidget, QString desc)
 {
+    LOG_INFO("Initiating chart export in PNG format : "+desc);
+
     // get file name
-    QString defaultExtension = ".png";
-    QString defaultExtensionUsed = ".png";
-    QString filter = tr("PNG files (*.png *.PNG)");
+    QString defaultExtensionUsed = "PNG files (*.png *.PNG)";
+    QString filter = tr("PNG files (*.png *.PNG);;All files (*)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Select an image file"),
-        GbpController::getInstance().getLastDir(), filter, &defaultExtensionUsed);
+        GbpController::getInstance().getLastDirExport(), filter, &defaultExtensionUsed);
     if (fileName != ""){
         // fix the filename to add the proper suffix
         QFileInfo fi(fileName);
         if(fi.suffix()==""){    // user has not specified an extension
-            fileName.append(defaultExtension);
+            fileName.append(".png");
         }
+        GbpController::getInstance().setLastDirExport(fi.absolutePath());
+
         bool successful;
         successful = chartWidget->grab().save(fileName,"PNG", 100) ;  // max quality
         if(successful == false){
             QMessageBox::critical(nullptr,tr("Error"),
-                tr("Export process failed. The creation of the image file did not succeed"));
+                tr("Export failed. The creation of the image file did not succeed"));
+            GbpLogger::getInstance().logError(QString("Export failed. The creation of the image "
+                "file %1 did not succeed").arg(REDACT(fileName)));
             return;
         }
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            "Success of chart export");
+        LOG_INFO(QString("Export to file %1 has succeeded")
+            .arg(REDACT(fileName)));
     } else{
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            "Chart export canceled");
+        LOG_INFO("Export canceled by user");
     }
+}
+
+
+void AnalysisDialog::exportRelativeWeightLegendAsCsvFile()
+{
+    LOG_INFO(
+        QString("Initiating Relative Weight legend export in CSV format with amount %1")
+         .arg((GbpController::getInstance().getExportTextAmountLocalized()==true)?
+        ("localized"):("not localized")));
+
+    QString defaultExtensionUsed = "CSV files (*.csv *.CSV)";
+    QString filter = tr("CSV files (*.csv *.CSV);;Text files (*.txt *.TXT);;All files (*)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a file"),
+        GbpController::getInstance().getLastDirExport(), filter, &defaultExtensionUsed);
+    if (fileName == ""){
+        // User has canceled
+        LOG_INFO("Export has been canceled");
+        return;
+    }
+
+    // fix the filename to add the proper suffix
+    QFileInfo fi(fileName);
+    if(fi.suffix()==""){    // user has not specified an extension
+        fileName.append(".csv");
+    }
+    GbpController::getInstance().setLastDirExport(fi.absolutePath());
+
+    QFile file(fileName);
+    if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
+        QMessageBox::critical(nullptr,tr("Error"),tr("Export process failed. Cannot open the "
+            "file for saving"));
+        GbpLogger::getInstance().logError(QString("Export failed : Cannot open file %1")
+            .arg(REDACT(fileName)));
+        return;
+    }
+
+    QString rank ;
+    QString percentage ;
+    QString name ;
+    QString amount;
+    QString s;
+    double d;
+    int i;
+    bool b;
+
+    // determine how many elements there are. We display all month/years between
+    // tomorrow and max date as established by the scenario
+    int noRows = ui->RW_listWidget->count();
+
+    // write header
+    s = QString("%1\t%2\t%3\t%4\n").arg(tr("Rank"),tr("Percentage"),tr("Csd name"),
+        tr("Amount"));
+    file.write(s.toUtf8());
+
+    // write data
+    for (int var = 0; var < noRows; ++var) {
+        // Get line
+        QListWidgetItem* item = ui->RW_listWidget->item(var);
+        QString name = item->text();
+
+        LegendItemInfo info = item->data(Qt::UserRole).value<LegendItemInfo>();
+
+        // Rank
+        if (GbpController::getInstance().getExportTextAmountLocalized()) {
+            rank = CurrencyHelper::formatAmount(info.rank, currInfo, locale, false);
+        } else {
+            rank =QString::number(static_cast<int>(info.rank));
+        }
+
+        // Percentage
+        if (GbpController::getInstance().getExportTextAmountLocalized()) {
+            percentage = CurrencyHelper::formatAmount(info.percentage, currInfo, locale, false);
+        } else {
+            percentage = QString::number(info.percentage,'f', currInfo.noOfDecimal);
+        }
+
+        // Amount
+        if (GbpController::getInstance().getExportTextAmountLocalized()) {
+            amount = CurrencyHelper::formatAmount(info.amount, currInfo, locale, false);
+        } else {
+            amount = QString::number(info.amount,'f', currInfo.noOfDecimal);
+        }
+
+        // Write the result
+        s = QString("%1\t%2\t%3\t%4\n").arg(rank, percentage, name, amount);
+        file.write(s.toUtf8());
+    }
+
+    file.close();
+    LOG_INFO(QString("Export to %1 is successful").arg(REDACT(fileName)));
 }
 
 
@@ -1078,18 +1422,11 @@ void AnalysisDialog::initReportChart(ReportType type)
     (*xAxisPtr)  = new QBarCategoryAxis();
     //
     QFont fontX = (*xAxisPtr)->labelsFont();
-    uint oldFontSize = fontX.pointSize();
-    uint newFontSize = Util::changeFontSize(2, true, fontX.pointSize());
     if (type == ReportType::MONTHLY) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis dialog - Monthly chart - X axis - Font size set from %1 to %2")
-            .arg(oldFontSize).arg(newFontSize));
+        Util::changeFontSize(fontX, Util::FontResizeIntensity::AVERAGE, true);
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis dialog - Yearly chart - X axis - Font size set from %1 to %2")
-            .arg(oldFontSize).arg(newFontSize));
+        Util::changeFontSize(fontX, Util::FontResizeIntensity::AVERAGE, true);
     }
-    fontX.setPointSize(newFontSize);
     (*xAxisPtr)->setLabelsFont(fontX);
     //
     (*xAxisPtr)->append(categories);
@@ -1099,18 +1436,11 @@ void AnalysisDialog::initReportChart(ReportType type)
     (*yAxisPtr) = new QValueAxis();
     //
     QFont fontY = (*yAxisPtr)->labelsFont();
-    oldFontSize = fontY.pointSize();
-    newFontSize = Util::changeFontSize(2, true, fontY.pointSize());
     if (type == ReportType::MONTHLY) {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis dialog - Monthly chart - Y axis font size set from %1 to %2")
-            .arg(oldFontSize).arg(newFontSize));
+        Util::changeFontSize(fontY, Util::FontResizeIntensity::AVERAGE, true);
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("Analysis dialog - Yearly chart - Y axis - Font size set from %1 to %2")
-            .arg(oldFontSize).arg(newFontSize));
+        Util::changeFontSize(fontY, Util::FontResizeIntensity::AVERAGE, true);
     }
-    fontY.setPointSize(newFontSize);
     (*yAxisPtr)->setLabelsFont(fontY);
     //
     (*yAxisPtr)->setRange(0,1);
@@ -1118,7 +1448,7 @@ void AnalysisDialog::initReportChart(ReportType type)
     (*yAxisPtr)->setMinorTickCount(4); // 5 bins
     (*chartPtr)->addAxis((*yAxisPtr), Qt::AlignLeft); // the CHART (not the series) takes ownership
     series->attachAxis((*yAxisPtr));
-    if(GbpController::getInstance().getIsDarkModeSet()==true){
+    if(GbpController::getInstance().useDarkModeForChart()==true){
         (*chartPtr)->setTheme(QChart::ChartThemeDark);
     } else {
         (*chartPtr)->setTheme(QChart::ChartThemeLight);
@@ -1127,7 +1457,7 @@ void AnalysisDialog::initReportChart(ReportType type)
 }
 
 
-// Return full QDate for start end end period for the displayed bar chart, from the widgets content
+// Return full QDate for start and end period for the displayed bar chart, from the widgets content
 void AnalysisDialog::getStartEndDateReportChart(ReportType type, QDate &startDate,
     QDate &endDate) const
 {
@@ -1275,9 +1605,320 @@ void AnalysisDialog::calculateStatsForGraph(const QList<double> data, double &me
 }
 
 
+// Get the list of all dates included in a specific bin
+QList<QDate> AnalysisDialog::getListOfDatesCoveredbyBin(ReportType type, QDate binDate)
+{
+    QList<QDate> answer;
+    if (type == ReportType::MONTHLY) {
+        // Month
+        QDate fDate = QDate(binDate.year(), binDate.month(), 1);
+        QDate tDate = QDate(binDate.year(), binDate.month(), binDate.daysInMonth());
+        QDate date = fDate;
+        while(date <= tDate){
+            // add the element to the list
+            answer.append(date);
+            // increase date
+            date = date.addDays(1);
+        }
+    } else {
+        // Year
+        QDate fDate = QDate(binDate.year(),1,1);
+        QDate tDate = QDate(binDate.year(),12,31);
+        QDate date = fDate;
+        while(date <= tDate){
+            // add the element to the list
+            answer.append(date);
+            // increase date
+            date = date.addDays(1);
+        }
+    }
+    return answer;
+}
+
+
+void AnalysisDialog::tags_UpdateNoTagsSelected()
+{
+    ui->tags_noTagsSelectedLabel->setText(tr("%1 selected").arg(selectedTags.size()));
+}
+
+
+void AnalysisDialog::exportTagsAnalysisAsCsv()
+{
+    // *** get a file name ***
+    QString defaultExtensionUsed = "CSV files (*.csv *.CSV)";
+    QString filter = tr("CSV files (*.csv *.CSV);;Text files (*.txt *.TXT);;All files (*)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a file"),
+        GbpController::getInstance().getLastDirExport(), filter, &defaultExtensionUsed);
+    if (fileName == ""){
+        return;
+    }
+    // *** fix the filename to add the proper suffix ***
+    QFileInfo fi(fileName);
+    if(fi.suffix()==""){    // user has not specified an extension
+        fileName.append(".csv");
+    }
+    GbpController::getInstance().setLastDirExport(fi.absolutePath());
+    LOG_INFO(QString("Attempting to export Tags Analysis to CSV file \"%1\" ...")
+        .arg(REDACT(fileName)));
+
+    QFile file(fileName);
+    if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
+        QMessageBox::critical(nullptr,tr("Error"),tr("Cannot open the file for writing"));
+        GbpLogger::getInstance().logError(
+            QString("Export failed : Cannot open the file for saving"));
+        return;
+    }
+
+    // *** export to the file ***
+    QString s;
+
+    // write header
+    s = QString("%1\t%2\t%3\n").arg(tr("Tag name"),tr("Total Amount"), tr("Weight (%)"));
+    file.write(s.toUtf8());
+
+    // write data : no sorting by weight...
+    QString amountString;
+    for (auto it = tagsTableData.constBegin(); it != tagsTableData.constEnd(); ++it) {
+        const QUuid& key = it.key();
+        const TagContribution& data = it.value();
+
+        if (GbpController::getInstance().getExportTextAmountLocalized()) {
+            // Localized
+            amountString = CurrencyHelper::formatAmount(data.amount, currInfo, locale, false);
+        } else {
+            // not localized
+            amountString = QString::number(data.amount,'f', currInfo.noOfDecimal);
+        }
+
+        s = QString("%1\t%2\t%3\n").arg(data.name).arg(amountString).arg(100*data.weight);
+        file.write(s.toUtf8());
+    }
+
+    // Close file and exit
+    file.close();
+    LOG_INFO("Export succeeded");
+}
+
+
+void AnalysisDialog::redisplay_TagTable()
+{
+    if (ready==false) {
+        return;
+    }
+
+    // Get current scenario
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if(scenario.isNull()){
+        return; // if no scenario loaded (should not happen)
+    }
+
+    // *** Get/validate To and From dates ***
+    QDate from = ui->tagsFromDateEdit->date();
+    QDate to = ui->tagsToDateEdit->date();
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+    if(!from.isValid()){
+        QMessageBox::critical(nullptr,tr("Error"),tr("\"From\" date is invalid"));
+        return;
+    } else if (!to.isValid()) {
+        QMessageBox::critical(nullptr,tr("Error"),tr("\"To\" date is invalid"));
+        return;
+    } else if (to<from){
+        QString fromString = from.toString(Qt::ISODate);
+        QString toString = to.toString(Qt::ISODate);
+        QString s = QString(tr("\"To\" date %1 cannot occur before \"From\" date %2"))
+            .arg(toString,fromString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+        return;
+    } else if (from<tomorrow){
+        QString fromString = from.toString(Qt::ISODate);
+        QString tomorrowString = tomorrow.toString(Qt::ISODate);
+        QString s = QString(tr("\"From\" date %1 cannot be smaller than \"tomorrow\" %2"))
+            .arg(fromString,tomorrowString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+        return;
+    }
+
+    // *** Rebuild tags data ***
+    tagsTableData.clear();
+    double totalWithoutTags;
+    tags_rebuildData(from, to, tagsTableData, totalWithoutTags); // key is Tag ID
+
+    // Disable sorting when filling the table
+    ui->tagsTableWidget->setSortingEnabled(false);
+
+    // *** Update the table with the content ***
+    ui->tagsTableWidget->clearContents();
+    ui->tagsTableWidget->setRowCount(tagsTableData.size());
+    int row = 0;
+
+    for (auto it = tagsTableData.constBegin(); it != tagsTableData.constEnd(); ++it) {
+        const QUuid& key = it.key();
+        const TagContribution& data = it.value();
+        // Use key and value (read-only)
+        QString s1 = data.name;
+        QString s2 = CurrencyHelper::formatAmount(abs(data.amount),currInfo,locale,false);
+        QString s3 = QString::number(data.weight*100, 'f', 3);
+        QTableWidgetItem* wi1 = new QTableWidgetItem(s1);
+        QTableWidgetItem* wi2 = new NumericTableWidgetItem(s2);
+        wi2->setData(Qt::UserRole, data.amount);
+        QTableWidgetItem* wi3 = new NumericTableWidgetItem(s3);
+        wi3->setData(Qt::UserRole, data.weight);
+        wi1->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        wi2->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        wi3->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        ui->tagsTableWidget->setItem(row,0,wi1);
+        ui->tagsTableWidget->setItem(row,1,wi2);
+        ui->tagsTableWidget->setItem(row,2,wi3);
+        row++;
+    }
+
+    // update total amount and set the color
+    ui->tags_totalAmountLabel->setText(CurrencyHelper::formatAmount(abs(totalWithoutTags),currInfo,
+        locale,true));
+    if (ui->tagsIncomesRadioButton->isChecked()==true) {
+        ui->tags_totalAmountLabel->setStyleSheet(Util::getStyleSheetStringForColor(
+            GbpController::getInstance().getIncomeColor()));
+    } else {
+        ui->tags_totalAmountLabel->setStyleSheet(Util::getStyleSheetStringForColor(
+            GbpController::getInstance().getExpenseColor()));
+    }
+
+    // re-enable sorting
+    ui->tagsTableWidget->setSortingEnabled(true);
+}
+
+
+void AnalysisDialog::tags_rebuildData( QDate from, QDate to, QHash<QUuid,TagContribution>& data,
+    double& totalWithoutTags)
+{
+    // Reset output variables
+    totalWithoutTags = 0;
+    data.clear();
+
+    // Init the structure for each selected tag
+    bool found;
+    QSet<QUuid> selectedTagsSet = selectedTags.getFilterTagIdSet();
+    for (const QUuid& tagId : selectedTagsSet) {
+        // Get tags's name
+        Tag t = availableTags.getTag(tagId,found);
+        if (found==false) {
+            continue; // should never happen
+        }
+        // Add to "data"
+        data.insert(tagId, {.name=t.getName(), .amount=0, .weight=0});
+    }
+
+
+    // Get current scenario
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if(scenario.isNull()){
+        return ; // if no scenario loaded (should not happen)
+    }
+
+    // Make sure the raw data is available (which should always be the case)
+    QSharedPointer<CombinedFeStreams> chartRawData = chartRawDataRef.toStrongRef();
+    if(chartRawData.isNull()){
+        return ; // should never happen
+    }
+
+    // take a reference to all the relationships defined between Csds and Tags
+    TagCsdRelationships r = scenario->getTagCsdRelationships() ;
+
+    // are we processing income or expense related stuff ?
+    bool incomeProcessing = (ui->tagsIncomesRadioButton->isChecked()? (true):(false));
+
+    QList<CombinedFeStreams::DailyInfo> listDi = chartRawData->getCombinedStreams();
+    const qsizetype diSize = listDi.size();
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+
+    /*
+     * Strategy : for each existing DailyInfo, look in the incomeList/expenseList and for each
+     * Csd found, get the list of all linked tags. For each tag found,
+     * add the contribution to "data".
+     */
+
+    for (int var = 0; var < diSize; ++var) {
+
+        // +++ Pre-processing +++
+
+        CombinedFeStreams::DailyInfo di = listDi[var];
+        if(di.used == false){
+            continue;
+        }
+        QDate diDate = tomorrow.addDays(var);
+
+
+        // +++ Processing +++
+
+        // Make sure this date is inside the user-selected period
+        if ( (diDate<from) || (diDate>to) ) {
+            continue;
+        }
+
+        // Add total income and expense
+        if (incomeProcessing==true) {
+            totalWithoutTags += di.totalIncomes;
+        } else {
+            totalWithoutTags += di.totalExpenses;
+        }
+
+        // Proceed by iterating through all the elements for that day and distribute the
+        // contribution of each tag
+        QList<Fe>* feListPtr = (incomeProcessing==true)?(&(di.incomesList)):(&(di.expensesList));
+        foreach (const Fe fe, *feListPtr) {
+            // Get a pointer to the CSD
+            QSharedPointer<Csd> csdPtr = fe.csdPtr.toStrongRef();
+            if(csdPtr.isNull()){
+                continue;   // should never happen
+            }
+            // Get all the tags associated to this CSD and for each add the contribution
+            const QSet<QUuid> idSet = r.getRelationshipsForCsd(csdPtr->getId());
+            for (const QUuid& tagId : idSet) {
+                // Add the contribution of this tag if it is in the list of selected tags
+                if (selectedTags.containsTagId(tagId)==true) {
+                    TagContribution v = data.value(tagId, {}); // may already exist or not
+                    v.amount += fe.amount; // can be negative
+                    data.insert(tagId,v);
+                }
+            }
+        }
+    }
+
+    // Calculate weight. totalWithoutTags an be 0 !
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        const QUuid& key = it.key(); // Key is read-only
+        TagContribution& value = it.value(); // Value is modifiable
+
+        // If totalWithoutTags==0, we set weight to 0 since it is irrelevant
+        if (totalWithoutTags==0) {
+            value.weight = 0;
+        } else{
+            value.weight = value.amount/totalWithoutTags;
+        }
+    }
+
+
+    return ;
+}
+
+
+
+AnalysisDialog::RelWeightGrouping AnalysisDialog::getGroupingTypeSelected()
+{
+    if (ui->incomesRelativeWeigthRadioButton->isChecked()==true) {
+        return RelWeightGrouping::RWGROUPING_INCOMES;
+    } else if (ui->expensesRelativeWeigthRadioButton->isChecked()==true){
+        return RelWeightGrouping::RWGROUPING_EXPENSES;
+    } else {
+        // should never happen
+        throw std::logic_error("Analysis Dialog : no group selected");
+    }
+}
+
+
 void AnalysisDialog::on_monthlyReportChartDurationSpinBox_valueChanged(int arg1)
 {
-    redisplay_ReportChart(ReportType::MONTHLY, false);
+    redisplay_ReportChart(ReportType::MONTHLY);
 }
 
 
@@ -1288,7 +1929,7 @@ void AnalysisDialog::on_monthlyReportChartRightToolButton_clicked()
     start = start.addMonths(ui->monthlyReportChartDurationSpinBox->value());
     ui->monthlyReportChartFromYearSpinBox->setValue(start.year());
     ui->monthlyReportChartFromMonthComboBox->setCurrentIndex(start.month()-1);
-    redisplay_ReportChart(ReportType::MONTHLY, false);
+    redisplay_ReportChart(ReportType::MONTHLY);
 }
 
 
@@ -1299,62 +1940,56 @@ void AnalysisDialog::on_monthlyReportChartLeftToolButton_clicked()
     start = start.addMonths(-ui->monthlyReportChartDurationSpinBox->value());
     ui->monthlyReportChartFromYearSpinBox->setValue(start.year());
     ui->monthlyReportChartFromMonthComboBox->setCurrentIndex(start.month()-1);
-    redisplay_ReportChart(ReportType::MONTHLY, false);
+    redisplay_ReportChart(ReportType::MONTHLY);
 }
 
 
 void AnalysisDialog::on_monthlyReportChartFromMonthComboBox_currentIndexChanged(int index)
 {
-    redisplay_ReportChart(ReportType::MONTHLY, false);
+    redisplay_ReportChart(ReportType::MONTHLY);
 }
 
 
 void AnalysisDialog::on_monthlyReportChartFromYearSpinBox_valueChanged(int arg1)
 {
-    redisplay_ReportChart(ReportType::MONTHLY, false);
+    redisplay_ReportChart(ReportType::MONTHLY);
 }
 
 
 
 void AnalysisDialog::on_monthlyReportChartIncomesRadioButton_clicked()
 {
-    redisplay_ReportChart(ReportType::MONTHLY, false);
+    redisplay_ReportChart(ReportType::MONTHLY);
 }
 
 
 void AnalysisDialog::on_monthlyReportChartExpensesRadioButton_clicked()
 {
-    redisplay_ReportChart(ReportType::MONTHLY, false);
+    redisplay_ReportChart(ReportType::MONTHLY);
 }
 
 
 void AnalysisDialog::on_monthlyReportChartIncomesExpensesRadioButton_clicked()
 {
-    redisplay_ReportChart(ReportType::MONTHLY, false);
+    redisplay_ReportChart(ReportType::MONTHLY);
 }
 
 
 void AnalysisDialog::on_monthlyReportChartDeltasRadioButton_clicked()
 {
-    redisplay_ReportChart(ReportType::MONTHLY, false);
-}
-
-
-void AnalysisDialog::on_exportImageMonthlyReportChartPushButton_clicked()
-{
-    exportChartAsImage(ui->monthlyReportChartWidget);
+    redisplay_ReportChart(ReportType::MONTHLY);
 }
 
 
 void AnalysisDialog::on_yearlyReportChartFromYearSpinBox_valueChanged(int arg1)
 {
-    redisplay_ReportChart(ReportType::YEARLY, false);
+    redisplay_ReportChart(ReportType::YEARLY);
 }
 
 
 void AnalysisDialog::on_yearlyReportChartDurationSpinBox_valueChanged(int arg1)
 {
-    redisplay_ReportChart(ReportType::YEARLY, false);
+    redisplay_ReportChart(ReportType::YEARLY);
 }
 
 
@@ -1363,7 +1998,7 @@ void AnalysisDialog::on_yearlyReportChartLeftToolButton_clicked()
     QDate start = QDate(ui->yearlyReportChartFromYearSpinBox->value(),1,1);
     start = start.addYears(-ui->yearlyReportChartDurationSpinBox->value());
     ui->yearlyReportChartFromYearSpinBox->setValue(start.year());
-    redisplay_ReportChart(ReportType::YEARLY, false);
+    redisplay_ReportChart(ReportType::YEARLY);
 }
 
 
@@ -1372,36 +2007,455 @@ void AnalysisDialog::on_yearlyReportChartRightToolButton_clicked()
     QDate start = QDate(ui->yearlyReportChartFromYearSpinBox->value(),1,1);
     start = start.addYears(ui->yearlyReportChartDurationSpinBox->value());
     ui->yearlyReportChartFromYearSpinBox->setValue(start.year());
-    redisplay_ReportChart(ReportType::YEARLY, false);
+    redisplay_ReportChart(ReportType::YEARLY);
 }
 
 
 void AnalysisDialog::on_yearlyReportChartIncomesRadioButton_clicked()
 {
-    redisplay_ReportChart(ReportType::YEARLY, false);
+    redisplay_ReportChart(ReportType::YEARLY);
 }
 
 
 void AnalysisDialog::on_yearlyReportChartExpensesRadioButton_clicked()
 {
-    redisplay_ReportChart(ReportType::YEARLY, false);
+    redisplay_ReportChart(ReportType::YEARLY);
 }
 
 
 void AnalysisDialog::on_yearlyReportChartIncomesExpensesRadioButton_clicked()
 {
-    redisplay_ReportChart(ReportType::YEARLY, false);
+    redisplay_ReportChart(ReportType::YEARLY);
 }
 
 
 void AnalysisDialog::on_yearlyReportChartDeltasRadioButton_clicked()
 {
-    redisplay_ReportChart(ReportType::YEARLY, false);
+    redisplay_ReportChart(ReportType::YEARLY);
 }
 
 
-void AnalysisDialog::on_exportImageYearlyReportChartPushButton_clicked()
+
+bool AnalysisDialog::Bin::operator==(const Bin &o) const
 {
-    exportChartAsImage(ui->yearlyReportChartWidget);
+    return (this->income==o.income) && (this->expense==o.expense) &&
+           (this->cashBalance==o.cashBalance) && (this->delta==o.delta);
+}
+
+
+bool AnalysisDialog::Bin::operator!=(const Bin &o) const
+{
+    return !(*this==o);
+}
+
+
+void AnalysisDialog::on_incomesRelativeWeigthRadioButton_clicked()
+{
+    updateRelativeWeightChart();
+    LOG_DEBUG_INFO("Analysis Dialog : Income radiobutton clicked");
+}
+
+
+void AnalysisDialog::on_expensesRelativeWeigthRadioButton_clicked()
+{
+    updateRelativeWeightChart();
+    LOG_DEBUG_INFO("Analysis Dialog : Expense radiobutton clicked");
+}
+
+
+void AnalysisDialog::on_tagsSelectTagsPushButton_clicked()
+{
+    // send for display
+    emit signalChooseTagsPrepareContent(availableTags, selectedTags.getFilterTagIdSet());
+    selectTagsDlg->show();
+}
+
+
+// void AnalysisDialog::on_tagsFromDateEdit_userDateChanged(const QDate &date)
+// {
+//     redisplay_TagTable();
+//     LOG_DEBUG_INFO(QString("Tags From date changed to %1").arg(date.toString()));
+// }
+
+
+// void AnalysisDialog::on_tagsToDateEdit_userDateChanged(const QDate &date)
+// {
+//     redisplay_TagTable();
+//     LOG_DEBUG_INFO(QString("Tags To date changed to %1").arg(date.toString()));
+// }
+
+
+void AnalysisDialog::on_tagsIncomesRadioButton_clicked()
+{
+    redisplay_TagTable();
+    LOG_DEBUG_INFO(QString("Analysis Dialog - Tags : Income radiobutton clicked"));
+}
+
+
+void AnalysisDialog::on_tagsExpensesRadioButton_clicked()
+{
+    redisplay_TagTable();
+    LOG_DEBUG_INFO(QString("Analysis Dialog - Tags : Expense radiobutton clicked"));
+}
+
+
+bool AnalysisDialog::TagContribution::operator==(const TagContribution &o) const
+{
+    return ( (this->amount==o.amount) && (this->name==o.name) && (this->weight==o.weight) );
+}
+
+bool AnalysisDialog::TagContribution::operator!=(const TagContribution &o) const
+{
+    return !(*this==o);
+}
+
+
+bool AnalysisDialog::NumericTableWidgetItem::operator<(const QTableWidgetItem &other) const
+{
+    bool ok1, ok2;
+    double v1 = data(Qt::UserRole).toDouble(&ok1);
+    double v2 = other.data(Qt::UserRole).toDouble(&ok2);
+
+    if (ok1 && ok2)
+        return v1 < v2;
+    // fallback to text compare
+    return text() < other.text();
+}
+
+
+void AnalysisDialog::on_RW_ClearSelectionPushButton_clicked()
+{
+    ui->RW_listWidget->clearSelection();
+    ui->RW_listWidget->setCurrentItem(nullptr);
+    clearLegendWidgets();
+}
+
+
+void AnalysisDialog::on_globalExportCsvPushButton_clicked()
+{
+    int index = ui->tabWidget->currentIndex();
+
+    switch (index) {
+        case 0:
+            // Legend of Relative Weight
+            exportRelativeWeightLegendAsCsvFile();
+            break;
+        case 3:
+            // Monthly table report
+            exportTextMonthlyYearlyReport(ReportType::MONTHLY);
+            break;
+        case 4:
+            // Annual table report
+            exportTextMonthlyYearlyReport(ReportType::YEARLY);
+            break;
+        case 5:
+            // Tags
+            exportTagsAnalysisAsCsv();
+            break;
+        default:
+            return;
+            break;
+    }
+}
+
+
+void AnalysisDialog::on_globalExportImagePushButton_clicked()
+{
+    int index = ui->tabWidget->currentIndex();
+
+    switch (index) {
+        case 0:
+            // Relative Weight
+            exportChartAsImage(ui->chartRelativeWeigthWidget, tr("Relative weight"));
+            break;
+        case 1:
+            // Monthly report chart
+            exportChartAsImage(ui->monthlyReportChartWidget, tr("Monthly report chart"));
+            break;
+        case 2:
+            // Annual report chart
+            exportChartAsImage(ui->yearlyReportChartWidget, tr("Annual report chart"));
+            break;
+        default:
+            return;
+            break;
+    }
+}
+
+
+void AnalysisDialog::on_tabWidget_currentChanged(int index)
+{
+    switch (index) {
+        case 0:
+            // Relative Weight
+            ui->globalExportCsvPushButton->setText(tr("Export legend..."));
+            ui->globalExportCsvPushButton->setVisible(true);
+            ui->globalExportImagePushButton->setVisible(true);
+            break;
+        case 1:
+            // Monthly report chart
+            ui->globalExportCsvPushButton->setVisible(false);
+            ui->globalExportImagePushButton->setVisible(true);
+            break;
+        case 2:
+            // Annual report chart
+            ui->globalExportCsvPushButton->setVisible(false);
+            ui->globalExportImagePushButton->setVisible(true);
+            break;
+        case 3:
+            // Monthly table report
+            ui->globalExportCsvPushButton->setText(tr("Export table..."));
+            ui->globalExportCsvPushButton->setVisible(true);
+            ui->globalExportImagePushButton->setVisible(false);
+            break;
+        case 4:
+            // Annual table report
+            ui->globalExportCsvPushButton->setText(tr("Export table..."));
+            ui->globalExportCsvPushButton->setVisible(true);
+            ui->globalExportImagePushButton->setVisible(false);
+            break;
+        case 5:
+            // Tags
+            ui->globalExportCsvPushButton->setText(tr("Export table..."));
+            ui->globalExportCsvPushButton->setVisible(true);
+            ui->globalExportImagePushButton->setVisible(false);
+            break;
+        default:
+            return;
+            break;
+    }
+}
+
+
+void AnalysisDialog::on_RW_horizontalSlider_valueChanged(int value)
+{
+    int step = 30;
+    int snapped = ((value + step/2) / step) * step;
+    if (snapped != value){
+        ui->RW_horizontalSlider->setValue(snapped);
+    }
+    // redraw the pie
+    seriesRelativeWeigth->setPieStartAngle(snapped);
+    seriesRelativeWeigth->setPieEndAngle(360+snapped);
+}
+
+
+void AnalysisDialog::on_RW_ShowLabelsCheckBox_checkStateChanged(const Qt::CheckState &arg1)
+{
+    for (QPieSlice *s : seriesRelativeWeigth->slices()) {
+        s->setLabelVisible(ui->RW_ShowLabelsCheckBox->isChecked());
+    }
+}
+
+
+void AnalysisDialog::on_RW_listWidget_itemSelectionChanged()
+{
+    // remove stand out for all
+    QList<QPieSlice *> list = seriesRelativeWeigth->slices();
+    for (auto slice : seriesRelativeWeigth->slices()) {
+        slice->setExploded(false);
+    }
+
+    // Clear Legend widgets
+    clearLegendWidgets();
+
+    // Get selection : row index is equivalent to rank
+    QItemSelectionModel* selectionModel = ui->RW_listWidget->selectionModel();
+    QModelIndexList selectedRows = selectionModel->selectedRows();
+
+    // If there is element selected, just return
+    if (selectedRows.size()==0) {
+        return;
+    }
+
+    // make the slice stand out
+    double cummulPercentage=0;
+    double cummulAmount=0;
+    uint lastRank=-1;
+    double max = CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal);
+    foreach (const QModelIndex &index, selectedRows) {
+        // set slice appearence
+        QPieSlice *slice = seriesRelativeWeigth->slices().at(index.row());
+        slice->setExploded(true);
+        slice->setExplodeDistanceFactor(0.10); // 10% of radius
+        // calculate cumulative amount and percentage
+        LegendItemInfo info = index.data(Qt::UserRole).value<LegendItemInfo>();
+        cummulAmount += info.amount;
+        if(cummulAmount > max){
+            cummulAmount = max;
+        }
+        cummulPercentage += info.percentage;
+        lastRank = info.rank;
+    }
+
+    // fill the Legend widgets
+    if (selectedRows.size()==1) {
+        updateLegendWidgets(lastRank, cummulAmount, cummulPercentage);
+    } else {
+        // rank is irrelevant if more than 1 row selected
+        updateLegendWidgets(-1, cummulAmount, cummulPercentage);
+    }
+
+}
+
+
+void AnalysisDialog::on_RW_ApplyDatesPushButton_clicked()
+{
+    // Validate dates
+
+    QDate from = ui->fromDateEdit->date();
+    QDate to = ui->toDateEdit->date();
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+
+    if(from.isValid()==false){
+        QString fromString = from.toString(Qt::ISODate);
+        QString toString = to.toString(Qt::ISODate);
+        QString s = QString(tr("\"From\" date %1 is invalid"))
+            .arg(fromString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+
+        // return to previous values
+        ui->fromDateEdit->setDate(rwPreviousFromDate);
+        ui->toDateEdit->setDate(rwPreviousToDate);
+
+        return;
+    } else if (to.isValid()==false){
+        QString fromString = from.toString(Qt::ISODate);
+        QString toString = to.toString(Qt::ISODate);
+        QString s = QString(tr("\"To\" date %1 is invalid"))
+            .arg(toString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+
+        // return to previous values
+        ui->fromDateEdit->setDate(rwPreviousFromDate);
+        ui->toDateEdit->setDate(rwPreviousToDate);
+
+        return;
+    } else if (to < from){
+        QString fromString = from.toString(Qt::ISODate);
+        QString toString = to.toString(Qt::ISODate);
+        QString s = QString(tr("\"To\" date %1 cannot occur before \"From\" date %2"))
+            .arg(toString).arg(fromString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+
+        // return to previous values
+        ui->fromDateEdit->setDate(rwPreviousFromDate);
+        ui->toDateEdit->setDate(rwPreviousToDate);
+
+        return;
+    } else if (from < tomorrow){
+        QString fromString = from.toString(Qt::ISODate);
+        QString tomorrowString = tomorrow.toString(Qt::ISODate);
+        QString s = QString(tr("\"From\" date %1 cannot occur before \"tomorrow\" %2"))
+            .arg(fromString).arg(tomorrowString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+
+        // return to previous value
+        ui->fromDateEdit->setDate(rwPreviousFromDate);
+        ui->toDateEdit->setDate(rwPreviousToDate);
+
+        return;
+    } else if (to < tomorrow){
+        QString toString = to.toString(Qt::ISODate);
+        QString tomorrowString = tomorrow.toString(Qt::ISODate);
+        QString s = QString(tr("\"To\" date %1 cannot occur before \"tomorrow\" %2"))
+            .arg(toString).arg(tomorrowString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+
+        // return to previous value
+        ui->fromDateEdit->setDate(rwPreviousFromDate);
+        ui->toDateEdit->setDate(rwPreviousToDate);
+
+        return;
+    }
+
+    // Remember these new dates
+    rwPreviousFromDate = from;
+    rwPreviousToDate = to;
+
+    // Make the required updates to the charts and legends
+    updateRelativeWeightChart();
+    LOG_DEBUG_INFO(QString("RW - From-To date changed to %1 %2")
+        .arg(from.toString()).arg(to.toString()));
+
+}
+
+
+void AnalysisDialog::on_tags_ApplyDatesPushButton_clicked()
+{
+
+    // Validate dates
+
+    QDate from = ui->tagsFromDateEdit->date();
+    QDate to = ui->tagsToDateEdit->date();
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+
+    if(from.isValid()==false){
+        QString fromString = from.toString(Qt::ISODate);
+        QString toString = to.toString(Qt::ISODate);
+        QString s = QString(tr("\"From\" date %1 is invalid"))
+            .arg(fromString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+
+        // return to previous values
+        ui->tagsFromDateEdit->setDate(tagsPreviousFromDate);
+        ui->tagsToDateEdit->setDate(tagsPreviousToDate);
+
+        return;
+    } else if (to.isValid()==false){
+        QString fromString = from.toString(Qt::ISODate);
+        QString toString = to.toString(Qt::ISODate);
+        QString s = QString(tr("\"To\" date %1 is invalid"))
+            .arg(toString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+        // return to previous values
+        ui->tagsFromDateEdit->setDate(tagsPreviousFromDate);
+        ui->tagsToDateEdit->setDate(tagsPreviousToDate);
+
+        return;
+    } else if (to < from){
+        QString fromString = from.toString(Qt::ISODate);
+        QString toString = to.toString(Qt::ISODate);
+        QString s = QString(tr("\"To\" date %1 cannot occur before \"From\" date %2"))
+            .arg(toString).arg(fromString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+        // return to previous values
+        ui->tagsFromDateEdit->setDate(tagsPreviousFromDate);
+        ui->tagsToDateEdit->setDate(tagsPreviousToDate);
+
+        return;
+    } else if (from < tomorrow){
+        QString fromString = from.toString(Qt::ISODate);
+        QString tomorrowString = tomorrow.toString(Qt::ISODate);
+        QString s = QString(tr("\"From\" date %1 cannot occur before \"tomorrow\" %2"))
+            .arg(fromString).arg(tomorrowString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+        // return to previous values
+        ui->tagsFromDateEdit->setDate(tagsPreviousFromDate);
+        ui->tagsToDateEdit->setDate(tagsPreviousToDate);
+
+        return;
+    } else if (to < tomorrow){
+        QString toString = to.toString(Qt::ISODate);
+        QString tomorrowString = tomorrow.toString(Qt::ISODate);
+        QString s = QString(tr("\"To\" date %1 cannot occur before \"tomorrow\" %2"))
+            .arg(toString).arg(tomorrowString);
+        QMessageBox::critical(nullptr,tr("Error"),s.toLocal8Bit().data());
+        // return to previous values
+        ui->tagsFromDateEdit->setDate(tagsPreviousFromDate);
+        ui->tagsToDateEdit->setDate(tagsPreviousToDate);
+
+        return;
+    }
+
+    // Remember these new dates
+    tagsPreviousFromDate = from;
+    tagsPreviousToDate = to;
+
+    // Make the required updates to the tables
+    redisplay_TagTable();
+    LOG_DEBUG_INFO(QString("Tags - From-To date changed to %1 %2")
+        .arg(from.toString()).arg(to.toString()));
+
 }
 

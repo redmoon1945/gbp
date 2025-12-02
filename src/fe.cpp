@@ -20,12 +20,19 @@
 
 
 bool Fe::operator==(const Fe& o) const {
-    if( (amount != o.amount) ||
-        (occurrence != o.occurrence) ||
-        (id != o.id) ){
+    if( fabs(amount - o.amount) >= 0.0001 ){
         return false;
     }
-    return true;
+    // Two QWeakPointer<T> instances point to the same shared object if they reference the same
+    // control block, which is managed by the associated QSharedPointer<T>. The control block
+    // contains the object pointer and reference counts.
+    auto ptr1 = csdPtr.toStrongRef();
+    auto ptr2 = o.csdPtr.toStrongRef();
+    if ( (ptr1!=nullptr) && (ptr2!=nullptr) && (ptr1->getId()==ptr2->getId()) ){
+        return true;
+    }
+
+    return false;
 }
 
 
@@ -38,40 +45,13 @@ bool Fe::operator!=(const Fe &o) const
 Fe &Fe::operator=(const Fe &o)
 {
     this->amount = o.amount;
-    this->occurrence = o.occurrence;
-    this->id = o.id;
-    return *this;
-}
-
-
-QString Fe::toString() const {
-    return QString("(%1,%2)").arg(amount).arg(occurrence.toString());
-}
-
-
-// for the amount , a "loose" comparison is performed. 2 double are declared equal if
-// the difference is less than the smallest unit of all the currency available
-// (3 decimals + 1 spare for rounding)
-bool FeDisplay::operator==(const FeDisplay& o) const {
-    if( fabs(amount - o.amount) >= 0.0001 ){
-        return false;
-    }
-    if( id != o.id ){
-        return false;
-    }
-    return true;
-}
-
-FeDisplay &FeDisplay::operator=(const FeDisplay &o)
-{
-    this->amount = o.amount;
-    this->id = o.id;
+    this->csdPtr = o.csdPtr; // simple duplication of the weak pointer
     return *this;
 }
 
 
 
-QString FeDisplay::toString(QString streamDefName, const CurrencyInfo& currInfo,
+QString Fe::toString(QString streamDefName, const CurrencyInfo& currInfo,
     const QLocale& locale) const {
     QString amountString = locale.toString(amount,'f', currInfo.noOfDecimal);
     QString s = QString("%1 : %2").arg(amountString).arg(streamDefName);

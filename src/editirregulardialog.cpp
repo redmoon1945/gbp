@@ -20,9 +20,12 @@
 #include "qcolordialog.h"
 #include "ui_editirregulardialog.h"
 #include "gbpcontroller.h"
+#include "gbplogger.h"
 #include <QMessageBox>
 #include <QFont>
 #include <QCoreApplication>
+#include <QFileDialog>
+#include <qforeach.h>
 
 
 EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
@@ -34,12 +37,7 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
 
     // use smaller font for description list
     QFont descFont = ui->descPlainTextEdit->font();
-    uint oldFontSize = descFont.pointSize();
-    uint newFontSize = Util::changeFontSize(1,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit irregular dialog - Description - Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    descFont.setPointSize(newFontSize);
+    Util::changeFontSize(descFont, Util::FontResizeIntensity::WEAK, true);
     ui->descPlainTextEdit->setFont(descFont);
 
     // force description widget to be small (cant do it in Qt Designer...)
@@ -47,33 +45,18 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     ui->descPlainTextEdit->setFixedHeight(fm.height()*(2*1.2)); // 2 lines
 
     // use smaller font for the warning Label (for past events)
-    QFont warninglabelFont = ui->warningLabel->font();
-    oldFontSize = warninglabelFont.pointSize();
-    newFontSize = Util::changeFontSize(1,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit irregular dialog - Warning label - Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    warninglabelFont.setPointSize(newFontSize);
-    ui->warningLabel->setFont(warninglabelFont);
+    QFont warningLabelFont = ui->warningLabel->font();
+    Util::changeFontSize(warningLabelFont, Util::FontResizeIntensity::WEAK, true);
+    ui->warningLabel->setFont(warningLabelFont);
 
     // use smaller font for the "future" Label
     QFont futurLabelFont = ui->futurLabel->font();
-    oldFontSize = futurLabelFont.pointSize();
-    newFontSize = Util::changeFontSize(1,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit irregular dialog - Future label - Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    futurLabelFont.setPointSize(newFontSize);
+    Util::changeFontSize(futurLabelFont, Util::FontResizeIntensity::WEAK, true);
     ui->futurLabel->setFont(futurLabelFont);
 
     // use smaller font for tag list
     QFont tagFont = ui->tagsEdit->font();
-    uint oldTagFontSize = tagFont.pointSize();
-    uint newTagFontSize = Util::changeFontSize(2, true, oldTagFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit periodic dialog - Tags - Font size set from %1 to %2").
-        arg(oldTagFontSize).arg(newTagFontSize));
-    tagFont.setPointSize(newTagFontSize);
+    Util::changeFontSize(tagFont, Util::FontResizeIntensity::AVERAGE, true);
     ui->tagsEdit->setFont(tagFont);
 
     // make the tag list not too high (must be done after font setting)
@@ -98,7 +81,7 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     tableModel->setItalicTableFont(italic);
 
     // force max len for name (not possible for Description)
-    ui->nameLineEdit->setMaxLength(FeStreamDef::NAME_MAX_LEN);
+    ui->nameLineEdit->setMaxLength(Csd::NAME_MAX_LEN);
 
     // the edit add element dialog
     eie = new EditIrregularElementDialog(locale,this);        // auto-destroyed by Qt
@@ -152,12 +135,21 @@ EditIrregularDialog::~EditIrregularDialog()
 }
 
 
-void EditIrregularDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
-    IrregularFeStreamDef irStreamDef, CurrencyInfo newCurrInfo, QDate maxDateScenarioFeGeneration,
+void EditIrregularDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
+    QWeakPointer<IrregularCsd> iCsd, CurrencyInfo newCurrInfo, QDate maxDateScenarioFeGeneration,
     QSet<QUuid> associatedTagIds, Tags availTags)
 {
+    // If we are editing a existing Csd, convert csd reference to strong pointer
+    QSharedPointer<IrregularCsd> irCsd;
+    if (isNewCsd==false) {
+        irCsd = iCsd.toStrongRef();
+        if (irCsd.isNull()) {
+            return; // Should never happen
+        }
+    }
+
     // remember some variables
-    this->editingExistingStreamDef = !isNewStreamDef;
+    this->editingExistingCsd = !isNewCsd;
     this->currInfo = newCurrInfo;
     this->isIncome = isIncome;
     this->maxDateFeGeneration = maxDateScenarioFeGeneration;
@@ -167,13 +159,17 @@ void EditIrregularDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
     // Set the currency info for the table model and then
     // update model (the view will be automatically updated)
     tableModel->setCurrInfo(currInfo);
-    tableModel->setItems(irStreamDef.getAmountSet());
+    if (isNewCsd==false) {
+        tableModel->setItems(irCsd->getAmountSet());
+    } else {
+        tableModel->setItems({});
+    }
 
     // decoration color
-    if (isNewStreamDef) {
+    if (isNewCsd) {
         decorationColor = QColor(); // use normal color for new Stream Def
     } else {
-        decorationColor = irStreamDef.getDecorationColor(); // can be normal or custom
+        decorationColor = irCsd->getDecorationColor(); // can be normal or custom
     }
     if (decorationColor.isValid()==false) {
         // use normal color
@@ -199,11 +195,11 @@ void EditIrregularDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
         ui->futurLabel->setVisible(false);
     }
 
-    if(editingExistingStreamDef){
+    if(editingExistingCsd){
         // *** EXISTING ***
 
         // remember the id
-        initialId = irStreamDef.getId();
+        initialId = irCsd->getId();
 
         // Set title
         if(isIncome){
@@ -213,9 +209,9 @@ void EditIrregularDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
         }
         ui->applyPushButton->setText(tr("Apply"));
         ui->cancelPushButton->setText(tr("Cancel"));
-        ui->nameLineEdit->setText(irStreamDef.getName());
-        ui->descPlainTextEdit->setPlainText(irStreamDef.getDesc());
-        if (irStreamDef.getActive()){
+        ui->nameLineEdit->setText(irCsd->getName());
+        ui->descPlainTextEdit->setPlainText(irCsd->getDesc());
+        if (irCsd->getActive()){
             ui->activeYesRadioButton->setChecked(true);
         } else {
             ui->activeNoRadioButton->setChecked(true);
@@ -229,7 +225,7 @@ void EditIrregularDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
         // *** CREATING ***
 
         // clean up the window
-        cleanUpForNewStreamDef();
+        cleanUpForNewCsd();
 
         initialId = QUuid::createUuid();
         // set some UI elements
@@ -257,26 +253,25 @@ void EditIrregularDialog::slotPlainTextEditionCompleted()
 }
 
 
-// This can be for an edition of existing element or the definition of a new element
 void EditIrregularDialog::slotEditElementResult(bool isEdition, QDate oldDate, QDate newDate,
     double editedAmount, QString editedNotes)
 {
     // get the current data from the model
-    QMap<QDate, IrregularFeStreamDef::AmountInfo> items = tableModel->getItems();
+    QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
 
     // convert amount to decimal form
     int ok;
 
-    // necessarily always valid
-    qint64 amount = CurrencyHelper::amountDoubleToQint64(editedAmount, currInfo.noOfDecimal, ok);
-
+    // necessarily always valid. Amount is always >=0.
+    quint64 amount = static_cast<quint64>(CurrencyHelper::amountDoubleToQint64(editedAmount,
+        currInfo.noOfDecimal, ok));
     if (ok != 0) {
         // we should not have an error because the widget is limiting the value entered
         return;
     }
 
     // update the data
-    IrregularFeStreamDef::AmountInfo ai = {.amount=amount, .notes=editedNotes};
+    IrregularCsd::AmountInfo ai = {.amount=amount, .notes=editedNotes};
     if ( isEdition && (oldDate!=newDate) ){
         // delete the old entry since date has changed
         items.remove(oldDate);
@@ -300,7 +295,7 @@ void EditIrregularDialog::slotEditElementCompleted()
 }
 
 
-void EditIrregularDialog::slotImportResult(QMap<QDate, IrregularFeStreamDef::AmountInfo> items)
+void EditIrregularDialog::slotImportResult(QMap<QDate, IrregularCsd::AmountInfo> items)
 {
     // update the model (the table view will be updated automatically)
     tableModel->setItems(items);
@@ -316,8 +311,7 @@ void EditIrregularDialog::slotImportCompleted()
 void EditIrregularDialog::slotVisualizeOccurrencesCompleted()
 {
     // Log the operation
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Visualize occurences completed"));
+    LOG_DEBUG_INFO("Visualize occurences completed");
 }
 
 
@@ -331,41 +325,39 @@ void EditIrregularDialog::on_loadPushButton_clicked()
 void EditIrregularDialog::on_cancelPushButton_clicked()
 {
     hide();
-    emit signalEditIrregularStreamDefCompleted();
+    emit signalEditIrregularCsdCompleted();
 }
 
 
 void EditIrregularDialog::on_applyPushButton_clicked()
 {
-    if (editingExistingStreamDef) {
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("Attempting to modify Irregular item \"%1\" ...")
-            .arg(ui->nameLineEdit->text()));
+    if (editingExistingCsd) {
+        LOG_INFO( QString("Attempting to modify Irregular csd \"%1\" ...")
+            .arg(REDACT(ui->nameLineEdit->text())));
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("Attempting to create new Irregular item \"%1\" ...")
-            .arg(ui->nameLineEdit->text()));
+        LOG_INFO(QString("Attempting to create new Irregular csd \"%1\" ...")
+            .arg(REDACT(ui->nameLineEdit->text())));
     }
 
-    QMap<QDate, IrregularFeStreamDef::AmountInfo> items = tableModel->getItems();
-    IrregularFeStreamDef irStreamDef(items, initialId, (ui->nameLineEdit->text().trimmed())
-        .left(FeStreamDef::NAME_MAX_LEN), ui->descPlainTextEdit->toPlainText()
-        .left(FeStreamDef::DESC_MAX_LEN),  ui->activeYesRadioButton->isChecked(), isIncome,
-        decorationColor);
+    QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
+    QSharedPointer<IrregularCsd> irCsd = QSharedPointer<IrregularCsd> (
+        new IrregularCsd(items, initialId, (ui->nameLineEdit->text().trimmed())
+        .left(Csd::NAME_MAX_LEN), ui->descPlainTextEdit->toPlainText()
+        .left(Csd::DESC_MAX_LEN),  ui->activeYesRadioButton->isChecked(), isIncome,
+        decorationColor));
 
-    emit signalEditIrregularStreamDefResult(ui->activeYesRadioButton->isChecked(), irStreamDef);
+    emit signalEditIrregularCsdResult(ui->activeYesRadioButton->isChecked(), irCsd);
 
-    if (editingExistingStreamDef) {
+    if (editingExistingCsd) {
         hide();
-        emit signalEditIrregularStreamDefCompleted();
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("    Modifications applied to existing Irregular item"));
+        emit signalEditIrregularCsdCompleted();
+        LOG_INFO("    Modifications applied");
     } else {
-        cleanUpForNewStreamDef();
+        cleanUpForNewCsd();
         ui->nameLineEdit->setFocus();
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("    New Irregular item created"));
+        LOG_INFO("    New Irregular csd created");
     }
+    LOG_INFO("End of edition");
 
 }
 
@@ -381,7 +373,7 @@ void EditIrregularDialog::on_addPushButton_clicked()
 
 void EditIrregularDialog::on_editPushButton_clicked()
 {
-    QMap<QDate, IrregularFeStreamDef::AmountInfo> items = tableModel->getItems();
+    QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
     QList<QDate> existingDates = items.keys();
     QList<int> selectedRows = getSelectedRows();
     if (selectedRows.size()!=1){
@@ -390,7 +382,7 @@ void EditIrregularDialog::on_editPushButton_clicked()
         return;
     }
     QDate aDate = existingDates.at(selectedRows.at(0));
-    IrregularFeStreamDef::AmountInfo ai = items.value(aDate);
+    IrregularCsd::AmountInfo ai = items.value(aDate);
     int ok;
 
     // necessarily always valid
@@ -408,7 +400,7 @@ void EditIrregularDialog::on_editPushButton_clicked()
 
 void EditIrregularDialog::on_deletePushButton_clicked()
 {
-    QMap<QDate, IrregularFeStreamDef::AmountInfo> items = tableModel->getItems();
+    QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
     QList<QDate> existingDates = items.keys();
     QList<int> selectedRows = getSelectedRows();
     if (selectedRows.size()==0){
@@ -457,12 +449,12 @@ QList<int> EditIrregularDialog::getSelectedRows()
 }
 
 
-void EditIrregularDialog::cleanUpForNewStreamDef(){
+void EditIrregularDialog::cleanUpForNewCsd(){
     ui->nameLineEdit->setText("");
     ui->descPlainTextEdit->setPlainText("");
     ui->activeYesRadioButton->setChecked(true);
     initialId = QUuid::createUuid();
-    tableModel->setItems(QMap<QDate, IrregularFeStreamDef::AmountInfo>());// erase data
+    tableModel->setItems(QMap<QDate, IrregularCsd::AmountInfo>());// erase data
 
     // decoration color
     ui->decorationColorCheckBox->setChecked(false);
@@ -581,25 +573,84 @@ void EditIrregularDialog::on_decorationColorCheckBox_clicked()
 
 void EditIrregularDialog::on_visualizeOccurrencesPushButton_clicked()
 {
-    // Build a new IrregularFeStreamDef using data in the fields
-    QMap<QDate, IrregularFeStreamDef::AmountInfo> items = tableModel->getItems();
-    IrregularFeStreamDef irStreamDef(items, initialId, ui->nameLineEdit->text(),
+    // Build a new IrregularCsd using data in the fields
+    QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
+    QSharedPointer<IrregularCsd> irCsd = QSharedPointer<IrregularCsd>(
+        new IrregularCsd(items, initialId, ui->nameLineEdit->text(),
         ui->descPlainTextEdit->toPlainText(),
-        ui->activeYesRadioButton->isChecked(), isIncome, decorationColor);
+        ui->activeYesRadioButton->isChecked(), isIncome, decorationColor));
 
     // Log the operation
-    if (GbpController::getInstance().getLogLevel()==GbpController::Debug) {
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("About to visualize occurrences for irregular item name=%1")
-            .arg(ui->nameLineEdit->text()));
-    } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("About to visualize occurrences for irregular item"));
-    }
+    LOG_INFO( QString("About to visualize occurrences for irregular item name = %1")
+        .arg(REDACT(ui->nameLineEdit->text())));
 
     emit signalVisualizeOccurrencesPrepareContent(currInfo, Growth(), maxDateFeGeneration,
-        &irStreamDef);
+        irCsd.toWeakRef());
     visualizeOccurrencesDialog->show();
 }
 
+
+
+void EditIrregularDialog::on_exportPushButton_clicked()
+{
+    // *** get a file name ***
+    QString defaultExtensionUsed = "CSV files (*.csv *.CSV)";
+    QString filter = tr("CSV files (*.csv *.CSV);;Text files (*.txt *.TXT);;All files (*)");
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a file"),
+        GbpController::getInstance().getLastDirExport(), filter, &defaultExtensionUsed);
+    if (fileName == ""){
+        return;
+    }
+    // *** fix the filename to add the proper suffix ***
+    QFileInfo fi(fileName);
+    if(fi.suffix()==""){    // user has not specified an extension
+        fileName.append(".csv");
+    }
+    GbpController::getInstance().setLastDirExport(fi.absolutePath());
+    LOG_INFO( QString("Attempting to export Irregular Csd \"%1\" Financial events to text "
+        "file \"%2\" ...").arg(REDACT(ui->nameLineEdit->text().trimmed())).arg(REDACT(fileName)));
+
+    QFile file(fileName);
+    if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
+        QMessageBox::critical(nullptr,tr("Error"),tr("Cannot open the file for writing"));
+        LOG_ERROR("    Export failed : Cannot open the file for saving");
+        return;
+    }
+
+    // *** export to the file ***
+    QString s;
+
+    // write header
+    s = QString("%1\t%2\t%3\n").arg(tr("Date"),tr("Amount"), tr("Notes"));
+    file.write(s.toUtf8());
+
+    // set date format
+    QString dateFormat = "yyyy-MM-dd";  // ISO
+    if (GbpController::getInstance().getExportTextDateLocalized()==true) {
+        dateFormat = locale.dateFormat(QLocale::ShortFormat);
+    }
+
+    // write data
+    QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
+    QString amountString;
+    for (auto it = items.cbegin(); it != items.cend(); ++it) {
+        const QDate &date = it.key();
+        const IrregularCsd::AmountInfo &info = it.value();
+        //
+        QString dateString = locale.toString(date, dateFormat );
+        if (GbpController::getInstance().getExportTextAmountLocalized()) {
+            // Localized
+            amountString = CurrencyHelper::formatAmount(info.amount, currInfo, locale, false);
+        } else {
+            // not localized
+            amountString = QString::number(info.amount,'f', currInfo.noOfDecimal);
+        }
+        s = QString("%1\t%2\t%3\n").arg(dateString,amountString, info.notes);
+        file.write(s.toUtf8());
+    }
+
+    // Close file and exit
+    file.close();
+    LOG_INFO("    Export succeeded");
+}
 

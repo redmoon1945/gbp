@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>207</height>
+    <height>220</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,7 +70,7 @@
             <date>
              <year>1999</year>
              <month>12</month>
-             <day>22</day>
+             <day>20</day>
             </date>
            </property>
            <property name="currentSection">
@@ -231,6 +231,9 @@
          <property name="text">
           <string>Close</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -238,8 +241,11 @@
          <property name="text">
           <string>Apply</string>
          </property>
-         <property name="default">
+         <property name="autoDefault">
           <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

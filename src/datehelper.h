@@ -18,25 +18,39 @@
 
 #ifndef DATEHELPER_H
 #define DATEHELPER_H
+
 #include <QDate>
 
-struct GbpMonthDay{
-    quint8 month;   // jan = 1
-    quint8 day;
-};
-
+/**
+ * @class DateHelper
+ * @brief Contains helper methods to manipulate dates.
+ */
 class DateHelper
 {
 public:
-    DateHelper();
-    static QDate getNextEventDateDaily(QDate date,quint16 multiplier)  ;
-    static QDate getNextEventDateWeekly(QDate date,quint16 multiplier)  ;
-    static QDate getNextEventDateMonthly(QDate date,quint16 multiplier)  ;
-    static QDate getNextEventDateEndOfMonth(QDate date,quint16 multiplier)  ;
-    static QDate getNextEventDateYearly(QDate date,quint16 multiplier)  ;
-    static QDate getNextEndOfMonth(QDate date, quint16 multiplier) ;
+
+    enum class TimeUnitType {Day, Week, Month, EndOfMonth, Year};
+
+    /**
+     * @brief From a given date "X", calculates the next or previous date by adding or subtracting
+     * from "X" a given number "multiplier" of "Time Unit" (see TimeUnitType).
+     * @param date The starting date.
+     * @param multiplier Number of Time Units to add (positive) or subtract (negative).
+     * @return The resulting date.
+     * @throws std::invalid_argument If the date is invalid.
+     */
+    static QDate getNextDate(const QDate& date, TimeUnitType noOfTimeUnits, int multiplier)  ;
+
+    /**
+     * @brief Checks if a date is the last day of its month.
+     * @param date The date to check.
+     * @return True if the date is the last day of the month, false otherwise.
+     * @throws std::invalid_argument If the date is invalid.
+     */
     static bool isEndOfMonth(QDate date);
 
+private:
+    static QDate getNextDateEndOfMonth(const QDate &date, int multiplier);
 };
 
 #endif // DATEHELPER_H

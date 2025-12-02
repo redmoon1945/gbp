@@ -22,7 +22,7 @@
 #include <QDialog>
 #include <QDate>
 #include <QLocale>
-#include "irregularfestreamdef.h"
+#include "irregularcsd.h"
 #include "currencyhelper.h"
 
 namespace Ui {
@@ -43,7 +43,7 @@ public slots:
 
 signals:
     // For client of LoadIrregularTextFileDialog : Send results of import
-    void signalImportResult(QMap<QDate,IrregularFeStreamDef::AmountInfo> amountSet);
+    void signalImportResult(QMap<QDate,IrregularCsd::AmountInfo> amountSet);
     void signalImportCompleted();
 
 private slots:

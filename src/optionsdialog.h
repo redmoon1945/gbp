@@ -49,6 +49,8 @@ public:
         quint8 yzeroLine;
         // effect on X axis Date Format
         quint8 xaxisDateFormat;
+        // effect for some "incomes / expenses" colors throughtout the application
+        quint8 incomeExpenseColor;
     };
     enum OPTIONS_IMPACT_DATA {DATA_UNCHANGED=0, DATA_RECALCULATE=1};
     enum OPTIONS_IMPACT_CHART_SCALING {CHART_SCALING_NONE=0, CHART_SCALING_RESCALE=1};
@@ -57,6 +59,7 @@ public:
     enum OPTIONS_IMPACT_WHEEL_ZOOM {WHEEL_ZOOM_NONE=0, WHEEL_ZOOM_REFRESH=1 };
     enum OPTIONS_IMPACT_Y_ZERO_LINE {Y_ZERO_LINE_NONE=0, Y_ZERO_LINE_REFRESH=1 };
     enum OPTIONS_IMPACT_XAXIS_DATE_FORMAT {XAXIS_DATE_FORMAT_NONE=0, XAXIS_DATE_FORMAT_REFRESH=1 };
+    enum OPTIONS_IMPACT_IECOLOR{IECOLOR_UNCHANGED=0, IE_COLOR_REFRESH=1};
 
     explicit OptionsDialog(QWidget *parent = nullptr);
     ~OptionsDialog();
@@ -86,27 +89,52 @@ private slots:
     void on_lightModeSelectedPointColorPushButton_clicked();
     void on_darkModeYzeroLineColorPushButton_clicked();
     void on_lightModeYzeroLineColorPushButton_clicked();
+    void on_incomeColorPushButton_clicked();
+    void on_expenseColorPushButton_clicked();
+    void on_incomeColorResetPushButton_clicked();
+    void on_expenseColorResetPushButton_clicked();
+    void on_resetPushButton_clicked();
 
 private:
     Ui::OptionsDialog *ui;
 
-    // For button used to represent color
-    enum ColorItem {CI_CURVE, CI_POINT, CI_SELECTED_POINT, CI_YZERO_LINE};
-    enum ColorTheme {CT_DARK_MODE, CT_LIGHT_MODE};
+    /**
+     * @brief Color indicator (identify a push button and an associated label)
+     */
+    enum ColorItem {CI_CURVE_DT, CI_CURVE_LT, CI_POINT_DT, CI_POINT_LT, CI_SELECTED_POINT_DT,
+        CI_SELECTED_POINT_LT, CI_YZERO_LINE_DT, CI_YZERO_LINE_LT,
+        CI_INCOME_COLOR, CI_EXPENSE_COLOR};
 
-    // variables
+    // *** VARIABLES ***
+
+    // Custom Colors set by the user in the form. Their values are kept in explicit variables
+    // and not in widgets. It is simpler than extracting the color from the color pushbutton.
     QColor darkModeCurveColor;
     QColor darkModePointColor;
     QColor darkModeSelectedPointColor;
     QColor lightModeCurveColor;
     QColor lightModePointColor;
     QColor lightModeSelectedPointColor;
-    QString newCustomFontString;
     QColor yZeroLineDarkModeColor;
     QColor yZeroLineLightModeColor;
+    QColor incomeColor;
+    QColor expenseColor;
 
-    // methods
-    void setColorInfo(ColorTheme theme, ColorItem item);
+    // Custom font selected by the user. Its value is kept in an explicit variable
+    // and not in widgets. It is simpler than extracting the string from the widget.
+    // If empty, it means it has not been set yet (unitialized).
+    QString newCustomFontString;
+
+
+    // *** METHODS ***
+
+    /**
+     * @brief Set the color of a particular "color indicator", that is a push button and a label.
+     * @param item The color indicator identifier.
+     * @param color The color to set.
+     */
+    void setColorInfo(ColorItem item, QColor theColor);
+
     QString fontLabel(const QFont font) const;
     QString fontStyleToString(const QFont font) const;
     QString fontWeightToString(const QFont font) const;

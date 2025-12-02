@@ -39,12 +39,7 @@ EditVariableGrowthDialog::EditVariableGrowthDialog(QString newGrowthName, QLocal
     ui->growthTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     // Makes note characters smaller and italic
     QFont noteFont = ui->noteLabel->font();
-    uint oldFontSize = noteFont.pointSize();
-    uint newFontSize = Util::changeFontSize(1,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("EdityVariableGrowth - Note : Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    noteFont.setPointSize(newFontSize);
+    Util::changeFontSize(noteFont, Util::FontResizeIntensity::WEAK, true);
     ui->noteLabel->setFont(noteFont);
 
     // the edit add element dialog
@@ -83,6 +78,9 @@ void EditVariableGrowthDialog::slotPrepareContent(Growth newGrowth)
     tableModel->setGrowthName(tableModel->getGrowthName());
     // update model (the view will be automatically updated)
     tableModel->setGrowthData(newGrowth);
+
+    // Set focus on "Apply"
+    ui->applyPushButton->setFocus();
 }
 
 

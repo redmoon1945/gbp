@@ -19,6 +19,7 @@
 
 #include "edittagdialog.h"
 #include "gbpcontroller.h"
+#include "gbplogger.h"
 #include "ui_edittagdialog.h"
 #include <QMessageBox>
 #include <QListWidgetItem>
@@ -33,15 +34,8 @@ EditTagDialog::EditTagDialog(QLocale aLocale, QWidget *parent)
     ui->nameLineEdit->setMaxLength(Tag::MAX_NAME_LEN);
 
     // use smaller font for description list
-    uint oldFontSize;
-    uint newFontSize;
     QFont descFont = ui->descPlainTextEdit->font();
-    oldFontSize = descFont.pointSize();
-    newFontSize = Util::changeFontSize(1,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit tag - Description - Font size set from %1 to %2").arg(oldFontSize)
-        .arg(newFontSize));
-    descFont.setPointSize(newFontSize);
+    Util::changeFontSize(descFont, Util::FontResizeIntensity::WEAK, true);
     ui->descPlainTextEdit->setFont(descFont);
 
     // force description widget to be small (cant do it in Qt Designer...)
@@ -222,17 +216,15 @@ void EditTagDialog::loadSuggestions()
     QFile incomesFile(QString(":/Doc/resources/tag_suggestions_incomes_%1.txt").
         arg((langCode=="fr")?("fr"):("en")));
     QFile expensesFile(QString(":/Doc/resources/tag_suggestions_expenses_%1.txt").
-                      arg((langCode=="fr")?("fr"):("en")));
+        arg((langCode=="fr")?("fr"):("en")));
     if(incomesFile.exists()==false){
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
-            QString("Load tag suggestions : %1 does not exist in the resource file").arg(
-            incomesFile.fileName()));
+        LOG_ERROR( QString("Load tag suggestions : %1 does not exist in the resource file")
+            .arg(incomesFile.fileName()));
         return;
     }
     if(expensesFile.exists()==false){
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Error,
-            QString("Load tag suggestions : %1 does not exist in the resource file").arg(
-            expensesFile.fileName()));
+        LOG_ERROR( QString("Load tag suggestions : %1 does not exist in the resource file")
+            .arg(expensesFile.fileName()));
         return;
     }
 
@@ -256,17 +248,16 @@ void EditTagDialog::loadSuggestions()
                 }
             }
         } catch (const std::exception& e) {
-            QString errorStringLog = QString("An unexpected error has occured.\n\nDetails : %1")
+            QString logErrorMessage = QString("An unexpected error has occurred.\n\nDetails : %1")
                 .arg(e.what());
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Error,
-                QString("Import failed : %1").arg(errorStringLog));
+            LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
             return;
         }
     } else {
-        QString errorStringLog = QString("Cannot open file %1 in read-only mode")
-            .arg(incomesFile.fileName());
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Error,
-            QString("Import failed : %1").arg(errorStringLog));
+        QString logErrorMessage = QString("Cannot open file %1 in read-only mode")
+            .arg(REDACT(incomesFile.fileName()));
+        LOG_ERROR( QString("Import failed for Tag Suggestions (incomes): %1")
+            .arg(logErrorMessage));
         return ;
     }
 
@@ -290,17 +281,16 @@ void EditTagDialog::loadSuggestions()
                 }
             }
         } catch (const std::exception& e) {
-            QString errorStringLog = QString("An unexpected error has occured.\n\nDetails : %1")
+            QString logErrorMessage = QString("An unexpected error has occurred.\n\nDetails : %1")
             .arg(e.what());
-            GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Error,
-                QString("Import failed : %1").arg(errorStringLog));
+            LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
             return;
         }
     } else {
-        QString errorStringLog = QString("Cannot open file %1 in read-only mode")
+        QString logErrorMessage = QString("Cannot open file %1 in read-only mode")
         .arg(expensesFile.fileName());
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal,GbpController::Error,
-            QString("Import failed : %1").arg(errorStringLog));
+        LOG_ERROR( QString("Import failed for Tag Suggestions (expenses): %1")
+            .arg(logErrorMessage) );
         return ;
     }
 }

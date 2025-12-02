@@ -141,12 +141,13 @@ QVariant ScenarioCsdTableModel::data(const QModelIndex &index, int role) const
 
 
 // Do a complete refresh of the table content, using the data passed
-void ScenarioCsdTableModel::refresh(CurrencyInfo currInfo, QMap<QUuid, PeriodicFeStreamDef>
-    incomesDefPeriodic, QMap<QUuid, IrregularFeStreamDef> incomesDefIrregular,
-    QMap<QUuid, PeriodicFeStreamDef> expensesDefPeriodic, QMap<QUuid, IrregularFeStreamDef>
-    expensesDefIrregular, Tags tags, TagCsdRelationships tagsRelationships, bool showIncomes,
-    bool showExpenses, bool showPeriodic, bool showIrregular, bool showActive, bool showInactive,
-    FilterTags filterTags)
+void ScenarioCsdTableModel::refresh(CurrencyInfo currInfo, QHash<QUuid, QSharedPointer<PeriodicCsd>>
+    incomesDefPeriodic, QHash<QUuid, QSharedPointer<IrregularCsd>> incomesDefIrregular,
+    QHash<QUuid, QSharedPointer<PeriodicCsd>> expensesDefPeriodic, QHash<QUuid,
+    QSharedPointer<IrregularCsd>> expensesDefIrregular, Tags tags,
+    TagCsdRelationships tagsRelationships, bool showIncomes, bool showExpenses, bool showPeriodic,
+    bool showIrregular, bool showActive, bool showInactive, FilterTags filterTags,
+    bool tagFilteringEnabled)
 {
 
     emit beginResetModel();
@@ -175,57 +176,59 @@ void ScenarioCsdTableModel::refresh(CurrencyInfo currInfo, QMap<QUuid, PeriodicF
 
     if (showIncomes){
         if (showPeriodic) {
-            foreach(PeriodicFeStreamDef item, incomesDefPeriodic.values() ){
-                bool active = item.getActive();
+            foreach(QSharedPointer<PeriodicCsd> item, incomesDefPeriodic.values() ){
+                bool active = item->getActive();
                 if ( (active==true && showActive==true) ||
                     (active==false && showInactive==true) ) {
 
                     // Does it pass the tag filter test ?
-                    if ( false == isItemPassTagFilter(item.getId(), tagsRelationships, filterTags)){
+                    if ( false == isItemPassTagFilter(item->getId(), tagsRelationships, filterTags,
+                        tagFilteringEnabled)){
                         continue; // item does not pass the tag filter test, it cannot be displayed
                     }
 
                     ItemInfo info;
-                    info.id = item.getId();
-                    info.name = item.getName();
+                    info.id = item->getId();
+                    info.name = item->getName();
                     info.type = tr("Periodic");
-                    info.isActive = item.getActive();
-                    info.info = item.toStringForDisplay(currInfo,theLocale);
-                    info.csdNameColor = item.getDecorationColor();
+                    info.isActive = item->getActive();
+                    info.info = item->toStringForDisplay(currInfo,theLocale);
+                    info.csdNameColor = item->getDecorationColor();
                     int ok;
-                    info.amount = CurrencyHelper::quint64ToDoubleString(item.getAmount(), currInfo,
+                    info.amount = CurrencyHelper::quint64ToDoubleString(item->getAmount(), currInfo,
                         theLocale, false, ok);;
                     if ( ok != 0 ){
                         // amount or noOfCurrencyDecimals is too big, should not happen
                         info.amount = QString("Error");
                     }
-                    MyString sortKey = MyString(item.getName().leftJustified(
-                        FeStreamDef::NAME_MAX_LEN,' ', true).append(info.id.toString()));
+                    MyString sortKey = MyString(item->getName().leftJustified(
+                        Csd::NAME_MAX_LEN,' ', true).append(info.id.toString()));
                     proxyList.insert(sortKey, info);
                 }
             }
         }
         if (showIrregular) {
-            foreach(IrregularFeStreamDef item, incomesDefIrregular.values() ){
-                bool active = item.getActive();
+            foreach(QSharedPointer<IrregularCsd> item, incomesDefIrregular.values() ){
+                bool active = item->getActive();
                 if ( (active==true && showActive==true) ||
                     (active==false && showInactive==true) ) {
 
                     // Does it pass the tag filter test ?
-                    if ( false == isItemPassTagFilter(item.getId(), tagsRelationships, filterTags)){
+                    if ( false == isItemPassTagFilter(item->getId(), tagsRelationships, filterTags,
+                        tagFilteringEnabled)){
                         continue; // item does not pass the tag filter test, it cannot be displayed
                     }
 
                     ItemInfo info;
-                    info.id = item.getId();
-                    info.name = item.getName();
+                    info.id = item->getId();
+                    info.name = item->getName();
                     info.type = tr("Irregular");
-                    info.isActive = item.getActive();
-                    info.info = item.toStringForDisplay(currInfo,theLocale);
+                    info.isActive = item->getActive();
+                    info.info = item->toStringForDisplay(currInfo,theLocale);
                     info.amount = "";
-                    info.csdNameColor = item.getDecorationColor();
-                    MyString sortKey = MyString(item.getName().leftJustified(
-                        FeStreamDef::NAME_MAX_LEN,' ',true).append(info.id.toString()));
+                    info.csdNameColor = item->getDecorationColor();
+                    MyString sortKey = MyString(item->getName().leftJustified(
+                        Csd::NAME_MAX_LEN,' ',true).append(info.id.toString()));
                     proxyList.insert(sortKey, info);
                 }
             }
@@ -234,57 +237,59 @@ void ScenarioCsdTableModel::refresh(CurrencyInfo currInfo, QMap<QUuid, PeriodicF
 
     if (showExpenses) {
         if (showPeriodic) {
-            foreach(PeriodicFeStreamDef item, expensesDefPeriodic.values() ){
-                bool active = item.getActive();
+            foreach(QSharedPointer<PeriodicCsd> item, expensesDefPeriodic.values() ){
+                bool active = item->getActive();
                 if ( (active==true && showActive==true) ||
                     (active==false && showInactive==true) ) {
 
                     // Does it pass the tag filter test ?
-                    if ( false == isItemPassTagFilter(item.getId(), tagsRelationships, filterTags)){
+                    if ( false == isItemPassTagFilter(item->getId(), tagsRelationships, filterTags,
+                        tagFilteringEnabled)){
                         continue; // item does not pass the tag filter test, it cannot be displayed
                     }
 
                     ItemInfo info;
-                    info.id = item.getId();
-                    info.name = item.getName();
+                    info.id = item->getId();
+                    info.name = item->getName();
                     info.type = tr("Periodic");
-                    info.isActive = item.getActive();
-                    info.info = item.toStringForDisplay(currInfo,theLocale);
+                    info.isActive = item->getActive();
+                    info.info = item->toStringForDisplay(currInfo,theLocale);
                     int ok;
-                    info.amount = CurrencyHelper::quint64ToDoubleString(item.getAmount(), currInfo,
+                    info.amount = CurrencyHelper::quint64ToDoubleString(item->getAmount(), currInfo,
                         theLocale, false, ok);
-                    info.csdNameColor = item.getDecorationColor();
+                    info.csdNameColor = item->getDecorationColor();
                     if ( ok != 0 ){
                         // amount or noOfCurrencyDecimals is too big, should not happen
                         info.amount = QString("Error");
                     }
-                    MyString sortKey = MyString(item.getName().leftJustified(
-                        FeStreamDef::NAME_MAX_LEN,' ',true).append(info.id.toString()));
+                    MyString sortKey = MyString(item->getName().leftJustified(
+                        Csd::NAME_MAX_LEN,' ',true).append(info.id.toString()));
                     proxyList.insert(sortKey.toLower(), info);
                 }
             }
         }
         if (showIrregular) {
-            foreach(IrregularFeStreamDef item, expensesDefIrregular.values() ){
-                bool active = item.getActive();
+            foreach(QSharedPointer<IrregularCsd> item, expensesDefIrregular.values() ){
+                bool active = item->getActive();
                 if ( (active==true && showActive==true) ||
                     (active==false && showInactive==true) ) {
 
                     // Does it pass the tag filter test ?
-                    if ( false == isItemPassTagFilter(item.getId(), tagsRelationships, filterTags)){
+                    if ( false == isItemPassTagFilter(item->getId(), tagsRelationships, filterTags,
+                        tagFilteringEnabled)){
                         continue; // item does not pass the tag filter test, it cannot be displayed
                     }
 
                     ItemInfo info;
-                    info.id = item.getId();
-                    info.name = item.getName();
+                    info.id = item->getId();
+                    info.name = item->getName();
                     info.type = tr("Irregular");
-                    info.isActive = item.getActive();
-                    info.info = item.toStringForDisplay(currInfo,theLocale);
+                    info.isActive = item->getActive();
+                    info.info = item->toStringForDisplay(currInfo,theLocale);
                     info.amount = "";
-                    info.csdNameColor = item.getDecorationColor();
-                    MyString sortKey = MyString(item.getName().leftJustified(
-                        FeStreamDef::NAME_MAX_LEN,' ',true).append(info.id.toString()));
+                    info.csdNameColor = item->getDecorationColor();
+                    MyString sortKey = MyString(item->getName().leftJustified(
+                        Csd::NAME_MAX_LEN,' ',true).append(info.id.toString()));
                     proxyList.insert(sortKey.toLower(), info);
                 }
             }
@@ -339,9 +344,9 @@ int ScenarioCsdTableModel::getNoItems()
 // Check if this Csd passes the tags filter test. If returns false, the Csd cannot be displayed.
 // If returnes true, the Csd is allowed to be displayed if it passes the other filter tests.
 bool ScenarioCsdTableModel::isItemPassTagFilter(QUuid csdId, TagCsdRelationships
-    tagCsdRelationships, FilterTags filterTags)
+    tagCsdRelationships, FilterTags filterTags, bool tagFilteringEnabled)
 {
-    if( filterTags.getEnableFilterByTags()==false){
+    if( tagFilteringEnabled==false){
         return true;
     }
 
@@ -363,13 +368,15 @@ bool ScenarioCsdTableModel::isItemPassTagFilter(QUuid csdId, TagCsdRelationships
             }
         }
         return false;
-    } else { // NONE
+    } else if (filterTags.getMode()==FilterTags::Mode::NOT){
         foreach (QUuid filtertagId, filterTags.getFilterTagIdSet()) {
             if (csdTagIdSet.contains(filtertagId)==true) {
                 return false;
             }
         }
         return true;
+    } else { // ILLEGAL
+        throw std::logic_error("Tag Combination Mode is invalid");
     }
 }
 

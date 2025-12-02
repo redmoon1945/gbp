@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>592</height>
+    <width>1070</width>
+    <height>653</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -77,7 +77,7 @@
                   </sizepolicy>
                  </property>
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The date of &amp;quot;Today&amp;quot; in GBP is set  from the computer's  date. There wont be any financial events generated at or before this date.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The date of &amp;quot;Today&amp;quot; in GBP is set from the computer's date. There won't be any financial events generated at or before this date.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="text">
                   <string>System's date at start-up</string>
@@ -103,7 +103,7 @@
                   </sizepolicy>
                  </property>
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The date of &amp;quot;Today&amp;quot; in GBP is fixed and set explicitely by the user : computer's date is not used for that purpose. There wont be any financial events generated at or before this date.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The date of &amp;quot;Today&amp;quot; in GBP is fixed and set explicitly by the user : computer's date is not used for that purpose. There won't be any financial events generated at or before this date.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="text">
                   <string>Specific value</string>
@@ -247,6 +247,9 @@
                  <property name="text">
                   <string>Choose...</string>
                  </property>
+                 <property name="autoDefault">
+                  <bool>false</bool>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -274,7 +277,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Allow colorization of Cash Stream Definition names :</string>
+              <string>Allow colorization of cash stream definition names :</string>
              </property>
             </widget>
            </item>
@@ -306,7 +309,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Export to CSV - Amounts are localized :</string>
+              <string>Export to CSV - amounts are localized :</string>
              </property>
             </widget>
            </item>
@@ -322,6 +325,33 @@
                </property>
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Any amount value (whatever the currency) used in any CSV export process is localized, that is the &amp;quot;thousands separator&amp;quot; and &amp;quot;decimal separator&amp;quot; are set according to the default language used on the computer. &lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : &amp;quot;thousands separator&amp;quot; is not used and &amp;quot;decimal separator&amp;quot; is &amp;quot;.&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Export to CSV - dates are localized :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QCheckBox" name="exportTextDateLocalizedCheckBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Any date used in any CSV export process is localized, that is, it obeys the convention of &amp;quot;short format&amp;quot; of the default language used on the computer. &lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : Format &amp;quot;YYYY-MM-DD&amp;quot; is used&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>
@@ -446,37 +476,10 @@
              </item>
             </layout>
            </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_16">
-             <property name="text">
-              <string>Export to CSV - Dates are localized :</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
-             <item>
-              <widget class="QCheckBox" name="exportTextDateLocalizedCheckBox">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Any date used in any CSV export process is localized, that is, it obeys the convention of &amp;quot;short format&amp;quot; of the default language used on the computer. &lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : Format &amp;quot;YYYY-MM-DD&amp;quot; is used&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
            <item row="6" column="0">
             <widget class="QLabel" name="label_19">
              <property name="text">
-              <string>Show Tooltips :</string>
+              <string>Show tooltips :</string>
              </property>
             </widget>
            </item>
@@ -498,6 +501,184 @@
                </property>
                <property name="checked">
                 <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>Income color :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_26">
+             <item>
+              <widget class="QPushButton" name="incomeColorPushButton">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color for some amounts representing incomes or positive values. Default value is a balanced optimized green, good for dark or light theme. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_36">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="incomeColorLabel">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_34">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_35">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Expanding</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>60</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="incomeColorResetPushButton">
+               <property name="text">
+                <string>Reset to default</string>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_23">
+             <property name="text">
+              <string>Expense color :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_27">
+             <item>
+              <widget class="QPushButton" name="expenseColorPushButton">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the color for some amounts representing expenses or negatives values. Default value is a balanced optimized red, good for dark or light theme. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_39">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="expenseColorLabel">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_37">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_40">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Expanding</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>60</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="expenseColorResetPushButton">
+               <property name="text">
+                <string>Reset to default</string>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -839,26 +1020,58 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Use Dark Mode :</string>
+                 <string>Chart theming :</string>
                 </property>
                </widget>
               </item>
               <item row="5" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_11">
                 <item>
-                 <widget class="QCheckBox" name="chartDarkModeCheckBox">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
+                 <widget class="QRadioButton" name="chartThemingLightRadioButton">
                   <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : For all charts, use a theme that fits a dark mode, that is dark background and light font colors.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : For all charts, use a theme that fits a light mode, that is light background and dark font colors.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Force light theme for all charts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="text">
-                   <string/>
+                   <string>Force light mode</string>
                   </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_5</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="chartThemingDarkRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Force dark theme for all charts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Force dark mode</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_5</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="chartThemingFollowRadioButton">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Try to detect if system desktop theme is &amp;quot;dark&amp;quot;, in which case all the charts will also be set to dark theme. Default is light theme. On Linux, detection can fail for some desktop themes, in which case all the charts will be set to light theme.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Follow system's theme</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">buttonGroup_5</string>
+                  </attribute>
                  </widget>
                 </item>
                 <item>
@@ -897,7 +1110,7 @@
             </sizepolicy>
            </property>
            <property name="title">
-            <string>Light Mode Settings</string>
+            <string>Light mode settings</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>
@@ -940,6 +1153,9 @@
                     </property>
                     <property name="text">
                      <string/>
+                    </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
                     </property>
                    </widget>
                   </item>
@@ -1004,6 +1220,9 @@
                     <property name="text">
                      <string/>
                     </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
+                    </property>
                    </widget>
                   </item>
                   <item>
@@ -1067,6 +1286,9 @@
                     <property name="text">
                      <string/>
                     </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
+                    </property>
                    </widget>
                   </item>
                   <item>
@@ -1127,6 +1349,9 @@
                     <property name="text">
                      <string/>
                     </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
+                    </property>
                    </widget>
                   </item>
                   <item>
@@ -1183,7 +1408,7 @@
             </sizepolicy>
            </property>
            <property name="title">
-            <string>Dark Mode Settings</string>
+            <string>Dark mode settings</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
@@ -1226,6 +1451,9 @@
                     </property>
                     <property name="text">
                      <string/>
+                    </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
                     </property>
                    </widget>
                   </item>
@@ -1290,6 +1518,9 @@
                     <property name="text">
                      <string/>
                     </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
+                    </property>
                    </widget>
                   </item>
                   <item>
@@ -1353,6 +1584,9 @@
                     <property name="text">
                      <string/>
                     </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
+                    </property>
                    </widget>
                   </item>
                   <item>
@@ -1412,6 +1646,9 @@
                     </property>
                     <property name="text">
                      <string/>
+                    </property>
+                    <property name="autoDefault">
+                     <bool>false</bool>
                     </property>
                    </widget>
                   </item>
@@ -1485,6 +1722,16 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QPushButton" name="resetPushButton">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
@@ -1502,12 +1749,24 @@
        <property name="text">
         <string>Cancel</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="applyPushButton">
        <property name="text">
         <string>Save</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -1518,9 +1777,10 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_4"/>
   <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_5"/>
  </buttongroups>
 </ui>

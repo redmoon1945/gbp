@@ -68,13 +68,13 @@ The file to be imported must be a UNICODE-ENCODED text file. UTF-8 , UTF-16 and 
 where :
     &lt;date&gt; :  date of the event. Must be in ISO 8601 format (YYYY-MM-DD). E.g. 2025-12-31
     TAB : is the TAB character (0x09)
-    &lt;amount&gt; : a double number, without thousand separator. Decimal separator must be &quot;.&quot;. Not smaller than 0 and not greater than :
-         999,999,999,999,999   for currencies with 0 decimals (e.g. Yen)
-         99,999,999,999,999.9  for currencies with 1 decimal
-         9,999,999,999,999.99  for currencies with 2 decimals
-         999,999,999,999.999  for currencies with 3 decimals
+    &lt;amount&gt; : a double number, without thousand separator. Decimal separator must be &quot;.&quot;. Must be between 0 and the following maximum (depending on currency decimals):
+         999 999 999 999 999   for currencies with 0 decimals (e.g. Yen)
+         99 999 999 999 999.9  for currencies with 1 decimal
+         9 999 999 999 999.99  for currencies with 2 decimals
+         999 999 999 999.999  for currencies with 3 decimals
     &lt;notes&gt; : a brief description of this item. Max 100 characters. Note that this field is OPTIONAL. 
-   CR : carriage return characgter (\n )
+   CR : carriage return character (\n )
 
 All imported items will be tagged as &quot;active&quot;, meaning they will be considered for the cashflow curve.</string>
        </property>
@@ -134,6 +134,9 @@ All imported items will be tagged as &quot;active&quot;, meaning they will be co
          <property name="text">
           <string>Browse...</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -176,12 +179,21 @@ All imported items will be tagged as &quot;active&quot;, meaning they will be co
        <property name="text">
         <string>Cancel</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="importPushButton">
        <property name="text">
         <string>Import</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

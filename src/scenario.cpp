@@ -23,42 +23,26 @@
 #include <qjsonarray.h>
 #include "scenario.h"
 #include "currencyhelper.h"
+#include "constants.h"
+
 
 // stay independant of "gbpcontroller.h"
 
-// File format version of a scenario on disk. Format released up to now are :
-// 1.0.0 : gbp 1.0 to and including 1.3
-// 2.0.0 : gbp 1.4
-// Format 2.0.0 cannot be read by gbp 1.3 ou before.
-// but format 1.0.0 can be read by gbp 1.4+ (will be converted on the fly to 2.0.0)
 QString Scenario::LATEST_VERSION = "2.0.0";
 QString Scenario::VERSION_1 = "1.0.0";
-
-quint16 Scenario::NAME_MAX_LEN = 100;
-quint16 Scenario::DESC_MAX_LEN = 4000;
-quint16 Scenario::VERSION_MAX_LEN = 20;
-quint16 Scenario::MAX_NO_STREAM_DEF = 200;
-quint16 Scenario::MIN_DURATION_FE_GENERATION = 1;   // we mandate at least 1 year of data
-quint16 Scenario::MAX_DURATION_FE_GENERATION = 100;   // slow search speed at maximum...
-// This has a great influence on the response time after a user click on a point to display info.
-// 25 provides a reasonable search time, but expect people to boost it to 50 or even 75.
-// More optimization may be required.
-quint16 Scenario::DEFAULT_DURATION_FE_GENERATION = 25; // provide a reasonable search time for click
-// Max no of tags defined per scenario. Essentially, well over any perceived reasonable value.
-quint16 Scenario::MAX_NO_TAGS = 200;
 
 
 Scenario::Scenario(const Scenario &o){
     this->version = o.version;
-    this->name = o.name.left(NAME_MAX_LEN); // truncate if required
+    this->name = o.name;
     this->description = o.description;
     this->feGenerationDuration = o.feGenerationDuration;
     this->inflation = o.inflation;
     this->countryCode = o.countryCode;
-    this->incomesDefPeriodic = o.incomesDefPeriodic;
-    this->incomesDefIrregular = o.incomesDefIrregular;
-    this->expensesDefPeriodic = o.expensesDefPeriodic;
-    this->expensesDefIrregular = o.expensesDefIrregular;
+    this->incomePeriodicCsds = o.incomePeriodicCsds;
+    this->incomeIrregularCsds = o.incomeIrregularCsds;
+    this->expensePeriodicCsds = o.expensePeriodicCsds;
+    this->expenseIrregularCsds = o.expenseIrregularCsds;
     this->tags = o.tags;
     this->tagCsdRelationships = o.tagCsdRelationships;
 }
@@ -71,17 +55,17 @@ Scenario::~Scenario()
 
 Scenario::Scenario(const QString version, const QString name, const QString description,
     const quint16 feGenerationDuration, const Growth inflation, QString countryCode,
-    const QMap<QUuid, PeriodicFeStreamDef> incomesDefPeriodicSet, const QMap<QUuid,
-    IrregularFeStreamDef> incomesDefIrregularSet,
-    const QMap<QUuid, PeriodicFeStreamDef> expensesDefPeriodicSet,
-    const QMap<QUuid, IrregularFeStreamDef> expensesDefIrregularSet,
+    QHash<QUuid,QSharedPointer<PeriodicCsd>> incomePeriodicCsdSet,
+    QHash<QUuid,QSharedPointer<IrregularCsd>> incomeIrregularCsdSet,
+    QHash<QUuid,QSharedPointer<PeriodicCsd>> expensePeriodicCsdSet,
+    QHash<QUuid,QSharedPointer<IrregularCsd>> expenseIrregularCsdSet,
     const Tags newTags, const TagCsdRelationships newtagCsdRelationships) :
-    version(version.left(VERSION_MAX_LEN)), name(name.left(NAME_MAX_LEN)),
-    description(description.left(DESC_MAX_LEN)), feGenerationDuration(feGenerationDuration),
-    inflation(inflation), countryCode(countryCode), incomesDefPeriodic(incomesDefPeriodicSet),
-    incomesDefIrregular(incomesDefIrregularSet), expensesDefPeriodic(expensesDefPeriodicSet),
-    expensesDefIrregular(expensesDefIrregularSet), tags(newTags),
-    tagCsdRelationships(newtagCsdRelationships)
+    version(version.left(VERSION_MAX_LEN)),
+    name(name.left(NAME_MAX_LEN)), description(description.left(DESC_MAX_LEN)),
+    feGenerationDuration(feGenerationDuration), inflation(inflation), countryCode(countryCode),
+    incomePeriodicCsds(incomePeriodicCsdSet), incomeIrregularCsds(incomeIrregularCsdSet),
+    expensePeriodicCsds(expensePeriodicCsdSet),expenseIrregularCsds(expenseIrregularCsdSet),
+    tags(newTags), tagCsdRelationships(newtagCsdRelationships)
 {}
 
 
@@ -93,10 +77,10 @@ Scenario &Scenario::operator=(const Scenario &o)
     this->feGenerationDuration = o.feGenerationDuration;
     this->inflation = o.inflation;
     this->countryCode = o.countryCode;
-    this->incomesDefPeriodic = o.incomesDefPeriodic;
-    this->incomesDefIrregular = o.incomesDefIrregular;
-    this->expensesDefPeriodic = o.expensesDefPeriodic;
-    this->expensesDefIrregular = o.expensesDefIrregular;
+    this->incomePeriodicCsds = o.incomePeriodicCsds;
+    this->incomeIrregularCsds = o.incomeIrregularCsds;
+    this->expensePeriodicCsds = o.expensePeriodicCsds;
+    this->expenseIrregularCsds = o.expenseIrregularCsds;
     this->tags = o.tags;
     this->tagCsdRelationships = o.tagCsdRelationships;
 
@@ -113,18 +97,22 @@ bool Scenario::operator==(const Scenario &o) const
         !(this->countryCode==o.countryCode) ){
         return false;
     }
-    if ( !(this->incomesDefPeriodic==o.incomesDefPeriodic) ){
+
+    // Csds
+    if ( false == deepComparePeriodicCsdMaps(this->incomePeriodicCsds, o.incomePeriodicCsds) ) {
         return false;
     }
-    if ( !(this->incomesDefIrregular==o.incomesDefIrregular) ){
+    if ( false == deepCompareIrregularCsdMaps(this->incomeIrregularCsds,o.incomeIrregularCsds) ){
         return false;
     }
-    if ( !(this->expensesDefPeriodic==o.expensesDefPeriodic) ){
+    if ( false == deepComparePeriodicCsdMaps(this->expensePeriodicCsds,o.expensePeriodicCsds) ){
         return false;
     }
-    if ( !(this->expensesDefIrregular==o.expensesDefIrregular) ){
+    if ( false == deepCompareIrregularCsdMaps(this->expenseIrregularCsds,o.expenseIrregularCsds) ){
         return false;
     }
+
+    // tags and relationships
     if ( !(this->tags==o.tags) ){
         return false;
     }
@@ -135,11 +123,10 @@ bool Scenario::operator==(const Scenario &o) const
 }
 
 
-// Save the scenario in an JSON file. If the file exists, it is overwritten.
 Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
 {
     QJsonObject jobject;
-    Scenario::FileResult result = {.code=ERROR_OTHER, .errorStringUI="", .errorStringLog=""};
+    Scenario::FileResult result;
     QJsonDocument doc;
 
     // simple elements
@@ -153,31 +140,31 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
     try {
         // incomes - Periodic
         QJsonObject jobjectIncomesPs;
-        for (auto it = incomesDefPeriodic.begin(); it != incomesDefPeriodic.end(); ++it) {
-            PeriodicFeStreamDef ps = it.value();
-            jobjectIncomesPs[it.key().toString(QUuid::WithoutBraces)] = ps.toJson();
+        for (auto it = incomePeriodicCsds.begin(); it != incomePeriodicCsds.end(); ++it) {
+            QSharedPointer<PeriodicCsd> ps = it.value();
+            jobjectIncomesPs[it.key().toString(QUuid::WithoutBraces)] = ps->toJson();
         }
         jobject["IncomesPeriodic"] = jobjectIncomesPs;
         // incomes - irregular
         QJsonObject jobjectIncomesIr;
-        for (auto it = incomesDefIrregular.begin(); it != incomesDefIrregular.end(); ++it) {
-            IrregularFeStreamDef ir = it.value();
-            jobjectIncomesIr[it.key().toString(QUuid::WithoutBraces)] = ir.toJson();
+        for (auto it = incomeIrregularCsds.begin(); it != incomeIrregularCsds.end(); ++it) {
+            QSharedPointer<IrregularCsd> ir = it.value();
+            jobjectIncomesIr[it.key().toString(QUuid::WithoutBraces)] = ir->toJson();
         }
         jobject["IncomesIrregular"] = jobjectIncomesIr;
 
         // expenses - Periodic
         QJsonObject jobjectExpensesPs;
-        for (auto it = expensesDefPeriodic.begin(); it != expensesDefPeriodic.end(); ++it) {
-            PeriodicFeStreamDef ps = it.value();
-            jobjectExpensesPs[it.key().toString(QUuid::WithoutBraces)] = ps.toJson();
+        for (auto it = expensePeriodicCsds.begin(); it != expensePeriodicCsds.end(); ++it) {
+            QSharedPointer<PeriodicCsd> ps = it.value();
+            jobjectExpensesPs[it.key().toString(QUuid::WithoutBraces)] = ps->toJson();
         }
         jobject["ExpensesPeriodic"] = jobjectExpensesPs;
         // expenses - irregular
         QJsonObject jobjectExpensesIr;
-        for (auto it = expensesDefIrregular.begin(); it != expensesDefIrregular.end(); ++it) {
-            IrregularFeStreamDef ir = it.value();
-            jobjectExpensesIr[it.key().toString(QUuid::WithoutBraces)] = ir.toJson();
+        for (auto it = expenseIrregularCsds.begin(); it != expenseIrregularCsds.end(); ++it) {
+            QSharedPointer<IrregularCsd> ir = it.value();
+            jobjectExpensesIr[it.key().toString(QUuid::WithoutBraces)] = ir->toJson();
         }
         jobject["ExpensesIrregular"] = jobjectExpensesIr;
 
@@ -188,27 +175,26 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
         jobject["TagRelationships"] = tagCsdRelationships.toJson();
 
         // Build the final JSON document
-        doc =  QJsonDocument(jobject);   // gather everything and create JSON document
+        doc = QJsonDocument(jobject);   // gather everything and create JSON document
 
         // validate
         if (doc.isNull()){
             // should never happen
-            result.code = SAVE_ERROR_INTERNAL_JSON_CREATION;
-            result.errorStringUI = tr("Cannot form a valid Json Document");
-            result.errorStringLog = "Cannot form a valid Json Document";
+            result.code = FileResultCode::SAVE_ERROR_JSON_CREATION;
+            result.logErrorMessage = "Cannot form a valid Json Document";
             return result;
         }
 
     } catch(const std::runtime_error& re) {
-        result.errorStringUI = tr("Runtime error: (%1)").arg(re.what());
-        result.errorStringLog = QString("Runtime error: (%1)").arg(re.what());
-        result.code = SAVE_ERROR_INTERNAL_JSON_CREATION;
+        result.logErrorMessage = QString("Runtime error trying to form a valid Json Document: %1")
+            .arg(re.what());
+        result.code = FileResultCode::SAVE_ERROR_JSON_CREATION;
         return result;
     }
     catch(const std::exception& ex){
-        result.errorStringUI = tr("Error: (%1)").arg(ex.what());
-        result.errorStringLog = QString("Error: (%1)").arg(ex.what());
-        result.code = SAVE_ERROR_INTERNAL_JSON_CREATION;
+        result.logErrorMessage = QString("Error occured while trying to form a valid Json "
+            "Document: %1").arg(ex.what());
+        result.code = FileResultCode::SAVE_ERROR_JSON_CREATION;
         return result;
     }
 
@@ -218,56 +204,59 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
     // file before opening it
     if (false==file.open(QFile::WriteOnly)){
         if (fileAlreadyExist){
-            result.code = SAVE_ERROR_OPENING_FILE_FOR_WRITING;
-            result.errorStringUI = tr("Cannot overwrite the scenario file "
-                ": check permissions");
-            result.errorStringLog = "Cannot open the file in write-only mode";
+            result.code = FileResultCode::SAVE_ERROR_OPENING_FILE_FOR_WRITING;
+            result.logErrorMessage = QString("Cannot open existing file in write-only mode : %1")
+                .arg(file.errorString());
         } else {
-            result.code = SAVE_ERROR_CREATING_FILE_FOR_WRITING;
-            result.errorStringUI = tr("Cannot create the scenario file : check permissions");
-            result.errorStringLog = "Cannot create the file in write-only mode";
+            result.code = FileResultCode::SAVE_ERROR_CREATING_FILE_FOR_WRITING;
+            result.logErrorMessage = QString("Cannot create the file in write-only mode : %1")
+                .arg(file.errorString());
         }
 
         return result;
     }
     if (-1==file.write(doc.toJson())){
         file.close();
-        result.code = SAVE_ERROR_WRITING_TO_FILE;
-        result.errorStringUI = tr("Cannot write to the file");
-        result.errorStringLog = "Cannot write to the file";
+        result.code = FileResultCode::SAVE_ERROR_WRITING_TO_FILE;
+        result.logErrorMessage = QString("Cannot write to the file : %1").arg(file.errorString());
         return result;
     }
     file.close();
 
-    result.code = SUCCESS;
-    result.errorStringUI = "";
-    result.errorStringLog = "";
+    result.code = FileResultCode::SUCCESS;
+    result.logErrorMessage = "";
     return result;
 }
 
 
-// Create a new Scenario object in memory from the content of a JSON scenario file on disk.
-// If an old file format version is found, the file is automatically converted to the latest format,
-// ON THE FLY, without notifying the user.
 Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
 {
     QJsonValue buf;
     bool ok;
-    Scenario::FileResult result = {.code=ERROR_OTHER, .errorStringUI="", .errorStringLog="",
-        .version1found=false};
+    Scenario::FileResult result;
 
-    // open the file
+    // Check if the file exists
     QFile file(fullFileName);
     if (!file.exists()){
         result.code = FileResultCode::LOAD_FILE_DOES_NOT_EXIST;
-        result.errorStringUI = tr("File %1 does not exist").arg(fullFileName);
-        result.errorStringLog = QString("File %1 does not exist").arg(fullFileName);
+        result.logErrorMessage = QString("The file does not exist");
         return result;
     }
+
+    // Check if the file is readable
+    QFileInfo fileInfo(fullFileName);
+    if ( fileInfo.isReadable()==false) {
+        result.code = FileResultCode::LOAD_FILE_IS_NOT_READABLE;
+        result.logErrorMessage = tr("The file is not \"readable\". The current user running "
+            "GBP might not have the necessary read permissions.");
+        return result;
+    }
+
+    // open the file
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         result.code = FileResultCode::LOAD_CANNOT_OPEN_FILE;
-        result.errorStringUI = tr("Cannot open file %1 in read-only mode").arg(fullFileName);
-        result.errorStringLog = QString("Cannot open file %1 in read-only mode").arg(fullFileName);
+        result.logErrorMessage = QString("Cannot open file in read-only mode % 1")
+            .arg(file.errorString());
         return result;
     }
 
@@ -277,12 +266,9 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     file.close();
     if (error.error != QJsonParseError::NoError) {
         result.code = FileResultCode::LOAD_JSON_PARSING_ERROR;
-        result.errorStringUI = tr("File %1 is not a GBP scenario file.\n\nDetails : "
-                                  "Error code = %2 ,offset = %3, error message = %4").arg(fullFileName).arg(error.error)
-                                   .arg(error.offset).arg(error.errorString());
-        result.errorStringLog = QString("File %1 is not a GBP scenario file.\n\nDetails : "
-                                        "Error code = %2 ,offset = %3, error message = %4").arg(fullFileName).arg(error.error)
-                                    .arg(error.offset).arg(error.errorString());
+        result.logErrorMessage = QString("JSON parsing error. Error code = %1, "
+            "offset = %2, error message = %3")
+            .arg(error.error).arg(error.offset).arg(error.errorString());
         return result;
     }
 
@@ -290,27 +276,24 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     QJsonObject root = doc.object();
 
     // version : first thing to read, in order to check version
-    // If version 1 found, convert to version 2 on the fly
+    // If version 1 found, convert to version 2 on the fly.
     buf = root.value("Version");
     if (buf == QJsonValue::Undefined){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Cannot find Version tag");
-        result.errorStringLog = QString("Cannot find Version tag");
+        result.logErrorMessage = QString("Cannot find token \"Version\"");
         return result;
     }
     if (buf.isString()==false){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Version tag is not a string");
-        result.errorStringLog = QString("Version tag is not a string");
+        result.logErrorMessage = QString("Version token is not a string");
         return result;
     }
     QString version = buf.toString();
     if( version.length()>VERSION_MAX_LEN ){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Version tag has a length %1, which is longer "
-            "than max allowed of %2").arg(version.length()).arg(VERSION_MAX_LEN);
-        result.errorStringLog = QString("Version tag has a length %1, which is longer "
-            "than max allowed of %2").arg(version.length()).arg(VERSION_MAX_LEN);
+        result.logErrorMessage = QString("Version token has a length of %1, which is longer "
+            "than max allowed of %2")
+            .arg(version.length()).arg(VERSION_MAX_LEN);
         return result;
     }
     if( version != Scenario::LATEST_VERSION ){
@@ -318,38 +301,37 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
             result.version1found = true;    // notify that we have auto-converted V1 to latest
             version = LATEST_VERSION;       // since it is auto-converted when loaded
         } else {
-            // appears to be an invalid version. This is an error.
-            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            // appears to be an invalid or future version. This is an error.
+            result.code = FileResultCode::LOAD_UNKNOWN_VERSION;
             QFileInfo fileInfo(fullFileName);
-            result.errorStringUI  = tr("Scenario file %1 is of version %2, which is incompatible "
-                "with version %3 used by this version of the application").arg(fileInfo.fileName())
+            result.logErrorMessage  = QString("The scenario file uses file format version %1, "
+                "which is incompatible with this version of GBP that requires version %2 "
+                "or older")
                 .arg(version).arg(Scenario::LATEST_VERSION);
-            result.errorStringLog  = QString("Scenario file %1 is of version %2, which is "
-                "incompatible with  version %3 used by this version of the application")
-                .arg(fileInfo.fileName()).arg(version).arg(Scenario::LATEST_VERSION);
             return result;
         }
     }
+
+    // Edited By (added in 1.7.0). We do not load this value (if present), because
+    // it will anyway be overwritten by Scenario()
 
     // name
     buf = root.value("Name");
     if (buf == QJsonValue::Undefined){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Cannot find Name tag");
-        result.errorStringLog = QString("Cannot find Name tag");
+        result.logErrorMessage = QString("Cannot find token \"Name\"");
         return result;
     }
     if (buf.isString()==false){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Name tag is not a string");
-        result.errorStringLog = QString("Name tag is not a string");
+        result.logErrorMessage = QString("Name toen is not a string");
         return result;
     }
     QString name = buf.toString();
     if (name.length()>NAME_MAX_LEN){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Name tag is too long");
-        result.errorStringLog = QString("Name tag is too long");
+        result.logErrorMessage = QString("Name token is too long (%1), maximum length is %2")
+            .arg(name.length()).arg(NAME_MAX_LEN);
         return result;
     }
 
@@ -357,23 +339,20 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     buf = root.value("Description");
     if (buf == QJsonValue::Undefined){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Cannot find Description tag");
-        result.errorStringLog = QString("Cannot find Description tag");
+        result.logErrorMessage = QString("Cannot find token \"Description\"");
         return result;
     }
     if (buf.isString()==false){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Description tag is not a string");
-        result.errorStringLog = QString("Description tag is not a string");
+        result.logErrorMessage = QString("Description token is not a string");
         return result;
     }
     QString desc = buf.toString();
     if (desc.length()>DESC_MAX_LEN){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Description tag has a length of %1, which is greater than "
-                                  "the maximum allowed of %2").arg(desc.length()).arg(DESC_MAX_LEN);
-        result.errorStringLog = QString("Description tag has a length of %1, which is greater "
-                                        "than the maximum allowed of %2").arg(desc.length()).arg(DESC_MAX_LEN);
+        result.logErrorMessage = QString("Description token has a length of %1, which is greater "
+            "than the maximum allowed of %2")
+            .arg(desc.length()).arg(DESC_MAX_LEN);
         return result;
     }
 
@@ -382,27 +361,25 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     quint16 feGenDuration;
     if (buf == QJsonValue::Undefined){
         // Older versions may not have this field : give it default value
-        feGenDuration = Scenario::DEFAULT_DURATION_FE_GENERATION;
+        feGenDuration = Constants::DEFAULT_DURATION_FE_GENERATION;
     } else {
         if (buf.isDouble()==false){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("FeGeneration tag is not a number");
-            result.errorStringLog = "FeGeneration tag is not a number";
+            result.logErrorMessage = "FeGeneration token is not a number";
             return result;
         }
         int ok;
         double d = buf.toDouble();
         feGenDuration = Util::extractQuint16FromDoubleWithNoFracPart(d,
-                                                                     Scenario::MAX_DURATION_FE_GENERATION, ok);
+            Constants::MAX_DURATION_FE_GENERATION, ok);
         if ( ok==-1 ){
-            result.errorStringUI = tr("FeGenerationDuration - Value %1 is not an integer").arg(d);
-            result.errorStringLog = QString("FeGenerationDuration - Value %1 is not an integer")
-                                        .arg(d);
+            result.logErrorMessage = QString("FeGenerationDuration: Value %1 is not an integer")
+                .arg(d);
             return result;
         }
         if ( ok==-2 ){
-            result.errorStringUI = tr("FeGenerationDuration - Value %1 is too big").arg(d);
-            result.errorStringLog = QString("FeGenerationDuration - Value %1 is too big").arg(d);
+            result.logErrorMessage = QString("FeGenerationDuration: Value %1 is too big")
+                .arg(d);
             return result;
         }
     }
@@ -411,21 +388,18 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     buf = root.value("CountryCode");
     if (buf == QJsonValue::Undefined){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Cannot find CountryCode tag");
-        result.errorStringLog = QString("Cannot find CountryCode tag");
+        result.logErrorMessage = QString("Cannot find token \"CountryCode\"");
         return result;
     }
     if (buf.isString()==false){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("CountryCode tag is not a string");
-        result.errorStringLog = QString("CountryCode tag is not a string");
+        result.logErrorMessage = QString("CountryCode token is not a string");
         return result;
     }
     QString countryCode = buf.toString();
     if ( !(CurrencyHelper::countryExists(countryCode)) ){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Country code %1 is invalid").arg(countryCode);
-        result.errorStringLog = QString("Country code %1 is invalid").arg(countryCode);
+        result.logErrorMessage = QString("CountryCode %1 is invalid").arg(countryCode);
         return result;
     }
 
@@ -433,262 +407,310 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     buf = root.value("Inflation");
     if (buf == QJsonValue::Undefined){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Cannot find Inflation tag");
-        result.errorStringLog = QString("Cannot find Inflation tag");
+        result.logErrorMessage = QString("Cannot find token \"Inflation\"");
         return result;
     }
     if (buf.isObject()==false){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Inflation tag is not an object");
-        result.errorStringLog = QString("Inflation tag is not an object");
+        result.logErrorMessage = QString("Inflation token is not an object");
         return result;
     }
-    Util::OperationResult infParsingResult;
+    Util::ResultOfOperation infParsingResult;
     Growth inflation = Growth::fromJson(buf.toObject(),infParsingResult);
-    if (infParsingResult.success==false){
+    if (infParsingResult.status==Util::ResultOfOperationStatus::ERROR){
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Inflation value is invalid : %1").arg(
-            infParsingResult.errorStringUI);
-        result.errorStringLog = QString("Inflation value is invalid : %1")
-                                    .arg(infParsingResult.errorStringLog);
+        result.logErrorMessage = QString("Inflation value is invalid : %1")
+            .arg(infParsingResult.logErrorMessage);
         return result;
     }
 
     // => read the 4 complex maps <=
-    QMap<QUuid,PeriodicFeStreamDef> incPsMap;
-    QMap<QUuid,IrregularFeStreamDef> incIrMap;
-    QMap<QUuid,PeriodicFeStreamDef> expPsMap;
-    QMap<QUuid,IrregularFeStreamDef> expIrMap;
+    QHash<QUuid,QSharedPointer<PeriodicCsd>> incPsMap;
+    QHash<QUuid,QSharedPointer<IrregularCsd>> incIrMap;
+    QHash<QUuid,QSharedPointer<PeriodicCsd>> expPsMap;
+    QHash<QUuid,QSharedPointer<IrregularCsd>> expIrMap;
 
-    // QMap Income Periodic
+    // QMap Income Periodic Csds
     {
         buf = root.value("IncomesPeriodic");
         if (buf == QJsonValue::Undefined){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Cannot find IncomesPeriodic tag");
-            result.errorStringLog = "Cannot find IncomesPeriodic tag";
+            result.logErrorMessage = "Cannot find token \"IncomesPeriodic\"";
             return result;
         }
         if (buf.isObject()==false){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("IncomesPeriodic tag is not an object");
-            result.errorStringLog = "IncomesPeriodic tag is not an object";
+            result.logErrorMessage = "IncomesPeriodic token is not an object";
             return result;
         }
         QJsonObject incPsObject = buf.toObject();
-        // check max no of Stream Def
-        if (incPsObject.count()> MAX_NO_STREAM_DEF){
+        // check max no of Csds
+        if (incPsObject.count()> MAX_NO_CSDS){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI =tr("Too many Periodic Incomes items found (%1 found, max "
-                                      "is %2)").arg(incPsObject.count()).arg(MAX_NO_STREAM_DEF);
-            result.errorStringLog =QString("Too many Periodic Incomes items found (%1 found, "
-                                            "max is %2)").arg(incPsObject.count()).arg(MAX_NO_STREAM_DEF);
+            result.logErrorMessage =QString("Too many Periodic Incomes items found (%1 found, "
+                "max is %2)")
+                .arg(incPsObject.count()).arg(MAX_NO_CSDS);
             return result;
         }
+
+        // Build the Hash table object
         for (auto it = incPsObject.begin(); it != incPsObject.end(); ++it) {
-            QString key = it.key();             // Stream Def ID string representation
-            QUuid id = QUuid::fromString(key);  // the id itself
-            if (id.isNull()) {
+            QString key = it.key();             // Csds ID string representation
+            QUuid id = Util::convertStringToQuuid(key,ok);  // the id itself
+            if (ok==false) {
+                key.truncate(38);
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = tr("Periodic Income - Value for key %1 is not a valid "
-                                          "UUID").arg(key);
-                result.errorStringLog = QString("Periodic Income - Value for key %1 is not a "
-                                                "valid UUID").arg(key);
+                result.logErrorMessage = QString("Key \"%1\" for Periodic Income is not a "
+                    "valid UUID").arg(key);
                 return result;
             }
-            // extract associated Stream Def
+            // extract associated Csds
             QJsonValueRef valueRef = it.value();
             if (!valueRef.isObject()){
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = tr("Periodic Income - Value for key %1 is not an "
-                                          "Object").arg(key);
-                result.errorStringLog = QString("Periodic Income - Value for key %1 is not an "
-                                                "Object").arg(key);
+                result.logErrorMessage = QString("Periodic Income Value for key \"%1\" is not an "
+                    "Object").arg(key);
                 return result;
             }
             QJsonObject valueObject = valueRef.toObject();
-            Util::OperationResult parsingResult;
-            PeriodicFeStreamDef value = PeriodicFeStreamDef::fromJson(valueObject,parsingResult);
-            if(parsingResult.success==false){
+            Util::ResultOfOperation parsingResult;
+            QSharedPointer<PeriodicCsd> value = PeriodicCsd::fromJson(valueObject,parsingResult);
+            if(parsingResult.status==Util::ResultOfOperationStatus::ERROR){
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = parsingResult.errorStringUI;
-                result.errorStringLog = parsingResult.errorStringLog;
+                result.logErrorMessage = parsingResult.logErrorMessage;
                 return result;
             }
+            // The CSD ID must match the key mentioned in the Hash table itself
+            if (id != value->getId()) {
+                result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+                result.logErrorMessage = QString("IncomesPeriodic: Key \"%1\" in Hash table does"
+                    " not match the ID \"%2\" in the Csd")
+                    .arg(key)
+                    .arg(value->getId().toString(QUuid::WithoutBraces));
+                return result;
+            }
+
+            // Make sure this key is unique. Qt JSON parser should already have removed the
+            // duplicate entries and kept ust the last one.
+            if (incPsMap.contains(id)==true) {
+                result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+                result.logErrorMessage = QString("IncomesPeriodic: Duplicate Key \"%1\"")
+                    .arg(key);
+                return result;
+            }
+
             incPsMap.insert(id, value);
         }
     }
 
-    // QMap Income Irregular
+    // QMap Income Irregular Csds
     {
         buf = root.value("IncomesIrregular");
         if (buf == QJsonValue::Undefined){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Cannot find IncomesIrregular tag");
-            result.errorStringLog = "Cannot find IncomesIrregular tag";
+            result.logErrorMessage = "Cannot find token \"IncomesIrregular\"";
             return result;
         }
         if (buf.isObject()==false){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("IncomesIrregular tag is not an object");
-            result.errorStringLog = "IncomesIrregular tag is not an object";
+            result.logErrorMessage = "IncomesIrregular token is not an object";
             return result;
         }
         QJsonObject incIrrObject = buf.toObject();
-        // check max no of Stream Def
-        if (incIrrObject.count()> MAX_NO_STREAM_DEF){
+        // check max no of Csds
+        if (incIrrObject.count()> MAX_NO_CSDS){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Too many Irregular Incomes items found (%1 found, max "
-                                      "is %2)").arg(incIrrObject.count()).arg(MAX_NO_STREAM_DEF);
-            result.errorStringLog = QString("Too many Irregular Incomes items found (%1 found, "
-                                            "max is %2)").arg(incIrrObject.count()).arg(MAX_NO_STREAM_DEF);
+            result.logErrorMessage = QString("Too many Irregular Incomes items found (%1 found, "
+                "max is %2)").arg(incIrrObject.count()).arg(MAX_NO_CSDS);
             return result;
         }
+
+        // Build the Hash table object
         for (auto it = incIrrObject.begin(); it != incIrrObject.end(); ++it) {
-            QString key = it.key(); // Stream Def ID string representation
-            QUuid id = QUuid::fromString(key);  // the id itself
-            if (id.isNull()) {
+            QString key = it.key(); // Csd ID string representation
+            QUuid id = Util::convertStringToQuuid(key,ok);  // the id itself
+            if (ok==false) {
+                key.truncate(38);
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = tr("Irregular Income - Value for key %1 is not a "
-                                          "valid UUID").arg(key);
-                result.errorStringLog = QString("Irregular Income - Value for key %1 is not "
-                                                "a valid UUID").arg(key);
+                result.logErrorMessage = QString("Key \"%1\" for Irregular Income is not "
+                    "a valid UUID").arg(key);
                 return result;
             }
-            // extract associated Stream Def
+            // extract associated Csd
             QJsonValueRef valueRef = it.value();
             if (!valueRef.isObject()){
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = tr("Irregular Income - Value for key %1 is not an "
-                                          "Object").arg(key);
-                result.errorStringLog = QString("Irregular Income - Value for key %1 is not "
-                                                "an Object").arg(key);
+                result.logErrorMessage = QString("Irregular Income Value for key \"%1\" is not "
+                    "an Object").arg(key);
                 return result;
             }
             QJsonObject valueObject = valueRef.toObject();
-            Util::OperationResult parsingResult;
-            IrregularFeStreamDef value = IrregularFeStreamDef::fromJson(valueObject,parsingResult);
-            if(parsingResult.success==false){
+            Util::ResultOfOperation parsingResult;
+            QSharedPointer<IrregularCsd> value = IrregularCsd::fromJson(valueObject,parsingResult);
+            if(parsingResult.status==Util::ResultOfOperationStatus::ERROR){
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = parsingResult.errorStringUI;
-                result.errorStringLog = parsingResult.errorStringLog;
+                result.logErrorMessage = parsingResult.logErrorMessage;
                 return result;
             }
+            // The CSD ID must match the key mentioned in the Hash table itself
+            if (id != value->getId()) {
+                result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+                result.logErrorMessage = QString("IncomesIrregular: Key \"%1\" in Hash table does "
+                    "not match the ID \"%2\" in the Csd")
+                    .arg(key)
+                    .arg(value->getId().toString(QUuid::WithoutBraces));
+                return result;
+            }
+
+            // Make sure this key is unique. Qt JSON parser should already have removed the
+            // duplicate entries and kept ust the last one.
+            if (incIrMap.contains(id)==true) {
+                result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+                result.logErrorMessage = QString("IncomesIrregular: Duplicate Key \"%1\"")
+                    .arg(key);
+                return result;
+            }
+
             incIrMap.insert(id, value);
         }
     }
 
-    // QMap Expense Periodic
+    // QMap Expense Periodic Csds
     {
         buf = root.value("ExpensesPeriodic");
         if (buf == QJsonValue::Undefined){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Cannot find ExpensesPeriodic tag");
-            result.errorStringLog = "Cannot find ExpensesPeriodic tag";
+            result.logErrorMessage = "Cannot find token \"ExpensesPeriodic\"";
             return result;
         }
         if (buf.isObject()==false){
-            throw std::domain_error("ExpensesPeriodic tag is not an object");
+            throw std::domain_error("ExpensesPeriodic token is not an object");
         }
         QJsonObject expPsObject = buf.toObject();
-        // check max no of Stream Def
-        if (expPsObject.count()> MAX_NO_STREAM_DEF){
+        // check max no of Csds
+        if (expPsObject.count()> MAX_NO_CSDS){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Too many Periodic Expenses items found (%1 found, "
-                                      "max is %2)").arg(expPsObject.count()).arg(MAX_NO_STREAM_DEF);
-            result.errorStringLog = QString("Too many Periodic Expenses items found (%1 found, "
-                                            "max is %2)").arg(expPsObject.count()).arg(MAX_NO_STREAM_DEF);
+            result.logErrorMessage = QString("Too many Periodic Expenses items found (%1 found, "
+                "max is %2)").arg(expPsObject.count()).arg(MAX_NO_CSDS);
             return result;
         }
+
+        // Build the Hash table object
         for (auto it = expPsObject.begin(); it != expPsObject.end(); ++it) {
-            QString key = it.key(); // Stream Def ID string representation
+            QString key = it.key(); // Csd ID string representation
             QUuid id = QUuid::fromString(key);  // the id itself
             if (id.isNull()) {
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = tr("Periodic Expense - Value for key %1 is not a "
-                                          "valid UUID").arg(key);
-                result.errorStringLog = QString("Periodic Expense - Value for key %1 is not a "
-                                                "valid UUID").arg(key);
+                result.logErrorMessage = QString("Periodic Expense Value for key \"%1\" is not a "
+                    "valid UUID").arg(key);
                 return result;
             }
-            // extract associated Stream Def
+            // extract associated Csds
             QJsonValueRef valueRef = it.value();
             if (!valueRef.isObject()){
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = tr("Periodic Expense - Value for key %1 is not an "
-                                          "Object").arg(key);
-                result.errorStringLog = QString("Periodic Expense - Value for key %1 is not "
-                                                "an Object").arg(key);
+                result.logErrorMessage = QString("Periodic Expense Value for key \"%1\" is not "
+                    "an Object").arg(key);
                 return result;
             }
             QJsonObject valueObject = valueRef.toObject();
-            Util::OperationResult parsingResult;
-            PeriodicFeStreamDef value = PeriodicFeStreamDef::fromJson(valueObject,parsingResult);
-            if(parsingResult.success==false){
+            Util::ResultOfOperation parsingResult;
+            QSharedPointer<PeriodicCsd> value = PeriodicCsd::fromJson(valueObject,parsingResult);
+            if(parsingResult.status==Util::ResultOfOperationStatus::ERROR){
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = parsingResult.errorStringUI;
-                result.errorStringLog = parsingResult.errorStringLog;
+                result.logErrorMessage = parsingResult.logErrorMessage;
                 return result;
             }
+            // The CSD ID must match the key mentioned in the Hash table itself
+            if (id != value->getId()) {
+                result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+                result.logErrorMessage = QString("ExpensesPeriodic: Key \"%1\" in Hash table does "
+                    "not match the ID \"%2\" in the Csd")
+                    .arg(key)
+                    .arg(value->getId().toString(QUuid::WithoutBraces));
+                return result;
+            }
+
+            // Make sure this key is unique. Qt JSON parser should already have removed the
+            // duplicate entries and kept ust the last one.
+            if (expPsMap.contains(id)==true) {
+                result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+                result.logErrorMessage = QString("ExpensesPeriodic: Duplicate Key \"%1\"")
+                    .arg(key);
+                return result;
+            }
+
             expPsMap.insert(id, value);
         }
     }
 
-    // QMap Expense Irregular
+    // QMap Expense Irregular Csds
     {
         buf = root.value("ExpensesIrregular");
         if (buf == QJsonValue::Undefined){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Cannot find ExpensesIrregular tag");
-            result.errorStringLog = "Cannot find ExpensesIrregular tag";
+            result.logErrorMessage = "Cannot find token \"ExpensesIrregular\"";
             return result;
         }
         if (buf.isObject()==false){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("ExpensesIrregular tag is not an object");
-            result.errorStringLog = "ExpensesIrregular tag is not an object";
+            result.logErrorMessage = "ExpensesIrregular token is not an object";
             return result;
         }
         QJsonObject expIrrObject = buf.toObject();
-        // check max no of Stream Def
-        if (expIrrObject.count()> MAX_NO_STREAM_DEF){
+        // check max no of sds
+        if (expIrrObject.count()> MAX_NO_CSDS){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Too many Irregular Expenses items found (%1 found, "
-                                      "max is %2)").arg(expIrrObject.count()).arg(MAX_NO_STREAM_DEF);
-            result.errorStringLog = QString("Too many Irregular Expenses items found (%1 found, "
-                                            "max is %2)").arg(expIrrObject.count()).arg(MAX_NO_STREAM_DEF);
+            result.logErrorMessage = QString("Too many Irregular Expenses items found (%1 found, "
+                "max is %2)").arg(expIrrObject.count()).arg(MAX_NO_CSDS);
             return result;
         }
+
+        // Build the Hash table object
         for (auto it = expIrrObject.begin(); it != expIrrObject.end(); ++it) {
-            QString key = it.key(); // Stream Def ID string representation
+            QString key = it.key(); // Csd ID string representation
             QUuid id = QUuid::fromString(key);  // the id itself
             if (id.isNull()) {
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = tr("Irregular Expense - Value for key %1 is not a "
-                                          "valid UUID").arg(key);
-                result.errorStringLog = QString("Irregular Expense - Value for key %1 is not "
-                                                "a valid UUID").arg(key);
+                result.logErrorMessage = QString("Irregular Expense Value for key \"%1\" is not "
+                    "a valid UUID").arg(key);
                 return result;
             }
-            // extract associated Stream Def
+            // extract associated Csd
             QJsonValueRef valueRef = it.value();
             if (!valueRef.isObject()){
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = tr("Irregular Expense - Value for key %1 is not an "
-                                          "Object").arg(key);
-                result.errorStringLog = QString("Irregular Expense - Value for key %1 is not "
-                                                "an Object").arg(key);
+                result.logErrorMessage = QString("Irregular Expense Value for key \"%1\" is not "
+                    "an Object").arg(key);
                 return result;
             }
             QJsonObject valueObject = valueRef.toObject();
-            Util::OperationResult parsingResult;
-            IrregularFeStreamDef value = IrregularFeStreamDef::fromJson(valueObject,parsingResult);
-            if(parsingResult.success==false){
+            Util::ResultOfOperation parsingResult;
+            QSharedPointer<IrregularCsd> value = IrregularCsd::fromJson(valueObject,parsingResult);
+            if(parsingResult.status==Util::ResultOfOperationStatus::ERROR){
                 result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-                result.errorStringUI = parsingResult.errorStringUI;
-                result.errorStringLog = parsingResult.errorStringLog;
+                result.logErrorMessage = parsingResult.logErrorMessage;
                 return result;
             }
+            // The CSD ID must match the key mentioned in the Hash table itself
+            if (id != value->getId()) {
+                result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+                result.logErrorMessage = QString("ExpensesIrregular: Key \"%1\" in Hash table does"
+                    " not match the ID \"%2\" in the Csd")
+                    .arg(key)
+                    .arg(value->getId().toString(QUuid::WithoutBraces));
+                return result;
+            }
+
+            // Make sure this key is unique. Qt JSON parser should already have removed the
+            // duplicate entries and kept ust the last one.
+            if (expIrMap.contains(id)==true) {
+                result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+                result.logErrorMessage = QString("ExpensesIrregular: Duplicate Key \"%1\"")
+                    .arg(key);
+                return result;
+            }
+
             expIrMap.insert(id, value);
         }
     }
@@ -701,18 +723,15 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     } else {
         if (buf.isObject()==false){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Tags tag is not an object");
-            result.errorStringLog = QString("Tags tag is not an object");
+            result.logErrorMessage = QString("Tags token is not an object");
             return result;
         }
-        Util::OperationResult parsingResult;
+        Util::ResultOfOperation parsingResult;
         theTags = Tags::fromJson(buf.toObject(), parsingResult);
-        if (parsingResult.success==false){
+        if (parsingResult.status==Util::ResultOfOperationStatus::ERROR){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Tags value is invalid : %1").arg(
-                parsingResult.errorStringUI);
-            result.errorStringLog = QString("Tags value is invalid : %1")
-                .arg(parsingResult.errorStringLog);
+            result.logErrorMessage = QString("%1")
+                .arg(parsingResult.logErrorMessage);
             return result;
         }
     }
@@ -725,18 +744,15 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     } else {
         if (buf.isObject()==false){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Tag relationships is not an object");
-            result.errorStringLog = QString("Tag relationships is not an object");
+            result.logErrorMessage = QString("Tags relationships is not an object");
             return result;
         }
-        Util::OperationResult parsingResult;
+        Util::ResultOfOperation parsingResult;
         rel = TagCsdRelationships::fromJson(buf.toObject(),parsingResult);
-        if (parsingResult.success==false){
+        if (parsingResult.status==Util::ResultOfOperationStatus::ERROR){
             result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.errorStringUI = tr("Tag Relationships value is invalid : %1").arg(
-                parsingResult.errorStringUI);
-            result.errorStringLog = QString("Tag Relationships value is invalid : %1")
-                                        .arg(parsingResult.errorStringLog);
+            result.logErrorMessage = QString("%1")
+                .arg(parsingResult.logErrorMessage);
             return result;
         }
     }
@@ -744,15 +760,23 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
 
     // All data have been collected : build and return a new Scenario
     result.code = FileResultCode::SUCCESS;
-    QSharedPointer<Scenario> ptr(new Scenario(version, name, desc, feGenDuration, inflation,
-        countryCode, incPsMap, incIrMap, expPsMap, expIrMap, theTags, rel));
+    QSharedPointer<Scenario> ptr;
+    try {
+        ptr = QSharedPointer<Scenario>(new Scenario(version, name, desc, feGenDuration, inflation,
+            countryCode, incPsMap, incIrMap, expPsMap, expIrMap, theTags, rel));
+    } catch (...) {
+        // should never happen
+        result.code = FileResultCode::LOAD_ERROR;
+        result.logErrorMessage = QString("An unexpected exception occured while trying to create "
+            "the scenario object");
+        return result;
+    }
     result.scenarioPtr = ptr;
 
     // Once the scenario is built, check that all relationships have tags and fsds defined
     if (false == ptr->checkTagCsdRelationshipsIntegrity()) {
         result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.errorStringUI = tr("Tag Relationships integrity is invalid");
-        result.errorStringLog = QString("Tag Relationships integrity is invalid");
+        result.logErrorMessage = QString("Tags Relationships integrity is invalid");
         return result;
     }
 
@@ -763,8 +787,7 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
         if (convertResult.code != FileResultCode::SUCCESS) {
             // we have a problem, should not happen in principle
             result.code = FileResultCode::LOAD_CANNOT_UPGRADE;
-            result.errorStringUI = convertResult.errorStringUI;
-            result.errorStringLog = convertResult.errorStringLog;
+            result.logErrorMessage = convertResult.logErrorMessage;
             return result;
         }
     }
@@ -773,27 +796,10 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
 }
 
 
-// Generate the whole suite of financial events for that scenario
-// Input params :
-//   today : today as defined by gbp
-//   systemLocale : Locale used for amount formatting
-//   fromTo : interval of time inside which the events should be generated. Must be of type BOUNDED.
-//   pvAnnualDiscountRate : annual discount rate in percentage, to transform future into present
-//                          value. 0 means keep future values. Cannot be negative.
-//   pvPresent : date considered to be the "present" for convertion to PV purpose. Usually,
-//               "tomorrow" is what is required
-// Output params:
-//   saturationCount : number of times the FE amount was over the maximum allowed
-QMap<QDate, CombinedFeStreams::DailyInfo> Scenario::generateFinancialEvents(QDate today,
+QSharedPointer<CombinedFeStreams> Scenario::generateFinancialEvents(QDate today,
     QLocale systemLocale, DateRange fromto, double pvAnnualDiscountRate, QDate pvPresent,
     uint &saturationCount) const
 {
-    CombinedFeStreams comb;
-    uint saturationNo;
-    saturationCount = 0;
-    FeMinMaxInfo minMaxInfo; // we wont use it
-    bool found;
-
     // check input parameters
     if (pvAnnualDiscountRate < 0 ) {
         throw std::invalid_argument("PV discount rate cannot be negative");
@@ -804,238 +810,251 @@ QMap<QDate, CombinedFeStreams::DailyInfo> Scenario::generateFinancialEvents(QDat
     if (today.isValid()==false) {
         throw std::invalid_argument("Today date is invalid");
     }
-    if (fromto.getType() != DateRange::BOUNDED) {
+    if (fromto.getType() != DateRange::Type::BOUNDED) {
         throw std::invalid_argument("fromtoInitial is not of type BOUNDED");
     }
 
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(systemLocale,
-        countryCode, found);
+    // calculate the number of max days acccording to the scenario limit
+    // and create the combinedStream object
+    QDate maxDate = today.addYears(feGenerationDuration); // compute max date for FeGeneration
+    QDate tomorrow = today.addDays(1);
+    qint64 tomorrowJulianDays = tomorrow.toJulianDay();
+    int maxNoOfdays = maxDate.toJulianDay() - tomorrowJulianDays + 1;
+    QSharedPointer<CombinedFeStreams> comb = QSharedPointer<CombinedFeStreams>(
+        new CombinedFeStreams(maxNoOfdays) );
+
+    // Build the shared FeStream to be reused by all the Csds.
+    // Reference to the proper Csd will be set when appropriate, so now we set a null value.
+    FeStream sharedFeStream(maxNoOfdays, QWeakPointer<Csd>());
+
+    uint saturationNo;
+    saturationCount = 0;
+    FeMinMaxInfo minMaxInfo; // we wont use it
+    bool found;
+
+    // We dont care about the currency name language here, because we are not going to use it.
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(
+        countryCode, QLocale::Language::English, found);
     if (!found){
         // should never happen
-        return comb.getCombinedStreams();
+        return comb;
     }
 
-    // compute max date for FeGeneration
-    QDate maxDate = today.addYears(feGenerationDuration);
+    foreach(QSharedPointer<PeriodicCsd> item,incomePeriodicCsds){
+        sharedFeStream.setCsdPtr(item.toWeakRef());
+        item->generateEventStream(sharedFeStream, tomorrow, fromto,
+            maxDate, inflation, pvAnnualDiscountRate, pvPresent, saturationNo, minMaxInfo);
+        comb->addStream(sharedFeStream,currInfo);
+        saturationCount += saturationNo;
+    }
+    foreach(QSharedPointer<PeriodicCsd> item,expensePeriodicCsds){
+        sharedFeStream.setCsdPtr(item.toWeakRef());
+        item->generateEventStream(sharedFeStream, tomorrow, fromto,
+            maxDate, inflation, pvAnnualDiscountRate, pvPresent, saturationNo, minMaxInfo);
+        comb->addStream(sharedFeStream,currInfo);
+        saturationCount += saturationNo;
+    }
+    foreach(QSharedPointer<IrregularCsd> item,incomeIrregularCsds){
+        sharedFeStream.setCsdPtr(item.toWeakRef());
+        item->generateEventStream(sharedFeStream, tomorrow, fromto,
+            maxDate, pvAnnualDiscountRate, pvPresent, saturationNo, minMaxInfo);
+        comb->addStream(sharedFeStream,currInfo);
+        saturationCount += saturationNo;
+    }
+    foreach(QSharedPointer<IrregularCsd> item,expenseIrregularCsds){
+        sharedFeStream.setCsdPtr(item.toWeakRef());
+        item->generateEventStream(sharedFeStream, tomorrow, fromto,
+            maxDate, pvAnnualDiscountRate, pvPresent, saturationNo, minMaxInfo);
+        comb->addStream(sharedFeStream,currInfo);
+        saturationCount += saturationNo;
+    }
 
-    foreach(PeriodicFeStreamDef item,incomesDefPeriodic){
-        QList<Fe> stream = item.generateEventStream(fromto, maxDate, inflation,
-            pvAnnualDiscountRate, pvPresent, saturationNo, minMaxInfo);
-        comb.addStream(stream,currInfo);
-        saturationCount += saturationNo;
-    }
-    foreach(PeriodicFeStreamDef item,expensesDefPeriodic){
-        QList<Fe> stream = item.generateEventStream(fromto, maxDate, inflation,
-            pvAnnualDiscountRate, pvPresent, saturationNo, minMaxInfo);
-        comb.addStream(stream,currInfo);
-        saturationCount += saturationNo;
-    }
-    foreach(IrregularFeStreamDef item,incomesDefIrregular){
-        QList<Fe> stream = item.generateEventStream(fromto, maxDate, pvAnnualDiscountRate,
-            pvPresent, saturationNo, minMaxInfo);
-        comb.addStream(stream,currInfo);
-        saturationCount += saturationNo;
-    }
-    foreach(IrregularFeStreamDef item,expensesDefIrregular){
-        QList<Fe> stream = item.generateEventStream(fromto, maxDate, pvAnnualDiscountRate,
-            pvPresent, saturationNo, minMaxInfo);
-        comb.addStream(stream,currInfo);
-        saturationCount += saturationNo;
-    }
-
-    return comb.getCombinedStreams();
+    return comb;
 }
 
 
-void Scenario::getStreamDefNameAndColorFromId(QUuid id, QString& name, QColor& color, bool &found) const
+void Scenario::getCsdNameAndColorFromId(QUuid id, QString& name, QColor& color,
+    bool &found) const
 {
     found = true;
 
-    foreach(PeriodicFeStreamDef item,incomesDefPeriodic){
-        if (item.getId()==id){
-            name = item.getName();
-            color = item.getDecorationColor();
-            return;
-        }
+    QSharedPointer<PeriodicCsd> ptrPeriodic = incomePeriodicCsds.value(id);
+    if (ptrPeriodic != nullptr){
+        name = ptrPeriodic->getName();
+        color = ptrPeriodic->getDecorationColor();
+        return;
     }
-    foreach(PeriodicFeStreamDef item,expensesDefPeriodic){
-        if (item.getId()==id){
-            name = item.getName();
-            color = item.getDecorationColor();
-            return;
-        }
+    ptrPeriodic = expensePeriodicCsds.value(id);
+    if (ptrPeriodic != nullptr){
+        name = ptrPeriodic->getName();
+        color = ptrPeriodic->getDecorationColor();
+        return;
     }
-    foreach(IrregularFeStreamDef item,incomesDefIrregular){
-        if (item.getId()==id){
-            name = item.getName();
-            color = item.getDecorationColor();
-            return;
-        }
+    QSharedPointer<IrregularCsd> ptrIrregular = incomeIrregularCsds.value(id);
+    if (ptrIrregular != nullptr){
+        name = ptrIrregular->getName();
+        color = ptrIrregular->getDecorationColor();
+        return;
     }
-    foreach(IrregularFeStreamDef item,expensesDefIrregular){
-        if (item.getId()==id){
-            name = item.getName();
-            color = item.getDecorationColor();
-            return;
-        }
+    ptrIrregular = expenseIrregularCsds.value(id);
+    if (ptrIrregular != nullptr){
+        name = ptrIrregular->getName();
+        color = ptrIrregular->getDecorationColor();
+        return;
     }
 
     found = false;
+    name = "";
+    color = QColor();
     return ;
 }
 
 
-// Does the Financial Stream Definition identified by id exists ?
-bool Scenario::fsdIdExists(QUuid id) const
+bool Scenario::csdIdExists(QUuid id) const
 {
-    foreach(PeriodicFeStreamDef item,incomesDefPeriodic){
-        if (item.getId()==id){
-            return true;
-        }
+    if ( incomePeriodicCsds.contains(id) || expensePeriodicCsds.contains(id) ||
+        incomeIrregularCsds.contains(id) || expenseIrregularCsds.contains(id) ){
+        return true;
+    } else{
+        return false;
     }
-    foreach(PeriodicFeStreamDef item,expensesDefPeriodic){
-        if (item.getId()==id){
-            return true;
-        }
-    }
-    foreach(IrregularFeStreamDef item,incomesDefIrregular){
-        if (item.getId()==id){
-            return true;
-        }
-    }
-    foreach(IrregularFeStreamDef item,expensesDefIrregular){
-        if (item.getId()==id){
-            return true;
-        }
-    }
-    return false;
 }
 
 
-// Compare this scenario with another one and evaluate if the cenario flow data generated by both
-// will be exactly the same. It does so without actually generating the events and is then very
-// significantly much faster, though not exact all the time. As a matter of fact, there are some
-// more complex cases where False is returned but the flow data is still the same.
-bool Scenario::evaluateIfSameFlowData(QSharedPointer<Scenario> o) const
+bool Scenario::evaluateIfSameFeStream(QSharedPointer<Scenario> o, QString& diff) const
 {
-    if ( (feGenerationDuration!=o->feGenerationDuration) ||
-        (inflation!=o->inflation) ){
+    diff = "";
+
+    if ( feGenerationDuration != o->feGenerationDuration ){
+        diff = QString("Scenario duration is different (%1 vs %2)")
+            .arg(feGenerationDuration).arg(o->feGenerationDuration);
         return false;
     }
 
-    if ( (incomesDefPeriodic.size() != o->incomesDefPeriodic.size()) ||
-        (expensesDefPeriodic.size() != o->expensesDefPeriodic.size()) ||
-        (incomesDefIrregular.size() != o->incomesDefIrregular.size()) ||
-        (expensesDefIrregular.size() != o->expensesDefIrregular.size())
-        ){
+    if( inflation != o->inflation){
+        diff = QString("Scenario inflation is different");
         return false;
     }
 
-    // Incomes Periodic
-    {
-        QList<PeriodicFeStreamDef> valuesPer = incomesDefPeriodic.values();
-        QList<PeriodicFeStreamDef> otherValuesPer = o->incomesDefPeriodic.values();
-        foreach(PeriodicFeStreamDef value, valuesPer){
-            bool found = false;
-            for(int i=0;i<otherValuesPer.size();i++){
-                PeriodicFeStreamDef otherValuePer = otherValuesPer.at(i);
-                if( true == value.evaluateIfSameFeList(otherValuePer) ){
-                    // These 2 items will generate the same FE List, lets go to the other "value"
-                    found = true;
-                    // remove the otherItem for the next loop iteration
-                    otherValuesPer.removeAt(i);
-                    break;
-                }
-            }
-            if(found==false){
-                // we cant find an item that will generate the same FE List.
-                return false;
-            }
-        }
+    // All Csd lists must have the same size
+    if ( incomePeriodicCsds.size() != o->incomePeriodicCsds.size()){
+        diff = QString("Income Periodic set have different size (%1 vs %2)")
+            .arg(incomePeriodicCsds.size()).arg(o->incomePeriodicCsds.size());
+        return false;
+    }
+    if ( expensePeriodicCsds.size() != o->expensePeriodicCsds.size()){
+        diff = QString("Expense Periodic set have different size (%1 vs %2)")
+            .arg(expensePeriodicCsds.size()).arg(o->expensePeriodicCsds.size());
+        return false;
+    }
+    if ( incomeIrregularCsds.size() != o->incomeIrregularCsds.size()){
+        diff = QString("Income Irregular set have different size (%1 vs %2)")
+            .arg(incomeIrregularCsds.size()).arg(o->incomeIrregularCsds.size());
+        return false;
+    }
+    if ( expenseIrregularCsds.size() != o->expenseIrregularCsds.size()){
+        diff = QString("Expense Irregular set have different size (%1 vs %2)")
+            .arg(expenseIrregularCsds.size()).arg(o->expenseIrregularCsds.size());
+        return false;
     }
 
-    // Expenses Periodic
-    {
-        QList<PeriodicFeStreamDef> valuesPer = expensesDefPeriodic.values();
-        QList<PeriodicFeStreamDef> otherValuesPer = o->expensesDefPeriodic.values();
-        foreach(PeriodicFeStreamDef value, valuesPer){
-            bool found = false;
-            for(int i=0;i<otherValuesPer.size();i++){
-                PeriodicFeStreamDef otherValuePer = otherValuesPer.at(i);
-                if( true == value.evaluateIfSameFeList(otherValuePer) ){
-                    // These 2 items will generate the same FE List, lets go to the other "value"
-                    found = true;
-                    // remove the otherItem for the next loop iteration
-                    otherValuesPer.removeAt(i);
-                    break;
-                }
-            }
-            if(found==false){
-                // we cant find an item that will generate the same FE List.
-                return false;
-            }
+    // Must have the same lists of ID. Otherwise a CSD has been removed and another one added,
+    // which possibly leads to different FE list (not 100% sure). We'll check later if the
+    // relevant contents are identical
+    for (auto it = incomePeriodicCsds.constBegin(); it != incomePeriodicCsds.constEnd(); ++it) {
+        if (o->incomePeriodicCsds.contains(it.key())==false) {
+            diff = QString("Income Periodic : one UUID is not in both Hashmap : %1")
+                .arg(it.key().toString(QUuid::WithoutBraces));
+            return false;
         }
     }
-
-
-    // Incomes Irregular
-    {
-        QList<IrregularFeStreamDef> valuesIrr = incomesDefIrregular.values();
-        QList<IrregularFeStreamDef> otherValuesIrr = o->incomesDefIrregular.values();
-        foreach(IrregularFeStreamDef valuesIrr, valuesIrr){
-            bool found = false;
-            for(int i=0;i<otherValuesIrr.size();i++){
-                IrregularFeStreamDef otherValueIrr = otherValuesIrr.at(i);
-                if( true == valuesIrr.evaluateIfSameFeList(otherValueIrr) ){
-                    // These 2 items will generate the same FE List, lets go to the other "value"
-                    found = true;
-                    // remove the otherItem for the next loop iteration
-                    otherValuesIrr.removeAt(i);
-                    break;
-                }
-            }
-            if(found==false){
-                // we cant find an item that will generate the same FE List.
-                return false;
-            }
+    for (auto it = expensePeriodicCsds.constBegin(); it != expensePeriodicCsds.constEnd(); ++it) {
+        if (o->expensePeriodicCsds.contains(it.key())==false) {
+            diff = QString("Expense Periodic : one UUID is not in both Hashmap : %1")
+                .arg(it.key().toString(QUuid::WithoutBraces));
+            return false;
+        }
+    }
+    for (auto it = incomeIrregularCsds.constBegin(); it != incomeIrregularCsds.constEnd(); ++it) {
+        if (o->incomeIrregularCsds.contains(it.key())==false) {
+            diff = QString("Income Irregular : one UUID is not in both Hashmap : %1")
+                .arg(it.key().toString(QUuid::WithoutBraces));
+            return false;
+        }
+    }
+    for (auto it = expenseIrregularCsds.constBegin(); it != expenseIrregularCsds.constEnd(); ++it) {
+        if (o->expenseIrregularCsds.contains(it.key())==false) {
+            diff = QString("Expense Irregular : one UUID is not in both Hashmap : %1")
+                .arg(it.key().toString(QUuid::WithoutBraces));
+            return false;
         }
     }
 
 
-    // Expenses Irregular
-    {
-        QList<IrregularFeStreamDef> valuesIrr = expensesDefIrregular.values();
-        QList<IrregularFeStreamDef> otherValuesIrr = o->expensesDefIrregular.values();
-        foreach(IrregularFeStreamDef valueIrr, valuesIrr){
-            bool found = false;
-            for(int i=0;i<otherValuesIrr.size();i++){
-                IrregularFeStreamDef otherValueIrr = otherValuesIrr.at(i);
-                if( true == valueIrr.evaluateIfSameFeList(otherValueIrr) ){
-                    // These 2 items will generate the same FE List, lets go to the other "value"
-                    found = true;
-                    // remove the otherItem for the next loop iteration
-                    otherValuesIrr.removeAt(i);
-                    break;
-                }
-            }
-            if(found==false){
-                // we cant find an item that will generate the same FE List.
-                return false;
-            }
+    // Incomes Periodic : check that each Csd for a given key have guaranteed identical Fe Stream
+    for (auto it = incomePeriodicCsds.constBegin(); it != incomePeriodicCsds.constEnd(); ++it) {
+        const QUuid& key = it.key();
+        const QSharedPointer<PeriodicCsd>& ptr = it.value();
+        const QSharedPointer<PeriodicCsd> ptr2 = o->incomePeriodicCsds.value(key);
+        // compare
+        if ((ptr2.isNull()) || (ptr.isNull())) {
+            return false; // should never happen
+        }
+        if( false == ptr->evaluateIfSameFeList(*ptr2, diff) ){
+            return false;
         }
     }
 
+    // Expenses Periodic : check that each Csd for a given key have guaranteed identical Fe Stream
+    for (auto it = expensePeriodicCsds.constBegin(); it != expensePeriodicCsds.constEnd(); ++it) {
+        const QUuid& key = it.key();
+        const QSharedPointer<PeriodicCsd>& ptr = it.value();
+        const QSharedPointer<PeriodicCsd> ptr2 = o->expensePeriodicCsds.value(key);
+        // compare
+        if ((ptr2.isNull()) || (ptr.isNull())) {
+            return false; // should never happen
+        }
+        if( false == ptr->evaluateIfSameFeList(*ptr2, diff) ){
+            return false;
+        }
+    }
+
+    // Incomes Irregular : check that each Csd for a given key have guaranteed identical Fe Stream
+    for (auto it = incomeIrregularCsds.constBegin(); it != incomeIrregularCsds.constEnd(); ++it) {
+        const QUuid& key = it.key();
+        const QSharedPointer<IrregularCsd>& ptr = it.value();
+        const QSharedPointer<IrregularCsd> ptr2 = o->incomeIrregularCsds.value(key);
+        // compare
+        if ((ptr2.isNull()) || (ptr.isNull())) {
+            return false; // should never happen
+        }
+        if( false == ptr->evaluateIfSameFeList(*ptr2, diff) ){
+            return false;
+        }
+    }
+
+    // Expenses Irregular : check that each Csd for a given key have guaranteed identical Fe Stream
+    for (auto it = expenseIrregularCsds.constBegin(); it != expenseIrregularCsds.constEnd(); ++it) {
+        const QUuid& key = it.key();
+        const QSharedPointer<IrregularCsd>& ptr = it.value();
+        const QSharedPointer<IrregularCsd> ptr2 = o->expenseIrregularCsds.value(key);
+        // compare
+        if ((ptr2.isNull()) || (ptr.isNull())) {
+            return false; // should never happen
+        }
+        if( false == ptr->evaluateIfSameFeList(*ptr2, diff) ){
+            return false;
+        }
+    }
 
     return true;
 }
 
 
-// Create an empty scenario. No inflation, no Csd, no tag
 QSharedPointer<Scenario> Scenario::createBlankScenario(QString countryCode)
 {
-    QSharedPointer<Scenario> newScenario;
-    newScenario = QSharedPointer<Scenario>(new Scenario(
-        Scenario::LATEST_VERSION, tr("No name"), "", Scenario::DEFAULT_DURATION_FE_GENERATION,
+    QSharedPointer<Scenario> newScenario = QSharedPointer<Scenario>(new Scenario(
+        Scenario::LATEST_VERSION, tr("No name"), "", Constants::DEFAULT_DURATION_FE_GENERATION,
         Growth::fromConstantAnnualPercentageDouble(0), countryCode, {},{},{},{},
         Tags(), TagCsdRelationships()));
     return newScenario;
@@ -1046,14 +1065,14 @@ int Scenario::getNoOfPeriodicIncomes(bool activeOnly)
 {
     if (activeOnly==true) {
         int no = 0;
-        foreach (PeriodicFeStreamDef ps, incomesDefPeriodic) {
-            if (ps.getActive()==true){
+        foreach (QSharedPointer<PeriodicCsd> ps, incomePeriodicCsds) {
+            if (ps->getActive()==true){
                 no++;
             }
         }
         return no;
     } else {
-        return incomesDefPeriodic.size();
+        return incomePeriodicCsds.size();
     }
 }
 
@@ -1062,14 +1081,14 @@ int Scenario::getNoOfIrregularIncomes(bool activeOnly)
 {
     if (activeOnly==true) {
         int no = 0;
-        foreach (IrregularFeStreamDef is, incomesDefIrregular) {
-            if (is.getActive()==true){
+        foreach (QSharedPointer<IrregularCsd> is, incomeIrregularCsds) {
+            if (is->getActive()==true){
                 no++;
             }
         }
         return no;
     } else {
-        return incomesDefIrregular.size();
+        return incomeIrregularCsds.size();
     }
 
 }
@@ -1079,14 +1098,14 @@ int Scenario::getNoOfPeriodicExpenses(bool activeOnly)
 {
     if (activeOnly==true) {
         int no = 0;
-        foreach (PeriodicFeStreamDef ps, expensesDefPeriodic) {
-            if (ps.getActive()==true){
+        foreach (QSharedPointer<PeriodicCsd> ps, expensePeriodicCsds) {
+            if (ps->getActive()==true){
                 no++;
             }
         }
         return no;
     } else {
-        return expensesDefPeriodic.size();
+        return expensePeriodicCsds.size();
     }
 }
 
@@ -1095,24 +1114,59 @@ int Scenario::getNoOfIrregularExpenses(bool activeOnly)
 {
     if (activeOnly==true) {
         int no = 0;
-        foreach (IrregularFeStreamDef is, expensesDefIrregular) {
-            if (is.getActive()==true){
+        foreach (QSharedPointer<IrregularCsd> is, expenseIrregularCsds) {
+            if (is->getActive()==true){
                 no++;
             }
         }
         return no;
     } else {
-        return expensesDefIrregular.size();
+        return expenseIrregularCsds.size();
     }
 }
 
 
-// Check if Tag IDs and Fsds ID referenced by tagCsdRelationships exists.
-// Return true if it is the case, false otherwise
+QString Scenario::FileResult::codeToString()
+{
+        switch (code) {
+            case FileResultCode::SUCCESS:
+                return "SUCCESS";
+            case FileResultCode::ERROR_OTHER:
+                return "MISC ERROR";
+            case FileResultCode::SAVE_ERROR_CREATING_FILE_FOR_WRITING:
+                return "FILE CREATION FAILED IN WRITE MODE";
+            case FileResultCode::SAVE_ERROR_OPENING_FILE_FOR_WRITING:
+                return "FILE OPENING FAILED IN WRITE MODE";
+            case FileResultCode::SAVE_ERROR_WRITING_TO_FILE:
+                return "ERROR WRITING TO FILE";
+            case FileResultCode::SAVE_ERROR_JSON_CREATION:
+                return "JSON CREATION FAILED";
+            case FileResultCode::LOAD_FILE_DOES_NOT_EXIST:
+                return "FILE DOES NOT EXIST";
+            case FileResultCode::LOAD_FILE_IS_NOT_READABLE:
+                return "FILE IS NOT READABLE";
+            case FileResultCode::LOAD_CANNOT_OPEN_FILE:
+                return "CANNOT OPEN FILE";
+            case FileResultCode::LOAD_JSON_PARSING_ERROR:
+                return "JSON PARSING ERROR";
+            case FileResultCode::LOAD_JSON_SEMANTIC_ERROR:
+                return "JSON SEMANTIC ERROR";
+            case FileResultCode::LOAD_CANNOT_UPGRADE:
+                return "CANNOT UPGRADE";
+            case FileResultCode::LOAD_ERROR:
+                return "LOAD ERROR";
+            case FileResultCode::LOAD_UNKNOWN_VERSION:
+                return "UNKNOWN FILE VERSION";
+            default:
+                return "UNKNOWN";
+    }
+}
+
+
 bool Scenario::checkTagCsdRelationshipsIntegrity()
 {
-    QSet<QUuid> theTagsRel = tagCsdRelationships.getAllTagsWithRelationships();
-    QSet<QUuid> theCsdsRel = tagCsdRelationships.getAllCsdsWithRelationships();
+    QList<QUuid> theTagsRel = tagCsdRelationships.getAllTagsWithRelationships();
+    QList<QUuid> theCsdsRel = tagCsdRelationships.getAllCsdsWithRelationships();
 
     // Check Tag ID exists
     foreach (QUuid tId, theTagsRel) {
@@ -1122,12 +1176,93 @@ bool Scenario::checkTagCsdRelationshipsIntegrity()
         }
     }
     foreach (QUuid fId, theCsdsRel) {
-        bool found = fsdIdExists(fId);
+        bool found = csdIdExists(fId);
         if (found==false) {
             return false;
         }
     }
     return true;
+}
+
+
+bool Scenario::deepComparePeriodicCsdMaps(const QHash<QUuid, QSharedPointer<PeriodicCsd> > &map1,
+    const QHash<QUuid, QSharedPointer<PeriodicCsd> > &map2) const
+{
+    // Check if the sizes are different
+    if (map1.size() != map2.size()) {
+        return false;
+    }
+
+    // Iterate through the first map
+    for (auto it = map1.cbegin(); it != map1.cend(); ++it) {
+        const QUuid& key = it.key();
+        const QSharedPointer<PeriodicCsd>& value1 = it.value();
+
+        // Check if the key exists in the second map
+        if (!map2.contains(key)) {
+            return false;
+        }
+
+        const QSharedPointer<PeriodicCsd>& value2 = map2.value(key);
+
+        // Check if both values are null or if they are equal
+        if (value1 == nullptr && value2 == nullptr) {
+            continue; // Both are null, considered equal
+        }
+        if (value1 == nullptr || value2 == nullptr || (*value1 != *value2) ) {
+            return false; // One is null or they are not equal
+        }
+    }
+
+    return true; // All keys and values are equal
+}
+
+
+bool Scenario::deepCompareIrregularCsdMaps(const QHash<QUuid, QSharedPointer<IrregularCsd> > &map1,
+    const QHash<QUuid, QSharedPointer<IrregularCsd> > &map2) const
+{
+    // Check if the sizes are different
+    if (map1.size() != map2.size()) {
+        return false;
+    }
+
+    // Iterate through the first map
+    for (auto it = map1.cbegin(); it != map1.cend(); ++it) {
+        const QUuid& key = it.key();
+        const QSharedPointer<IrregularCsd>& value1 = it.value();
+
+        // Check if the key exists in the second map
+        if (!map2.contains(key)) {
+            return false;
+        }
+
+        const QSharedPointer<IrregularCsd>& value2 = map2.value(key);
+
+        // Check if both values are null or if they are equal
+        if (value1 == nullptr && value2 == nullptr) {
+            continue; // Both are null, considered equal
+        }
+        if (value1 == nullptr || value2 == nullptr || (*value1 != *value2) ) {
+            return false; // One is null or they are not equal
+        }
+    }
+
+    return true; // All keys and values are equal
+}
+
+
+Scenario::FileResult::FileResult()
+{
+    init();
+}
+
+
+void Scenario::FileResult::init()
+{
+    code = FileResultCode::ERROR_OTHER;
+    logErrorMessage = "";
+    version1found = false;
+    scenarioPtr = QSharedPointer<Scenario>( scenarioPtr); // null
 }
 
 
@@ -1183,47 +1318,47 @@ void Scenario::setCountryCode(const QString &newCountryCode)
     countryCode = newCountryCode;
 }
 
-QMap<QUuid, PeriodicFeStreamDef> Scenario::getIncomesDefPeriodic() const
+QHash<QUuid, QSharedPointer<PeriodicCsd>> Scenario::getIncomePeriodicCsds() const
 {
-    return incomesDefPeriodic;
+    return incomePeriodicCsds;
 }
 
-void Scenario::setIncomesDefPeriodic(const QMap<QUuid, PeriodicFeStreamDef> &newIncomesDefPeriodic)
+void Scenario::setIncomePeriodicCsds(const QHash<QUuid, QSharedPointer<PeriodicCsd>> &newincomePeriodicCsds)
 {
-    incomesDefPeriodic = newIncomesDefPeriodic;
+    incomePeriodicCsds = newincomePeriodicCsds;
 }
 
-QMap<QUuid, IrregularFeStreamDef> Scenario::getIncomesDefIrregular() const
+QHash<QUuid, QSharedPointer<IrregularCsd>> Scenario::getIncomeIrregularCsds() const
 {
-    return incomesDefIrregular;
+    return incomeIrregularCsds;
 }
 
-void Scenario::setIncomesDefIrregular(const QMap<QUuid,
-    IrregularFeStreamDef> &newIncomesDefIrregular)
+void Scenario::setIncomeIrregularCsds(const QHash<QUuid,
+    QSharedPointer<IrregularCsd>> &newincomeIrregularCsds)
 {
-    incomesDefIrregular = newIncomesDefIrregular;
+    incomeIrregularCsds = newincomeIrregularCsds;
 }
 
-QMap<QUuid, PeriodicFeStreamDef> Scenario::getExpensesDefPeriodic() const
+QHash<QUuid, QSharedPointer<PeriodicCsd>> Scenario::getExpensePeriodicCsds() const
 {
-    return expensesDefPeriodic;
+    return expensePeriodicCsds;
 }
 
-void Scenario::setExpensesDefPeriodic(const QMap<QUuid,
-    PeriodicFeStreamDef> &newExpensesDefPeriodic)
+void Scenario::setExpensePeriodicCsds(const QHash<QUuid,
+    QSharedPointer<PeriodicCsd>> &newexpensePeriodicCsds)
 {
-    expensesDefPeriodic = newExpensesDefPeriodic;
+    expensePeriodicCsds = newexpensePeriodicCsds;
 }
 
-QMap<QUuid, IrregularFeStreamDef> Scenario::getExpensesDefIrregular() const
+QHash<QUuid, QSharedPointer<IrregularCsd>> Scenario::getExpenseIrregularCsds() const
 {
-    return expensesDefIrregular;
+    return expenseIrregularCsds;
 }
 
-void Scenario::setExpensesDefIrregular(const QMap<QUuid,
-    IrregularFeStreamDef> &newExpensesDefIrregular)
+void Scenario::setExpenseIrregularCsds(const QHash<QUuid,
+    QSharedPointer<IrregularCsd>> &newexpenseIrregularCsds)
 {
-    expensesDefIrregular = newExpensesDefIrregular;
+    expenseIrregularCsds = newexpenseIrregularCsds;
 }
 
 quint16 Scenario::getFeGenerationDuration() const
@@ -1255,7 +1390,4 @@ void Scenario::setTagCsdRelationships(const TagCsdRelationships &newtagCsdRelati
 {
     tagCsdRelationships = newtagCsdRelationships;
 }
-
-
-
 

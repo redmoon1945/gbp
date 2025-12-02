@@ -23,10 +23,9 @@
 #include <QLocale>
 #include <QHash>
 #include <qlistwidget.h>
+#include "choosetagsdialog.h"
 #include "edittagdialog.h"
 #include "managetagschoosecsddialog.h"
-#include "managetagschoosetagsdialog.h"
-#include "ui_managetagschoosetagsdialog.h"
 #include "tags.h"
 #include "tagcsdrelationships.h"
 #include "edittagdialog.h"
@@ -57,7 +56,7 @@ signals:
     void signalAddCsdPrepareContent(QSet<managetags::CsdItem> csdSet);
 
     // Add Tag to link : prepare before edition
-    void signalAddTagsPrepareContent(Tags tags, QSet<QUuid> unlinkedTagIds);
+    void signalAddTagsPrepareContent(Tags tags, QSet<QUuid> preSelectedTags);
 
 public slots:
     // From client of ManageTagsDialog : Prepare edition. Call this before show()
@@ -73,8 +72,8 @@ public slots:
     void slotChooseCsdsCompleted();
 
     // Result and completion signal from Add Tag (TAB Csd View)
-    void slotChooseTagsResult(QSet<QUuid> newTagsToLink);
-    void slotChooseTagsCompleted();
+    void slotChooseTagsResult(QSet<QUuid> selectedTagsIds);
+    void slotChooseTagsCompleted(bool canceled);
 
 private slots:
     // General
@@ -145,7 +144,7 @@ private:
     // children dialogs
     EditTagDialog* editTagDlg;
     ManageTagsChooseCsdDialog* addCsdDlg;
-    ManageTagsChooseTagsDialog* addTagDlg;
+    ChooseTagsDialog* addTagDlg;
 
     // *** Methods ***
 

@@ -21,10 +21,14 @@ set(PROJECT_SOURCES
     analysisdialog.cpp
     analysisdialog.h
     analysisdialog.ui
-    combinedfestreams.cpp
+    choosetagsdialog.h
+    choosetagsdialog.cpp
+    choosetagsdialog.ui
     combinedfestreams.cpp
     combinedfestreams.h
-    combinedfestreams.h
+    constants.h
+    csd.h
+    csd.cpp
     currencyhelper.cpp
     currencyhelper.h
     customqchartview.cpp
@@ -63,18 +67,22 @@ set(PROJECT_SOURCES
     editvariablegrowthmodel.h
     fe.cpp
     fe.h
-    festreamdef.cpp
-    festreamdef.h
+    festream.cpp
+    festream.h
     filtertags.h
     filtertags.cpp
     gbpcontroller.cpp
     gbpcontroller.h
+    gbplogger.h
+    gbplogger.cpp
+    gbpqmessage.h
+    gbpqmessage.cpp
     globaltooltipfilter.h
     globaltooltipfilter.cpp
     growth.cpp
     growth.h
-    irregularfestreamdef.cpp
-    irregularfestreamdef.h
+    irregularcsd.cpp
+    irregularcsd.h
     loadirregulartextfiledialog.cpp
     loadirregulartextfiledialog.h
     loadirregulartextfiledialog.ui
@@ -88,9 +96,6 @@ set(PROJECT_SOURCES
     managetagschoosecsddialog.h
     managetagschoosecsddialog.cpp
     managetagschoosecsddialog.ui
-    managetagschoosetagsdialog.h
-    managetagschoosetagsdialog.cpp
-    managetagschoosetagsdialog.ui
     managetagscsdinfo.h
     managetagscsdinfo.cpp
     managetagstagsdefmodel.h
@@ -98,8 +103,8 @@ set(PROJECT_SOURCES
     optionsdialog.cpp
     optionsdialog.h
     optionsdialog.ui
-    periodicfestreamdef.cpp
-    periodicfestreamdef.h
+    periodiccsd.cpp
+    periodiccsd.h
     plaintexteditiondialog.cpp
     plaintexteditiondialog.h
     plaintexteditiondialog.ui
@@ -116,9 +121,6 @@ set(PROJECT_SOURCES
     selectcountrydialog.cpp
     selectcountrydialog.h
     selectcountrydialog.ui
-    setfiltertagsdialog.h
-    setfiltertagsdialog.cpp
-    setfiltertagsdialog.ui
     tag.h
     tag.cpp
     tagcsdrelationships.h
@@ -157,10 +159,6 @@ qt6_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 qt6_add_executable(gbp MANUAL_FINALIZATION ${PROJECT_SOURCES} ${QM_FILES}
     gbp_resources.qrc
-
-
-
-
 )
 
 

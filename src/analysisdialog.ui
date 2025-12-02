@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1300</width>
-    <height>700</height>
+    <height>841</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,12 +16,15 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="toolTip">
+      <string/>
+     </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="relativeWeightTab">
       <attribute name="title">
-       <string>Relative Weight</string>
+       <string>Relative weight</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -39,109 +42,157 @@
           <number>10</number>
          </property>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
+          <layout class="QHBoxLayout" name="horizontalLayout_Header">
            <item>
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>From :</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDateEdit" name="fromDateEdit">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximumDate">
-              <date>
-               <year>2999</year>
-               <month>12</month>
-               <day>31</day>
-              </date>
-             </property>
-             <property name="minimumDate">
-              <date>
-               <year>2000</year>
-               <month>1</month>
-               <day>1</day>
-              </date>
-             </property>
-             <property name="displayFormat">
-              <string notr="true">yyyy-MMMM-dd</string>
-             </property>
-             <property name="calendarPopup">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Policy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>30</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>To :</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDateEdit" name="toDateEdit">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="toolTip">
-              <string/>
-             </property>
-             <property name="dateTime">
-              <datetime>
-               <hour>0</hour>
-               <minute>0</minute>
-               <second>0</second>
-               <year>2051</year>
-               <month>1</month>
-               <day>3</day>
-              </datetime>
-             </property>
-             <property name="maximumDate">
-              <date>
-               <year>2999</year>
-               <month>12</month>
-               <day>31</day>
-              </date>
-             </property>
-             <property name="minimumDate">
-              <date>
-               <year>2000</year>
-               <month>1</month>
-               <day>1</day>
-              </date>
-             </property>
-             <property name="displayFormat">
-              <string notr="true">yyyy-MMMM-dd</string>
-             </property>
-             <property name="calendarPopup">
-              <bool>true</bool>
-             </property>
-            </widget>
+            <layout class="QVBoxLayout" name="verticalLayout_16">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_17">
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>From :</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateEdit" name="fromDateEdit">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximumDate">
+                  <date>
+                   <year>2999</year>
+                   <month>12</month>
+                   <day>31</day>
+                  </date>
+                 </property>
+                 <property name="minimumDate">
+                  <date>
+                   <year>2000</year>
+                   <month>1</month>
+                   <day>1</day>
+                  </date>
+                 </property>
+                 <property name="displayFormat">
+                  <string notr="true">yyyy-MMMM-dd</string>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_35">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Policy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>To :</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateEdit" name="toDateEdit">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                 <property name="dateTime">
+                  <datetime>
+                   <hour>0</hour>
+                   <minute>0</minute>
+                   <second>0</second>
+                   <year>2051</year>
+                   <month>1</month>
+                   <day>3</day>
+                  </datetime>
+                 </property>
+                 <property name="maximumDate">
+                  <date>
+                   <year>2999</year>
+                   <month>12</month>
+                   <day>31</day>
+                  </date>
+                 </property>
+                 <property name="minimumDate">
+                  <date>
+                   <year>2000</year>
+                   <month>1</month>
+                   <day>1</day>
+                  </date>
+                 </property>
+                 <property name="displayFormat">
+                  <string notr="true">yyyy-MMMM-dd</string>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout">
+               <item>
+                <spacer name="horizontalSpacer_32">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="RW_ApplyDatesPushButton">
+                 <property name="text">
+                  <string>Apply dates</string>
+                 </property>
+                 <property name="autoDefault">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_33">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </item>
            <item>
             <spacer name="horizontalSpacer_4">
@@ -189,29 +240,28 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_2">
+            <spacer name="horizontalSpacer_21">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Fixed</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>50</width>
                <height>20</height>
               </size>
              </property>
             </spacer>
            </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <widget class="QLabel" name="noElementsLabel">
              <property name="toolTip">
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>No of most significant elements to show :</string>
+              <string>Most significant elements :</string>
              </property>
             </widget>
            </item>
@@ -229,7 +279,7 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_5">
+            <spacer name="horizontalSpacer_2">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
              </property>
@@ -254,57 +304,316 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>30</height>
+             <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="titleLabel">
-           <property name="font">
-            <font>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Relative Weight of Incomes</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="chartRelativeWeigthWidget" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <layout class="QHBoxLayout" name="HL_Pie" stretch="1,0">
            <item>
-            <widget class="QPushButton" name="exportImageRelativeWeigthPushButton">
-             <property name="text">
-              <string>Export to image file...</string>
-             </property>
-            </widget>
+            <layout class="QVBoxLayout" name="verticalLayout_15">
+             <item>
+              <widget class="QWidget" name="chartRelativeWeigthWidget" native="true">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>500</width>
+                 <height>400</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_15">
+               <item>
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>Rotate :</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSlider" name="RW_horizontalSlider">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate the pie chart : can be useful to better see some labels.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="minimum">
+                  <number>0</number>
+                 </property>
+                 <property name="maximum">
+                  <number>330</number>
+                 </property>
+                 <property name="singleStep">
+                  <number>30</number>
+                 </property>
+                 <property name="pageStep">
+                  <number>30</number>
+                 </property>
+                 <property name="value">
+                  <number>0</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="tickPosition">
+                  <enum>QSlider::TickPosition::TicksBelow</enum>
+                 </property>
+                 <property name="tickInterval">
+                  <number>30</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Policy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>10</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="RW_ShowLabelsCheckBox">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show or hide the labels for the pie chart.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Show labels</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_28">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </item>
            <item>
-            <spacer name="horizontalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+            <layout class="QVBoxLayout" name="verticalLayout_14">
+             <item>
+              <widget class="QListWidget" name="RW_listWidget">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>false</bool>
+               </property>
+               <property name="selectionMode">
+                <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
+               </property>
+               <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QFormLayout" name="formLayout">
+               <property name="labelAlignment">
+                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_13">
+                 <property name="text">
+                  <string>Percentage :</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_14">
+                 <property name="text">
+                  <string>Amount :</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <item>
+                  <widget class="QLabel" name="rwPercentageLabel">
+                   <property name="text">
+                    <string>---</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="rwPercentageSignLabel">
+                   <property name="text">
+                    <string>%</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_27">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item row="2" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <item>
+                  <widget class="QLabel" name="rwAmountLabel">
+                   <property name="text">
+                    <string>---</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_29">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_15">
+                 <property name="text">
+                  <string>Rank :</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <item>
+                  <widget class="QLabel" name="rwRankLabel">
+                   <property name="text">
+                    <string>---</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_8">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <item>
+                <spacer name="horizontalSpacer_30">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="RW_ClearSelectionPushButton">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unselect everything in the Legend listbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Clear selection</string>
+                 </property>
+                 <property name="autoDefault">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_16">
+               <item>
+                <widget class="QLabel" name="dummyLabel">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_7">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
@@ -314,7 +623,7 @@
      </widget>
      <widget class="QWidget" name="monthlyReportChartTab">
       <attribute name="title">
-       <string>Monthly Report - Chart</string>
+       <string>Monthly chart</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
@@ -510,7 +819,7 @@
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account the Cash Stream Definitions of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="text">
-                   <string>Incomes and Expenses</string>
+                   <string>Incomes and expenses</string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>
@@ -553,16 +862,6 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_8">
            <item>
-            <widget class="QPushButton" name="exportImageMonthlyReportChartPushButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the chart into a PNG file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Export to Image File...</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <spacer name="horizontalSpacer_10">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
@@ -583,7 +882,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Selected Bar :</string>
+              <string>Selected bar :</string>
              </property>
             </widget>
            </item>
@@ -630,7 +929,7 @@
      </widget>
      <widget class="QWidget" name="annualReportChartTab">
       <attribute name="title">
-       <string>Annual Report - Chart</string>
+       <string>Annual chart</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_11">
        <item>
@@ -820,7 +1119,7 @@
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the Cash Stream Definitions of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="text">
-                   <string>Incomes and Expenses</string>
+                   <string>Incomes and expenses</string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>
@@ -863,16 +1162,6 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
-            <widget class="QPushButton" name="exportImageYearlyReportChartPushButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the chart into a PNG file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Export to Image File...</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <spacer name="horizontalSpacer_9">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
@@ -893,7 +1182,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Selected Bar :</string>
+              <string>Selected bar :</string>
              </property>
             </widget>
            </item>
@@ -940,7 +1229,7 @@
      </widget>
      <widget class="QWidget" name="monthlyReportTableTab">
       <attribute name="title">
-       <string>Monthly Report - Table</string>
+       <string>Monthly report</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
@@ -965,37 +1254,13 @@
            <property name="selectionMode">
             <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
            </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+           </property>
            <attribute name="horizontalHeaderStretchLastSection">
             <bool>true</bool>
            </attribute>
           </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QPushButton" name="exportMonthlyReportToTextPushButton">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export table's content in a CSV file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Export to CSV...</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
          </item>
         </layout>
        </item>
@@ -1003,7 +1268,7 @@
      </widget>
      <widget class="QWidget" name="annualReportTableTab">
       <attribute name="title">
-       <string>Annual Report - Table</string>
+       <string>Annual report</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
@@ -1028,22 +1293,281 @@
            <property name="selectionMode">
             <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
            </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+           </property>
           </widget>
          </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tagsTab">
+      <attribute name="title">
+       <string>Tags</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_13">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_12">
+         <property name="leftMargin">
+          <number>10</number>
+         </property>
+         <property name="topMargin">
+          <number>10</number>
+         </property>
+         <property name="rightMargin">
+          <number>10</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <layout class="QHBoxLayout" name="horizontalLayout_9">
            <item>
-            <widget class="QPushButton" name="exportYearlyReportToTextPushButton">
+            <layout class="QVBoxLayout" name="verticalLayout_tags_dates">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_19">
+               <item>
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string>From :</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateEdit" name="tagsFromDateEdit">
+                 <property name="maximumDateTime">
+                  <datetime>
+                   <hour>23</hour>
+                   <minute>59</minute>
+                   <second>59</second>
+                   <year>2999</year>
+                   <month>12</month>
+                   <day>31</day>
+                  </datetime>
+                 </property>
+                 <property name="minimumDateTime">
+                  <datetime>
+                   <hour>0</hour>
+                   <minute>0</minute>
+                   <second>0</second>
+                   <year>2000</year>
+                   <month>1</month>
+                   <day>1</day>
+                  </datetime>
+                 </property>
+                 <property name="maximumDate">
+                  <date>
+                   <year>2999</year>
+                   <month>12</month>
+                   <day>31</day>
+                  </date>
+                 </property>
+                 <property name="minimumDate">
+                  <date>
+                   <year>2000</year>
+                   <month>1</month>
+                   <day>1</day>
+                  </date>
+                 </property>
+                 <property name="displayFormat">
+                  <string>yyyy-MMMM-dd</string>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_22">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Policy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_9">
+                 <property name="text">
+                  <string>To :</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDateEdit" name="tagsToDateEdit">
+                 <property name="maximumDate">
+                  <date>
+                   <year>2999</year>
+                   <month>12</month>
+                   <day>31</day>
+                  </date>
+                 </property>
+                 <property name="minimumDate">
+                  <date>
+                   <year>2000</year>
+                   <month>1</month>
+                   <day>1</day>
+                  </date>
+                 </property>
+                 <property name="displayFormat">
+                  <string>yyyy-MMMM-dd</string>
+                 </property>
+                 <property name="calendarPopup">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_18">
+               <item>
+                <spacer name="horizontalSpacer_31">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="tags_ApplyDatesPushButton">
+                 <property name="text">
+                  <string>Apply dates</string>
+                 </property>
+                 <property name="autoDefault">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_34">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_23">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>50</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="tagsIncomesRadioButton">
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export the table's content in a CSV file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For each tag selected, take into account only the Cash Stream Definitions of type &amp;quot;income&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Export to CSV...</string>
+              <string>Incomes</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup_4</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="tagsExpensesRadioButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For each tag selected, take into account only the Cash Stream Definitions of type &amp;quot;expense&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Expenses</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup_4</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_25">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>50</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="tagsSelectTagsPushButton">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the tags for which the contribution will be compared&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Select tags...</string>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_8">
+            <spacer name="horizontalSpacer_26">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>5</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="tags_noTagsSelectedLabel">
+             <property name="text">
+              <string>0 selected</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_24">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
              </property>
@@ -1054,6 +1578,95 @@
               </size>
              </property>
             </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Orientation::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Policy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>10</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_total">
+           <item>
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>Total amount for that period : </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="tags_totalAmountLabel">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Total amount for that period, not taking into account any tag.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Orientation::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Policy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>10</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_PieChart">
+           <item>
+            <widget class="QTableWidget" name="tagsTableWidget">
+             <property name="editTriggers">
+              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>false</bool>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+             </property>
+             <property name="sortingEnabled">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -1074,13 +1687,39 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>10</height>
+       <height>5</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_DialogButtons">
+     <item>
+      <widget class="QPushButton" name="globalExportCsvPushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export the table to a CSV formatted file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Export legend...</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="globalExportImagePushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export the chart to a PNG file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Export chart...</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -1099,6 +1738,12 @@
        <property name="text">
         <string>Close</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
     </layout>
@@ -1110,6 +1755,7 @@
  <buttongroups>
   <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_4"/>
   <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

@@ -17,97 +17,58 @@
  */
 
 #include "datehelper.h"
+#include <stdexcept>
 
-DateHelper::DateHelper()
+QDate DateHelper::getNextDate(const QDate& date, TimeUnitType noOfTimeUnits, int multiplier)
 {
+    if ( !date.isValid() ) {
+        throw std::invalid_argument("Invalid date");
+    }
+    if ( multiplier==0 ) {
+        throw std::invalid_argument("Invalid multiplier");
+    }
 
+    switch (noOfTimeUnits) {
+        case TimeUnitType::Day:
+            return date.addDays(multiplier);
+        case TimeUnitType::Week:
+            return date.addDays(7*multiplier);
+        case TimeUnitType::Month:
+            return date.addMonths(multiplier);
+        case TimeUnitType::Year:
+            return date.addYears(multiplier);
+        case TimeUnitType::EndOfMonth:
+            return getNextDateEndOfMonth(date, multiplier);
+        default: // should not happen
+            return date;
+    }
 }
 
 
-QDate DateHelper::getNextEventDateDaily(QDate date,quint16 multiplier)
+QDate DateHelper::getNextDateEndOfMonth(const QDate& date, int multiplier)
 {
-    if (multiplier==0){
-        throw std::invalid_argument("multiplier must be greater than 0");
+    if ( (!date.isValid()) || (multiplier==0)) {
+        throw std::invalid_argument("Invalid input arguments");
     }
-    if (!date.isValid()){
-        throw std::invalid_argument("date is invalid");
-    }
-    return date.addDays(1*multiplier);
-}
 
-
-QDate DateHelper::getNextEventDateWeekly(QDate date,quint16 multiplier)
-{
-    if (multiplier==0){
-        throw std::invalid_argument("multiplier must be greater than 0");
+    QDate d = date;
+    if ( (multiplier<0) || (date.day() == date.daysInMonth()) ) {
+        d = date.addMonths(multiplier) ;
+    } else {
+        // multiplier > 0 and date is not at the end of a month
+        d = date.addMonths(-1).addMonths(multiplier) ;
     }
-    if (!date.isValid()){
-        throw std::invalid_argument("date is invalid");
-    }
-    return date.addDays(7*multiplier);
-}
-
-
-QDate DateHelper::getNextEventDateMonthly(QDate date,quint16 multiplier)
-{
-    if (multiplier==0){
-        throw std::invalid_argument("multiplier must be greater than 0");
-    }
-    if (!date.isValid()){
-        throw std::invalid_argument("date is invalid");
-    }
-    return date.addMonths(1*multiplier);
-}
-
-
-QDate DateHelper::getNextEventDateEndOfMonth(QDate date,quint16 multiplier)
-{
-    if (multiplier==0){
-        throw std::invalid_argument("multiplier must be greater than 0");
-    }
-    if (!date.isValid()){
-        throw std::invalid_argument("date is invalid");
-    }
-    return getNextEndOfMonth(date,multiplier);
-}
-
-
-QDate DateHelper::getNextEventDateYearly(QDate date,quint16 multiplier)
-{
-    if (multiplier==0){
-        throw std::invalid_argument("multiplier must be greater than 0");
-    }
-    if (!date.isValid()){
-        throw std::invalid_argument("date is invalid");
-    }
-    return date.addYears(1*multiplier);
-}
-
-
-// multiplier must be greater than 0.
-// If date is not aready at end-of-month, next event will be end-of-month for that month
-QDate DateHelper::getNextEndOfMonth(QDate date, quint16 multiplier)
-{
-    if (multiplier==0){
-        throw std::invalid_argument("multiplier must be greater than 0");
-    }
-    if (!date.isValid()){
-        throw std::invalid_argument("date is invalid");
-    }
-    QDate nextDay = date;
-    QDate result = date;
-    for (int i = 0; i < multiplier; ++i) {
-        nextDay = result.addDays(1);
-        result = QDate(nextDay.year(), nextDay.month(),nextDay.daysInMonth());
-    }
-    return result;
+    return QDate(d.year(), d.month(), d.daysInMonth());
 }
 
 
 // Check if a date correspond to the end of the month
 bool DateHelper::isEndOfMonth(QDate date)
 {
-    QDate nextDay = date.addDays(1);
-    return (nextDay.month()!=date.month());
+    if (!date.isValid()) {
+        throw std::invalid_argument("Invalid date: " + date.toString().toStdString());
+    }
+    return (date.day()==date.daysInMonth());
 }
+
 

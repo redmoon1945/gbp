@@ -24,7 +24,7 @@
 #include <QMap>
 #include <QFont>
 #include <QUuid>
-#include "irregularfestreamdef.h"
+#include "irregularcsd.h"
 #include "currencyhelper.h"
 
 QT_BEGIN_NAMESPACE
@@ -50,8 +50,8 @@ public:
     int getPositionForDate(QDate date);
 
     // Getters / Setters
-    QMap<QDate, IrregularFeStreamDef::AmountInfo> getItems() const;
-    void setItems(const QMap<QDate, IrregularFeStreamDef::AmountInfo> &newItems);
+    QMap<QDate, IrregularCsd::AmountInfo> getItems() const;
+    void setItems(const QMap<QDate, IrregularCsd::AmountInfo> &newItems);
     QLocale getTheLocale() const;
     void setTheLocale(const QLocale &newTheLocale);
     CurrencyInfo getCurrInfo() const;
@@ -65,7 +65,7 @@ public:
 
 private:
     // Model Data - key order corresponds to display order
-    QMap<QDate, IrregularFeStreamDef::AmountInfo> items;
+    QMap<QDate, IrregularCsd::AmountInfo> items;
 
     // misc variables
     QLocale theLocale;

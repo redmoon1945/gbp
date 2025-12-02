@@ -46,6 +46,8 @@ private slots:
     void on_applyPushButton_clicked();
     void on_cancelPushButton_clicked();
     void on_DateIntervalDialog_rejected();
+    void on_setTomorrowPushButton_clicked();
+    void on_setEoyPushButton_clicked();
 
 private:
     Ui::DateIntervalDialog *ui;

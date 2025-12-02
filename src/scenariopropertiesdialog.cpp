@@ -84,14 +84,15 @@ void ScenarioPropertiesDialog::slotPrepareContent()
             theScenario->getNoOfIrregularExpenses(false)));
 
         bool found;
-        CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, theScenario->getCountryCode(), found);
+        CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(
+            theScenario->getCountryCode(), locale.language(), found);
         if(found){
             ui->currencyLabel->setText(QString("%1 (%2)").arg(currInfo.name,currInfo.isoCode));
         } else {
             ui->currencyLabel->setText(tr("Unknown"));
         }
 
-        if (theScenario->getInflation().getType()==Growth::CONSTANT){
+        if (theScenario->getInflation().getType()==Growth::Type::CONSTANT){
             qint64 intInf = theScenario->getInflation().getAnnualConstantGrowth();
             double inf = Growth::fromDecimalToDouble(intInf);
             ui->inflationLabel->setText(tr("Constant annual inflation of %1 percent").arg(inf));

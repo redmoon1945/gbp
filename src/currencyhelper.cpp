@@ -19,71 +19,62 @@
 #include <QLocale>
 #include "currencyhelper.h"
 #include "util.h"
-#include <limits>
 
 
-
+const quint64 CurrencyHelper::NATIVE_MAX_VALUE_ALLOWED =    99999999999999; //14 digits
+const double CurrencyHelper::MAX_VALUE_ALLOWED_0_DECIMAL = 99999999999999;
+const double CurrencyHelper::MAX_VALUE_ALLOWED_1_DECIMAL =  9999999999999.9;
+const double CurrencyHelper::MAX_VALUE_ALLOWED_2_DECIMAL =   999999999999.99;
+const double CurrencyHelper::MAX_VALUE_ALLOWED_3_DECIMAL =    99999999999.999;
+const double CurrencyHelper::MAX_VALUE_ALLOWED_4_DECIMAL =     9999999999.9999;
+const qint8 CurrencyHelper::MAX_NO_OF_DECIMALS = 4; // CLF and UYW have 4 fractional decimal units
 
 CurrencyHelper::CurrencyHelper()
 {
 }
 
 
-// no currency on Earth has more than 3 decimals
 quint8 CurrencyHelper::maxValueAllowedForNoOfDecimalsForCurrency()
 {
-    return 3;
+    return MAX_NO_OF_DECIMALS;
 }
 
 
-// A limit to the max value of an amount is required, to detect the potential overflowing the
-// qint64 storage before it occurs and also to limit the values to the expected usage (good
-// practice). We set arbitrarily the max limit of an amount to 1000 trillion - 1, assuming max
-// number of decimals in a currency (3). This is way more than what is required in typical GBP
-// usage, even with very depreciated currencies. Also, importantly, we want the max to be storable
-// in a double, which is needed when comparing values. Double can store 15 digits in all cases
-// (garanteed, it can be sometimes more).
-//     largest value of qint64      =  9 223 372 036 854 775 807 , that is 19 digits
-//     largest value of quint64     = 18 446 744 073 709 551 615 , that is 20 digits
-//     established limit of amount  =    999 999 999 999 999 999 , that is 15 digits
-qint64 CurrencyHelper::maxValueAllowedForAmount()
+quint64 CurrencyHelper::maxValueAllowedForAmount()
 {
-    return 999999999999999; //15 digits
+    return NATIVE_MAX_VALUE_ALLOWED;
 }
 
 
-// we expect noOfDigits to always be in the valid range, hence the error triggering an exception
-// instead of setting a "result" parameter that would have to be checked at every call
 double CurrencyHelper::maxValueAllowedForAmountInDouble(quint8 noOfDecimalDigits)
 {
-    if (noOfDecimalDigits > maxValueAllowedForNoOfDecimalsForCurrency()){
-        throw std::invalid_argument("noOfDigits is too big");
+    switch (noOfDecimalDigits) {
+        case 0: return MAX_VALUE_ALLOWED_0_DECIMAL;
+        case 1: return MAX_VALUE_ALLOWED_1_DECIMAL;
+        case 2: return MAX_VALUE_ALLOWED_2_DECIMAL;
+        case 3: return MAX_VALUE_ALLOWED_3_DECIMAL;
+        case 4: return MAX_VALUE_ALLOWED_4_DECIMAL;
+        default: throw std::invalid_argument("noOfDigits is too big");
     }
-    qint64 max = maxValueAllowedForAmount();
-    long double ld = static_cast<long double>(max)/Util::quickPow10(noOfDecimalDigits);
-    double d = static_cast<double>(ld);
-    return d;   // we know there wont be loss of precision
 }
 
 
-// Not localized. Minus sign not included
-int CurrencyHelper::maxCharForMaxAmountInDouble(quint8 noOfDecimalDigits)
+uint CurrencyHelper::maxCharForMaxAmountInDouble(quint8 noOfDecimalDigits)
 {
-    double d = maxValueAllowedForAmountInDouble(noOfDecimalDigits);
-    QString s = QString::number(d, 'f', noOfDecimalDigits);
-    return s.length();
+    switch (noOfDecimalDigits) {
+        case 0: return 14;
+        case 1: return 15;
+        case 2: return 15;
+        case 3: return 15;
+        case 4: return 15;
+        default:
+            QString s = QString("noOfDigits %1 is too big").arg(noOfDecimalDigits);
+            throw std::invalid_argument(s.toStdString());
+
+    }
 }
 
 
-// No of guaranteed decimal digits precision :
-// float : 6
-// double : 15
-// long double : 18
-// qint64 : 18 (max is 9223372036854775808, 9999999999999999999 cannot be stored)
-// https://www.exploringbinary.com/decimal-precision-of-binary-floating-point-numbers/
-// So a qint64 can be stored completely in a long double and vice versa.
-// But since we limit max value of an amount (qint64) to 15 digits), it will always fit in a double.
-// If success, return result = 0;
 double CurrencyHelper::amountQint64ToDouble(qint64 amount, quint8 noOfDecimal, int &result)
 {
     // check if amount is above the max allowed
@@ -96,8 +87,8 @@ double CurrencyHelper::amountQint64ToDouble(qint64 amount, quint8 noOfDecimal, i
         return 0;
     }
     result = 0;
-    long double ld = static_cast<long double>(amount)/Util::quickPow10(noOfDecimal);
-    return static_cast<double>(ld);// we know there wont be loss of precision
+    double d = static_cast<double>(amount)/Util::quickPow10(noOfDecimal);
+    return d;
 }
 
 
@@ -108,43 +99,40 @@ qint64 CurrencyHelper::amountDoubleToQint64(double amount, quint8 noOfDecimal, i
         result = -2;
         return 0;
     }
-    // check if amount is above the max allowed. If it pass, result will also pass
+
+    // check if amount is above the max allowed.
     if (fabs(amount)>maxValueAllowedForAmountInDouble(noOfDecimal)){
         result = -1;
         return 0;
     }
-    long double ld = amount*Util::quickPow10(noOfDecimal);
-    long double t = std::round(ld);
 
-    if ( (t > std::numeric_limits<qint64>::max()) ||
-        (t < std::numeric_limits<qint64>::min()) ){ // long double needed to compared to quint64
-        // should never happen
-        throw std::invalid_argument("result is too big");
-    }
+    double d = amount*Util::quickPow10(noOfDecimal);
+    double t = std::round(d);
     result = 0;
-    return static_cast<qint64>(t); // loss of precision possible here
+    return static_cast<qint64>(t);
 }
 
 
-// Format a raw amount (qint64) to currency string, taking into account the locale's decimal point and group separator
-QString CurrencyHelper::quint64ToDoubleString(quint64 amount, CurrencyInfo cInfo, QLocale locale, bool addISOcode, int &result)
+QString CurrencyHelper::quint64ToDoubleString(qint64 amount, CurrencyInfo cInfo, QLocale locale,
+    bool addISOcode, int &result)
 {
     double d = amountQint64ToDouble( amount, cInfo.noOfDecimal, result);
     if (result != 0){
         return "";
     }
-    QString s = locale.toString(d,'f',cInfo.noOfDecimal);
-    if (addISOcode) {
-        return QString("%1 %2").arg(s).arg(cInfo.isoCode);
-    } else{
-        return s;
-    }
+    return formatAmount(d, cInfo, locale, addISOcode);
 }
 
 
-// Format a double amount to currency string, taking into account the locale's decimal point and group separator
-QString CurrencyHelper::formatAmount(double amount, CurrencyInfo cInfo, QLocale locale, bool addISOcode)
+QString CurrencyHelper::formatAmount(double amount, CurrencyInfo cInfo, QLocale locale,
+    bool addISOcode)
 {
+    if (cInfo.noOfDecimal > MAX_NO_OF_DECIMALS) {
+        return "";
+    }
+    if (fabs(amount) > maxValueAllowedForAmountInDouble(cInfo.noOfDecimal)) {
+        return "";
+    }
     QString s = locale.toString(amount,'f',cInfo.noOfDecimal);
     if (addISOcode) {
         return QString("%1 %2").arg(s).arg(cInfo.isoCode);
@@ -156,17 +144,19 @@ QString CurrencyHelper::formatAmount(double amount, CurrencyInfo cInfo, QLocale 
 
 qint64 CurrencyHelper::add(qint64 a, qint64 b)
 {
-    qint64 r = a + b;   // potential for saturation here...but 2 "max allowed" added will be below max(qint64)
-    qint64 max = maxValueAllowedForAmount();
+    // potential for saturation here...but 2 "max allowed" added will be below max(qint64)
+    qint64 r = a + b;
+
+    // Handle overflow
     if(r<0){
-        if (r < -max){
-            return -max ;
+        if (r < -NATIVE_MAX_VALUE_ALLOWED){
+            return -NATIVE_MAX_VALUE_ALLOWED ;
         } else {
             return r;
         }
     } else {
-        if (r > max){
-            return max ;
+        if (r > NATIVE_MAX_VALUE_ALLOWED){
+            return NATIVE_MAX_VALUE_ALLOWED ;
         } else {
             return r;
         }
@@ -174,8 +164,6 @@ qint64 CurrencyHelper::add(qint64 a, qint64 b)
 }
 
 
-// Return a list of 2-letter country codes (key) and their names (value). Name are provided in current Locale's language if available,
-// otherwise in English
 QMap<QString, QString> CurrencyHelper::getCountries(QLocale theLocale)
 {
     if ( theLocale.language() == QLocale::Language::French ){
@@ -186,20 +174,21 @@ QMap<QString, QString> CurrencyHelper::getCountries(QLocale theLocale)
 }
 
 
-// build from list of countries. Key is currency code, value is Description
-QMap<QString, QString> CurrencyHelper::getCurrencies(QLocale systemLocale)
+QMap<QString, QString> CurrencyHelper::getCurrencies(QLocale::Language language)
 {
     QMap<QString, QString> result;
     for (auto it = countries.begin(); it != countries.end(); ++it) {
         QString countryCode = it.key();
         // get info about associated currency for that country
         bool found;
-        CurrencyInfo currInfo = getCurrencyInfoFromCountryCode(systemLocale, countryCode, found);
+        CurrencyInfo currInfo = getCurrencyInfoFromCountryCode(countryCode,
+            language, found);
         if(!found){
             continue; // should not happen
         }
         // add to the map
-        QString desc = QString("%1 (%2) - %3").arg(currInfo.isoCode).arg(currInfo.symbol).arg(currInfo.name);
+        QString desc = QString("%1 (%2) - %3").arg(currInfo.isoCode).arg(currInfo.symbol)
+            .arg(currInfo.name);
         if ( !(result.contains(currInfo.isoCode))){
             result.insert(currInfo.isoCode,desc);
         }
@@ -210,16 +199,12 @@ QMap<QString, QString> CurrencyHelper::getCurrencies(QLocale systemLocale)
 
 bool CurrencyHelper::countryExists(QString countryCode)
 {
-    if(countries.contains(countryCode)){
-        return true;
-    }else{
-        return false;
-    }
+    return countries.contains(countryCode);
 }
 
-// if not found, found is set to false, true otherwise
-// Special patch for  USA' where curency name is fixed.
-CurrencyInfo CurrencyHelper::getCurrencyInfoFromCountryCode(QLocale systemLocale, QString countryCode, bool& found)
+
+CurrencyInfo CurrencyHelper::getCurrencyInfoFromCountryCode(
+    QString countryCode, QLocale::Language language, bool& found)
 {
     found = false;
     CurrencyInfo currInfo;
@@ -232,45 +217,33 @@ CurrencyInfo CurrencyHelper::getCurrencyInfoFromCountryCode(QLocale systemLocale
 
     QLocale loc(QLocale::Language::AnyLanguage,country);
     currInfo.isoCode = loc.currencySymbol(QLocale::CurrencyIsoCode);
-    currInfo.symbol = loc.currencySymbol(QLocale::CurrencySymbol);
-    currInfo.name = loc.currencySymbol(QLocale::CurrencyDisplayName);
+    currInfo.symbol = loc.currencySymbol(QLocale::CurrencySymbol); // in native language
 
-    // patches for missing data from Qt
-    if (currInfo.name=="") {
-        if(currInfo.isoCode=="MVR"){                    // Maldives
-            currInfo.name = "Maldivian Rufiyaa";
-        } else if (currInfo.isoCode=="NGN") {           // Nigeria
-            currInfo.name = "Nigerian Naira";
-        } else if (currInfo.isoCode=="PGK") {           // Papua New Guinean
-            currInfo.name = "Papua New Guinean Kina";
-        } else if (currInfo.isoCode=="GBP") {           // UK
-            currInfo.name = "British Pound";
-        } else if (currInfo.isoCode=="RWF") {           // Rwanda
-            currInfo.name = "Rwandan Franc";
-        } else if (currInfo.isoCode=="ZMW") {           // Zambia
-            currInfo.name = "Zambian Kwacha";
-        } else if (currInfo.isoCode=="PAB") {           // Panama
-            currInfo.name = "Balboa Panameño";
-        } else if (currInfo.isoCode=="PYG") {           // Paraguay
-            currInfo.name = "Paraguayan Guaraní";
-        } else {
-            currInfo.name = "Unknown";
-        }
+    // Use English or French name based on the Locale
+    if ( (language == QLocale::Language::French) && (currencyNamesFrench.contains(
+        currInfo.isoCode)) ) {
+        currInfo.name = currencyNamesFrench[currInfo.isoCode];
+    } else if ( currencyNamesEnglish.contains(currInfo.isoCode) ) {
+        // If not French, then it is English. isoCode must exist though.
+        currInfo.name = currencyNamesEnglish[currInfo.isoCode];
+    } else {
+        // Fallback for unknown currencies (should be rare with comprehensive maps we have)
+        currInfo.name = "Unknown";
     }
-    if (currInfo.symbol=="") {
-        if (currInfo.isoCode=="MVR"){                   // Maldives
-            currInfo.symbol="Rf";
-        } else if (currInfo.isoCode=="PGK"){            // Papua New Guinean
-            currInfo.symbol = "K";
-        } else {
-            currInfo.symbol= "Unknown";
-        }
+
+    // Special handling for symbols
+    if (currInfo.symbol.isEmpty()) {
+        currInfo.symbol = "Unknown";
     }
+
     if (currInfo.isoCode=="CVE"){
-        currInfo.symbol="$";                            // something is returned by Qt but it is not displayable (???)
+        currInfo.symbol="$"; // something is returned by Qt but it is not displayable (???)
     }
-    if (currInfo.isoCode=="USD"){
-        currInfo.name = "US Dollar";
+    if (currInfo.isoCode == "JPY") {
+        currInfo.symbol = "¥"; // Use standard Yen symbol (U+00A5) instead of fullwidth (U+FFE5)
+    }
+    if (currInfo.isoCode == "CHF") {
+        currInfo.symbol = "fr"; // choose the french symbol
     }
 
     currInfo.noOfDecimal = currencyDecimalDigits.value(currInfo.isoCode,2);
@@ -278,17 +251,13 @@ CurrencyInfo CurrencyHelper::getCurrencyInfoFromCountryCode(QLocale systemLocale
 }
 
 
-// list of countries for which the currency has a no of decimal different from 2
 QMap<QString,int> CurrencyHelper::currencyDecimalDigits = {
-    {"BHD",3},{"BIF",0},{"CLF",4},{"CLP",0},{"DJF",0},{"GNF",0},{"IQD",3},{"ISK",0},{"JOD",3},{"JPY",0},
-    {"KMF",0},{"KRW",0},{"KWD",3},{"LYD",3},{"OMR",3},{"PYG",0},{"RWF",0},{"TND",3},{"UGX",0},{"UYI",0},
-    {"UYW",4},{"VND",0},{"VUV",0},{"XAF",0},{"XOF",0},{"XPF",0}
+    {"BHD",3},{"BIF",0},{"CLF",4},{"CLP",0},{"DJF",0},{"GNF",0},{"IQD",3},{"ISK",0},{"JOD",3},
+    {"JPY",0},{"KMF",0},{"KRW",0},{"KWD",3},{"LYD",3},{"OMR",3},{"PYG",0},{"RWF",0},{"TND",3},
+    {"UGX",0},{"UYI",0},{"UYW",4},{"VND",0},{"VUV",0},{"XAF",0},{"XOF",0},{"XPF",0}
 };
 
 
-// DEFAULT (English)
-// must be ISO 3166 alpha-2
-// See https://github.com/umpirsky/country-list/tree/master/data
 QMap<QString,QString> CurrencyHelper::countries = {
     {"AF","Afghanistan"},
     {"AX","Åland Islands"},
@@ -542,9 +511,7 @@ QMap<QString,QString> CurrencyHelper::countries = {
 
 };
 
-// FRENCH
-// must be ISO 3166 alpha-2
-// See https://github.com/umpirsky/country-list/tree/master/data
+
 QMap<QString,QString> CurrencyHelper::countries_fr = {
     {"AF","Afghanistan"},
     {"ZA","Afrique du Sud"},
@@ -797,3 +764,336 @@ QMap<QString,QString> CurrencyHelper::countries_fr = {
     {"ZW","Zimbabwe"}
 };
 
+// Comprehensive list of currency names in English (ISO 4217)
+QMap<QString, QString> CurrencyHelper::currencyNamesEnglish = {
+    {"AED", "United Arab Emirates Dirham"},
+    {"AFN", "Afghan Afghani"},
+    {"ALL", "Albanian Lek"},
+    {"AMD", "Armenian Dram"},
+    {"ANG", "Netherlands Antillean Guilder"},
+    {"AOA", "Angolan Kwanza"},
+    {"ARS", "Argentine Peso"},
+    {"AUD", "Australian Dollar"},
+    {"AWG", "Aruban Florin"},
+    {"AZN", "Azerbaijani Manat"},
+    {"BAM", "Bosnia-Herzegovina Convertible Mark"},
+    {"BBD", "Barbadian Dollar"},
+    {"BDT", "Bangladeshi Taka"},
+    {"BGN", "Bulgarian Lev"},
+    {"BHD", "Bahraini Dinar"},
+    {"BIF", "Burundian Franc"},
+    {"BMD", "Bermudian Dollar"},
+    {"BND", "Brunei Dollar"},
+    {"BOB", "Bolivian Boliviano"},
+    {"BRL", "Brazilian Real"},
+    {"BSD", "Bahamian Dollar"},
+    {"BTC", "Bitcoin"},
+    {"BTN", "Bhutanese Ngultrum"},
+    {"BWP", "Botswanan Pula"},
+    {"BYN", "Belarusian Ruble"},
+    {"BZD", "Belize Dollar"},
+    {"CAD", "Canadian Dollar"},
+    {"CDF", "Congolese Franc"},
+    {"CHF", "Swiss Franc"},
+    {"CLF", "Chilean Unit of Account"},
+    {"CLP", "Chilean Peso"},
+    {"CNY", "Chinese Yuan"},
+    {"COP", "Colombian Peso"},
+    {"CRC", "Costa Rican Colón"},
+    {"CUC", "Cuban Convertible Peso"},
+    {"CUP", "Cuban Peso"},
+    {"CVE", "Cape Verdean Escudo"},
+    {"CZK", "Czech Koruna"},
+    {"DJF", "Djiboutian Franc"},
+    {"DKK", "Danish Krone"},
+    {"DOP", "Dominican Peso"},
+    {"DZD", "Algerian Dinar"},
+    {"EGP", "Egyptian Pound"},
+    {"ERN", "Eritrean Nakfa"},
+    {"ETB", "Ethiopian Birr"},
+    {"EUR", "Euro"},
+    {"FJD", "Fijian Dollar"},
+    {"FKP", "Falkland Islands Pound"},
+    {"GBP", "British Pound"},
+    {"GEL", "Georgian Lari"},
+    {"GGP", "Guernsey Pound"},
+    {"GHS", "Ghanaian Cedi"},
+    {"GIP", "Gibraltar Pound"},
+    {"GMD", "Gambian Dalasi"},
+    {"GNF", "Guinean Franc"},
+    {"GTQ", "Guatemalan Quetzal"},
+    {"GYD", "Guyanaese Dollar"},
+    {"HKD", "Hong Kong Dollar"},
+    {"HNL", "Honduran Lempira"},
+    {"HRK", "Croatian Kuna"},
+    {"HTG", "Haitian Gourde"},
+    {"HUF", "Hungarian Forint"},
+    {"IDR", "Indonesian Rupiah"},
+    {"ILS", "Israeli New Shekel"},
+    {"IMP", "Manx Pound"},
+    {"INR", "Indian Rupee"},
+    {"IQD", "Iraqi Dinar"},
+    {"IRR", "Iranian Rial"},
+    {"ISK", "Icelandic Króna"},
+    {"JEP", "Jersey Pound"},
+    {"JMD", "Jamaican Dollar"},
+    {"JOD", "Jordanian Dinar"},
+    {"JPY", "Yen"},
+    {"KES", "Kenyan Shilling"},
+    {"KGS", "Kyrgyzstani Som"},
+    {"KHR", "Cambodian Riel"},
+    {"KMF", "Comorian Franc"},
+    {"KPW", "North Korean Won"},
+    {"KRW", "South Korean Won"},
+    {"KWD", "Kuwaiti Dinar"},
+    {"KYD", "Cayman Islands Dollar"},
+    {"KZT", "Kazakhstani Tenge"},
+    {"LAK", "Lao Kip"},
+    {"LBP", "Lebanese Pound"},
+    {"LKR", "Sri Lankan Rupee"},
+    {"LRD", "Liberian Dollar"},
+    {"LSL", "Lesotho Loti"},
+    {"LYD", "Libyan Dinar"},
+    {"MAD", "Moroccan Dirham"},
+    {"MDL", "Moldovan Leu"},
+    {"MGA", "Malagasy Ariary"},
+    {"MKD", "Macedonian Denar"},
+    {"MMK", "Myanmar Kyat"},
+    {"MNT", "Mongolian Tugrik"},
+    {"MOP", "Macanese Pataca"},
+    {"MRU", "Mauritanian Ouguiya"},
+    {"MUR", "Mauritian Rupee"},
+    {"MVR", "Maldivian Rufiyaa"},
+    {"MWK", "Malawian Kwacha"},
+    {"MXN", "Mexican Peso"},
+    {"MYR", "Malaysian Ringgit"},
+    {"MZN", "Mozambican Metical"},
+    {"NAD", "Namibian Dollar"},
+    {"NGN", "Nigerian Naira"},
+    {"NIO", "Nicaraguan Córdoba"},
+    {"NOK", "Norwegian Krone"},
+    {"NPR", "Nepalese Rupee"},
+    {"NZD", "New Zealand Dollar"},
+    {"OMR", "Omani Rial"},
+    {"PAB", "Panamanian Balboa"},
+    {"PEN", "Peruvian Sol"},
+    {"PGK", "Papua New Guinean Kina"},
+    {"PHP", "Philippine Peso"},
+    {"PKR", "Pakistani Rupee"},
+    {"PLN", "Polish Zloty"},
+    {"PYG", "Paraguayan Guaraní"},
+    {"QAR", "Qatari Riyal"},
+    {"RON", "Romanian Leu"},
+    {"RSD", "Serbian Dinar"},
+    {"RUB", "Russian Rubles"},
+    {"RWF", "Rwandan Franc"},
+    {"SAR", "Saudi Riyal"},
+    {"SBD", "Solomon Islands Dollar"},
+    {"SCR", "Seychellois Rupee"},
+    {"SDG", "Sudanese Pound"},
+    {"SEK", "Swedish Krona"},
+    {"SGD", "Singapore Dollar"},
+    {"SHP", "Saint Helena Pound"},
+    {"SLL", "Sierra Leonean Leone"},
+    {"SOS", "Somali Shilling"},
+    {"SRD", "Surinamese Dollar"},
+    {"SSP", "South Sudanese Pound"},
+    {"STN", "São Tomé and Príncipe Dobra"},
+    {"SVC", "Salvadoran Colón"},
+    {"SYP", "Syrian Pound"},
+    {"SZL", "Swazi Lilangeni"},
+    {"THB", "Thai Baht"},
+    {"TJS", "Tajikistani Somoni"},
+    {"TMT", "Turkmenistani Manat"},
+    {"TND", "Tunisian Dinar"},
+    {"TOP", "Tongan Paʻanga"},
+    {"TRY", "Turkish Lira"},
+    {"TTD", "Trinidad and Tobago Dollar"},
+    {"TWD", "New Taiwan Dollar"},
+    {"TZS", "Tanzanian Shilling"},
+    {"UAH", "Ukrainian Hryvnia"},
+    {"UGX", "Ugandan Shilling"},
+    {"USD", "US Dollar"},
+    {"UYU", "Uruguayan Peso"},
+    {"UYW", "Uruguayan Nominal Wage Index Unit"},
+    {"UZS", "Uzbekistani Som"},
+    {"VES", "Venezuelan Bolívar"},
+    {"VND", "Vietnamese Dong"},
+    {"VUV", "Vanuatu Vatu"},
+    {"WST", "Samoan Tala"},
+    {"XAF", "Central African CFA Franc"},
+    {"XCD", "East Caribbean Dollar"},
+    {"XOF", "West African CFA Franc"},
+    {"XPF", "CFP Franc"},
+    {"YER", "Yemeni Rial"},
+    {"ZAR", "South African Rand"},
+    {"ZMW", "Zambian Kwacha"},
+    {"ZWL", "Zimbabwean Dollar"}
+};
+
+// Comprehensive list of currency names in French (ISO 4217)
+QMap<QString, QString> CurrencyHelper::currencyNamesFrench = {
+    {"AED", "Dirham des Émirats arabes unis"},
+    {"AFN", "Afghani afghan"},
+    {"ALL", "Lek albanais"},
+    {"AMD", "Dram arménien"},
+    {"ANG", "Florin des Antilles néerlandaises"},
+    {"AOA", "Kwanza angolais"},
+    {"ARS", "Peso argentin"},
+    {"AUD", "Dollar australien"},
+    {"AWG", "Florin arubais"},
+    {"AZN", "Manat azerbaïdjanais"},
+    {"BAM", "Mark convertible de Bosnie-Herzégovine"},
+    {"BBD", "Dollar barbadien"},
+    {"BDT", "Taka bangladais"},
+    {"BGN", "Lev bulgare"},
+    {"BHD", "Dinar bahreïni"},
+    {"BIF", "Franc burundais"},
+    {"BMD", "Dollar bermudien"},
+    {"BND", "Dollar brunéien"},
+    {"BOB", "Boliviano bolivien"},
+    {"BRL", "Réal brésilien"},
+    {"BSD", "Dollar bahamien"},
+    {"BTC", "Bitcoin"},
+    {"BTN", "Ngultrum bhoutanais"},
+    {"BWP", "Pula botswanais"},
+    {"BYN", "Rouble biélorusse"},
+    {"BZD", "Dollar bélizien"},
+    {"CAD", "Dollar canadien"},
+    {"CDF", "Franc congolais"},
+    {"CHF", "Franc suisse"},
+    {"CLF", "Unité de compte chilienne"},
+    {"CLP", "Peso chilien"},
+    {"CNY", "Yuan chinois"},
+    {"COP", "Peso colombien"},
+    {"CRC", "Colón costaricien"},
+    {"CUC", "Peso cubain convertible"},
+    {"CUP", "Peso cubain"},
+    {"CVE", "Escudo cap-verdien"},
+    {"CZK", "Couronne tchèque"},
+    {"DJF", "Franc djiboutien"},
+    {"DKK", "Couronne danoise"},
+    {"DOP", "Peso dominicain"},
+    {"DZD", "Dinar algérien"},
+    {"EGP", "Livre égyptienne"},
+    {"ERN", "Nakfa érythréen"},
+    {"ETB", "Birr éthiopien"},
+    {"EUR", "Euro"},
+    {"FJD", "Dollar fidjien"},
+    {"FKP", "Livre des îles Malouines"},
+    {"GBP", "Livre sterling"},
+    {"GEL", "Lari géorgien"},
+    {"GGP", "Livre de Guernesey"},
+    {"GHS", "Cedi ghanéen"},
+    {"GIP", "Livre de Gibraltar"},
+    {"GMD", "Dalasi gambien"},
+    {"GNF", "Franc guinéen"},
+    {"GTQ", "Quetzal guatémaltèque"},
+    {"GYD", "Dollar guyanien"},
+    {"HKD", "Dollar de Hong Kong"},
+    {"HNL", "Lempira hondurien"},
+    {"HRK", "Kuna croate"},
+    {"HTG", "Gourde haïtienne"},
+    {"HUF", "Forint hongrois"},
+    {"IDR", "Roupie indonésienne"},
+    {"ILS", "Nouveau shekel israélien"},
+    {"IMP", "Livre mannoise"},
+    {"INR", "Roupie indienne"},
+    {"IQD", "Dinar irakien"},
+    {"IRR", "Rial iranien"},
+    {"ISK", "Couronne islandaise"},
+    {"JEP", "Livre de Jersey"},
+    {"JMD", "Dollar jamaïcain"},
+    {"JOD", "Dinar jordanien"},
+    {"JPY", "Yen japonais"},
+    {"KES", "Shilling kényan"},
+    {"KGS", "Som kirghize"},
+    {"KHR", "Riel cambodgien"},
+    {"KMF", "Franc comorien"},
+    {"KPW", "Won nord-coréen"},
+    {"KRW", "Won sud-coréen"},
+    {"KWD", "Dinar koweïtien"},
+    {"KYD", "Dollar des îles Caïmans"},
+    {"KZT", "Tenge kazakh"},
+    {"LAK", "Kip laotien"},
+    {"LBP", "Livre libanaise"},
+    {"LKR", "Roupie srilankaise"},
+    {"LRD", "Dollar libérien"},
+    {"LSL", "Loti lesothan"},
+    {"LYD", "Dinar libyen"},
+    {"MAD", "Dirham marocain"},
+    {"MDL", "Leu moldave"},
+    {"MGA", "Ariary malgache"},
+    {"MKD", "Denar macédonien"},
+    {"MMK", "Kyat birman"},
+    {"MNT", "Tugrik mongol"},
+    {"MOP", "Pataca macanaise"},
+    {"MRU", "Ouguiya mauritanienne"},
+    {"MUR", "Roupie mauricienne"},
+    {"MVR", "Rufiyaa maldivienne"},
+    {"MWK", "Kwacha malawite"},
+    {"MXN", "Peso mexicain"},
+    {"MYR", "Ringgit malaisien"},
+    {"MZN", "Metical mozambicain"},
+    {"NAD", "Dollar namibien"},
+    {"NGN", "Naira nigérian"},
+    {"NIO", "Córdoba nicaraguayen"},
+    {"NOK", "Couronne norvégienne"},
+    {"NPR", "Roupie népalaise"},
+    {"NZD", "Dollar néo-zélandais"},
+    {"OMR", "Rial omanais"},
+    {"PAB", "Balboa panaméen"},
+    {"PEN", "Sol péruvien"},
+    {"PGK", "Kina papouan-néo-guinéen"},
+    {"PHP", "Peso philippin"},
+    {"PKR", "Roupie pakistanaise"},
+    {"PLN", "Zloty polonais"},
+    {"PYG", "Guaraní paraguayen"},
+    {"QAR", "Riyal qatari"},
+    {"RON", "Leu roumain"},
+    {"RSD", "Dinar serbe"},
+    {"RUB", "Rouble russe"},
+    {"RWF", "Franc rwandais"},
+    {"SAR", "Riyal saoudien"},
+    {"SBD", "Dollar des îles Salomon"},
+    {"SCR", "Roupie seychelloise"},
+    {"SDG", "Livre soudanaise"},
+    {"SEK", "Couronne suédoise"},
+    {"SGD", "Dollar de Singapour"},
+    {"SHP", "Livre de Sainte-Hélène"},
+    {"SLL", "Leone sierra-léonais"},
+    {"SOS", "Shilling somalien"},
+    {"SRD", "Dollar surinamais"},
+    {"SSP", "Livre sud-soudanaise"},
+    {"STN", "Dobra de São Tomé et Príncipe"},
+    {"SVC", "Colón salvadorien"},
+    {"SYP", "Livre syrienne"},
+    {"SZL", "Lilangeni swazi"},
+    {"THB", "Baht thaïlandais"},
+    {"TJS", "Somoni tadjik"},
+    {"TMT", "Manat turkmène"},
+    {"TND", "Dinar tunisien"},
+    {"TOP", "Paʻanga tongien"},
+    {"TRY", "Lire turque"},
+    {"TTD", "Dollar de Trinité-et-Tobago"},
+    {"TWD", "Nouveau dollar taïwanais"},
+    {"TZS", "Shilling tanzanien"},
+    {"UAH", "Hryvnia ukrainienne"},
+    {"UGX", "Shilling ougandais"},
+    {"USD", "Dollar américain"},
+    {"UYU", "Peso uruguayen"},
+    {"UYW", "Unité indexée sur les salaires nominaux uruguayens"},
+    {"UZS", "Som ouzbek"},
+    {"VES", "Bolívar vénézuélien"},
+    {"VND", "Dong vietnamien"},
+    {"VUV", "Vatu vanuatuan"},
+    {"WST", "Tala samoan"},
+    {"XAF", "Franc CFA d’Afrique centrale"},
+    {"XCD", "Dollar des Caraïbes orientales"},
+    {"XOF", "Franc CFA d’Afrique de l’Ouest"},
+    {"XPF", "Franc CFP"},
+    {"YER", "Rial yéménite"},
+    {"ZAR", "Rand sud-africain"},
+    {"ZMW", "Kwacha zambien"},
+    {"ZWL", "Dollar zimbabwéen"}
+};

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>600</height>
+    <height>664</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -156,7 +156,7 @@
        <item row="6" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>No of periodic cash stream incomes :</string>
+          <string>No of periodic incomes CSD :</string>
          </property>
         </widget>
        </item>
@@ -187,7 +187,7 @@
        <item row="7" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>No of irregular cash stream incomes :</string>
+          <string>No of irregular incomes CSD :</string>
          </property>
         </widget>
        </item>
@@ -218,7 +218,7 @@
        <item row="8" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>No of periodic cash stream expenses :</string>
+          <string>No of periodic expenses CSD :</string>
          </property>
         </widget>
        </item>
@@ -249,7 +249,7 @@
        <item row="9" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>No of irregular cash stream expenses :</string>
+          <string>No of irregular expenses CSD :</string>
          </property>
         </widget>
        </item>
@@ -483,6 +483,12 @@
         <widget class="QPushButton" name="closePushButton">
          <property name="text">
           <string>Close</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

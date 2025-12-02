@@ -86,7 +86,7 @@ QVariant EditIrregularModel::data(const QModelIndex &index, int role) const
                 return theLocale.toString(key,QLocale::FormatType::ShortFormat);
                 //return theLocale.toString(key,"yyyy-MMM-dd (ddd)");
             } else if (col==1){ //*** Amount ***
-                IrregularFeStreamDef::AmountInfo ai = items.value(key);
+                IrregularCsd::AmountInfo ai = items.value(key);
                 int result;
                 QString vStr = CurrencyHelper::quint64ToDoubleString(ai.amount,currInfo,theLocale,
                     false,result);
@@ -96,7 +96,7 @@ QVariant EditIrregularModel::data(const QModelIndex &index, int role) const
                 }
                 return vStr ;
             } else if (col==2) {   //*** notes ***
-                IrregularFeStreamDef::AmountInfo ai = items.value(key);
+                IrregularCsd::AmountInfo ai = items.value(key);
                 return ai.notes;
             }
         }
@@ -141,13 +141,13 @@ int EditIrregularModel::getPositionForDate(QDate aDate)
 
 // GETTERS / SETTERS ***
 
-QMap<QDate, IrregularFeStreamDef::AmountInfo> EditIrregularModel::getItems() const
+QMap<QDate, IrregularCsd::AmountInfo> EditIrregularModel::getItems() const
 {
     return items;
 }
 
 
-void EditIrregularModel::setItems(const QMap<QDate, IrregularFeStreamDef::AmountInfo> &newItems)
+void EditIrregularModel::setItems(const QMap<QDate, IrregularCsd::AmountInfo> &newItems)
 {
 
     // we assume model has completely changed (easier that way)

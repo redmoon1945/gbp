@@ -19,18 +19,21 @@
 #include "editscenariodialog.h"
 #include "ui_editscenariodialog.h"
 #include "gbpcontroller.h"
+#include "gbplogger.h"
 #include "currencyhelper.h"
 #include <QMessageBox>
 #include <QFontDatabase>
 #include <QColorDialog>
 #include <QCoreApplication>
-#include "setfiltertagsdialog.h"
+#include "choosetagsdialog.h"
+#include "gbpqmessage.h"
+#include "constants.h"
 
 
-EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
-//    QDialog(parent),
+EditScenarioDialog::EditScenarioDialog(QLocale locale) :
     QDialog(NULL),  // By passing NULL, we make this window independant, but MainWindow must close
                     // it before exiting
+    started(false),
     ui(new Ui::EditScenarioDialog)
 {
     // Qt UI build-up
@@ -49,12 +52,10 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     ui->scenarioNameLineEdit->setMaxLength(Scenario::NAME_MAX_LEN);
 
     // set constraints for end date calculation
-    ui->maxDurationSpinBox->setMaximum(Scenario::MAX_DURATION_FE_GENERATION);
-    ui->maxDurationSpinBox->setMinimum(Scenario::MIN_DURATION_FE_GENERATION);
+    ui->maxDurationSpinBox->setMaximum(Constants::MAX_DURATION_FE_GENERATION);
+    ui->maxDurationSpinBox->setMinimum(Constants::MIN_DURATION_FE_GENERATION);
 
     // tweak Item Table fonts
-    uint oldFontSize;
-    uint newFontSize;
     //
     QFont defaultTableFont = ui->itemsTableView->font();
     //
@@ -72,22 +73,12 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     //
     QFont infoActiveTableFont = ui->itemsTableView->font();
     infoActiveTableFont.setItalic(true);
-    oldFontSize = infoActiveTableFont.pointSize();
-    newFontSize = Util::changeFontSize(1, true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit scenario - infoActiveTable - Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    infoActiveTableFont.setPointSize(newFontSize);
+    Util::changeFontSize(infoActiveTableFont, Util::FontResizeIntensity::WEAK, true);
     //
     QFont infoInactiveTableFont = ui->itemsTableView->font();
     infoInactiveTableFont.setStrikeOut(true);
     infoInactiveTableFont.setItalic(true);
-    oldFontSize = infoInactiveTableFont.pointSize();
-    newFontSize = Util::changeFontSize(1, true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit scenario - infoInactiveTable - Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    infoInactiveTableFont.setPointSize(newFontSize);
+    Util::changeFontSize(infoInactiveTableFont, Util::FontResizeIntensity::WEAK, true);
 
     // set up the list model for items ListView : in UI form, filtering buttons must have been set
     // according to model's default
@@ -105,26 +96,16 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
 
     // use smaller font for description text
     QFont descFont = ui->DescPlainTextEdit->font();
-    oldFontSize = descFont.pointSize();
-    newFontSize = Util::changeFontSize(2,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit scenario - Description - Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    descFont.setPointSize(newFontSize);
+    Util::changeFontSize(descFont, Util::FontResizeIntensity::AVERAGE, true);
     ui->DescPlainTextEdit->setFont(descFont);
 
     // force description widget to be small (cant do it in Qt Designer...)
     QFontMetrics fm(ui->DescPlainTextEdit->font());
     ui->DescPlainTextEdit->setFixedHeight(fm.height()*(3*1.2)); // 3 lines
 
-    // use much smaller font for filter controls
+    // use smaller font for filter controls
     QFont filterButtonFont = ui->filterPeriodicsCheckBox->font();
-    oldFontSize = filterButtonFont.pointSize();
-    newFontSize =Util::changeFontSize(2,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit scenario - Filter buttons - Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    filterButtonFont.setPointSize(newFontSize);
+    Util::changeFontSize(filterButtonFont, Util::FontResizeIntensity::AVERAGE, true);
     ui->filterPeriodicsCheckBox->setFont(filterButtonFont);
     ui->filterIrregularsCheckBox->setFont(filterButtonFont);
     ui->filterEnabledCheckBox->setFont(filterButtonFont);
@@ -133,24 +114,26 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     ui->incomesRadioButton->setFont(filterButtonFont);
     ui->expensesRadioButton->setFont(filterButtonFont);
     ui->filterTagsCheckBox->setFont(filterButtonFont);
-    ui->filterTagsPushButton->setFont(filterButtonFont);
     ui->filterTagsPushButton->setVisible(false);
 
+    // use much smaller font for tag filter button and combo
+    QFont filterTagButtonFont = ui->filterTagsPushButton->font();
+    Util::changeFontSize(filterTagButtonFont, Util::FontResizeIntensity::AVERAGE, true);
+    ui->filterTagsPushButton->setFont(filterTagButtonFont);
+    ui->filterTagsCombinationComboBox->setFont(filterTagButtonFont);
+
     // Set color of "incomes" and "expenses" filter
-    ui->incomesRadioButton->setStyleSheet("color: rgb(0,255,0);");
-    ui->expensesRadioButton->setStyleSheet("color: rgb(255,0,0);");
+    ui->incomesRadioButton->setStyleSheet(Util::getStyleSheetStringForColor(
+        GbpController::getInstance().getIncomeColor()));
+    ui->expensesRadioButton->setStyleSheet(Util::getStyleSheetStringForColor(
+        GbpController::getInstance().getExpenseColor()));
 
     // Update text for "new" buttons
     updateNewButtonsText();
 
     // use smaller font for action buttons
     QFont actionButtonFont = ui->addPeriodicPushButton->font();
-    oldFontSize = actionButtonFont.pointSize();
-    newFontSize =Util::changeFontSize(1,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit scenario - Action buttons - Font size set from %1 to %2")
-        .arg(oldFontSize).arg(newFontSize));
-    actionButtonFont.setPointSize(newFontSize);
+    Util::changeFontSize(actionButtonFont, Util::FontResizeIntensity::WEAK, true);
     ui->addPeriodicPushButton->setFont(actionButtonFont);
     ui->addIrregularPushButton->setFont(actionButtonFont);
     ui->deletePushButton->setFont(actionButtonFont);
@@ -162,10 +145,26 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     ui->selectAllPushButton->setFont(actionButtonFont);
     ui->unselectAllPushButton->setFont(actionButtonFont);
 
-    // Filter tags are disabled
+    // Filter by tags is disabled
     filterTags.clear();
     ui->filterTagsCheckBox->setChecked(false);
-    ui->filterTagsPushButton->setVisible(false);
+    setFilterTagsWidgetsVisibility(false);
+
+    // Color FilterTags widgets
+    ui->filterTagsCheckBox->setStyleSheet(Util::getStyleSheetStringForColor(
+        Util::getOptimizedBlue()));
+
+    // fill FilterTags combination Combobox
+    ui->filterTagsCombinationComboBox->insertItem(0,tr("All required"),FilterTags::Mode::ALL);
+    ui->filterTagsCombinationComboBox->insertItem(0,tr("At least one"),FilterTags::Mode::ANY);
+    ui->filterTagsCombinationComboBox->insertItem(0,
+        tr("None of those"),FilterTags::Mode::NOT);
+    ui->filterTagsCombinationComboBox->setCurrentIndex(1);
+    filterTags.setMode(FilterTags::Mode::ANY);
+
+    // set buttons titles
+    ui->applyPushButton->setText(tr("Apply changes"));
+    ui->cancelPushButton->setText(tr("Cancel"));
 
     // Plain Text Edition Dialog, auto-destroyed by Qt
     editDescriptionDialog = new PlainTextEditionDialog(this);
@@ -176,19 +175,19 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
     ecInflation->setModal(true);
 
     // Periodic Stream Def Edit dialog, auto-destroyed by Qt
-    psStreamDefDialog = new EditPeriodicDialog(locale, this);
-    psStreamDefDialog->setModal(true);
+    psCsdDialog = new EditPeriodicDialog(locale, this);
+    psCsdDialog->setModal(true);
 
     // Irregular Stream Def Edit dialog, auto-destroyed by Qt
-    irStreamDefDialog = new EditIrregularDialog(locale, this);
-    irStreamDefDialog->setModal(true);
+    irCsdDialog = new EditIrregularDialog(locale, this);
+    irCsdDialog->setModal(true);
 
     // Manage Tags dialog, auto-destroyed by Qt
     manageTagsDlg = new ManageTagsDialog(locale, this);
     manageTagsDlg->setModal(true);
 
     // Edit Filter Tags, auto-destroyed by Qt
-    setFilterTagsDlg = new SetFilterTagsDialog(this);
+    setFilterTagsDlg = new ChooseTagsDialog(this);
     setFilterTagsDlg->setModal(true);
 
     // connect emitters & receivers for Dialogs : Variable Inflation Edition
@@ -200,20 +199,20 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
         this, &EditScenarioDialog::slotEditVariableInflationCompleted);
 
     // connect emitters & receivers for Dialogs : Periodic Stream Def Edition
-    QObject::connect(this, &EditScenarioDialog::signalEditPeriodicStreamDefPrepareContent,
-        psStreamDefDialog, &EditPeriodicDialog::slotPrepareContent);
-    QObject::connect(psStreamDefDialog, &EditPeriodicDialog::signalEditPeriodicStreamDefResult,
-        this, &EditScenarioDialog::slotEditPeriodicStreamDefResult);
-    QObject::connect(psStreamDefDialog, &EditPeriodicDialog::signalEditPeriodicStreamDefCompleted,
-        this, &EditScenarioDialog::slotEditPeriodicStreamDefCompleted);
+    QObject::connect(this, &EditScenarioDialog::signalEditPeriodicCsdPrepareContent,
+        psCsdDialog, &EditPeriodicDialog::slotPrepareContent);
+    QObject::connect(psCsdDialog, &EditPeriodicDialog::signalEditPeriodicCsdResult,
+        this, &EditScenarioDialog::slotEditPeriodicCsdResult);
+    QObject::connect(psCsdDialog, &EditPeriodicDialog::signalEditPeriodicCsdCompleted,
+        this, &EditScenarioDialog::slotEditPeriodicCsdCompleted);
 
     // connect emitters & receivers for Dialogs : Irregular Stream Def Edition
-    QObject::connect(this, &EditScenarioDialog::signalEditIrregularStreamDefPrepareContent,
-        irStreamDefDialog, &EditIrregularDialog::slotPrepareContent);
-    QObject::connect(irStreamDefDialog, &EditIrregularDialog::signalEditIrregularStreamDefResult,
-        this, &EditScenarioDialog::slotEditIrregularStreamDefResult);
-    QObject::connect(irStreamDefDialog, &EditIrregularDialog::signalEditIrregularStreamDefCompleted,
-        this, &EditScenarioDialog::slotEditIrregularStreamDefCompleted);
+    QObject::connect(this, &EditScenarioDialog::signalEditIrregularCsdPrepareContent,
+        irCsdDialog, &EditIrregularDialog::slotPrepareContent);
+    QObject::connect(irCsdDialog, &EditIrregularDialog::signalEditIrregularCsdResult,
+        this, &EditScenarioDialog::slotEditIrregularCsdResult);
+    QObject::connect(irCsdDialog, &EditIrregularDialog::signalEditIrregularCsdCompleted,
+        this, &EditScenarioDialog::slotEditIrregularCsdCompleted);
 
     // connect emitters & receivers for Dialogs : Plain Text Edition
     QObject::connect(this, &EditScenarioDialog::signalPlainTextDialogPrepareContent,
@@ -234,11 +233,14 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale, QWidget *parent) :
 
     // connect emitters & receivers for Dialogs : SetFilterTags Edition
     QObject::connect(this, &EditScenarioDialog::signalSetFilterTagsPrepareContent,
-        setFilterTagsDlg, &SetFilterTagsDialog::slotPrepareContent);
-    QObject::connect(setFilterTagsDlg, &SetFilterTagsDialog::signalResult,
+        setFilterTagsDlg, &ChooseTagsDialog::slotPrepareContent);
+    QObject::connect(setFilterTagsDlg, &ChooseTagsDialog::signalResult,
         this, &EditScenarioDialog::slotSetFilterTagsResult);
-    QObject::connect(setFilterTagsDlg, &SetFilterTagsDialog::signalCompleted,
+    QObject::connect(setFilterTagsDlg, &ChooseTagsDialog::signalCompleted,
         this, &EditScenarioDialog::slotSetFilterTagsCompleted);
+
+    // Constructor is completed
+    started = true;
 
 }
 
@@ -255,32 +257,49 @@ void EditScenarioDialog::allowColoredCsdNames(bool value)
 }
 
 
-// We are about to start the process of editing the content of the current scenario
 void EditScenarioDialog::slotPrepareContent(QString countryCode,
     CurrencyInfo newCurrInfo)
 {
-    // remember/init some variables
+    // Get current scenario, if any. There must be one.
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if(scenario.isNull()){
+        return; // if no scenario loaded (should not happen)
+    }
+
+    QDate maxDate = GbpController::getInstance().getToday()
+        .addYears(Constants::DEFAULT_DURATION_FE_GENERATION);
+
+    // *** Copy properties of the current scenario, so we can work on a copy instead of
+    // *** the current one scenario. Some properties will go directly in UI components when
+    // *** it is possible
+
     this->countryCode = countryCode;
     this->currInfo = newCurrInfo;
     tempVariableInflation = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>());
 
-    QDate maxDate = GbpController::getInstance().getToday()
-        .addYears(Scenario::DEFAULT_DURATION_FE_GENERATION);
+    /*  The Csds of the scenario are DEEP copied, that is ID and name stay identical, but
+        we get new (so independant) QSharedPointer to each CSD. We have to remember that they are
+        referenced by data structures located elsewhere (e.g. main Cash Balance curve), so great
+        care must be taken to preserve them if data must not be regenerated. These will be the
+        working copies : they will be modified while editing the scenario data in the dialog.
+        The current scenario stays untouched as long as "APPLY" button has not been pressed.
+    */
+    incomesPeriodicCsd = PeriodicCsd::deepCopyHashmap(scenario->getIncomePeriodicCsds());
+    incomesIrregularCsd = IrregularCsd::deepCopyHashmap(scenario->getIncomeIrregularCsds());
+    expensesPeriodicCsd = PeriodicCsd::deepCopyHashmap(scenario->getExpensePeriodicCsds());
+    expensesIrregularCsd = IrregularCsd::deepCopyHashmap(scenario->getExpenseIrregularCsds());
+
+    // copy current tags and relationships
+    tags = scenario->getTags();
+    tagCsdRelationships = scenario->getTagCsdRelationships();
 
     // fill fields from current scenario
-    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario() ;
     ui->scenarioNameLineEdit->setText(scenario->getName());
     ui->DescPlainTextEdit->setPlainText(scenario->getDescription());
     ui->maxDurationSpinBox->setValue(scenario->getFeGenerationDuration());
 
-    // Set Csds
-    incomesDefPeriodic = scenario->getIncomesDefPeriodic();
-    incomesDefIrregular = scenario->getIncomesDefIrregular();
-    expensesDefPeriodic = scenario->getExpensesDefPeriodic();
-    expensesDefIrregular = scenario->getExpensesDefIrregular();
-
     // manage scenario inflation
-    if (scenario->getInflation().getType()==Growth::CONSTANT){
+    if (scenario->getInflation().getType()==Growth::Type::CONSTANT){
         ui->inflationConstantRadioButton->setChecked(true);
         qint64 intInf = scenario->getInflation().getAnnualConstantGrowth();
         double inf = Growth::fromDecimalToDouble(intInf);
@@ -295,19 +314,16 @@ void EditScenarioDialog::slotPrepareContent(QString countryCode,
         ui->editGrowthPushButton->setEnabled(true);
     }
 
-    // copy current tags and relationships
-    tags = scenario->getTags();
-    tagCsdRelationships = scenario->getTagCsdRelationships();
-
-    // Filter Tags : we try to keep the previous tag filters, in case this is the same scenario
+    // Filter Tags : we try to keep the previous filter tags, in case this is the same scenario
     // that we edited last time. checkAndAdjustFilterTags will take care to preserve the filter
     // tags if possible, removing what does not exist anymore. UI components are adjusted.
     checkAndAdjustFilterTags() ;
 
-    // set some buttons and titles
-    ui->applyPushButton->setText(tr("Apply changes"));
-    ui->cancelPushButton->setText(tr("Hide"));
+    // **********************************************************************************
+
+
     this->setWindowTitle(tr("Edit current scenario"));
+    ui->scenarioNameLineEdit->setFocus();
 
     // refresh the table content
     refreshCsdTableContent();
@@ -339,14 +355,14 @@ void EditScenarioDialog::slotEditVariableInflationCompleted()
 }
 
 
-void EditScenarioDialog::slotEditPeriodicStreamDefResult(bool isIncome,
-    PeriodicFeStreamDef psStreamDef)
+void EditScenarioDialog::slotEditPeriodicCsdResult(bool isIncome,
+    QSharedPointer<PeriodicCsd> pCsd)
 {
     // add the new or edited csd
-    if (psStreamDef.getIsIncome()==true) {
-        incomesDefPeriodic.insert(psStreamDef.getId(), psStreamDef);
+    if (pCsd->getIsIncome()==true) {
+        incomesPeriodicCsd.insert(pCsd->getId(), pCsd);
     } else {
-        expensesDefPeriodic.insert(psStreamDef.getId(), psStreamDef);
+        expensesPeriodicCsd.insert(pCsd->getId(), pCsd);
     }
 
     // update table content
@@ -354,47 +370,34 @@ void EditScenarioDialog::slotEditPeriodicStreamDefResult(bool isIncome,
 
     // select the new/edited item
     QList<QUuid> list = QList<QUuid>();
-    list.append(psStreamDef.getId());
+    list.append(pCsd->getId());
     selectRowsInTableView(list); // select if displayed
 
     // make sure it is visible in the viewport of the table
     bool found;
-    int row = itemTableModel->getRow(psStreamDef.getId(),found);
+    int row = itemTableModel->getRow(pCsd->getId(),found);
     if (found){
         QModelIndex index = itemTableModel->index(row,0);
         // does not always work...
         ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);
     }
-
-    // Log the operation
-    if (GbpController::getInstance().getLogLevel()==GbpController::Debug) {
-        GbpController::getInstance().log(GbpController::LogLevel::Debug,
-            GbpController::Info, QString("A periodic csd has been edited "
-            ". Income=%1 , name=%2")
-            .arg(isIncome).arg(psStreamDef.getName()));
-    } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
-            GbpController::Info, QString("A periodic csd has been edited "
-            ". Income=%1").arg(isIncome) );
-    }
-
 }
 
 
-// the edit/creation process of PeriodocSimpleStreamDef has completed
-void EditScenarioDialog::slotEditPeriodicStreamDefCompleted()
+// the edit/creation process of PeriodocSimpleCsd has completed
+void EditScenarioDialog::slotEditPeriodicCsdCompleted()
 {
 }
 
 
-void EditScenarioDialog::slotEditIrregularStreamDefResult(bool isIncome,
-    IrregularFeStreamDef irStreamDef)
+void EditScenarioDialog::slotEditIrregularCsdResult(bool isIncome,
+    QSharedPointer<IrregularCsd> irCsd)
 {
     // add the new or edited csd
-    if (irStreamDef.getIsIncome()==true) {
-        incomesDefIrregular.insert(irStreamDef.getId(), irStreamDef);
+    if (irCsd->getIsIncome()==true) {
+        incomesIrregularCsd.insert(irCsd->getId(), irCsd);
     } else {
-        expensesDefIrregular.insert(irStreamDef.getId(), irStreamDef);
+        expensesIrregularCsd.insert(irCsd->getId(), irCsd);
     }
 
     // update table content
@@ -402,32 +405,21 @@ void EditScenarioDialog::slotEditIrregularStreamDefResult(bool isIncome,
 
     // select the edited/new item
     QList<QUuid> list = QList<QUuid>();
-    list.append(irStreamDef.getId());
+    list.append(irCsd->getId());
     selectRowsInTableView(list);
 
     // make sure it is visible in the viewport of the table
     bool found;
-    int row = itemTableModel->getRow(irStreamDef.getId(),found);
+    int row = itemTableModel->getRow(irCsd->getId(),found);
     if (found){
         QModelIndex index = itemTableModel->index(row,0);
         // does not always work...
         ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);
     }
-
-    // Log the operation
-    if (GbpController::getInstance().getLogLevel()==GbpController::Debug) {
-        GbpController::getInstance().log(GbpController::LogLevel::Debug,
-            GbpController::Info, QString("An irregular csd has been edited. "
-            "Income = %1 , name = %2").arg(isIncome).
-            arg(irStreamDef.getName()));
-    } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("An irregular csd has been edited. Income = %1").arg(isIncome));
-    }
 }
 
 
-void EditScenarioDialog::slotEditIrregularStreamDefCompleted()
+void EditScenarioDialog::slotEditIrregularCsdCompleted()
 {
 }
 
@@ -452,10 +444,13 @@ void EditScenarioDialog::slotManageTagsCompleted()
 }
 
 
-void EditScenarioDialog::slotSetFilterTagsResult(FilterTags::Mode mode, QSet<QUuid> filterTagIdSet)
+/**
+ * @brief Result of the tag selection Dialog. Combination is left unchanged, as it is not
+ * handled by the Dialog.
+ * @param filterTagIdSet The list of tags selected.
+ */
+void EditScenarioDialog::slotSetFilterTagsResult(QSet<QUuid> filterTagIdSet)
 {
-    // we dont touch the AnyTags (which should be anyway set to false)
-    filterTags.setMode(mode);
     filterTags.setFilterTagIdSet(filterTagIdSet);
 
     // update table's content
@@ -463,15 +458,20 @@ void EditScenarioDialog::slotSetFilterTagsResult(FilterTags::Mode mode, QSet<QUu
 }
 
 
+/**
+ * @brief Handle completion of the Tag Selection Dialog. Tags' combination mode is not touched
+ * in any case.
+ * @details If user canceled, filterTags could stay empty while "filterByTags" is enabled.
+ * It does not make sense, so in that case, one disables by force "filterByTags".
+ * @param canceled
+ */
 void EditScenarioDialog::slotSetFilterTagsCompleted(bool canceled)
 {
-    // If user canceled, filterTags may stay empty while "EnableFilterTag" is ON.
-    // This is not a normal situation, so in that case force EnableFilterTag to OFF
-    if ( (canceled==true) && (filterTags.getEnableFilterByTags()==true) &&
+    if ( (canceled==true) && (ui->filterTagsCheckBox->isChecked()==true) &&
         (filterTags.getFilterTagIdSet().size()==0) ) {
-        filterTags.clear();
+        filterTags.clear(); // clear obly the tags, let the combination mode untouched.
         ui->filterTagsCheckBox->setChecked(false);
-        ui->filterTagsPushButton->setVisible(false);
+        setFilterTagsWidgetsVisibility(false);
         // update table's content
         refreshCsdTableContent();
     }
@@ -495,31 +495,39 @@ void EditScenarioDialog::on_editGrowthPushButton_clicked()
 void EditScenarioDialog::on_addPeriodicPushButton_clicked()
 {
     bool isIncome = ui->incomesRadioButton->isChecked();
-    PeriodicFeStreamDef psStreamDef;  // useless
     QDate maxDate = GbpController::getInstance().getToday().addYears(
         ui->maxDurationSpinBox->value());
     // launch the edit dialog to create a new Periodic FSD
-    emit signalEditPeriodicStreamDefPrepareContent(true, isIncome, psStreamDef, currInfo,
-        getInflationCurrentlyDefined(), maxDate,{},tags);
-    psStreamDefDialog->show();
+    emit signalEditPeriodicCsdPrepareContent(true, isIncome, QWeakPointer<PeriodicCsd>(),
+        currInfo, getInflationCurrentlyDefined(), maxDate,{},tags);
+    psCsdDialog->show();
 }
 
 
 void EditScenarioDialog::on_addIrregularPushButton_clicked()
 {
     bool isIncome = ui->incomesRadioButton->isChecked();
-    IrregularFeStreamDef irStreamDef;  // useless
     QDate maxDate = GbpController::getInstance().getToday().addYears(
         ui->maxDurationSpinBox->value());
-    emit signalEditIrregularStreamDefPrepareContent(true, isIncome, irStreamDef, currInfo,
-        maxDate,{},tags);
-    irStreamDefDialog->show();
+    emit signalEditIrregularCsdPrepareContent(true, isIncome, QWeakPointer<IrregularCsd>(),
+        currInfo, maxDate,{},tags);
+    irCsdDialog->show();
 }
 
 
 void EditScenarioDialog::on_cancelPushButton_clicked()
 {
     this->hide();
+
+    // clear useless variables that may use some space : they will be repopulated
+    // at the next call to slotPrepareContent
+    incomesPeriodicCsd.clear();
+    incomesIrregularCsd.clear();
+    expensesPeriodicCsd.clear();
+    expensesIrregularCsd.clear();
+    tags.clear();
+    tagCsdRelationships.clear();
+
     emit signalEditScenarioCompleted();
 }
 
@@ -579,8 +587,7 @@ void EditScenarioDialog::on_fullViewPushButton_clicked()
 
 void EditScenarioDialog::on_applyPushButton_clicked()
 {
-    // *** gather & validate some data to create a new Scenario ***
-
+    // *** gather & validate some data in the form to create a new Scenario ***
     QString name = ui->scenarioNameLineEdit->text().trimmed();
     QString desc = ui->DescPlainTextEdit->toPlainText();
     quint16 maxDuration = ui->maxDurationSpinBox->value();
@@ -593,63 +600,172 @@ void EditScenarioDialog::on_applyPushButton_clicked()
         inflation = tempVariableInflation;
     }
 
-    // *** Create a new scenario from the edit dialog data.
-    QSharedPointer<Scenario> scenario;
+    LOG_INFO(QString("Attempting to apply changes made to a scenario named %1").arg(REDACT(name)));
+
+    // *** Create a completely new scenario from the edit dialog data.
+    // *** Note that all Csd QSharedPointers will be different from the current scenario,
+    // *** which creates a problem if data does not need to be regenerated, since they
+    // *** are referenced elsewhere by WeakPointers. We will address this later.
+    QSharedPointer<Scenario> newScenario;
     try {
-        scenario = QSharedPointer<Scenario>(new Scenario(
+        newScenario = QSharedPointer<Scenario>(new Scenario(
             Scenario::LATEST_VERSION, name, desc, maxDuration, inflation, countryCode,
-            incomesDefPeriodic, incomesDefIrregular, expensesDefPeriodic, expensesDefIrregular,
+            incomesPeriodicCsd, incomesIrregularCsd, expensesPeriodicCsd, expensesIrregularCsd,
             tags, tagCsdRelationships));
     } catch (const std::exception& e) {
         // we should not get any exception...but plan for the worst
-        QString errorString = QString(tr("An unexpected error has occured while creating a "
+        QString errorString = QString(tr("An unexpected error has occurred while creating a "
             "scenario.\n\nDetails : %1"))
             .arg(e.what());
         QMessageBox::critical(nullptr,tr("Error"), errorString);
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal,
-            GbpController::Warning, QString(
-            "Modifying an existing scenario failed, unexpected exception occured : %1")
-            .arg(e.what()));
+        LOG_ERROR( QString("    Modification to this existing scenario failed, unexpected"
+            " exception occurred : %1").arg(e.what()));
+        LOG_INFO("Apply changes has completed");
         return;
     }
 
-    // *** Evaluate the type of changes made to the scenario. There are 2 options :
-    // *** 1) Scenario flow data will be different (e.g. new/deleted streamDef, max duration
-    //        modified) in which case data will have to be regenerated before chart is refreshed.
-    // *** 2) Cosmetic or no change
+    // *** Evaluate the type of changes made to the scenario.  There are 2 options :
+    // *** 1) Financial events list will be different (e.g. new/deleted/enabled/disabled Csd,
+    //        max duration modified, amounts changed, etc) in which case data will have to be
+    //        regenerated before chart is refreshed.
+    // *** 2) Financial events list will be different : only cosmetic changes or no change
     bool regenerateData = true;
-    if(GbpController::getInstance().isScenarioLoaded()==true){
-        regenerateData = !(GbpController::getInstance().getScenario()->evaluateIfSameFlowData(
-            scenario));
+    // Get current scenario(if any loaded)
+    QSharedPointer<Scenario> currScenario = GbpController::getInstance().getScenario()
+        .toStrongRef();
+    if(currScenario.isNull()==false){
+        // compare
+        QString diff;
+        regenerateData = !(currScenario->evaluateIfSameFeStream(newScenario, diff));
+        if(regenerateData==true){
+            LOG_INFO(QString("    Changes made will trigger a full recalculation of data : %1")
+                .arg(diff));
+        } else {
+            LOG_INFO("    Changes made will NOT trigger a full recalculation of data");
+        }
+    } else {
+        LOG_ERROR("    There is no current scenario (should not happen)");
+        LOG_INFO("Apply changes has completed");
+        return ; // should not happen
     }
 
+    // The tricky part...If data will not be re-generated, we want to keep the same
+    // Csd QSharedpointers found in the current scenario, because they are referenced elsewhere in
+    // the app. But set their contents with what/ has been changed during the edition (newScenario).
+    if (regenerateData == false) {
+
+        // --- Incomes, Periodic ---
+        {
+            auto curHash = currScenario->getIncomePeriodicCsds();
+            auto newHash = newScenario->getIncomePeriodicCsds();
+            for (auto it = curHash.begin(); it != curHash.end(); ++it) {
+                const QUuid id = it.key();
+                QSharedPointer<PeriodicCsd>& curCsd = it.value();// non-const ref editable in place
+                QSharedPointer<PeriodicCsd> newCsd =
+                    newHash.value(id,QSharedPointer<PeriodicCsd>());
+                if (newCsd.isNull() || curCsd.isNull()) { // Should never happen
+                    LOG_ERROR(QString("    newCsd.isNull() || curCsd.isNull()").arg(id.toString()));
+                    LOG_INFO("Apply changes has completed");
+                    return;
+                }
+                *curCsd = *newCsd; // copy "new" into "current" csd, keep the same QShardPointer
+            }
+            newScenario->setIncomePeriodicCsds(curHash);// Swap the Hashmap
+        }
+
+        // --- Incomes, Irregular ---
+        {
+            auto curHash = currScenario->getIncomeIrregularCsds();
+            auto newHash = newScenario->getIncomeIrregularCsds();
+            for (auto it = curHash.begin(); it != curHash.end(); ++it) {
+                const QUuid id = it.key();
+                QSharedPointer<IrregularCsd>& curCsd = it.value();// non-const ref editable in place
+                QSharedPointer<IrregularCsd>newCsd =
+                    newHash.value(id,QSharedPointer<IrregularCsd>());
+                if (newCsd.isNull() || curCsd.isNull()) { // Should never happen
+                    LOG_ERROR(QString("    newCsd.isNull() || curCsd.isNull()").arg(id.toString()));
+                    LOG_INFO("Apply changes has completed");
+                    return;
+                }
+                *curCsd = *newCsd; // copy "new" into "current" csd, keep the same QShardPointer
+            }
+            newScenario->setIncomeIrregularCsds(curHash);// Swap the Hashmap
+        }
+
+        // --- Expenses, Periodic ---
+        {
+            auto curHash = currScenario->getExpensePeriodicCsds();
+            auto newHash = newScenario->getExpensePeriodicCsds();
+            for (auto it = curHash.begin(); it != curHash.end(); ++it) {
+                const QUuid id = it.key();
+                QSharedPointer<PeriodicCsd>& curCsd = it.value();// non-const ref editable in place
+                QSharedPointer<PeriodicCsd> newCsd =
+                    newHash.value(id,QSharedPointer<PeriodicCsd>());
+                if (newCsd.isNull() || curCsd.isNull()) { // Should never happen
+                    LOG_ERROR(QString("    newCsd.isNull() || curCsd.isNull()").arg(id.toString()));
+                    LOG_INFO("Apply changes has completed");
+                    return;
+                }
+                *curCsd = *newCsd; // copy "new" into "current" csd, keep the same QShardPointer
+            }
+            newScenario->setExpensePeriodicCsds(curHash);// Swap the Hashmap
+        }
+
+        // --- Expenses, Irregular ---
+        {
+            auto curHash = currScenario->getExpenseIrregularCsds();
+            auto newHash = newScenario->getExpenseIrregularCsds();
+            for (auto it = curHash.begin(); it != curHash.end(); ++it) {
+                const QUuid id = it.key();
+                QSharedPointer<IrregularCsd>& curCsd = it.value();// non-const ref editable in place
+                QSharedPointer<IrregularCsd>newCsd =
+                    newHash.value(id,QSharedPointer<IrregularCsd>());
+                if (newCsd.isNull() || curCsd.isNull()) { // Should never happen
+                    LOG_ERROR(QString("   newCsd.isNull() || curCsd.isNull()").arg(id.toString()));
+                    LOG_INFO("Apply changes has completed");
+                    return;
+                }
+                *curCsd = *newCsd; // copy "new" into "current" csd, keep the same QShardPointer
+            }
+            newScenario->setExpenseIrregularCsds(curHash);// Swap the Hashmap
+        }
+
+    }
+
+    // we dont need the current scenario Strong Reference
+    currScenario.reset();
+
     // *** switch to the new/editted scenario
-    GbpController::getInstance().setScenario(scenario);
+    GbpController::getInstance().setScenario(newScenario);
+
+    // Make our own internal copies of Csd Hashes independant again. We have to do that
+    // because of the QSharedPointer issue.
+    currScenario = GbpController::getInstance().getScenario().toStrongRef();
+    incomesPeriodicCsd = PeriodicCsd::deepCopyHashmap(currScenario->getIncomePeriodicCsds());
+    incomesIrregularCsd = IrregularCsd::deepCopyHashmap(currScenario->getIncomeIrregularCsds());
+    expensesPeriodicCsd = PeriodicCsd::deepCopyHashmap(currScenario->getExpensePeriodicCsds());
+    expensesIrregularCsd = IrregularCsd::deepCopyHashmap(currScenario->getExpenseIrregularCsds());
 
     // *** log the changes
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Modifications to the existing scenario have been applied (but not saved yet"));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("    Name = %1").arg(scenario->getName()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug,
-        GbpController::Info, QString("    Country ISO code = %1")
-        .arg(scenario->getCountryCode()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("    Version = %1").arg(scenario->getVersion()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("    Fe Generation Duration = %1").arg(scenario->getFeGenerationDuration()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("    No of periodic incomes = %1").arg(scenario->getIncomesDefPeriodic()
-        .size()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("    No of irregular incomes = %1").arg(scenario->getIncomesDefIrregular()
-        .size()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("    No of periodic expenses = %1").arg(scenario->getExpensesDefPeriodic()
-        .size()));
-    GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-        QString("    No of irregular expenses = %1").arg(scenario->getExpensesDefIrregular()
-        .size()));
+    LOG_INFO(  "    Modifications to the existing scenario have been applied "
+        "(but not saved yet)");
+    LOG_DEBUG_INFO( QString("      Name = %1")
+        .arg(REDACT(currScenario->getName())));
+    LOG_DEBUG_INFO( QString("      Country ISO code = %1")
+        .arg(currScenario->getCountryCode()));
+    LOG_DEBUG_INFO( QString("      Version = %1")
+        .arg(currScenario->getVersion()));
+    LOG_DEBUG_INFO( QString("      Fe Generation Duration = %1")
+        .arg(currScenario->getFeGenerationDuration()));
+    LOG_DEBUG_INFO( QString("      No of periodic incomes = %1")
+        .arg(currScenario->getIncomePeriodicCsds().size()));
+    LOG_DEBUG_INFO( QString("      No of irregular incomes = %1")
+        .arg(currScenario->getIncomeIrregularCsds().size()));
+    LOG_DEBUG_INFO( QString("      No of periodic expenses = %1")
+        .arg(currScenario->getExpensePeriodicCsds().size()));
+    LOG_DEBUG_INFO( QString("      No of irregular expenses = %1")
+        .arg(currScenario->getExpenseIrregularCsds().size()));
+    LOG_INFO("Apply changes has completed");
 
     // *** Provide the editing result to caller
     // Retrieve New/edited scenario using GbpController::getInstance()
@@ -706,26 +822,31 @@ void EditScenarioDialog::updateNoItemsLabel()
 
 // When Incomes or Expenses filters change, we want the "New Periodic" and "New Irregular"
 // buttons have their text change accordingly
+// *** From 1.7.0, we change the text to shorten it, they are now idential
 void EditScenarioDialog::updateNewButtonsText()
 {
     if(ui->incomesRadioButton->isChecked()==true){
-        ui->addPeriodicPushButton->setText(tr("New periodic income..."));
-        ui->addIrregularPushButton->setText(tr("New irregular income..."));
+        ui->addPeriodicPushButton->setText(tr("New periodic..."));
+        ui->addIrregularPushButton->setText(tr("New irregular..."));
     } else {
-        ui->addPeriodicPushButton->setText(tr("New periodic expense..."));
-        ui->addIrregularPushButton->setText(tr("New irregular expense..."));
+        ui->addPeriodicPushButton->setText(tr("New periodic..."));
+        ui->addIrregularPushButton->setText(tr("New irregular..."));
     }
 }
 
 
-// Check if each tag in Filter Tags set is still exist in the current Tags set.
-// If not, remove it.  Return true if a change has been made, false otherwise.
+
+/**
+ * @brief Check if each tag in Filter Tags set does still exist in the current available Tags set.
+ * If not, remove it. Combination mode is not touched in anycase.
+ * @return True if the filterTags has changed, false otherwise.
+ */
 bool EditScenarioDialog::checkAndAdjustFilterTags()
 {
     bool changed = false;
 
-    // In filterTags, remove tags that do not exist anymore, whatever
-    // if EnableFilterTagging is true or not.
+    // In current filterTags, remove tags that do not exist anymore, whatever
+    // if FilterTagging is ON or OFF.
     QSet<QUuid> fTags = filterTags.getFilterTagIdSet();
     QSet<QUuid> iterationCopySet = fTags;
     foreach(QUuid filterTagId, iterationCopySet){
@@ -735,16 +856,16 @@ bool EditScenarioDialog::checkAndAdjustFilterTags()
         }
     }
     if(changed==true){
-        filterTags.setFilterTagIdSet(fTags); // refresh
+        filterTags.setFilterTagIdSet(fTags); // update
     }
 
-    // if EnableFilterByTags is true and there is no tag left in filtertags, then
+    // if FilterByTags is ON and there is no tag left in filtertags, then
     // we consider it is abnormal (why filter by tag when no tag is specified ?)
-    // and reset filterTags
-    if ( (filterTags.getEnableFilterByTags()==true) && (fTags.size()==0) ) {
+    // and reset&disable filterTags
+    if ( (ui->filterTagsCheckBox->isChecked()==true) && (fTags.size()==0) ) {
         filterTags.clear();
         ui->filterTagsCheckBox->setChecked(false);
-        ui->filterTagsPushButton->setVisible(false);
+        setFilterTagsWidgetsVisibility(false);
         changed = true;
     }
 
@@ -754,50 +875,49 @@ bool EditScenarioDialog::checkAndAdjustFilterTags()
 
 void EditScenarioDialog::refreshCsdTableContent()
 {
-    itemTableModel->refresh(currInfo, incomesDefPeriodic, incomesDefIrregular,
-        expensesDefPeriodic, expensesDefIrregular, tags, tagCsdRelationships,
+    itemTableModel->refresh(currInfo, incomesPeriodicCsd, incomesIrregularCsd,
+        expensesPeriodicCsd, expensesIrregularCsd, tags, tagCsdRelationships,
         ui->incomesRadioButton->isChecked(), ui->expensesRadioButton->isChecked(),
         ui->filterPeriodicsCheckBox->isChecked(), ui->filterIrregularsCheckBox->isChecked(),
         ui->filterEnabledCheckBox->isChecked(), ui->filterDisabledCheckBox->isChecked(),
-        filterTags);
+        filterTags, ui->filterTagsCheckBox->isChecked());
 
     // refresh indicator of the no of items in the table
     updateNoItemsLabel();
 }
 
 
-// Duplicate the selected Csd, add it to the proper set and return its ID.
-// If the csd "id" cannot be found, set "found" to false, otherwise set it to true.
+
 QUuid EditScenarioDialog::duplicateCsd(QUuid id, bool &found)
 {
     found = false;
     QUuid newId;
 
     // find the Csd and duplicate
-    if (incomesDefPeriodic.contains(id)) {
+    if (incomesPeriodicCsd.contains(id)) {
         found = true;
-        PeriodicFeStreamDef p = incomesDefPeriodic.value(id);
-        PeriodicFeStreamDef p2 = p.duplicate();
-        incomesDefPeriodic.insert(p2.getId(),p2);
-        newId = p2.getId();
-    } else if (incomesDefIrregular.contains(id)) {
+        QSharedPointer<PeriodicCsd> p = incomesPeriodicCsd.value(id);
+        QSharedPointer<PeriodicCsd> p2 = p->duplicate(false, false);
+        incomesPeriodicCsd.insert(p2->getId(),p2);
+        newId = p2->getId();
+    } else if (incomesIrregularCsd.contains(id)) {
         found = true;
-        IrregularFeStreamDef p = incomesDefIrregular.value(id);
-        IrregularFeStreamDef p2 = p.duplicate();
-        incomesDefIrregular.insert(p2.getId(),p2);
-        newId = p2.getId();
-    } else if (expensesDefPeriodic.contains(id)) {
+        QSharedPointer<IrregularCsd> p = incomesIrregularCsd.value(id);
+        QSharedPointer<IrregularCsd> p2 = p->duplicate(false, false);
+        incomesIrregularCsd.insert(p2->getId(),p2);
+        newId = p2->getId();
+    } else if (expensesPeriodicCsd.contains(id)) {
         found = true;
-        PeriodicFeStreamDef p = expensesDefPeriodic.value(id);
-        PeriodicFeStreamDef p2 = p.duplicate();
-        expensesDefPeriodic.insert(p2.getId(),p2);
-        newId = p2.getId();
-    } else if (expensesDefIrregular.contains(id)) {
+        QSharedPointer<PeriodicCsd> p = expensesPeriodicCsd.value(id);
+        QSharedPointer<PeriodicCsd> p2 = p->duplicate(false, false);
+        expensesPeriodicCsd.insert(p2->getId(),p2);
+        newId = p2->getId();
+    } else if (expensesIrregularCsd.contains(id)) {
         found = true;
-        IrregularFeStreamDef p = expensesDefIrregular.value(id);
-        IrregularFeStreamDef p2 = p.duplicate();
-        expensesDefIrregular.insert(p2.getId(),p2);
-        newId = p2.getId();
+        QSharedPointer<IrregularCsd> p = expensesIrregularCsd.value(id);
+        QSharedPointer<IrregularCsd> p2 = p->duplicate(false, false);
+        expensesIrregularCsd.insert(p2->getId(),p2);
+        newId = p2->getId();
     } else{
         // not found !
         return id;
@@ -811,46 +931,57 @@ QUuid EditScenarioDialog::duplicateCsd(QUuid id, bool &found)
 void EditScenarioDialog::removeCsds(QList<QUuid> toRemove)
 {
     foreach(QUuid id, toRemove){
-        if (incomesDefPeriodic.contains(id)) {
-            incomesDefPeriodic.remove(id);
+        if (incomesPeriodicCsd.contains(id)) {
+            incomesPeriodicCsd.remove(id);
         }
-        if (incomesDefIrregular.contains(id)) {
-            incomesDefIrregular.remove(id);
+        if (incomesIrregularCsd.contains(id)) {
+            incomesIrregularCsd.remove(id);
         }
-        if (expensesDefPeriodic.contains(id)) {
-            expensesDefPeriodic.remove(id);
+        if (expensesPeriodicCsd.contains(id)) {
+            expensesPeriodicCsd.remove(id);
         }
-        if (expensesDefIrregular.contains(id)) {
-            expensesDefIrregular.remove(id);
+        if (expensesIrregularCsd.contains(id)) {
+            expensesIrregularCsd.remove(id);
         }
     }
 }
 
 
-// Change the "enabled" status of a list of Csds.
 void EditScenarioDialog::enableDisableCsds(QList<QUuid> idList, bool enable)
 {
     foreach(QUuid id, idList){
-        if (incomesDefPeriodic.contains(id)) {
-            PeriodicFeStreamDef p = incomesDefPeriodic.value(id);
-            p.setActive(enable);
-            incomesDefPeriodic.insert(p.getId(),p);
+        if (incomesPeriodicCsd.contains(id)) {
+            QSharedPointer<PeriodicCsd> p = incomesPeriodicCsd.value(id);
+            p->setActive(enable);
+            continue;
         }
-        if (incomesDefIrregular.contains(id)) {
-            IrregularFeStreamDef p = incomesDefIrregular.value(id);
-            p.setActive(enable);
-            incomesDefIrregular.insert(p.getId(),p);
+        if (incomesIrregularCsd.contains(id)) {
+            QSharedPointer<IrregularCsd> p = incomesIrregularCsd.value(id);
+            p->setActive(enable);
+            continue;
         }
-        if (expensesDefPeriodic.contains(id)) {
-            PeriodicFeStreamDef p = expensesDefPeriodic.value(id);
-            p.setActive(enable);
-            expensesDefPeriodic.insert(p.getId(),p);
+        if (expensesPeriodicCsd.contains(id)) {
+            QSharedPointer<PeriodicCsd> p = expensesPeriodicCsd.value(id);
+            p->setActive(enable);
+            continue;
         }
-        if (expensesDefIrregular.contains(id)) {
-            IrregularFeStreamDef p = expensesDefIrregular.value(id);
-            p.setActive(enable);
-            expensesDefIrregular.insert(p.getId(),p);
+        if (expensesIrregularCsd.contains(id)) {
+            QSharedPointer<IrregularCsd> p = expensesIrregularCsd.value(id);
+            p->setActive(enable);
+            continue;
         }
+    }
+}
+
+
+void EditScenarioDialog::setFilterTagsWidgetsVisibility(bool visible)
+{
+    if (visible == true) {
+        ui->filterTagsPushButton->setVisible(true);
+        ui->filterTagsCombinationComboBox->setVisible(true);
+    } else {
+        ui->filterTagsPushButton->setVisible(false);
+        ui->filterTagsCombinationComboBox->setVisible(false);
     }
 }
 
@@ -867,36 +998,37 @@ void EditScenarioDialog::on_editPushButton_clicked()
             ui->itemsTableView->setFocus();    // fix the strange behavior
             return;
         }
-        // get the associated Csd type
-        FeStreamDef::FeStreamType type = getCsdTypeFromId(selectedIdList.at(0),found);
+        // get the associated Csd type, to redirect to the proper Edit Dialog
+        Csd::CsdType type = getCsdTypeFromId(selectedIdList.at(0),found);
         if (found==false) {
             return; // should not happen
         }
         QDate maxDate = GbpController::getInstance().getToday().addYears(
             ui->maxDurationSpinBox->value());
-        if (type == FeStreamDef::FeStreamType::PERIODIC){
-            PeriodicFeStreamDef ps = getPeriodicCsdFromId(selectedIdList.at(0),found);
+        if (type == Csd::CsdType::PERIODIC){
+            QSharedPointer<PeriodicCsd> ps = getPeriodicCsdFromId(selectedIdList.at(0),found);
             if (found==false) {
                 return; // should not happen
             }
             // Gather the tag id set this csd is associated with
-            QSet<QUuid> tSet = tagCsdRelationships.getRelationshipsForCsd(ps.getId());
+            QSet<QUuid> tSet = tagCsdRelationships.getRelationshipsForCsd(ps->getId());
             // Launch the edit dialog
-            emit signalEditPeriodicStreamDefPrepareContent(false,
-                ui->incomesRadioButton->isChecked(), ps, currInfo, getInflationCurrentlyDefined(),
+            emit signalEditPeriodicCsdPrepareContent(false,
+                ui->incomesRadioButton->isChecked(), ps.toWeakRef(), currInfo,
+                    getInflationCurrentlyDefined(),
                 maxDate, tSet, tags);
-            psStreamDefDialog->show();
+            psCsdDialog->show();
         } else {
-            IrregularFeStreamDef is =  getIrregularCsdFromId(selectedIdList.at(0),found);;
+            QSharedPointer<IrregularCsd> is =  getIrregularCsdFromId(selectedIdList.at(0),found);;
             if (found==false) {
                 return; // should not happen
             }
             // Gather the tag id set this fsd is associated with
-            QSet<QUuid> tSet = tagCsdRelationships.getRelationshipsForCsd(is.getId());
+            QSet<QUuid> tSet = tagCsdRelationships.getRelationshipsForCsd(is->getId());
             // Launch the edit dialog
-            emit signalEditIrregularStreamDefPrepareContent(false,
-                ui->incomesRadioButton->isChecked(), is, currInfo, maxDate, tSet, tags);
-            irStreamDefDialog->show();
+            emit signalEditIrregularCsdPrepareContent(false,
+                ui->incomesRadioButton->isChecked(), is.toWeakRef(), currInfo, maxDate, tSet, tags);
+            irCsdDialog->show();
         }
 
 }
@@ -993,7 +1125,6 @@ void EditScenarioDialog::on_enablePushButton_clicked()
     // change status of selected items
     enableDisableCsds(selectedIdList, true);
 
-
     // update table's content
     refreshCsdTableContent();
 
@@ -1034,11 +1165,11 @@ void EditScenarioDialog::on_setColorPushButton_clicked()
         return;
     }
 
-    // This is the custom color that will be choosen, if custom selection is requested.
+    // This is the custom color that will be chosen, if custom selection is requested.
     QColor color;
 
     // Ask if we have to revert to default system color or rather custom one
-    int choice = Util::messageBoxQuestion(this, tr("Question"),
+    int choice = GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::QUESTION, tr("Question"),
         tr("Do you want to revert back to the default system color or choose a custom one ?"),
         {tr("Cancel"),tr("System's default"),tr("Custom color")},2,0 );
     if(choice==-1){
@@ -1060,22 +1191,22 @@ void EditScenarioDialog::on_setColorPushButton_clicked()
 
     // Apply to all selected Csds
     foreach (QUuid id, selectedIdList) {
-        if (incomesDefPeriodic.contains(id)==true) {
-            PeriodicFeStreamDef ps = incomesDefPeriodic.value(id);
-            ps.setDecorationColor(color);
-            incomesDefPeriodic.insert(id,ps);
-        } else if (incomesDefIrregular.contains(id)==true) {
-            IrregularFeStreamDef is = incomesDefIrregular.value(id);
-            is.setDecorationColor(color);
-            incomesDefIrregular.insert(id,is);
-        } else if (expensesDefPeriodic.contains(id)==true) {
-            PeriodicFeStreamDef ps = expensesDefPeriodic.value(id);
-            ps.setDecorationColor(color);
-            expensesDefPeriodic.insert(id,ps);
-        } else if (expensesDefIrregular.contains(id)==true) {
-            IrregularFeStreamDef is = expensesDefIrregular.value(id);
-            is.setDecorationColor(color);
-            expensesDefIrregular.insert(id,is);
+        if (incomesPeriodicCsd.contains(id)==true) {
+            QSharedPointer<PeriodicCsd> ps = incomesPeriodicCsd.value(id);
+            ps->setDecorationColor(color);
+            incomesPeriodicCsd.insert(id,ps);
+        } else if (incomesIrregularCsd.contains(id)==true) {
+            QSharedPointer<IrregularCsd> is = incomesIrregularCsd.value(id);
+            is->setDecorationColor(color);
+            incomesIrregularCsd.insert(id,is);
+        } else if (expensesPeriodicCsd.contains(id)==true) {
+            QSharedPointer<PeriodicCsd> ps = expensesPeriodicCsd.value(id);
+            ps->setDecorationColor(color);
+            expensesPeriodicCsd.insert(id,ps);
+        } else if (expensesIrregularCsd.contains(id)==true) {
+            QSharedPointer<IrregularCsd> is = expensesIrregularCsd.value(id);
+            is->setDecorationColor(color);
+            expensesIrregularCsd.insert(id,is);
         }
     }
 
@@ -1107,21 +1238,21 @@ void EditScenarioDialog::on_manageTagsPushButton_clicked()
 {
     // Build the info structure for all currently defined Csds of the scenario
     QHash<QUuid, managetags::CsdItem> newCsdItems;
-    foreach (PeriodicFeStreamDef f, incomesDefPeriodic) {
-        newCsdItems.insert(f.getId(),{.id=f.getId(),.name=f.getName(),.isIncome=f.getIsIncome(),
-            .color=f.getDecorationColor()});
+    foreach (QSharedPointer<PeriodicCsd> f, incomesPeriodicCsd) {
+        newCsdItems.insert(f->getId(),{.id=f->getId(),.name=f->getName(),
+            .isIncome=f->getIsIncome(),.color=f->getDecorationColor()});
     }
-    foreach (IrregularFeStreamDef f, incomesDefIrregular) {
-        newCsdItems.insert(f.getId(), {.id=f.getId(),.name=f.getName(),.isIncome=f.getIsIncome(),
-            .color=f.getDecorationColor()});
+    foreach (QSharedPointer<IrregularCsd> f, incomesIrregularCsd) {
+        newCsdItems.insert(f->getId(), {.id=f->getId(),.name=f->getName(),
+            .isIncome=f->getIsIncome(),.color=f->getDecorationColor()});
     }
-    foreach (PeriodicFeStreamDef f, expensesDefPeriodic) {
-        newCsdItems.insert(f.getId(),{.id=f.getId(),.name=f.getName(),.isIncome=f.getIsIncome(),
-            .color=f.getDecorationColor()});
+    foreach (QSharedPointer<PeriodicCsd> f, expensesPeriodicCsd) {
+        newCsdItems.insert(f->getId(),{.id=f->getId(),.name=f->getName(),
+            .isIncome=f->getIsIncome(), .color=f->getDecorationColor()});
     }
-    foreach (IrregularFeStreamDef f, expensesDefIrregular) {
-        newCsdItems.insert(f.getId(),{.id=f.getId(),.name=f.getName(),.isIncome=f.getIsIncome(),
-            .color=f.getDecorationColor()});
+    foreach (QSharedPointer<IrregularCsd> f, expensesIrregularCsd) {
+        newCsdItems.insert(f->getId(),{.id=f->getId(),.name=f->getName(),
+            .isIncome=f->getIsIncome(),.color=f->getDecorationColor()});
     }
 
     // send for display
@@ -1159,8 +1290,7 @@ void EditScenarioDialog::on_filterTagsCheckBox_checkStateChanged(const Qt::Check
 {
     if (arg1==Qt::CheckState::Unchecked){
         // *** FILTER BY TAGS IS NOW DISABLED ***
-        filterTags.setEnableFilterByTags(false);
-        ui->filterTagsPushButton->setVisible(false);
+        setFilterTagsWidgetsVisibility(false);
         // Refresh table
         refreshCsdTableContent();
     } else if (arg1==Qt::CheckState::Checked) {
@@ -1178,11 +1308,10 @@ void EditScenarioDialog::on_filterTagsCheckBox_checkStateChanged(const Qt::Check
             return;
         }
 
-        filterTags.setEnableFilterByTags(true);
-        ui->filterTagsPushButton->setVisible(true);
+        setFilterTagsWidgetsVisibility(true);
         if ( (filterTags.getFilterTagIdSet().size()==0) ) {
-            // if no tag have been added to the filter set, this is "legal", but weird.
-            // So help user by forwarding him to the tag selection dialog.
+            // if no tag have been added to the filter set, so send user to the
+            // tag selection dialog.
             on_filterTagsPushButton_clicked();
             return;
         } else {
@@ -1196,67 +1325,93 @@ void EditScenarioDialog::on_filterTagsCheckBox_checkStateChanged(const Qt::Check
 
 void EditScenarioDialog::on_filterTagsPushButton_clicked()
 {
-    emit signalSetFilterTagsPrepareContent(tags, filterTags.getFilterTagIdSet(),
-        filterTags.getMode());
+    emit signalSetFilterTagsPrepareContent(tags, filterTags.getFilterTagIdSet());
     setFilterTagsDlg->show();
 }
 
 
 // Return the type of Csd having "id" as ID. Check value of "found" upon return to be sure
 // return value is meaningful.
-FeStreamDef::FeStreamType EditScenarioDialog::getCsdTypeFromId(QUuid id, bool &found)
+Csd::CsdType EditScenarioDialog::getCsdTypeFromId(QUuid id, bool &found)
 {
     found = false;
-    if (incomesDefPeriodic.contains(id)) {
+    if (incomesPeriodicCsd.contains(id)) {
         found = true;
-        return FeStreamDef::FeStreamType::PERIODIC;
-    } else if (incomesDefIrregular.contains(id)) {
+        return Csd::CsdType::PERIODIC;
+    } else if (incomesIrregularCsd.contains(id)) {
         found = true;
-        return FeStreamDef::FeStreamType::IRREGULAR;
-    } else if (expensesDefPeriodic.contains(id)) {
+        return Csd::CsdType::IRREGULAR;
+    } else if (expensesPeriodicCsd.contains(id)) {
         found = true;
-        return FeStreamDef::FeStreamType::PERIODIC;
-    } else if (expensesDefIrregular.contains(id)) {
+        return Csd::CsdType::PERIODIC;
+    } else if (expensesIrregularCsd.contains(id)) {
         found = true;
-        return FeStreamDef::FeStreamType::IRREGULAR;
+        return Csd::CsdType::IRREGULAR;
     }
-    return FeStreamDef::FeStreamType::PERIODIC; // dummy value since not found
+    return Csd::CsdType::PERIODIC; // dummy value since not found
 }
 
 
-// Return a Periodic Csd (income or expense) having "id" as ID. Check value of "found"
-// upon return to be sure return value is meaningful.
-PeriodicFeStreamDef EditScenarioDialog::getPeriodicCsdFromId(QUuid id, bool &found)
+
+QSharedPointer<PeriodicCsd> EditScenarioDialog::getPeriodicCsdFromId(QUuid id, bool &found)
 {
     found = false;
-    if (incomesDefPeriodic.contains(id)) {
+
+    QSharedPointer<PeriodicCsd> p = incomesPeriodicCsd.value(id, QSharedPointer<PeriodicCsd>());
+    if (p.isNull()==false) {
         found = true;
-        PeriodicFeStreamDef p = incomesDefPeriodic.value(id);
-        return p;
-    } else if (expensesDefPeriodic.contains(id)) {
-        found = true;
-        PeriodicFeStreamDef p = expensesDefPeriodic.value(id);
         return p;
     }
-    return PeriodicFeStreamDef(); // dummy value since not found
+
+    QSharedPointer<PeriodicCsd> p2 = expensesPeriodicCsd.value(id, QSharedPointer<PeriodicCsd>());
+    if (p2.isNull()==false) {
+        found = true;
+        return p2;
+    }
+
+    return QSharedPointer<PeriodicCsd>(); // dummy value since not found
 }
 
 
 // Return an Irregular Csd (income or expense) having "id" as ID. Check value of "found" upon
 // return to be sure return value is meaningful.
-IrregularFeStreamDef EditScenarioDialog::getIrregularCsdFromId(QUuid id, bool &found)
+QSharedPointer<IrregularCsd> EditScenarioDialog::getIrregularCsdFromId(QUuid id, bool &found)
 {
     found = false;
-    if (incomesDefIrregular.contains(id)) {
+
+    QSharedPointer<IrregularCsd> p = incomesIrregularCsd.value(id, QSharedPointer<IrregularCsd>());
+    if (p.isNull()==false) {
         found = true;
-        IrregularFeStreamDef i = incomesDefIrregular.value(id);
-        return i;
-    } else if (expensesDefIrregular.contains(id)) {
-        found = true;
-        IrregularFeStreamDef i = expensesDefIrregular.value(id);
-        return i;
+        return p;
     }
-    return IrregularFeStreamDef(); // dummy value since not found
+
+    QSharedPointer<IrregularCsd> p2 = expensesIrregularCsd.value(id, QSharedPointer<IrregularCsd>());
+    if (p2.isNull()==false) {
+        found = true;
+        return p2;
+    }
+
+
+    return QSharedPointer<IrregularCsd>(); // dummy value since not found
 }
 
+
+/**
+ * @brief Called when filter tag combination mode selection is changed. WARNING : this is
+ * also called when we insert item in the combobox at init time
+ * @param index Rank of the new selected item
+ */
+void EditScenarioDialog::on_filterTagsCombinationComboBox_currentIndexChanged(int index)
+{
+    if (started==false){
+        return;
+    }
+    // insert the selected combination mode into filterTags
+    QVariant qvar = ui->filterTagsCombinationComboBox->currentData();
+    FilterTags::Mode m = qvar.value<FilterTags::Mode>();
+    filterTags.setMode(m);
+
+    // update accordingly the CSD list
+    refreshCsdTableContent();
+}
 

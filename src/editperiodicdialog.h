@@ -23,7 +23,7 @@
 #include <QLocale>
 #include <QSet>
 #include <QUuid>
-#include "periodicfestreamdef.h"
+#include "periodiccsd.h"
 #include "currencyhelper.h"
 #include "editvariablegrowthdialog.h"
 #include "plaintexteditiondialog.h"
@@ -47,8 +47,8 @@ public:
 
 signals:
     // For client of EditPeriodicDialog : send result and edition completion notification
-    void signalEditPeriodicStreamDefResult(bool isIncome, PeriodicFeStreamDef psStreamDef);
-    void signalEditPeriodicStreamDefCompleted();
+    void signalEditPeriodicCsdResult(bool isIncome, QSharedPointer<PeriodicCsd> pCsd);
+    void signalEditPeriodicCsdCompleted();
     // Edit variable growth : Prepare dialog before edition
     void signalEditVariableGrowthPrepareContent(Growth growthIn);
     // edition of description : prepare Dialog before edition
@@ -57,14 +57,28 @@ signals:
     void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
     // Visualize occurrences : prepare Dialog before edition
     void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation,
-        QDate maxDateScenarioFeGeneration, FeStreamDef *streamDef);
+        QDate maxDateScenarioFeGeneration, QWeakPointer<PeriodicCsd> pCsd);
 
 
 public slots:
-    // From client of EditPeriodicDialog : Prepare edition
-    void slotPrepareContent(bool isNewStreamDef, bool isIncome, PeriodicFeStreamDef psStreamDef,
+
+    /**
+     * @brief From client of EditPeriodicDialog : Prepare for creating a new Periodic Csd or
+     * editing an existing one, before showing the Dialog.
+     * @param isNewCsd True if we are creating a new Csd, false if we are editing an existing one.
+     * @param isIncome True if we are creating/editing an income Csd, false if it an expense Csd.
+     * @param psCsd QSharedPointer to an existing Csd (if editing), to null QSharedPointer
+     * if creating.
+     * @param newCurrInfo Currency info of the scenario.
+     * @param inflation Scenario's inflation.
+     * @param theMaxDateFeGeneration Max Fe generation date as defined in the scenario.
+     * @param associatedTagIds For an exiting Csd, the set of tag IDs to which it is associated.
+     * @param availTags Set of all the tags defined in the scenario.
+     */
+    void slotPrepareContent(bool isNewCsd, bool isIncome, QWeakPointer<PeriodicCsd> pCsd,
         CurrencyInfo newCurrInfo, Growth inflation, QDate theMaxDateFeGeneration,
         QSet<QUuid> associatedTagIds, Tags availTags);
+
     // Edit variable growth child Dialog : receive result and edition completion notification
     void slotEditVariableGrowthResult(Growth growthOut);
     void slotEditVariableGrowthCompleted();
@@ -90,6 +104,8 @@ private slots:
     void on_growthComboBox_currentIndexChanged(int index);
     void on_growthTypePushButton_clicked();
     void on_editDescriptionPushButton_clicked();
+    void on_fromDateEdit_userDateChanged(const QDate &date);
+    void on_toDateEdit_userDateChanged(const QDate &date);
 
 private:
     Ui::EditPeriodicDialog *ui;
@@ -112,11 +128,16 @@ private:
     PlainTextEditionDialog* editDescriptionDialog;
     VisualizeOccurrencesDialog* visualizeoccurrencesDialog;
 
+    /**
+     * @struct BuildFromFormDataResult
+     * @brief Contains the resulting PeriodicCsd built from the data in the
+     * form and result of the build operation.
+     */
     struct BuildFromFormDataResult{
-        bool success;
-        QString errorMessageUI;
-        QString errorMessageLog;
-        PeriodicFeStreamDef pStreamDef;
+        Util::ResultOfOperation result;
+        QSharedPointer<PeriodicCsd> pCsd;
+        BuildFromFormDataResult();
+        void init();
     };
 
     // To represent choices for Growth Combobox
@@ -125,14 +146,19 @@ private:
     // methods
     void prepareDataToCreateANewStreamDef(bool slotPrepare);
     void updateAuxCustomGrowthWidgetAccessibility();
-    void buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataResult &result);
-    void updatePeriodCombobox(PeriodicFeStreamDef::PeriodType type);
+    void buildPeriodicCsdFromFormData(BuildFromFormDataResult &result);
+    void updatePeriodCombobox(PeriodicCsd::PeriodType type);
     void setVisibilityComponentsGrowthType(GrowthType type);
     void updateGrowthTypeCombobox(GrowthType type);
     GrowthType getGrowthTypeSelected();
     void setDecorationColorInfo();
     QString convertTagIDSetToString();
     void updateTagListTextBox();
+
+    /**
+     * @brief Make the warning sign visible if Start date > scenario's End date
+     */
+    void setVisibilityStartDateWarningSign();
 };
 
 #endif // EDITPERIODICDIALOG_H

@@ -19,8 +19,9 @@
 #include "editperiodicdialog.h"
 #include "ui_editperiodicdialog.h"
 #include "gbpcontroller.h"
+#include "gbplogger.h"
 #include "util.h"
-#include "periodicfestreamdef.h"
+#include "periodiccsd.h"
 #include <QMessageBox>
 #include <QCoreApplication>
 #include <QColorDialog>
@@ -34,18 +35,21 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
 
 
     // fill Period combobox
-    ui->periodComboBox->insertItem(0,Util::getPeriodName(
-        Util::PeriodType::YEARLY,true,false),PeriodicFeStreamDef::PeriodType::YEARLY);
-    ui->periodComboBox->insertItem(0,Util::getPeriodName(
-        Util::PeriodType::END_OF_MONTHLY,true,false),
-        PeriodicFeStreamDef::PeriodType::END_OF_MONTHLY);
-    ui->periodComboBox->insertItem(0,Util::getPeriodName(
-        Util::PeriodType::MONTHLY,true,false),PeriodicFeStreamDef::PeriodType::MONTHLY);
-    ui->periodComboBox->insertItem(0,Util::getPeriodName(
-        Util::PeriodType::WEEKLY,true,false),PeriodicFeStreamDef::PeriodType::WEEKLY);
-    ui->periodComboBox->insertItem(0,Util::getPeriodName(
-        Util::PeriodType::DAILY,true,false),PeriodicFeStreamDef::PeriodType::DAILY);
-    updatePeriodCombobox(PeriodicFeStreamDef::PeriodType::MONTHLY);
+    ui->periodComboBox->insertItem(0,PeriodicCsd::getPeriodName(PeriodicCsd::PeriodType::YEARLY,
+        true,false), PeriodicCsd::periodTypeToInt(PeriodicCsd::PeriodType::YEARLY) );
+    ui->periodComboBox->insertItem(0,PeriodicCsd::getPeriodName(
+        PeriodicCsd::PeriodType::END_OF_MONTHLY,true,false),
+        PeriodicCsd::periodTypeToInt(PeriodicCsd::PeriodType::END_OF_MONTHLY));
+    ui->periodComboBox->insertItem(0,PeriodicCsd::getPeriodName(
+        PeriodicCsd::PeriodType::MONTHLY,true,false),
+        PeriodicCsd::periodTypeToInt(PeriodicCsd::PeriodType::MONTHLY));
+    ui->periodComboBox->insertItem(0,PeriodicCsd::getPeriodName(
+        PeriodicCsd::PeriodType::WEEKLY,true,false),
+        PeriodicCsd::periodTypeToInt(PeriodicCsd::PeriodType::WEEKLY));
+    ui->periodComboBox->insertItem(0,PeriodicCsd::getPeriodName(
+        PeriodicCsd::PeriodType::DAILY,true,false),
+        PeriodicCsd::periodTypeToInt(PeriodicCsd::PeriodType::DAILY));
+    updatePeriodCombobox(PeriodicCsd::PeriodType::MONTHLY);
 
     // Fill Growth Combobox
     ui->growthComboBox->insertItem(0,tr("No growth"),
@@ -65,30 +69,20 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     ui->growthTypePostLabel->setText(tr(" on annual basis"));
 
     // use smaller font for description list
-    QFont descFont = ui->descPlainTextEdit->font();
-    uint oldFontSize = descFont.pointSize();
-    uint newFontSize = Util::changeFontSize(2,true, oldFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit periodic dialog - Description - Font size set from %1 to %2").
-        arg(oldFontSize).arg(newFontSize));
-    descFont.setPointSize(newFontSize);
-    ui->descPlainTextEdit->setFont(descFont);
+    QFont font = ui->descPlainTextEdit->font();
+    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true);
+    ui->descPlainTextEdit->setFont(font);
 
     // use smaller font for tag list
-    QFont tagFont = ui->tagsEdit->font();
-    uint oldTagFontSize = tagFont.pointSize();
-    uint newTagFontSize = Util::changeFontSize(2, true, oldTagFontSize);
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Edit periodic dialog - Tags - Font size set from %1 to %2").
-        arg(oldTagFontSize).arg(newTagFontSize));
-    tagFont.setPointSize(newTagFontSize);
-    ui->tagsEdit->setFont(tagFont);
+    font = ui->tagsEdit->font();
+    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true);
+    ui->tagsEdit->setFont(font);
 
-    // make the description list not too high (must be done after font setting)
+    // make the description list not too high and fixed (must be done after font setting)
     QFontMetrics fm(ui->descPlainTextEdit->font());
     ui->descPlainTextEdit->setFixedHeight(fm.height()*3 * 1.4); // 3 lines
 
-    // make the tag list not too high (must be done after font setting)
+    // make the tag list not too high and fixed (must be done after font setting)
     QFontMetrics fm2(ui->tagsEdit->font());
     ui->tagsEdit->setFixedHeight(fm2.height()*(2 * 1.4)); // 2 lines
 
@@ -106,7 +100,11 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     ui->toDateEdit->setEnabled(false);
     ui->fromDateEdit->setDate(GbpController::getInstance().getTomorrow());
     ui->toDateEdit->setDate(GbpController::getInstance().getToday().addYears(
-        Scenario::DEFAULT_DURATION_FE_GENERATION));
+        Constants::DEFAULT_DURATION_FE_GENERATION));
+
+    // set minimum date values
+    ui->fromDateEdit->setMinimumDate(PeriodicCsd::MIN_START_DATE);
+    ui->toDateEdit->setMinimumDate(PeriodicCsd::MIN_START_DATE.addDays(1));
 
     // Set format of Growth Type "Scenario Inflation" ComboBox
     ui->growthTypeScenaroInflationDoubleSpinBox->setMinimum(0);
@@ -120,7 +118,7 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     ui->growthTypeCustomConstantDoubleSpinBox->setSuffix("%");
 
     // force max len for name (not possible for Description)
-    ui->nameLineEdit->setMaxLength(FeStreamDef::NAME_MAX_LEN);
+    ui->nameLineEdit->setMaxLength(Csd::NAME_MAX_LEN);
 
     // Stream Def variable growth edit dialog
     editVariableGrowthDlg = new EditVariableGrowthDialog(tr("Growth"),locale,this);// auto-destroyed
@@ -132,6 +130,9 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     editDescriptionDialog = new PlainTextEditionDialog(this);  // auto-destroyed by Qt
     editDescriptionDialog->setModal(true);
 
+    // Set the color of the StartWarning label to "optimized orange"
+    ui->startWarningLabel->setText("\u26A0");
+    ui->startWarningLabel->setStyleSheet("color: #FF9800;");
 
     // "pack" the dialog to fit the font. This is required when there is no "expanding" widgets
     this->adjustSize();
@@ -169,23 +170,26 @@ EditPeriodicDialog::~EditPeriodicDialog()
 }
 
 
-// Prepare for creating a new Periodic Stream or editing an existing one, before showing the Dialog
-void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
-    PeriodicFeStreamDef psStreamDef, CurrencyInfo newCurrInfo, Growth inflation,
+void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
+    QWeakPointer<PeriodicCsd> pCsd, CurrencyInfo newCurrInfo, Growth inflation,
     QDate theMaxDateFeGeneration, QSet<QUuid> associatedTagIds, Tags availTags)
 {
+    // Convert csd to strong pointer if editing an existing csd
+    QSharedPointer<PeriodicCsd> psCsd;
+    if (isNewCsd==false) {
+        psCsd = pCsd.toStrongRef();
+        if(psCsd.isNull()){
+            return; // should never happen
+        }
+    }
+
     // check input values
     if ( theMaxDateFeGeneration.isValid()==false ) {
         throw std::invalid_argument("Invalid max date for FeGenerationDuration");
     }
-    if ( (isNewStreamDef==false) && ((psStreamDef.getStartDate().isValid()==false) ||
-        psStreamDef.getEndDate().isValid()==false)) {
-        throw std::invalid_argument("Invalid Validity Range value for this existing "
-            "Periodic Cash Stream Definition");
-    }
 
     // remember some variables
-    this->editingExistingStreamDef = !isNewStreamDef;
+    this->editingExistingStreamDef = !isNewCsd;
     this->currInfo = newCurrInfo;
     this->isIncome = isIncome;
     this->scenarioInflation = inflation;
@@ -202,10 +206,10 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
         arg(locale.toString(maxDateFeGeneration,locale.dateFormat(QLocale::ShortFormat))));
 
     // Name colorization
-    if (isNewStreamDef) {
-        decorationColor = QColor(); // use normal color for new Stream Def
+    if (isNewCsd) {
+        decorationColor = QColor(); // use normal color for new Csd
     } else {
-        decorationColor = psStreamDef.getDecorationColor(); // can be normal or custom
+        decorationColor = psCsd->getDecorationColor(); // can be normal or custom
     }
     if (decorationColor.isValid()==false) {
         // use normal color
@@ -221,10 +225,10 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
     setDecorationColorInfo();
 
     if(editingExistingStreamDef){
-        // *** editing an existing PeriodicFeStreamDef ***
+        // *** editing an existing PeriodicCsd ***
 
         // remember the id
-        initialId = psStreamDef.getId();
+        initialId = psCsd->getId();
 
         // Set title
         if(isIncome){
@@ -234,62 +238,62 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
         }
         ui->applyPushButton->setText(tr("Apply"));
         ui->closePushButton->setText(tr("Cancel"));
-        ui->nameLineEdit->setText(psStreamDef.getName());
-        ui->descPlainTextEdit->setPlainText(psStreamDef.getDesc());
+        ui->nameLineEdit->setText(psCsd->getName());
+        ui->descPlainTextEdit->setPlainText(psCsd->getDesc());
         int result;
-        double amountDouble = CurrencyHelper::amountQint64ToDouble(psStreamDef.getAmount(),
+        double amountDouble = CurrencyHelper::amountQint64ToDouble(psCsd->getAmount(),
             currInfo.noOfDecimal, result);
         if(result!=0){
             // should never happen
             amountDouble = 0;
         }
         ui->amountDoubleSpinBox->setValue(amountDouble);
-        ui->fromDateEdit->setDate(psStreamDef.getStartDate());
+        ui->fromDateEdit->setDate(psCsd->getStartDate());
 
         // set "to" date : do not clear value (handy)
-        if (psStreamDef.getUseScenarioForEndDate()==true) {
+        if (psCsd->getUseScenarioForEndDate()==true) {
             // used scenario value for end date
             ui->toScenarioRadioButton->setChecked(true);
             ui->toDateEdit->setEnabled(false);
         } else {
             // use custom value for end date
-            ui->toDateEdit->setDate(psStreamDef.getEndDate());
+            ui->toDateEdit->setDate(psCsd->getEndDate());
             ui->toCustomRadioButton->setChecked(true);
             ui->toDateEdit->setEnabled(true);
         }
 
-        if (psStreamDef.getActive()){
+        if (psCsd->getActive()){
             ui->activeYesRadioButton->setChecked(true);
         } else {
              ui->activeNoRadioButton->setChecked(true);
         }
-        ui->gapSpinBox->setValue(psStreamDef.getGrowthApplicationPeriod());
+        ui->gapSpinBox->setValue(psCsd->getGrowthApplicationPeriod());
 
         // Period type and multiplier
-        updatePeriodCombobox(psStreamDef.getPeriod());
-        ui->periodMultiplierSpinBox->setValue(psStreamDef.getPeriodMultiplier());
+        updatePeriodCombobox(psCsd->getPeriod());
+        ui->periodMultiplierSpinBox->setValue(psCsd->getPeriodMultiplier());
 
         // --- growth ---
 
         // in any case, rebuild and reset to empty
         tempVariableGrowth = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate,qint64>());
 
-        Growth ag = psStreamDef.getGrowth();
-        PeriodicFeStreamDef::GrowthStrategy gs = psStreamDef.getGrowthStrategy();
+        Growth ag = psCsd->getGrowth();
+        PeriodicCsd::GrowthStrategy gs = psCsd->getGrowthStrategy();
 
-        if(gs == PeriodicFeStreamDef::GrowthStrategy::NONE){
+        if(gs == PeriodicCsd::GrowthStrategy::NONE){
             ui->growthTypeScenaroInflationDoubleSpinBox->setValue(1);
             ui->growthTypeCustomConstantDoubleSpinBox->setValue(0);
             updateGrowthTypeCombobox(GrowthType::NONE);
 
-        } else if ( gs == PeriodicFeStreamDef::GrowthStrategy::INFLATION){
+        } else if ( gs == PeriodicCsd::GrowthStrategy::INFLATION){
             ui->growthTypeScenaroInflationDoubleSpinBox->setValue(
-                psStreamDef.getInflationAdjustmentFactor());
+                psCsd->getInflationAdjustmentFactor());
             ui->growthTypeCustomConstantDoubleSpinBox->setValue(0);
             updateGrowthTypeCombobox(GrowthType::SCENARIO);
         } else {
             // CUSTOM GROWTH
-            if (ag.getType()==Growth::CONSTANT){
+            if (ag.getType()==Growth::Type::CONSTANT){
                 qint64 d = ag.getAnnualConstantGrowth();
                 double d2 = Growth::fromDecimalToDouble(d);
                 ui->growthTypeScenaroInflationDoubleSpinBox->setValue(1);
@@ -310,7 +314,7 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
 
     } else{
 
-        // *** creating a new PeriodicFeStreamDef (value of psStreamDef then does not matter) ***
+        // *** creating a new PeriodicCsd (value of psCsd then does not matter) ***
 
         initialId = QUuid::createUuid();
 
@@ -327,6 +331,9 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewStreamDef, bool isIncome,
         // Init fields for a new Csd
         prepareDataToCreateANewStreamDef(true);
     }
+
+    // set visibility of the Start Date warning. From date must have been filled.
+    setVisibilityStartDateWarningSign();
 
     ui->nameLineEdit->setFocus();
 }
@@ -368,50 +375,46 @@ void EditPeriodicDialog::slotShowResultCompleted()
 void EditPeriodicDialog::slotVisualizeOccurrencesCompleted()
 {
     // Log the operation
-    GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-        QString("Visualize occurrences completed"));
+    LOG_INFO("Visualize occurrences completed");
 }
 
 
 void EditPeriodicDialog::on_applyPushButton_clicked()
 {
     if(editingExistingStreamDef){
-        GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
-            QString("Attempting to modify periodic item \"%1\" ...")
-            .arg(ui->nameLineEdit->text()));
+        LOG_INFO(QString("Attempting to apply changes made to a periodic csd \"%1\" ...")
+            .arg(REDACT(ui->nameLineEdit->text())));
     } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
-            QString("Attempting to create new periodic item \"%1\" ...")
-            .arg(ui->nameLineEdit->text()));
+        LOG_INFO(QString("Creating new periodic csd \"%1\" ...")
+            .arg(REDACT(ui->nameLineEdit->text())));
     }
 
     BuildFromFormDataResult result;
-    buidlPeriodicFeStreamDefFromFormData(result);
-    if (result.success==false){
-        QMessageBox::critical(nullptr,tr("Error"),result.errorMessageUI);
-        GbpController::getInstance().log(GbpController::LogLevel::Debug,GbpController::Info,
-            QString("    Changes not applied : Invalid data entered (%1)")
-            .arg(result.errorMessageLog));
+    buildPeriodicCsdFromFormData(result);
+    if (result.result.status==Util::ResultOfOperationStatus::ERROR){
+        QMessageBox::critical(nullptr,tr("Error"),result.result.userErrorMessage);
+        LOG_WARNING( QString("    Changes not applied : Invalid data entered (%1)")
+            .arg(result.result.logErrorMessage));
+        LOG_INFO("End of edition");
         return;
     }
 
     // send back result
-    emit signalEditPeriodicStreamDefResult (isIncome, result.pStreamDef);
+    emit signalEditPeriodicCsdResult (isIncome, result.pCsd);
 
     // if editing an existing Stream Def, then this is the end of it. For create,
     // then stay right there to facilitate the rapid creation of multiple Stream Def
     if(editingExistingStreamDef){
         hide();
-        emit signalEditPeriodicStreamDefCompleted();
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("    Modifications applied to periodic item"));
+        emit signalEditPeriodicCsdCompleted();
+        LOG_INFO("    Modifications applied to periodic csd");
     } else{
         // reset some parameters so we are ready to create yet another Stream Def
         prepareDataToCreateANewStreamDef(false);
         ui->nameLineEdit->setFocus();
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("    New periodic item created"));
+        LOG_INFO("    New periodic csd created");
     }
+    LOG_INFO("End of edition");
 }
 
 // Set form's widgets contents for creation of a new Stream Def
@@ -458,38 +461,52 @@ void EditPeriodicDialog::prepareDataToCreateANewStreamDef(bool slotPrepare)
 }
 
 
-void EditPeriodicDialog::buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataResult &result)
+void EditPeriodicDialog::buildPeriodicCsdFromFormData(BuildFromFormDataResult &result)
 {
-    result.success = false;
-    result.errorMessageUI = "";
-    result.errorMessageLog = "";
+    // Reset result to ERROR
+    result.init();
 
     // check if Validity range data is valid, then build it
     QDate from = ui->fromDateEdit->date();
     if( !from.isValid()){
-        result.errorMessageUI = tr("Start date is invalid");
-        result.errorMessageLog = "Start date is invalid";
+        result.result.userErrorMessage = tr("Start date is invalid");
+        result.result.logErrorMessage = "Start date is invalid";
+        return;
+    }
+    if( from < PeriodicCsd::MIN_START_DATE){
+        result.result.userErrorMessage = tr("Start date must not occur before %1")
+            .arg(locale.toString(PeriodicCsd::MIN_START_DATE, QLocale::LongFormat));
+        result.result.logErrorMessage = "Start date is invalid";
         return;
     }
     if (ui->toScenarioRadioButton->isChecked()==true) {
         if(maxDateFeGeneration<from){
-            result.errorMessageUI = tr("End date as defined at the scenario level must not occur "
-                "before the Start date");
-            result.errorMessageLog = "End date as defined at the scenario level must not occur "
-                "before the Start date";
-            return;
+
+        // Do nothing, as it is a valid case that can happen. No FE will be generated though.
+
+        //     result.result.userErrorMessage = tr("End date as defined at the scenario "
+        //         "level must not occur before the Start date");
+        //     result.result.logErrorMessage = "End date as defined at the scenario level"
+        //         " must not occur before the Start date";
+        //     return;
         }
     }
     QDate to = ui->toDateEdit->date(); // to date is allowed to go over maxDate from the scenario
     if ( ui->toCustomRadioButton->isChecked()==true){
         if( !to.isValid()){
-            result.errorMessageUI = tr("End date is invalid");
-            result.errorMessageLog = "End date is invalid";
+            result.result.userErrorMessage = tr("End date is invalid");
+            result.result.logErrorMessage = "End date is invalid";
             return;
         }
         if(to<from){
-            result.errorMessageUI = tr("End date must not occur before the Start date");
-            result.errorMessageLog = "End date must not occur before the Start date";
+            result.result.userErrorMessage = tr("End date must not occur before the Start date");
+            result.result.logErrorMessage = "End date must not occur before the Start date";
+            return;
+        }
+        if( to < PeriodicCsd::MIN_START_DATE.addDays(1)){
+            result.result.userErrorMessage = tr("End date must not occur before %1")
+            .arg(locale.toString(PeriodicCsd::MIN_START_DATE.addDays(1), QLocale::LongFormat));
+            result.result.logErrorMessage = "End date is invalid";
             return;
         }
     } else{
@@ -499,48 +516,51 @@ void EditPeriodicDialog::buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataR
         }
     }
 
-    //*** gather and transform data to create a Periodic Stream Def ***
+    //*** gather and transform data to create a Periodic Csd ***
 
     QVariant selectedData = ui->periodComboBox->itemData(ui->periodComboBox->currentIndex());
-    PeriodicFeStreamDef::PeriodType periodicType = static_cast<PeriodicFeStreamDef::PeriodType>(
-        selectedData.toInt());
+    PeriodicCsd::PeriodType periodicType;
+    if ( false == PeriodicCsd::intToPeriodType( selectedData.toInt(), periodicType ) ){
+        // should never happen
+        throw std::invalid_argument("Unknown Periodic Type value");
+    }
     int resultConv;
     qint64 amount = CurrencyHelper::amountDoubleToQint64(ui->amountDoubleSpinBox->value(),
         currInfo.noOfDecimal, resultConv);
     if (resultConv!=0){
         if (resultConv==-1){
-            result.errorMessageUI = QString(tr("The amount cannot be bigger than %1"))
+            result.result.userErrorMessage = QString(tr("The amount cannot be bigger than %1"))
                 .arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal));
-            result.errorMessageLog = QString("The amount cannot be bigger than %1")
+            result.result.logErrorMessage = QString("The amount cannot be bigger than %1")
                 .arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal));
             return;
         } else {
             // should never happen
-            result.errorMessageUI = QString(tr("An error occured while processing the "
+            result.result.userErrorMessage = QString(tr("An error occurred while processing the "
                 "amount : code=%1")).arg(resultConv);
-            result.errorMessageLog = QString("An error occured while processing the "
+            result.result.logErrorMessage = QString("An error occurred while processing the "
                 "amount : code=%1").arg(resultConv);
             return;
         }
     }
 
-    PeriodicFeStreamDef::GrowthStrategy gs;
+    PeriodicCsd::GrowthStrategy gs;
     GrowthType gt = getGrowthTypeSelected();
     Growth growth; // type "NONE"
 
     // Set Growth Strategy
     switch (gt) {
         case GrowthType::NONE:
-            gs = PeriodicFeStreamDef::GrowthStrategy::NONE;
+            gs = PeriodicCsd::GrowthStrategy::NONE;
             break;
         case GrowthType::SCENARIO:
-            gs = PeriodicFeStreamDef::GrowthStrategy::INFLATION;
+            gs = PeriodicCsd::GrowthStrategy::INFLATION;
             break;
         case GrowthType::CUSTOM_CONSTANT:
-            gs = PeriodicFeStreamDef::GrowthStrategy::CUSTOM;
+            gs = PeriodicCsd::GrowthStrategy::CUSTOM;
             break;
         case GrowthType::CUSTOM_VARIABLE:
-            gs = PeriodicFeStreamDef::GrowthStrategy::CUSTOM;
+            gs = PeriodicCsd::GrowthStrategy::CUSTOM;
             break;
         default:
             break;
@@ -569,38 +589,38 @@ void EditPeriodicDialog::buidlPeriodicFeStreamDefFromFormData(BuildFromFormDataR
 
     // build item
     try {
-        result.pStreamDef = PeriodicFeStreamDef(periodicType, periodMultiplier, amount, growth, gs,
-            gap, initialId, (ui->nameLineEdit->text().trimmed()).left(FeStreamDef::NAME_MAX_LEN),
-            ui->descPlainTextEdit->toPlainText().left(FeStreamDef::DESC_MAX_LEN),
+        result.pCsd = QSharedPointer<PeriodicCsd>( new PeriodicCsd(periodicType, periodMultiplier, amount, growth, gs,
+            gap, initialId, (ui->nameLineEdit->text().trimmed()).left(Csd::NAME_MAX_LEN),
+            ui->descPlainTextEdit->toPlainText().left(Csd::DESC_MAX_LEN),
             ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, from, to,
-            ui->toScenarioRadioButton->isChecked(),inflationModifFactor);
+            ui->toScenarioRadioButton->isChecked(),inflationModifFactor));
     } catch (const std::exception& e) {
         // unexpected error, should never happen
-        result.errorMessageUI = QString(tr("An unexpected error has occured.\n\nDetails : %1"))
+        result.result.userErrorMessage = QString(tr("An unexpected error has occurred.\n\nDetails : %1"))
             .arg(e.what());
-        result.errorMessageLog = QString("An unexpected error has occured.\n\nDetails : %1")
+        result.result.logErrorMessage = QString("An unexpected error has occurred.\n\nDetails : %1")
             .arg(e.what());
         return;
     }
 
-    result.success = true;
+    result.result.status = Util::ResultOfOperationStatus::SUCCESS;
     return;
 }
 
 
 // Set the selected item for Period Type combobox
-void EditPeriodicDialog::updatePeriodCombobox(PeriodicFeStreamDef::PeriodType type)
+void EditPeriodicDialog::updatePeriodCombobox(PeriodicCsd::PeriodType type)
 {
     // highly DEPENDANT on order to insertion in Dialog init !
-    if ( type == PeriodicFeStreamDef::PeriodType::DAILY){
+    if ( type == PeriodicCsd::PeriodType::DAILY){
         ui->periodComboBox->setCurrentIndex(0) ;
-    } else if (type == PeriodicFeStreamDef::PeriodType::WEEKLY){
+    } else if (type == PeriodicCsd::PeriodType::WEEKLY){
         ui->periodComboBox->setCurrentIndex(1) ;
-    } else if (type == PeriodicFeStreamDef::PeriodType::MONTHLY){
+    } else if (type == PeriodicCsd::PeriodType::MONTHLY){
         ui->periodComboBox->setCurrentIndex(2) ;
-    } else if (type == PeriodicFeStreamDef::PeriodType::END_OF_MONTHLY){
+    } else if (type == PeriodicCsd::PeriodType::END_OF_MONTHLY){
         ui->periodComboBox->setCurrentIndex(3) ;
-    } else if (type == PeriodicFeStreamDef::PeriodType::YEARLY){
+    } else if (type == PeriodicCsd::PeriodType::YEARLY){
         ui->periodComboBox->setCurrentIndex(4) ;
     }
 }
@@ -726,10 +746,54 @@ void EditPeriodicDialog::updateTagListTextBox()
 }
 
 
+void EditPeriodicDialog::setVisibilityStartDateWarningSign()
+{
+    QDate sDate = ui->fromDateEdit->date();
+    if (sDate.isValid()==false) {
+        return;
+    }
+
+    if( ui->toCustomRadioButton->isChecked()==false){
+        if (sDate > maxDateFeGeneration) {
+            ui->startWarningLabel->setVisible(true);
+            // ui->fromDateEdit->setStyleSheet(
+            //     "QDateEdit {"
+            //     "  border: 2px solid #FF6B6B;"  // Red border
+            //     "  border-radius: 4px;"
+            //     "}"
+            //     );
+
+        } else {
+            ui->startWarningLabel->setVisible(false);
+            //ui->fromDateEdit->setStyleSheet("");
+        }
+    } else {
+        QDate eDate = ui->toDateEdit->date();
+        if (eDate.isValid()==false) {
+            return;
+        }
+        if (eDate < sDate) {
+            ui->startWarningLabel->setVisible(true);
+            // ui->fromDateEdit->setStyleSheet(
+            //     "QDateEdit {"
+            //     "  border: 2px solid #FF6B6B;"  // Red border
+            //     "  border-radius: 4px;"
+            //     "}"
+            //     );
+        } else {
+            ui->startWarningLabel->setVisible(false);
+            //ui->fromDateEdit->setStyleSheet("");
+        }
+    }
+
+
+}
+
+
 void EditPeriodicDialog::on_closePushButton_clicked()
 {
     hide();
-    emit signalEditPeriodicStreamDefCompleted();
+    emit signalEditPeriodicCsdCompleted();
 }
 
 
@@ -782,31 +846,27 @@ void EditPeriodicDialog::on_visualizeOccurrencesPushButton_clicked()
 
     // build the Stream Def from the data entered in the form (can be valid or not)
     BuildFromFormDataResult result;
-    buidlPeriodicFeStreamDefFromFormData(result);
-    if (result.success==false){
-        QMessageBox::critical(nullptr,tr("Error"),result.errorMessageUI);
+    buildPeriodicCsdFromFormData(result);
+    if (result.result.status==Util::ResultOfOperationStatus::ERROR){
+        QMessageBox::critical(nullptr,tr("Error"),result.result.userErrorMessage);
         return;
     }
 
     // Log the operation
-    if (GbpController::getInstance().getLogLevel()==GbpController::Debug) {
-        GbpController::getInstance().log(GbpController::LogLevel::Debug, GbpController::Info,
-            QString("About to visualize occurrences for Periodic item name=%1")
-            .arg(ui->nameLineEdit->text()));
-    } else {
-        GbpController::getInstance().log(GbpController::LogLevel::Minimal, GbpController::Info,
-            QString("About to visualize occurrences for Periodic item"));
-    }
+    LOG_INFO( QString("About to visualize occurrences for Periodic item name=%1")
+        .arg(REDACT(ui->nameLineEdit->text())));
+
 
     // send for display
     emit signalVisualizeOccurrencesPrepareContent(currInfo, scenarioInflation, maxDateFeGeneration,
-        &(result.pStreamDef));
+        result.pCsd.toWeakRef());
     visualizeoccurrencesDialog->show();
 }
 
 
 void EditPeriodicDialog::on_toCustomRadioButton_toggled(bool checked)
 {
+    setVisibilityStartDateWarningSign();
     if (ui->toCustomRadioButton->isChecked()==true) {
         ui->toDateEdit->setEnabled(true);
     } else {
@@ -817,6 +877,7 @@ void EditPeriodicDialog::on_toCustomRadioButton_toggled(bool checked)
 
 void EditPeriodicDialog::on_toScenarioRadioButton_toggled(bool checked)
 {
+    setVisibilityStartDateWarningSign();
     if (ui->toCustomRadioButton->isChecked()==true) {
         ui->toDateEdit->setEnabled(true);
     } else {
@@ -856,4 +917,26 @@ void EditPeriodicDialog::on_editDescriptionPushButton_clicked()
 }
 
 
+EditPeriodicDialog::BuildFromFormDataResult::BuildFromFormDataResult()
+{
+    init();
+}
+
+
+void EditPeriodicDialog::BuildFromFormDataResult::init()
+{
+    result.init();
+    pCsd = QSharedPointer<PeriodicCsd>(); // null
+}
+
+void EditPeriodicDialog::on_fromDateEdit_userDateChanged(const QDate &date)
+{
+    setVisibilityStartDateWarningSign();
+}
+
+
+void EditPeriodicDialog::on_toDateEdit_userDateChanged(const QDate &date)
+{
+    setVisibilityStartDateWarningSign();
+}
 

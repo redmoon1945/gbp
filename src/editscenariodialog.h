@@ -21,7 +21,7 @@
 
 #include <QDialog>
 #include "plaintexteditiondialog.h"
-#include "periodicfestreamdef.h"
+#include "periodiccsd.h"
 #include "currencyhelper.h"
 #include "editvariablegrowthdialog.h"
 #include "editperiodicdialog.h"
@@ -30,7 +30,7 @@
 #include "tagcsdrelationships.h"
 #include "tags.h"
 #include "managetagsdialog.h"
-#include "setfiltertagsdialog.h"
+#include "choosetagsdialog.h"
 #include "filtertags.h"
 
 
@@ -39,13 +39,15 @@ namespace Ui { class EditScenarioDialog; }
 QT_END_NAMESPACE
 
 
-// Edit the content of an existing scenario
+/**
+ * @brief Dialog to edit the content of an existing scenario
+ */
 class EditScenarioDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit EditScenarioDialog(QLocale locale, QWidget *parent = nullptr);
+    explicit EditScenarioDialog(QLocale locale);
     ~EditScenarioDialog();
 
     // methods
@@ -62,14 +64,14 @@ signals:
     // edition of variable inflation : prepare Dialog before edition
     void signalEditVariableInflationPrepareContent(Growth growthIn);
 
-    // edition of PeriodicFeStreamDef :  prepare Dialog before edition
-    void signalEditPeriodicStreamDefPrepareContent(bool isNewStreamDef, bool isIncome,
-        PeriodicFeStreamDef psStreamDef, CurrencyInfo currInfo, Growth scenarioInflation,
+    // edition of PeriodicCsd :  prepare Dialog before edition
+    void signalEditPeriodicCsdPrepareContent(bool isNewCsd, bool isIncome,
+        QWeakPointer<PeriodicCsd> psCsd, CurrencyInfo currInfo, Growth scenarioInflation,
         QDate theMaxDateFeGeneration, QSet<QUuid> associatedTagIds, Tags availTags);
 
-    // edition of IrregularFeStreamDef :  prepare Dialog before edition
-    void signalEditIrregularStreamDefPrepareContent(bool isNewStreamDef, bool isIncome,
-        IrregularFeStreamDef irStreamDef, CurrencyInfo currInfo, QDate theMaxDateFeGeneration,
+    // edition of IrregularCsd :  prepare Dialog before edition
+    void signalEditIrregularCsdPrepareContent(bool isNewCsd, bool isIncome,
+        QWeakPointer<IrregularCsd> irCsd, CurrencyInfo currInfo, QDate theMaxDateFeGeneration,
         QSet<QUuid> associatedTagIds, Tags availTags);
 
     // Manage Tags : prepare Dialog before edition
@@ -77,8 +79,8 @@ signals:
         QHash<QUuid, managetags::CsdItem> newFsdItems);
 
     // Set tags filters
-    void signalSetFilterTagsPrepareContent(Tags tags, QSet<QUuid> preSelectedTags,
-        FilterTags::Mode mode);
+    void signalSetFilterTagsPrepareContent(Tags tags, QSet<QUuid> preSelectedTags);
+
 
 public slots:
     // response from child PlainTextEdition Dialog
@@ -89,24 +91,31 @@ public slots:
     void slotEditVariableInflationResult(Growth growthOut);
     void slotEditVariableInflationCompleted();
 
-    // edition of PeriodicStreamDef : result and completion
-    void slotEditPeriodicStreamDefResult(bool isIncome, PeriodicFeStreamDef psStreamDef);
-    void slotEditPeriodicStreamDefCompleted();
+    // edition of Periodic Csd : result and completion
+    void slotEditPeriodicCsdResult(bool isIncome, QSharedPointer<PeriodicCsd> pCsd);
+    void slotEditPeriodicCsdCompleted();
 
-    // edition of IrregularStreamDef : result and completion
-    void slotEditIrregularStreamDefResult(bool isIncome, IrregularFeStreamDef irStreamDef);
-    void slotEditIrregularStreamDefCompleted();
+    // edition of Irregular Csd : result and completion
+    void slotEditIrregularCsdResult(bool isIncome, QSharedPointer<IrregularCsd> irCsd);
+    void slotEditIrregularCsdCompleted();
 
     // Manage Tags : result and completion
     void slotManageTagsResult(Tags newTags, TagCsdRelationships newRelationships);
     void slotManageTagsCompleted();
 
     // Edition of Filter Tags : result and completion
-    void slotSetFilterTagsResult(FilterTags::Mode mode, QSet<QUuid> filterTagIdSet);
+    void slotSetFilterTagsResult(QSet<QUuid> filterTagIdSet);
     void slotSetFilterTagsCompleted(bool canceled);
 
-    // From client of EditScenarioDialog, to be called just before proceeding with
-    // the scenario editing (show())
+    /**
+     * @brief From client of EditScenarioDialog, to be called just before proceeding with the
+     * scenario editing (show()) The result will be a brand new scenario.
+     * @details This is actually creatig a copy of the current scenario parameters.
+     * There is always a current scenario when this is called, even in the case
+     * of a new scenario.
+     * @param countryCode ISO code of the country for the scenario to edit.
+     * @param newCurrInfo Currency info of the country for the scenario to edit.
+     */
     void slotPrepareContent(QString countryCode, CurrencyInfo newCurrInfo);
 
 private slots:
@@ -139,10 +148,12 @@ private slots:
     void on_filterDisabledCheckBox_checkStateChanged(const Qt::CheckState &arg1);
     void on_filterTagsCheckBox_checkStateChanged(const Qt::CheckState &arg1);
     void on_filterTagsPushButton_clicked();
-
+    void on_filterTagsCombinationComboBox_currentIndexChanged(int index);
 
 private:
     Ui::EditScenarioDialog *ui;
+
+    bool started; ///< True if this object has completed constructor phase
 
     // used to display double amount with proper decimal and thousands separators
     QLocale displayLocale;
@@ -150,17 +161,37 @@ private:
     // children dialogs
     PlainTextEditionDialog* editDescriptionDialog;
     EditVariableGrowthDialog* ecInflation;  // to edit variable inflation
-    EditPeriodicDialog* psStreamDefDialog;  // to edit one particular Periodic Stream Def
-    EditIrregularDialog* irStreamDefDialog; // to edit one particular irregular Stream Def
+    EditPeriodicDialog* psCsdDialog;  // to edit one particular Periodic Stream Def
+    EditIrregularDialog* irCsdDialog; // to edit one particular irregular Stream Def
     ManageTagsDialog* manageTagsDlg;       // to edit scenario's tags and relationships
-    SetFilterTagsDialog* setFilterTagsDlg; //to edit the set of tags used as filters for CSD display
+    ChooseTagsDialog* setFilterTagsDlg; //to edit the set of tags used as filters for CSD display
 
     // --- Edited scenario elements that cannot be represented by UI elements ---
 
-    QMap<QUuid,PeriodicFeStreamDef> incomesDefPeriodic;         // key is CSD ID
-    QMap<QUuid,IrregularFeStreamDef> incomesDefIrregular;       // key is CSD ID
-    QMap<QUuid,PeriodicFeStreamDef> expensesDefPeriodic;        // key is CSD ID
-    QMap<QUuid,IrregularFeStreamDef> expensesDefIrregular;      // key is CSD ID
+    /**
+     * @brief List of WORKING COPY of periodic income Csds. This is a DEEP copy, initially
+     * set from the current scenario. Key is CSD ID.
+     */
+    QHash<QUuid,QSharedPointer<PeriodicCsd>> incomesPeriodicCsd;
+
+    /**
+     * @brief List of WORKING COPY of irregular income Csds. This is a DEEP copy, initially
+     * set from the current scenario. Key is CSD ID.
+     */
+    QHash<QUuid,QSharedPointer<IrregularCsd>> incomesIrregularCsd;
+
+    /**
+     * @brief List of WORKING COPY of periodic expense Csds. This is a DEEP copy, initially
+     * set from the current scenario. Key is CSD ID.
+     */
+    QHash<QUuid,QSharedPointer<PeriodicCsd>> expensesPeriodicCsd;
+
+    /**
+     * @brief List of WORKING COPY of expense irregular Csds. This is a DEEP copy, initially
+     * set from the current scenario. Key is CSD ID.
+     */
+    QHash<QUuid,QSharedPointer<IrregularCsd>> expensesIrregularCsd;
+
     Growth tempVariableInflation;           // to hold the inflation data for Variable type
     QString countryCode;
     CurrencyInfo currInfo;
@@ -169,8 +200,7 @@ private:
     Tags tags;
     TagCsdRelationships tagCsdRelationships; // All tags links of this scenario
 
-    // Set of Tag Id used for filtering, along with some related infos. This is not part of
-    // a Scenario data.
+    // Set of Tag Id used for CDS filtering. This is NOT part of a Scenario data.
     FilterTags filterTags;
 
     // -------------------------------------------------------------------------------
@@ -186,14 +216,51 @@ private:
     void updateNoItemsLabel();
     void updateNewButtonsText();
     bool checkAndAdjustFilterTags();
+
+    /**
+     * @brief Refresh the whole Csd table fron the current content of the working Csd lists.
+     */
     void refreshCsdTableContent();
+
+    /**
+     * @brief Duplicate the selected Csd, add it to the proper set and return its ID.
+     * The duplicate has a new ID and new name.
+     * @param id ID of the Csd to duplicate.
+     * @param found Idicate if the Csd to duplicate exists.
+     * @return
+     */
     QUuid duplicateCsd(QUuid id, bool &found);
+
     void removeCsds(QList<QUuid> toRemove);
+
+    /**
+     * @brief Change the "enabled" status of a list of Csds.
+     * @param idList The list of Csd IDs.
+     * @param enable New state.
+     */
     void enableDisableCsds(QList<QUuid> idList, bool enable);
 
-    FeStreamDef::FeStreamType getCsdTypeFromId(QUuid id, bool &found);
-    PeriodicFeStreamDef getPeriodicCsdFromId(QUuid id, bool &found);
-    IrregularFeStreamDef getIrregularCsdFromId(QUuid id, bool &found);
+    void setFilterTagsWidgetsVisibility(bool visible);
+
+    Csd::CsdType getCsdTypeFromId(QUuid id, bool &found);
+
+    /**
+     * @brief Return a Periodic Csd (income or expense) having "id" as ID. Check value of "found"
+     * upon return to be sure return value is meaningful.
+     * @param id Id of the Csd to get.
+     * @param found True if the Csd exists, false otherwise.
+     * @return The Csd, wrapped in a QSharedPointer.
+     */
+    QSharedPointer<PeriodicCsd> getPeriodicCsdFromId(QUuid id, bool &found);
+
+    /**
+     * @brief Return an Irregualr Csd (income or expense) having "id" as ID. Check value of "found"
+     * upon return to be sure return value is meaningful.
+     * @param id Id of the Csd to get.
+     * @param found True if the Csd exists, false otherwise.
+     * @return The Csd, wrapped in a QSharedPointer.
+     */
+    QSharedPointer<IrregularCsd> getIrregularCsdFromId(QUuid id, bool &found);
 
 };
 

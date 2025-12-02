@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>335</width>
-    <height>268</height>
+    <width>375</width>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,7 +69,7 @@
            <item>
             <widget class="QDoubleSpinBox" name="annualDiscountRateDoubleSpinBox">
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Discount rate, on an annual basis&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Final annual discount rate, fully &lt;span style=&quot; font-weight:700;&quot;&gt;compounded&lt;/span&gt;. Compounding is made on a monthly basis. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="suffix">
               <string>%</string>
@@ -111,6 +111,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <widget class="QLabel" name="monthlyDiscountRateLabel">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The &lt;span style=&quot; font-weight:700;&quot;&gt;equivalent&lt;/span&gt; monthly discount rate, that will be &lt;span style=&quot; text-decoration: underline;&quot;&gt;compounded monthly &lt;/span&gt;to generate the annual discount rate above.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>---</string>
              </property>
@@ -237,6 +240,9 @@
          <property name="text">
           <string>FV -&gt; PV</string>
          </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -246,6 +252,9 @@
          </property>
          <property name="text">
           <string>PV -&gt; FV</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -266,6 +275,12 @@
         <widget class="QPushButton" name="closePushButton">
          <property name="text">
           <string>Close</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

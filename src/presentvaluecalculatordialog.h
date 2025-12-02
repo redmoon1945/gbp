@@ -13,7 +13,7 @@ class PresentValueCalculatorDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit PresentValueCalculatorDialog(QLocale locale, QWidget *parent = nullptr);
+    explicit PresentValueCalculatorDialog(QLocale locale);
     ~PresentValueCalculatorDialog();
 
 private slots:

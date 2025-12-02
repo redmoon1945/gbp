@@ -47,6 +47,9 @@ void SelectCountryDialog::slotPrepareContent()
     // pre-select the country defined in the Locale
     selectCountryInComboBox("");
     updateCurrencyLabels();
+
+    // Set focus to "Select"
+    ui->selectPushButton->setFocus();
 }
 
 
@@ -56,7 +59,8 @@ void SelectCountryDialog::on_selectPushButton_clicked()
     QString countryCode = getCurrentlySelectedCountryCode();
     // get info about the associated currency
     bool found;
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, countryCode, found);
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(countryCode,
+        locale.language(), found);
     if(!found){
         return; // should never happen
     }
@@ -105,7 +109,8 @@ void SelectCountryDialog::updateCurrencyLabels()
     QString countryCode = getCurrentlySelectedCountryCode();
     // get info about the selected currency and format it in the label
     bool found;
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(locale, countryCode, found);
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(countryCode,
+        locale.language(), found);
     if(!found){
         return; // should never happen
     }

@@ -116,7 +116,7 @@ Growth EditVariableGrowthModel::getGrowthData() const
 void EditVariableGrowthModel::setGrowthData(const Growth &newGrowthData)
 {
     // Must be variable type
-    if (newGrowthData.getType()!=Growth::VARIABLE){
+    if (newGrowthData.getType()!=Growth::Type::VARIABLE){
         throw std::invalid_argument("Growth must be of type \"complex\"");
     }
     // we assume model has completely changed (easier that way)

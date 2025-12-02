@@ -2,7 +2,7 @@
 #include "ui_presentvaluecalculatordialog.h"
 #include "util.h"
 
-PresentValueCalculatorDialog::PresentValueCalculatorDialog(QLocale locale, QWidget *parent)
+PresentValueCalculatorDialog::PresentValueCalculatorDialog(QLocale locale)
     : QDialog(NULL) // By passing NULL, we make this window independant, but MainWindow must close
                     // it before exiting
     , ui(new Ui::PresentValueCalculatorDialog)

@@ -20,7 +20,7 @@
 #include "ui_editirregularelementdialog.h"
 #include <QMessageBox>
 #include <QCoreApplication>
-#include "irregularfestreamdef.h"
+#include "irregularcsd.h"
 #include "gbpcontroller.h"
 
 
@@ -30,7 +30,7 @@ EditIrregularElementDialog::EditIrregularElementDialog(QLocale aLocale,QWidget *
 {
     ui->setupUi(this);
     this->locale = aLocale;
-    ui->notesLineEdit->setMaxLength(IrregularFeStreamDef::AmountInfo::NOTES_MAX_LEN);
+    ui->notesLineEdit->setMaxLength(IrregularCsd::AmountInfo::NOTES_MAX_LEN);
 
     // widen Date Widget
     QFontMetrics fm = ui->dateEdit->fontMetrics();
@@ -127,7 +127,7 @@ void EditIrregularElementDialog::on_applyPushButton_clicked()
         }
     } else {
         // *** EDITION ***
-        // replace old date if a change occured for the date and
+        // replace old date if a change occurred for the date and
         // without warning...
         if (latestOldDate != newDate) {
             int index = existingDates.indexOf(latestOldDate); // will always succeed

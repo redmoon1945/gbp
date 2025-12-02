@@ -18,9 +18,11 @@
 
 #include "managetagsdialog.h"
 #include "gbpcontroller.h"
+#include "gbpqmessage.h"
 #include "ui_managetagsdialog.h"
 #include <QMessageBox>
 #include <QFileDialog>
+#include "gbplogger.h"
 
 
 //----- GENERAL ------------------------------------------------------------------------------------
@@ -34,14 +36,10 @@ ManageTagsDialog::ManageTagsDialog(QLocale aLocale,QWidget *parent)
 
     // *** TAB : Tags Definition ***
 
-    // *** TAB : Tags Definition ***
-
-    // *** TAB : Tags Definition ***
-
     // *** General ***
 
     // EditTag dialog
-    editTagDlg = new EditTagDialog(aLocale, this);                // auto-destroyed by Qt because it is a child
+    editTagDlg = new EditTagDialog(aLocale, this); // auto-destroyed by Qt because it is a child
     editTagDlg->setModal(true);
 
     // Add CSD dialog
@@ -49,18 +47,17 @@ ManageTagsDialog::ManageTagsDialog(QLocale aLocale,QWidget *parent)
     addCsdDlg->setModal(true);
 
     // Add Tag Dialog
-    addTagDlg = new ManageTagsChooseTagsDialog(this);
+    addTagDlg = new ChooseTagsDialog(this);
     addTagDlg->setModal(true);
 
     // Always Select the fist tab
     ui->tagsTabWidget->setCurrentIndex(0);
 
     // set up the list model for tags in the TagsDef table view
-    QFont nameFont = ui->tagsDefTableView->font();
     QFont descFont = ui->tagsDefTableView->font();
-    uint newDescFontSize = Util::changeFontSize(1, true, descFont.pointSize());
-    descFont.setPointSize(newDescFontSize);
+    Util::changeFontSize(descFont, Util::FontResizeIntensity::WEAK, true);
     descFont.setItalic(true);
+    QFont nameFont = ui->tagsDefTableView->font();
     itemTableModel = new ManageTagsTagsDefModel(locale, nameFont, descFont);
     ui->tagsDefTableView->setModel(itemTableModel);
 
@@ -86,10 +83,10 @@ ManageTagsDialog::ManageTagsDialog(QLocale aLocale,QWidget *parent)
 
     // connect emitters & receivers for Dialogs : Add Tag links
     QObject::connect(this, &ManageTagsDialog::signalAddTagsPrepareContent, addTagDlg,
-        &ManageTagsChooseTagsDialog::slotPrepareContent);
-    QObject::connect(addTagDlg, &ManageTagsChooseTagsDialog::signalChooseTagsResult, this,
+        &ChooseTagsDialog::slotPrepareContent);
+    QObject::connect(addTagDlg, &ChooseTagsDialog::signalResult, this,
         &ManageTagsDialog::slotChooseTagsResult);
-    QObject::connect(addTagDlg, &ManageTagsChooseTagsDialog::signalChooseTagsCompleted, this,
+    QObject::connect(addTagDlg, &ChooseTagsDialog::signalCompleted, this,
         &::ManageTagsDialog::slotChooseTagsCompleted);
 }
 
@@ -116,6 +113,7 @@ void ManageTagsDialog::slotPrepareContent(Tags newTags, TagCsdRelationships newR
     // Csds could have changed since last time we enter this dialog : UI has to be updated.
     tagsView_Refresh();
     csdsView_Refresh();
+
 }
 
 
@@ -189,23 +187,6 @@ void ManageTagsDialog::slotEditTagCompleted()
 void ManageTagsDialog::tagsDef_UpdateTagList()
 {
     itemTableModel->setModelData(tags);
-
-    //ui->tagsDefListWidget->clear();
-
-    // fill tags list. Display name is name + description
-    // CustomListItem *item;
-    // bool found;
-    // QSet<Tag> tagSet = tags.getTags();
-    // foreach (Tag tag, tagSet) {
-    //     QString displayName = tag.getName();
-    //     if (tag.getDescription().length() !=0 ) {
-    //         // limit description to 50 char
-    //         displayName =  QString("%1  (%2)").arg(tag.getName())
-    //             .arg(Util::elideText(tag.getDescription(),50,true));
-    //     }
-    //     item = new CustomListItem(displayName,{.id=tag.getId(),.name=tag.getName()});
-    //     ui->tagsDefListWidget->addItem(item) ;  // list widget will take ownership of the item
-    // }
 
     // write no of elements in the Tag Label
     tagsDef_UpdateTagListLabel();
@@ -424,16 +405,10 @@ void ManageTagsDialog::on_tagsDefUnselectAllPushButton_clicked()
 }
 
 
-// void ManageTagsDialog::on_tagsDefListWidget_itemDoubleClicked(QListWidgetItem *item)
-// {
-//     on_tagsDefEditPushButton_clicked();
-// }
-
-
-
 void ManageTagsDialog::on_tagsDefImportPushButton_clicked()
 {
-    // Choose the scenario and load it
+    // Choose the scenario and load it. Use lastDir as starting directory since we are loading
+    // from scenario
     QSharedPointer<Scenario> scenario;
     QString dir = GbpController::getInstance().getLastDir();
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open an Existing Scenario"),dir);
@@ -441,8 +416,14 @@ void ManageTagsDialog::on_tagsDefImportPushButton_clicked()
         // load the scenario file
         Scenario::FileResult fr ;
         fr = Scenario::loadFromFile(fileName);
-        if (fr.code != Scenario::SUCCESS){
-            QMessageBox::critical(nullptr,tr("Error"), fr.errorStringUI);
+        if (fr.code != Scenario::FileResultCode::SUCCESS){
+            QString userErrorMessage = QString(tr("This scenario file cannot be loaded. "
+                "Error code = %1. See the log file for details : \n%2"))
+                .arg(fr.codeToString())
+                .arg(GbpLogger::getInstance().getLogFullFileName());
+            int choice = GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR,
+                tr("Error"), userErrorMessage, {tr("OK")}, 0, 0);
+
             return;
         }
         // extract tags
@@ -709,7 +690,11 @@ void ManageTagsDialog::slotChooseCsdsCompleted()
 }
 
 
-void ManageTagsDialog::slotChooseTagsResult(QSet<QUuid> newTagsToLink)
+/**
+ * @brief Result of the tags selection Dialog used to choose new tags to link to the selected Csd.
+ * @param selectedTags List of tags to be linked to the selected Csd
+ */
+void ManageTagsDialog::slotChooseTagsResult(QSet<QUuid> selectedTagsIds)
 {
     // get selected csd id (there should be one, since there are Tags items)
     QList<QUuid> selectionCsds = csdsView_GetSelectedCsdsIds();
@@ -718,7 +703,7 @@ void ManageTagsDialog::slotChooseTagsResult(QSet<QUuid> newTagsToLink)
     }
 
     // create new relationships
-    foreach (QUuid tagId, newTagsToLink) {
+    foreach (QUuid tagId, selectedTagsIds) {
         relationships.addRelationship(tagId, selectionCsds[0]);
     }
 
@@ -727,9 +712,8 @@ void ManageTagsDialog::slotChooseTagsResult(QSet<QUuid> newTagsToLink)
 }
 
 
-void ManageTagsDialog::slotChooseTagsCompleted()
+void ManageTagsDialog::slotChooseTagsCompleted(bool canceled)
 {
-
 }
 
 //----- TAB : CSD View -----------------------------------------------------------------------------
@@ -887,9 +871,8 @@ void ManageTagsDialog::on_csdsViewUnlinkPushButton_clicked()
     }
 
     // delete the relationships if any to delete
-    bool removed;
     foreach (QUuid tagId, selectionTags) {
-        removed = relationships.deleteRelationship(tagId, selectionCsds[0]);
+        relationships.deleteRelationship(tagId, selectionCsds[0]);
     }
 
     // update list of Tags
@@ -918,17 +901,17 @@ void ManageTagsDialog::on_csdsViewLinkPushButton_clicked()
     // Get all the Tag ids involved in a relationship with that csd
     QSet<QUuid> tagIdsInRelationship = relationships.getRelationshipsForCsd(selectionCsds[0]);
 
-    // Build list of Tag ids not included in relationships with selected csd
-    QSet<QUuid> tagUnlinkedSet;
+    // Build list of Tags not included in relationships with selected csd
+    Tags tagsUnlinked;
     QSet<Tag> allTagsSet = tags.getTags();
     foreach (Tag tag, allTagsSet) {
         QUuid id = tag.getId();
         if (false == tagIdsInRelationship.contains(id)) {
-            tagUnlinkedSet.insert(id);
+            tagsUnlinked.insert(tag);
         }
     }
 
-    if (tagUnlinkedSet.size()==0) {
+    if (tagsUnlinked.size()==0) {
         // all Tags are already in relationship with the selected csd
         QString errorString = QString(tr("No more tags to link. All the existing "
             "ones defined the scenario have already been linked to this cash stream definition."));
@@ -936,7 +919,7 @@ void ManageTagsDialog::on_csdsViewLinkPushButton_clicked()
         return;
     }
 
-    emit signalAddTagsPrepareContent(tags, tagUnlinkedSet);
+    emit signalAddTagsPrepareContent(tagsUnlinked,{});
     addTagDlg->show();
 }
 

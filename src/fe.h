@@ -20,40 +20,67 @@
 #define FE_H
 
 #include <QtGlobal>
+#include <QWeakPointer>
 #include <QDate>
 #include <QUuid>
+#include "csd.h"
 #include "currencyhelper.h"
 
-// A Financial Event is a single amount of money (either income or expense) that occurs at a specific moment in time (date).
-// It is generated through a FE Stream Definition. Amount is an int in the smaller currency unit (e.g. cents for US dollar).
+
+/**
+ * @struct Fe.
+ * @brief Financial Event. 16 bytes.
+ */
 struct Fe{
-    qint64 amount;          // NEGATIVE number for expense
-    QDate occurrence;       // Date when the financial event occured
-    QUuid id;               // Reference to the StreamDefinition having generated this Fe.
+    /**
+     * @brief Total and final amount for a specific day.  Negative number if expense.
+     * In currency unit.
+     */
+    double amount;
+    /**
+     * @brief Reference to the Csd having generated this Fe.
+     * DO NOT FREE DIRECTLY THIS POINTER.
+     * @details Before we used the Csd ID. This had the inconvenent of long repetitive search
+     * in QMap. Replacing it with a direct pointer to the CSD speed up things enormously. As for
+     * making sure the CSD still exists and we dont get a pointer to garbage, this is guaranteed
+     * by the fact that if a CSD is removed, all data will be rebuilt, which implies
+     * recreating all Fe objects.
+     */
+    QWeakPointer<Csd> csdPtr;
 
-    bool operator==(const Fe &o) const;
-    bool operator!=(const Fe &o) const;
-    Fe& operator=(const Fe &o) ;
+    /**
+     * @brief operator ==
+     * @details For the amount , a "loose" comparison is performed. 2 double are declared equal if
+     * the difference is less than the smallest unit of all the currency available (3 decimals + 1
+     * spare for rounding). For the reference to Csd, the 2 references are deemped equal if they
+     * point to the same Csd (i.e. same ID).
+     * @param o The object to compare to.
+     * @return True if both Fe are equal, false otherwise.
+     */
+    bool operator==(const Fe& o) const;
 
-    QString toString() const;
-};
+    /**
+     * @brief Inverse of  ==
+     * @param o The object to compare to.
+     * @return False if both Fe are equal, true otherwise.
+     */
+    bool operator!=(const Fe& o) const;
 
-// subset of a Fe just for display purpose (curve-related) : occurance date is not required.
-// toString is also geared toward curve display information.
-struct FeDisplay{
-    double amount;          // total and final amount for a specific day, negative number for expense, in currency unit
-    QUuid id;               // Reference to the StreamDefinition having generated this Fe
+    /**
+     * @brief operator =
+     * @param o The object to assign to.
+     * @return This object.
+     */
+    Fe &operator=(const Fe &o) ;
 
-    bool operator==(const FeDisplay& o) const;
-    FeDisplay &operator=(const FeDisplay &o) ;
-
+    // For display purpose, in the list box of the Daily Info of the Main Window.
     QString toString(QString streamDefName, const CurrencyInfo& currInfo, const QLocale& locale) const;
 };
 
 // structure to hold absolute y values min/max of a QList<Fe>
 struct FeMinMaxInfo{
-    qint64 yMin;    // 0 or positive
-    qint64 yMax;    // 0 or positive
+    quint64 yMin;    // 0 or positive
+    quint64 yMax;    // 0 or positive
 };
 
 

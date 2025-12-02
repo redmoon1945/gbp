@@ -19,12 +19,6 @@
 
 #include "tag.h"
 
-// We try to limit the length, because tags are just labels used to sort things out.
-// For display prupose, it is cumbersome if they are too long
-uint Tag::MAX_NAME_LEN = 50;
-// Max Description Length
-uint Tag::MAX_DESC_LEN = 1000;
-
 
 Tag::Tag() {
     this->id = QUuid::createUuid();
@@ -44,22 +38,13 @@ Tag::Tag(QString aName, QString aDescription) : Tag(QUuid::createUuid(),aName, a
 }
 
 
-
 Tag::Tag(QUuid anId, QString aName, QString aDescription) {
     if(anId.isNull()){
         throw std::domain_error("QUuid is invalid");
     }
-    this->id = anId;
-    // check if name is too long
-    if( aName.length() > Tag::MAX_NAME_LEN){
-        throw std::domain_error("Name is too long");
-    }
-    this->name = aName;
-    // check if description is too long before assignment
-    if( aDescription.length() > Tag::MAX_DESC_LEN){
-        throw std::domain_error("Description is too long");
-    }
-    this->description = aDescription;
+    this->id = anId;;
+    this->name = aName.trimmed().left(Tag::MAX_NAME_LEN);
+    this->description = aDescription.trimmed().left(Tag::MAX_DESC_LEN);
 }
 
 
@@ -110,9 +95,7 @@ QJsonObject Tag::toJson() const
 }
 
 
-
-// From JsonObject, get the data required to build later an object of this class
-Tag Tag::fromJson(const QJsonObject &jsonObject, Util::OperationResult &result)
+Tag Tag::fromJson(const QJsonObject &jsonObject, Util::ResultOfOperation &result)
 {
     QJsonValue jsonValue;
     int ok;
@@ -121,125 +104,113 @@ Tag Tag::fromJson(const QJsonObject &jsonObject, Util::OperationResult &result)
     QString name;
     QString description;
     Tag tag;
+    bool success;
 
-    result.success = false;
-    result.errorStringUI = "";
-    result.errorStringLog = "";
+    // Reset result to ERROR
+    result.init();
 
     // ID
     jsonValue = jsonObject.value("Id");
     if (jsonValue == QJsonValue::Undefined){
-        result.errorStringUI = tr("Cannot find Id tag");
-        result.errorStringLog = QString("Cannot find Id tag");
+        result.logErrorMessage = QString("Tag: Cannot find token \"Id\"");
         return tag;
     }
     if (jsonValue.isString()==false){
-        result.errorStringUI = tr("Id tag is not a string");
-        result.errorStringLog = QString("Id tag is not a string");
+        result.logErrorMessage = QString("Tag: Id is not a string");
         return tag;
     }
     QString idString  = jsonValue.toString();
-    if (idString.length()>100){
-        // arbitray , because I am not sure this is 36 char on ANY platform & Qt version
-        result.errorStringUI = tr("Id is too long");
-        result.errorStringLog = QString("Id is too long");
-        return tag;
-    }
-    id = QUuid::fromString(idString);
-    if (id.isNull()){
-        result.errorStringUI = tr("Id is not a valid UUID");
-        result.errorStringLog = QString("Id is not a valid UUID");
+    id = Util::convertStringToQuuid(idString, success);
+    if (success==false){
+        idString.truncate(38);
+        result.logErrorMessage = QString("Tag : Id \"%1\" is not a valid UUID").arg(idString);
         return tag;
     }
     // Name
     jsonValue = jsonObject.value("Name");
     if (jsonValue == QJsonValue::Undefined){
-        result.errorStringUI = tr("Cannot find Name tag");
-        result.errorStringLog = QString("Cannot find Name tag");
+        result.logErrorMessage = QString("Tag %1: Cannot find token \"Name\"").arg(idString);
         return tag;
     }
     if (jsonValue.isString()==false){
-        result.errorStringUI = tr("Name tag is not a string");
-        result.errorStringLog = QString("Name tag is not a string");
+        result.logErrorMessage = QString("Tag %1: Name token is not a string").arg(idString);
         return tag;
     }
     name = jsonValue.toString();
     if (name.length()>MAX_NAME_LEN){
-        result.errorStringUI = tr("Name is too long : max length is %1, found %2")
-            .arg(MAX_NAME_LEN).arg(name.length());
-        result.errorStringLog = QString("Name is too long : max length is %1, found %2")
-            .arg(MAX_NAME_LEN).arg(name.length());
+        result.logErrorMessage = QString("Tag %1: Name is too long, max length is %2 but"
+            " found %3")
+            .arg(idString).arg(MAX_NAME_LEN).arg(name.length());
         return tag;
     }
     // Description
     jsonValue = jsonObject.value("Description");
     if (jsonValue == QJsonValue::Undefined){
-        result.errorStringUI = tr("Cannot find Description tag");
-        result.errorStringLog = QString("Cannot find Description tag");
+        result.logErrorMessage = QString("Tag %1: Cannot find token \"Description\"")
+            .arg(idString);
         return tag;
     }
     if (jsonValue.isString()==false){
-        result.errorStringUI = tr("Description tag is not a string");
-        result.errorStringLog = QString("Description tag is not a string");
+        result.logErrorMessage = QString("Tag %1: Description tag is not a string")
+            .arg(idString);
         return tag;
     }
     description = jsonValue.toString();
     if (description.length()>MAX_DESC_LEN){
-        result.errorStringUI = tr("Description is too long : max length is %1, found %2")
-        .arg(MAX_DESC_LEN).arg(description.length());
-        result.errorStringLog = QString("Description is too long : max length is %1, found %2")
-                                    .arg(MAX_DESC_LEN).arg(description.length());
+        result.logErrorMessage = QString("Tag %1: Description is too long, max length is"
+            " %2 but found %3")
+            .arg(idString).arg(MAX_DESC_LEN).arg(description.length());
         return tag;
     }
 
     tag = Tag(id, name, description);
 
-    result.success = true;
-    result.errorStringUI = "";
-    result.errorStringLog = "";
+    result.status = Util::ResultOfOperationStatus::SUCCESS;
 
     return tag;
 }
 
 
-// Getters - Setters
 
 QUuid Tag::getId() const
 {
     return id;
 }
 
+
 void Tag::setId(const QUuid &newId)
 {
+    if (newId.isNull()) {
+        throw std::domain_error("QUuid is invalid");
+    }
     id = newId;
 }
+
 
 QString Tag::getName() const
 {
     return name;
 }
 
+
 void Tag::setName(const QString &newName)
 {
-    name = newName;
+    name = newName.trimmed().left(Tag::MAX_NAME_LEN);
 }
+
 
 QString Tag::getDescription() const
 {
     return description;
 }
 
+
 void Tag::setDescription(const QString &newDescription)
 {
-    description = newDescription;
+    description = newDescription.trimmed().left(Tag::MAX_DESC_LEN);
 }
 
 
-
-// This is a global function. Create a Hash value for Tag, required to use QSet with key = Tag.
-// Id is enough to guarantee uniqueness.
-// Qt doc says : "there must also be a GLOBAL qHash()
-// function that returns a hash value for an argument of the key's type."
 size_t  qHash(const Tag &t, size_t seed ) {
     //return qHashMulti(seed, t.getId(), t.getName());
     return qHash(t.getId(), seed);

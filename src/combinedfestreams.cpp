@@ -19,8 +19,30 @@
 #include "combinedfestreams.h"
 #include "currencyhelper.h"
 
-CombinedFeStreams::CombinedFeStreams()
+
+CombinedFeStreams::CombinedFeStreams(quint32 noOfDays)
 {
+    if(noOfDays==0){
+        throw std::invalid_argument("maxNoOfDays is zero");
+    }
+    // Must not exceed the max size
+    if (noOfDays > FeStream::MAX_DAYS) {
+        throw std::invalid_argument("maxNoOfDays is over the maximum allowed");
+    }
+    this->noOfDays = noOfDays;
+
+    // Allocate the array at full size. For 100 years, this is roughly 36600 elements.
+    // resize() changes the list’s size(), not just its capacity.
+    combinedStreams.resize(noOfDays);
+
+    // Init the array by marking all entries as "unused"
+    for (uint i = 0; i < noOfDays; ++i) {
+        combinedStreams[i] = {.used=false, .totalIncomes=0, .totalExpenses=0,
+            .incomesList={}, .expensesList={}};
+    }
+    noOfElementsUsed = 0;
+    noOfFe = 0;
+    csdContributors = {};
 }
 
 
@@ -30,22 +52,24 @@ CombinedFeStreams::CombinedFeStreams(const CombinedFeStreams &o)
 }
 
 
-CombinedFeStreams::CombinedFeStreams(const QMap<QDate, DailyInfo> set)
-{
-    this->combinedStreams = set;
-}
-
-
 CombinedFeStreams &CombinedFeStreams::operator=(const CombinedFeStreams &o)
 {
-    this->combinedStreams = o.combinedStreams;
+    if (this != &o){// to protect against self-assignment
+        this->combinedStreams = o.combinedStreams;
+        this->noOfDays = o.noOfDays;
+        this->noOfFe = o.noOfFe;
+        this->noOfElementsUsed = o.noOfElementsUsed;
+        this->csdContributors = o.csdContributors;
+    }
     return *this;
 }
 
 
 bool CombinedFeStreams::operator==(const CombinedFeStreams &o) const
 {
-    if ( !(this->combinedStreams == o.combinedStreams)) {
+    if ( !(this->combinedStreams == o.combinedStreams) ||
+        (this->noOfDays != o.noOfDays) || (this->noOfElementsUsed != o.noOfElementsUsed) ||
+        (this->noOfFe != o.noOfFe) || (this->csdContributors != o.csdContributors) ) {
         return false;
     } else {
         return true;
@@ -58,46 +82,83 @@ CombinedFeStreams::~CombinedFeStreams()
 }
 
 
-void CombinedFeStreams::addStream(const QList<Fe> theStream, CurrencyInfo currInfo)
+void CombinedFeStreams::addStream(const FeStream theStream, CurrencyInfo currInfo)
 {
-    if (theStream.size()==0){
+    // convert weak reference of theStream to strong reference.
+    // The Csd must exist.
+    auto csdStrongRefPtr = theStream.getCsdPtr().toStrongRef();
+    if (csdStrongRefPtr==nullptr){
+        return; // Csd does not exist anymore
+    }
+
+    // Check that theStream has the same no of elements than combinedStreams
+    if (theStream.getNoOfDays() != noOfDays) {
+        throw std::invalid_argument("New FeStream has not the right no of elements");
+    }
+
+    // Make sure this CSD has not already contributed, otherwise add it to the contributors.
+    if( csdContributors.contains(csdStrongRefPtr->getId())){
         return;
+    } else {
+        csdContributors.insert(csdStrongRefPtr->getId());
     }
-    foreach(Fe fe, theStream){
-        // find an existing entry for that date, if any
-        auto it = combinedStreams.find(fe.occurrence);
-        CombinedFeStreams::DailyInfo di;
-        if(it != combinedStreams.end()){    // there is already something for that date : add to it
-            di = it.value();
-        } else{                             // there is NO entry for that date : init it
-            di = CombinedFeStreams::DailyInfo();
-            di.totalDelta = 0;
-            di.totalExpenses = 0;
-            di.totalIncomes = 0;
-            di.incomesList = QList<FeDisplay>();
-            di.expensesList = QList<FeDisplay>();
+
+    // merge
+    QList<qint64> newFEList = theStream.getAmountSet();
+    for (uint i = 0; i < noOfDays; ++i) {
+        if (newFEList[i] != -1) {
+            // This is one more financial event in comb
+            noOfFe++;
+            // convert the amount from decimal to double (currency unit)
+            int convResult;
+            double amount = CurrencyHelper::amountQint64ToDouble(newFEList[i], currInfo.noOfDecimal,
+                convResult) ;
+            if (convResult != 0){
+                continue; // should never happen
+            }
+            if (combinedStreams[i].used == false) {
+                // this is a new entry for that day
+
+                // Update no of element used
+                noOfElementsUsed++;
+                // Mark the entry has used
+                combinedStreams[i].used = true;
+                // Set it
+                if (csdStrongRefPtr->getIsIncome()) {
+                    // new income
+                    combinedStreams[i].totalIncomes = amount;
+                    combinedStreams[i].totalExpenses = 0;
+                    // there wont be duplication
+                    combinedStreams[i].incomesList.append(
+                        {.amount=amount, .csdPtr=theStream.getCsdPtr()});
+                } else {
+                    // new expense
+                    combinedStreams[i].totalIncomes = 0;
+                    combinedStreams[i].totalExpenses = -amount;
+                    combinedStreams[i].expensesList.append(
+                        {.amount=(-amount), .csdPtr=theStream.getCsdPtr()});
+                }
+            } else {
+                // this is a existing entry for that day.
+                // WARNING : a "double" cumulative value will loose precision if a lot of
+                // "big amount" values are cumulated. We dont really care are we insist to keep the
+                // calculated amounts in double (to speed up things), which are uncapped.
+
+                if (csdStrongRefPtr->getIsIncome()) {
+                    // additional income
+                    combinedStreams[i].totalIncomes += amount;
+                    combinedStreams[i].incomesList.append(
+                        {.amount=amount, .csdPtr=theStream.getCsdPtr()});
+                } else {
+                    // additional expense
+                    combinedStreams[i].totalExpenses += (-amount);
+                    combinedStreams[i].expensesList.append(
+                        {.amount=(-amount), .csdPtr=theStream.getCsdPtr()});
+                }
+            }
         }
-        FeDisplay fed;
-        int convResult;
-        double amount = CurrencyHelper::amountQint64ToDouble(fe.amount, currInfo.noOfDecimal,
-            convResult) ;
-        if (convResult != 0){
-            return; // should never happen
-        }
-        fed.amount = amount;
-        fed.id = fe.id;
-        if (fe.amount<0){
-            // expense
-            di.expensesList.append(fed);
-            di.totalExpenses += amount;
-        }else{
-            // income
-            di.incomesList.append(fed);
-            di.totalIncomes += amount;
-        }
-        di.totalDelta += amount;
-        combinedStreams[fe.occurrence] = di;     // replacement if already exist
     }
+
 }
 
 
@@ -105,35 +166,111 @@ void CombinedFeStreams::addStream(const QList<Fe> theStream, CurrencyInfo currIn
 // the difference is less than the smallest unit of all the currency available
 // (3 decimals + 1 spare for rounding)
 bool CombinedFeStreams::DailyInfo::operator==(const DailyInfo& o) const{
-    if( fabs(totalIncomes - o.totalIncomes) >= 0.0001 )
+    if( used != o.used ){
         return false;
-    if( fabs(totalExpenses - o.totalExpenses) >= 0.0001 )
+    }
+    if( fabs(totalIncomes - o.totalIncomes) >= 0.0001 ) {
         return false;
-    if( fabs(totalDelta - o.totalDelta) >= 0.0001 )
+    }
+    if( fabs(totalExpenses - o.totalExpenses) >= 0.0001 ){
         return false;
-    if(incomesList != o.incomesList)
+    }
+    if(incomesList != o.incomesList){
         return false;
-    if(expensesList != o.expensesList)
+    }
+    if(expensesList != o.expensesList){
         return false;
+    }
     return true;
 }
 
+
 CombinedFeStreams::DailyInfo &CombinedFeStreams::DailyInfo::operator=(const DailyInfo &o)
 {
+    used = o.used;
     totalIncomes = o.totalIncomes;
     totalExpenses = o.totalExpenses;
-    totalDelta = o.totalDelta;
     incomesList = o.incomesList;
     expensesList = o.expensesList;
     return *this;
 }
 
 
-// getter & setter
+QString CombinedFeStreams::DailyInfo::toString() const
+{
+    if (used == false) {
+        return "Unused";
+    }
 
-QMap<QDate, CombinedFeStreams::DailyInfo> CombinedFeStreams::getCombinedStreams() const
+    // income list
+    QStringList incomeListSl;
+    incomeListSl.append(QString("IL:"));
+    if (incomesList.size()==0) {
+        incomeListSl.append(QString("Empty"));
+    } else {
+        for (int var = 0; var < incomesList.size(); ++var) {
+            auto csdStrongRefPtr = incomesList[var].csdPtr.toStrongRef();
+            if (csdStrongRefPtr==nullptr){
+                continue; // Csd does not exist anymore
+            }
+            incomeListSl.append(QString("(%1,%2)")
+                .arg(csdStrongRefPtr->getId().toString(QUuid::StringFormat::WithoutBraces))
+                .arg(incomesList[var].amount));
+        }
+    }
+    QString incomeListString = incomeListSl.join(" ");
+
+    // expense list
+    QStringList expenseListSl;
+    expenseListSl.append(QString("EL:"));
+    if (expensesList.size()==0) {
+        expenseListSl.append(QString("Empty"));
+    } else {
+        for (int var = 0; var < expensesList.size(); ++var) {
+            auto csdStrongRefPtr = expensesList[var].csdPtr.toStrongRef();
+            if (csdStrongRefPtr==nullptr){
+                continue; // Csd does not exist anymore
+            }
+            expenseListSl.append(QString("(%1,%2)")
+                .arg(csdStrongRefPtr->getId().toString(QUuid::StringFormat::WithoutBraces))
+                .arg(expensesList[var].amount));
+        }
+    }
+    QString expenseListString = expenseListSl.join(" ");
+
+    // all together
+    return QString("TI=%2 TE=%3 %4 %5").arg(totalIncomes).arg(totalExpenses)
+        .arg(incomeListString).arg(expenseListString) ;
+}
+
+
+// getters
+
+QList<CombinedFeStreams::DailyInfo> CombinedFeStreams::getCombinedStreams() const
 {
     return combinedStreams;
+}
+
+
+quint32 CombinedFeStreams::getNoOfDays() const
+{
+    return noOfDays;
+}
+
+
+quint32 CombinedFeStreams::getNoOfElementsUsed() const
+{
+    return noOfElementsUsed;
+}
+
+QSet<QUuid> CombinedFeStreams::getCsdContributors() const
+{
+    return csdContributors;
+}
+
+quint32 CombinedFeStreams::getNoOfFe() const
+{
+    return noOfFe;
 }
 
 

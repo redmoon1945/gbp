@@ -21,7 +21,7 @@
      </property>
      <widget class="QWidget" name="tagsTab">
       <attribute name="title">
-       <string>Tags Definition</string>
+       <string>Tags definitions</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
@@ -61,7 +61,7 @@
            <item>
             <widget class="QTableView" name="tagsDefTableView">
              <property name="alternatingRowColors">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="selectionBehavior">
               <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
@@ -96,6 +96,9 @@
              <property name="text">
               <string>Add...</string>
              </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -105,6 +108,9 @@
              </property>
              <property name="text">
               <string>Delete</string>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -116,6 +122,9 @@
              <property name="text">
               <string>Edit...</string>
              </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -125,6 +134,9 @@
              </property>
              <property name="text">
               <string>Duplicate</string>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -136,6 +148,9 @@
              <property name="text">
               <string>Import...</string>
              </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -143,12 +158,18 @@
              <property name="text">
               <string>Select all</string>
              </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="tagsDefUnselectAllPushButton">
              <property name="text">
               <string>Unselect all</string>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -173,7 +194,7 @@
      </widget>
      <widget class="QWidget" name="fromTagsTab">
       <attribute name="title">
-       <string>Links : Tags View</string>
+       <string>Links : tags view</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
@@ -193,7 +214,7 @@
          <item>
           <widget class="QLabel" name="tagLabel">
            <property name="text">
-            <string>Existing Tags</string>
+            <string>Existing tags</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -203,7 +224,7 @@
          <item>
           <widget class="QListWidget" name="tagsViewTagsListWidget">
            <property name="alternatingRowColors">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="selectionBehavior">
             <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
@@ -242,7 +263,7 @@
          <item>
           <widget class="QListWidget" name="tagsViewCsdListWidget">
            <property name="alternatingRowColors">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="selectionMode">
             <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
@@ -278,6 +299,9 @@
              <property name="text">
               <string>Link...</string>
              </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -288,6 +312,9 @@
              <property name="text">
               <string>Unlink</string>
              </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -295,12 +322,18 @@
              <property name="text">
               <string>Select all</string>
              </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="tagsViewUnselectAllLinksPushButton">
              <property name="text">
               <string>Unselect all</string>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -325,7 +358,7 @@
      </widget>
      <widget class="QWidget" name="fromCsdTab">
       <attribute name="title">
-       <string>Links : Cash Stream Definitions View</string>
+       <string>Links : cash stream definitions view</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
@@ -347,7 +380,7 @@
            <item>
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>Existing Cash Stream Definitions</string>
+              <string>Existing cash stream definitions</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -357,7 +390,10 @@
            <item>
             <widget class="QListWidget" name="csdsViewCsdsListWidget">
              <property name="alternatingRowColors">
-              <bool>true</bool>
+              <bool>false</bool>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
              </property>
              <property name="sortingEnabled">
               <bool>true</bool>
@@ -383,7 +419,7 @@
            <item>
             <widget class="QLabel" name="csdsViewTagsListLabel">
              <property name="text">
-              <string>Linked Tags</string>
+              <string>Linked tags</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -393,10 +429,13 @@
            <item>
             <widget class="QListWidget" name="csdsViewTagsListWidget">
              <property name="alternatingRowColors">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
              </property>
              <property name="sortingEnabled">
               <bool>true</bool>
@@ -421,10 +460,13 @@
              <item>
               <widget class="QPushButton" name="csdsViewLinkPushButton">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create &lt;span style=&quot; font-weight:700;&quot;&gt;new link(s) &lt;/span&gt;between the selected Cash Stream Definition to the left and a set of Tags that will be choosen in the following Dialog.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create &lt;span style=&quot; font-weight:700;&quot;&gt;new link(s) &lt;/span&gt;between the selected Cash Stream Definition to the left and a set of Tags that will be chosen in the following Dialog.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>Link...</string>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -436,6 +478,9 @@
                <property name="text">
                 <string>Unlink</string>
                </property>
+               <property name="autoDefault">
+                <bool>false</bool>
+               </property>
               </widget>
              </item>
              <item>
@@ -443,12 +488,18 @@
                <property name="text">
                 <string>Select all</string>
                </property>
+               <property name="autoDefault">
+                <bool>false</bool>
+               </property>
               </widget>
              </item>
              <item>
               <widget class="QPushButton" name="csdsViewUnselectPushButton">
                <property name="text">
                 <string>Unselect all</string>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -511,12 +562,24 @@
        <property name="text">
         <string>Cancel</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="applyPushButton">
        <property name="text">
         <string>Apply</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

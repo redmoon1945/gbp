@@ -16,38 +16,22 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/#AGPL/>.
  */
 
+// Must not include gbpcontroller.h, because it assumes a QApplication, which is not the case here.
+
+
 #include "util.h"
 #include "float.h"
+#include "qregularexpression.h"
 #include <QRandomGenerator64>
 #include <iomanip>
-#include <qmessagebox.h>
+#include <qfont.h>
+#include <quuid.h>
 
-
-
-
-
-QString Util::strDaily = "";
-QString Util::strWeekly = "";
-QString Util::strMonthly = "";
-QString Util::strEndOfMonthly = "";
-QString Util::strYearly = "";
-QString Util::strDailyPl = "";
-QString Util::strWeeklyPl = "";
-QString Util::strMonthlyPl = "";
-QString Util::strEndOfMonthlyPl = "";
-QString Util::strYearlyPl = "";
-QString Util::strDailyNc = "";
-QString Util::strWeeklyNc = "";
-QString Util::strMonthlyNc = "";
-QString Util::strEndOfMonthlyNc = "";
-QString Util::strYearlyNc = "";
-QString Util::strDailyPlNc = "";
-QString Util::strWeeklyPlNc = "";
-QString Util::strMonthlyPlNc = "";
-QString Util::strEndOfMonthlyPlNc = "";
-QString Util::strYearlyPlNc = "";
 
 QStringList Util::qtColorNames = {};
+
+
+
 
 Util::Util()
 {
@@ -55,96 +39,11 @@ Util::Util()
 }
 
 
-// must be called as soon as possible after the applicaiton starts
+// must be called as soon as possible after the application starts
 void Util::init()
 {
-    // init Period Names. We initialize static variables in a non-static context (cannot do
-    // otherwise because of translation)
-
-    strDaily = tr("Day");
-    strWeekly = tr("Week");
-    strMonthly = tr("Month");
-    strEndOfMonthly = tr("End-of-Month");
-    strYearly = tr("Year");
-    strDailyPl = tr("Days");
-    strWeeklyPl = tr("Weeks");
-    strMonthlyPl =tr("Months");
-    strEndOfMonthlyPl = tr("Ends-of-Month");
-    strYearlyPl =tr("Years");
-
-    strDailyNc = tr("day");
-    strWeeklyNc = tr("week");
-    strMonthlyNc = tr("month");
-    strEndOfMonthlyNc = tr("end-of-month");
-    strYearlyNc = tr("year");
-    strDailyPlNc = tr("days");
-    strWeeklyPlNc = tr("weeks");
-    strMonthlyPlNc = tr("months");
-    strEndOfMonthlyPlNc = tr("ends-of-month");
-    strYearlyPlNc = tr("years");
-
-    // Get QT smart lolor names
+    // Get QT smart color names
     qtColorNames = QColor::colorNames();
-}
-
-
-QString Util::getPeriodName(Util::PeriodType period, bool capitalizeFirstLetter, bool plural)
-{
-
-    if ( !plural ){
-        if (capitalizeFirstLetter){
-            if (period==Util::DAILY) {
-                return strDaily;
-            } else if (period==Util::WEEKLY){
-                return strWeekly;
-            } else if (period==Util::MONTHLY){
-                return strMonthly;
-            } else if (period==Util::END_OF_MONTHLY){
-                return strEndOfMonthly;
-            } else {
-                return strYearly;
-            }
-        } else {
-            if (period==Util::DAILY) {
-                return strDailyNc;
-            } else if (period==Util::WEEKLY){
-                return strWeeklyNc;
-            } else if (period==Util::MONTHLY){
-                return strMonthlyNc;
-            } else if (period==Util::END_OF_MONTHLY){
-                return strEndOfMonthlyNc;
-            } else {
-                return strYearlyNc;
-            }
-        }
-
-    } else {
-        if (capitalizeFirstLetter){
-            if (period==DAILY) {
-                return strDailyPl;
-            } else if (period==WEEKLY){
-                return strWeeklyPl;
-            } else if (period==MONTHLY){
-                return strMonthlyPl;
-            } else if (period==END_OF_MONTHLY){
-                return strEndOfMonthlyPl;
-            } else {
-                return strYearlyPl;
-            }
-        } else {
-            if (period==DAILY) {
-                return strDailyPlNc;
-            } else if (period==WEEKLY){
-                return strWeeklyPlNc;
-            } else if (period==MONTHLY){
-                return strMonthlyPlNc;
-            } else if (period==END_OF_MONTHLY){
-                return strEndOfMonthlyPlNc;
-            } else {
-                return strYearlyPlNc;
-            }
-        }
-    }
 }
 
 
@@ -201,33 +100,41 @@ long double Util::annualToDailyGrowth(long double annual)
 }
 
 
-// Comparing double is a very complex topic, but this implementation works for us.
-// https://stackoverflow.com/questions/17333/how-do-you-compare-float-and-double-while-accounting-for-precision-loss
-// https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
 bool Util::areDoublesApproxEqual(double a, double b, double epsilon=DBL_EPSILON)
 {
-    return fabs(a - b) <= 16 * DBL_EPSILON * fmax(fabs(a), fabs(b));
+    return fabs(a - b) <= epsilon;
+    //return fabs(a - b) <= 16 * DBL_EPSILON * fmax(fabs(a), fabs(b));
 }
 
 
-// Convert into a qint64 a double that contains no fractional part
-// Result :
-// 0 : success
-// -1 : fail, double has a fractional part and so does not contain an int
-// -2 : fail : double is out of range of qint64
-qint64 Util::extractQint64FromDoubleWithNoFracPart(double amount, int &result)
+qint64 Util::extractQint64FromDoubleWithNoFractionalPart(double amount, int &result)
 {
     long double ld = amount; // must use a long double to compare to min/max of qint64
-    if ( (ld > std::numeric_limits<qint64>::max()) ||
-        (ld < std::numeric_limits<qint64>::min()) ){
+    if ( std::isnan(amount) ){
         result = -2;
         return 0;
     }
-    qint64 r = static_cast<qint64>(amount);
-    if ( amount != r ){
+    if ( std::isinf(amount) ){
+        result = -3;
+        return 0;
+    }
+    if ( ld > std::numeric_limits<qint64>::max() ){
+        result = -4;
+        return 0;
+    }
+    if ( ld < std::numeric_limits<qint64>::min() ){
+        result = -5;
+        return 0;
+    }
+
+    // check if any fractional part
+    double intPart;
+    if (std::modf(amount, &intPart) != 0.0) {
         result = -1;
         return 0;
     }
+    // return the result
+    qint64 r = static_cast<qint64>(amount);
     result = 0;
     return r;
 }
@@ -281,42 +188,40 @@ QDateTime Util::dateToDateTimeLocal(const QDate& date, const QTimeZone& tz)
 }
 
 
-// Calculate present value of a future value using P = F / (1 + r)^n
-// F = future value
-// r = discount rate per period, in percentage
-// n = number of period
 long double Util::presentValue(long double futureValue, double discountRate, int period)
 {
     if (discountRate==0){
+        return futureValue;
+    }
+    if (period==0) {
         return futureValue;
     }
     return futureValue / powl((1 + 0.01L*discountRate), period);
 }
 
 
-
-// Calculate future value of a present value using F = P * (1 + r)^n
-// P = future value
-// r = interest rate per period, in percentage
-// n = number of period
 long double Util::futureValue(long double presentValue, double discountRate, int period)
 {
     if (discountRate==0){
         return presentValue;
     }
-    return presentValue * powl((1 + 0.01L*discountRate), period);
+    if (period==0) {
+        return presentValue;
+    }
+    return presentValue * powl((1 + (0.01L*discountRate)), period);
 }
 
 
-// Calculate conversion factor to transform a future value F into a present value P,
-// that is P = F * factor, where factor = 1 / ((1 + r)^n).
-// Input parameters:
-//   r = discount rate per period, in percentage. Must be >= 0
-//   n = number of period AFTER present period. Can be neative.
 long double Util::presentValueConversionFactor(long double discountRate, int period)
 {
     if (discountRate<0){
         throw std::out_of_range("Discount rate must be >= 0");
+    }
+    if (discountRate==0){
+        return 1;
+    }
+    if (period==0) {
+        return 1;
     }
     return 1.0L/powl((1 + (0.01L*discountRate)), period);
 }
@@ -373,39 +278,57 @@ bool Util::isValidBoolString(const QString& input) {
 }
 
 
-// Intensity : how aggressive the change will be
-//             1 : weak
-//             2 : average
-//             3 : aggressive
-uint Util::changeFontSize(int intensity, bool decreaseSize, uint originalSize)
+uint Util::calculateFontResize(Util::FontResizeIntensity intensity, bool decreaseSize,
+    uint originalSize)
 {
+    uint newSize;
+
+    if (originalSize==0) {
+        throw std::invalid_argument("Invalid original font size of 0");
+    }
+
     switch (intensity) {
-        case 1:
+        case Util::FontResizeIntensity::WEAK:
             if (decreaseSize) {
-                return( static_cast<uint>(originalSize * 0.90));
+                newSize = static_cast<uint>(originalSize * 0.90);
             } else {
-                return( static_cast<uint>(originalSize * (1/0.9)));
+                newSize = static_cast<uint>(originalSize * (1/0.9));
             }
         break;
-        case 2:
+        case Util::FontResizeIntensity::AVERAGE:
             if (decreaseSize) {
-                return( static_cast<uint>(originalSize * 0.75));
+                newSize = static_cast<uint>(originalSize * 0.75);
             } else {
-                return( static_cast<uint>(originalSize * (1/0.75)));
+                newSize = static_cast<uint>(originalSize * (1/0.75));
             }
             break;
-        case 3:
+        case Util::FontResizeIntensity::AGGRESSIVE:
             if (decreaseSize) {
-                return( static_cast<uint>(originalSize * 0.5));
+                newSize = static_cast<uint>(originalSize * 0.5);
             } else {
-                return( static_cast<uint>(originalSize * (1/0.5)));
+                newSize = static_cast<uint>(originalSize * 2);
+            }
+            break;
+        case Util::FontResizeIntensity::EXTREME:
+            if (decreaseSize) {
+                newSize = static_cast<uint>(originalSize * 0.3333333);
+            } else {
+                newSize = static_cast<uint>(originalSize * 3);
             }
             break;
         default:
-            throw std::invalid_argument("Unknown intensity factor");
+            throw std::invalid_argument("Unknown intensity factor"); // should never happen
             break;
         }
+
+        // New size must not be 0
+        if(newSize == 0){
+            return 1;
+        } else {
+            return newSize;
+        }
 }
+
 
 
 QString Util::getColorSmartName(QColor color, bool &found)
@@ -483,15 +406,11 @@ int Util::noOfMonthDifference(QDate from, QDate to)
     return ( (12*to.year())+to.month()) - ( (12*from.year())+from.month()) ;
 }
 
-// Return the Locale to use in the application, taking into account system locale override by an
-// argument passed to the application. Must be called once by main.cpp as early as possible.
-// Argument format must be : -locale=<L>-<T> where <L> is a 2 or 3 char string representing ISO 639
-// code and <T> is a 2 or 3 char string representing ISO 3166 code. E.g. : en-US, fr-CA
-// Return values :
-//   systemLocale : false if argument has been passed and is fully valid
-//   QLocale :the final QLocale to use
+
 QLocale Util::getLocale(QStringList arguments, bool& systemLocale){
-    // get the system Locale, which will be used in case of any error or if no argument is passed
+
+    // Get the Default System Locale, which will be used in case of any error in the
+    // "system locale override" argument passed or simply if it is not passed
     QLocale sysLocale = QLocale::system();
     systemLocale = true;
 
@@ -647,51 +566,135 @@ QString Util::wordCapitalize(bool upper, QString s)
 }
 
 
-// Version of "Question" QMessageBox with localized buttons texts.
-// Return index of the button selected (0 being the first) or -1 if cancel
-int Util::messageBoxQuestion(QWidget *parent, QString title, QString message, QStringList buttonsText,
-    uint defaultButtonIndex, uint escapeButtonIndex)
+void Util::changeFontSize(QFont &font, Util::FontResizeIntensity intensity, bool decreaseSize)
 {
-    // check integrity of parameters
-    if (buttonsText.size() < 1) {
-        throw std::invalid_argument("Custom Message Box : buttonsText "
-            "must contain at least one item");
+    int oldFontSize = font.pointSize();
+    if (oldFontSize==0) {
+        // this is illegal
+        throw std::invalid_argument("Invalid font size of 0");
     }
-    if (buttonsText.size() > 5) {
-        throw std::invalid_argument("Custom Message Box : buttonsText "
-            "exceeds the max no of buttons supported (5)");
+    int newFontSize = Util::calculateFontResize(intensity, decreaseSize, oldFontSize);
+    if (newFontSize==0) {
+        // this is a problem in the calculation, should not happen. Font is not changed.
+        return;
     }
-    if (buttonsText.size() <= defaultButtonIndex) {
-        throw std::invalid_argument("Custom Message Box : invalid defaultButtonIndex");
-    }
-    if (buttonsText.size() <= escapeButtonIndex) {
-        throw std::invalid_argument("Custom Message Box : invalid escapeButtonIndex");
-    }
-    // Display the messagebox
-    QMessageBox msgBox(parent);
-    msgBox.setWindowTitle(title);
-    msgBox.setText(message);
+    font.setPointSize(newFontSize);
+}
 
-    QList<QPushButton *> buttons; // the custom buttons we are going to create, in order
-    for (int var = 0; var < buttonsText.size(); ++var) {
-        QPushButton* b = msgBox.addButton(buttonsText.at(var), QMessageBox::ActionRole);
-        buttons.append(b);
-    }
-    msgBox.setDefaultButton(buttons.at(defaultButtonIndex));
-    msgBox.setEscapeButton((QAbstractButton *)(buttons.at(escapeButtonIndex)));
-    msgBox.setIcon(QMessageBox::Question);
-    msgBox.exec();
+QDate Util::isValidISO8601Date(const QString& dateStr, bool &valid)
+{
+    valid = false;
 
-    // process the answer
-    QAbstractButton *clickedButton = msgBox.clickedButton(); // bad QT design...should be PushButton
-    if (clickedButton == nullptr){
-        return -1;  // user escape the dialog
+    // Check if the string matches the ISO 8601 format: YYYY-MM-DD
+    QRegularExpression isoDateRegex("^\\d{4}-\\d{2}-\\d{2}$");
+    if (!isoDateRegex.match(dateStr).hasMatch()) {
+        return QDate();
     }
-    for (int var = 0; var < buttons.size(); ++var) {
-        if (clickedButton == (QAbstractButton *)(buttons.at(var)) ) {
-            return var;
-        }
+
+    // Parse the date to ensure it’s valid
+    QDate date = QDate::fromString(dateStr, "yyyy-MM-dd");
+    if (!date.isValid()) {
+        return QDate();
     }
-    // should never happen
-    return -1;
+    valid = true;
+    return date;
+}
+
+
+QColor Util::getOptimizedRed()
+{
+
+    static const QColor chatgptRed("#e5212a"); // Chat Gpt
+    static const QColor grokRed("#e5212a");    // Grok
+
+    return grokRed;
+}
+
+
+QColor Util::getOptimizedGreen()
+{
+    // Chatgpt
+    static const QColor chatgptGreen("#007a1f"); // Chat Gpt
+    static const QColor grokGreen("#008a00");    // Grok
+
+    return grokGreen;
+}
+
+
+
+QColor Util::getOptimizedBlue()
+{
+    // Chatgpt
+    static const QColor chatgptBlue("#004080"); // Chat Gpt
+    static const QColor grokBlue("#0072ee");    // Grok
+
+    return grokBlue;
+}
+
+
+QString Util::getStyleSheetStringForColor(QColor color)
+{
+    if (color.isValid()==false) {
+        return "Invalid color";
+    }
+    QString s = QString("color: rgb(%1, %2, %3)").arg(color.red()).arg(color.green())
+        .arg(color.blue()) ;
+    return s;
+}
+
+
+QUuid Util::convertStringToQuuid(QString s, bool& success)
+{
+    success = false;
+
+    QString newString = s.trimmed();
+
+    // if String is bigger than 36, it cannot be a QUuid (no braces allowed)
+    if(newString.length()>36){
+        return QUuid(); // invalid QUuid
+    }
+
+    QUuid id = QUuid::fromString(newString);
+    if (id.isNull()==false) {
+        success = true;
+    }
+
+    return id;
+}
+
+
+
+QString Util::getFontResizeIntensityNames(Util::FontResizeIntensity intensity)
+{
+    switch (intensity) {
+        case Util::FontResizeIntensity::WEAK:
+            return tr("Weak");
+            break;
+        case Util::FontResizeIntensity::AVERAGE:
+            return tr("Average");
+            break;
+        case Util::FontResizeIntensity::AGGRESSIVE:
+            return tr("Aggressive");
+            break;
+        case Util::FontResizeIntensity::EXTREME:
+            return tr("Extreme");
+            break;
+        default:
+            return tr("Unknow");
+            break;
+    }
+}
+
+
+Util::ResultOfOperation::ResultOfOperation()
+{
+    init();
+}
+
+
+void Util::ResultOfOperation::init()
+{
+    status = ResultOfOperationStatus::ERROR;
+    logErrorMessage = "";
+    userErrorMessage = "";
 }

@@ -21,8 +21,6 @@
 #include <QSet>
 
 
-quint16 Tags::MAX_NO_TAGS = 5000; // seems more than reasonable amount...
-
 
 Tags::Tags() {
     tags.clear();
@@ -64,12 +62,9 @@ Tags &Tags::operator=(const Tags &o)
 }
 
 
-// Add or replace a tag to the set. If this is a new tag (not present in the set), it will be added,
-// unless the max no of tags has been reached, in which case the method returns False (true
-// otherwise). If there is a tag that has the same ID, its value ("Tag") will be replaced by t.
 bool Tags::insert(Tag t)
 {
-    // Have we already reached the max no of tags ?
+    // Have we reached the max no of tags ?
     if (tags.count()>= MAX_NO_TAGS) {
         return false;
     }
@@ -81,15 +76,11 @@ bool Tags::insert(Tag t)
 }
 
 
-// Return true if an item was actually removed, false otherwise
-bool Tags::remove(Tag t)
-{
-    return tags.remove(t.getId());
-}
-
-
 bool Tags::remove(QUuid tagId)
 {
+    if (tagId.isNull()==true) {
+        return false;
+    }
     return tags.remove(tagId);
 }
 
@@ -102,11 +93,33 @@ void Tags::clear()
 
 bool Tags::containsTagId(QUuid tagId) const
 {
+    if (tagId.isNull()==true) {
+        return false;
+    }
     return tags.contains(tagId);
 }
 
 
-// Return no of time "name" corresponds to the name of a atg in the set
+bool Tags::cleanIdList(QSet<QUuid> &idList) const
+{
+    bool changed = false;
+
+    // In idList, remove tags that do not exist in this Object
+    QSet<QUuid> iterationCopySet = idList;
+    foreach(QUuid tagId, iterationCopySet){
+        if (tagId.isNull()==true) {
+            continue;
+        }
+        if (tags.contains(tagId)==false) {
+            idList.remove(tagId);
+            changed = true;
+        }
+    }
+
+    return changed;
+}
+
+
 quint16 Tags::containsTagName(QString name) const
 {
     quint16 no=0;
@@ -125,11 +138,15 @@ quint16 Tags::containsTagName(QString name) const
 Tag Tags::getTag(QUuid tagId, bool &found) const
 {
     Tag t;
+    found = false;
+
+    if (tagId.isNull()==true) {
+        return t;
+    }
     if ( true==tags.contains(tagId) ){
         found = true;
         return tags.value(tagId);
     } else {
-        found = false;
         return t;
     }
 }
@@ -145,6 +162,23 @@ QSet<Tag> Tags::getTags() const
 quint16 Tags::size() const
 {
     return tags.size();
+}
+
+
+QList<QUuid> Tags::getTagIdSet()
+{
+    return tags.keys();
+}
+
+
+QSet<QUuid> Tags::getTagIdSetAsQset()
+{
+    QSet<QUuid> r;
+    for (auto it = tags.constBegin(); it != tags.constEnd(); ++it) {
+        const QUuid &key = it.key();
+        r.insert(key);
+    }
+    return r;
 }
 
 
@@ -166,11 +200,11 @@ QJsonObject Tags::toJson() const
 }
 
 
-Tags Tags::fromJson(const QJsonObject &jsonObject, Util::OperationResult &result)
+Tags Tags::fromJson(const QJsonObject &jsonObject, Util::ResultOfOperation &result)
 {
-    result.success = false;
-    result.errorStringUI = "";
-    result.errorStringLog = "";
+    // Reset result to ERROR
+    result.init();
+
     Tags tagSet;
     QJsonArray jsonArrayTags;
     QJsonValue jsonValue;
@@ -182,17 +216,14 @@ Tags Tags::fromJson(const QJsonObject &jsonObject, Util::OperationResult &result
         return tagSet;
     }
     if (false==jsonValue.isArray()){
-        result.errorStringUI = tr("Set is not an array");
-        result.errorStringLog = QString("Set is not an array");
+        result.logErrorMessage = QString("Tags: Set is not an array");
         return tagSet;
     }
 
     // Check if too many tags
     jsonArrayTags = jsonValue.toArray();
     if (jsonArrayTags.size() > Tags::MAX_NO_TAGS) {
-        result.errorStringUI = tr("Too many tags : max allowed is %1, %2 found")
-            .arg(Tags::MAX_NO_TAGS).arg(jsonArrayTags.size());
-        result.errorStringLog = QString("Too many tags : max allowed is %1, %2 found")
+        result.logErrorMessage = QString("Tags: Too many tags : max allowed is %1, %2 found")
             .arg(Tags::MAX_NO_TAGS).arg(jsonArrayTags.size());
         return tagSet;
     }
@@ -203,16 +234,23 @@ Tags Tags::fromJson(const QJsonObject &jsonObject, Util::OperationResult &result
             QJsonObject jsonObject = value.toObject();
             // extract the tag
             Tag t = Tag::fromJson(jsonObject, result);
-            if (result.success==false){
+            if (result.status==Util::ResultOfOperationStatus::ERROR){
                 tagSet.clear();
+                result.logErrorMessage = "Tags->" + result.logErrorMessage;
                 return tagSet;
             }
             // add the tag to the set
             tagSet.insert(t);
+        } else {
+            // Illegal, must be an object (a tag)
+            result.init();
+            result.logErrorMessage = "Tags: An element of the tag list is not a object";
+            tagSet.clear();
+            return tagSet;
         }
     }
 
-    result.success = true;
+    result.status = Util::ResultOfOperationStatus::SUCCESS;
     return tagSet;
 }
 

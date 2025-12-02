@@ -18,24 +18,20 @@
 
 
 #include "tagcsdrelationships.h"
-#include <QMutableListIterator>
 #include <QCryptographicHash>
-#include <QMap>
-#include <QHash>
 #include <QJsonArray>
 
 
-quint16 TagCsdRelationships::MAX_NO_RELATIONSHIPS = 10000; // 200 tags x 500 csds
-
-
 TagCsdRelationships::TagCsdRelationships() {
-    store = QSet<TagCsdRelationship>();
+    tagLinks = QHash<QUuid,QSet<QUuid>>();
+    csdLinks = QHash<QUuid,QSet<QUuid>>();
 }
 
 
 TagCsdRelationships::TagCsdRelationships(const TagCsdRelationships &o)
 {
-    this->store = o.store;
+    this->tagLinks = o.tagLinks;
+    this->csdLinks = o.csdLinks;
 }
 
 
@@ -46,7 +42,7 @@ TagCsdRelationships::~TagCsdRelationships()
 
 bool TagCsdRelationships::operator==(const TagCsdRelationships &o) const
 {
-    if ( this->store!=o.store ) {
+    if ( (this->tagLinks!=o.tagLinks) || (this->csdLinks!=o.csdLinks) ) {
         return false;
     }
     return true;
@@ -62,187 +58,249 @@ bool TagCsdRelationships::operator!=(const TagCsdRelationships &o) const
 TagCsdRelationships &TagCsdRelationships::operator=(const TagCsdRelationships &o)
 {
     if (this != &o){                // to protect against self-assignment
-        this->store = o.store;
+        this->tagLinks = o.tagLinks;
+        this->csdLinks = o.csdLinks;
     }
     return *this;
 }
 
 
-// Return true if tagId has at least one relationship with a csdId
-bool TagCsdRelationships::tagHasRelationships(const QUuid tagId)
+bool TagCsdRelationships::tagHasRelationships(const QUuid tagId) const
 {
-    for (QSet<TagCsdRelationship>::const_iterator it = store.constBegin();
-        it != store.constEnd(); ++it) {
-        QUuid aTagId = it->tagId;
-        if(aTagId==tagId){
-            return true;
-        }
+    if (tagId.isNull()) {
+        return false;
     }
-    return false;
+    return tagLinks.contains(tagId);
 }
 
 
-bool TagCsdRelationships::csdHasRelationships(const QUuid csdId)
+bool TagCsdRelationships::csdHasRelationships(const QUuid csdId) const
 {
-    for (QSet<TagCsdRelationship>::const_iterator it = store.constBegin();
-        it != store.constEnd(); ++it) {
-        if(it->csdId==csdId){
-            return true;
-        }
+    if (csdId.isNull()) {
+        return false;
     }
-    return false;
+    return csdLinks.contains(csdId);
 }
 
 
-bool TagCsdRelationships::relationshipExists(const QUuid tagId, const QUuid csdId)
+bool TagCsdRelationships::relationshipExists(const QUuid tagId, const QUuid csdId) const
 {
-    return store.contains({.tagId=tagId, .csdId=csdId});
-}
-
-
-// Return all the csdId that have a relationship with that tagId
-QSet<QUuid> TagCsdRelationships::getRelationshipsForTag(const QUuid tagId)
-{
-    QSet<QUuid> result = {};
-    for (QSet<TagCsdRelationship>::const_iterator it = store.constBegin();
-        it != store.constEnd(); ++it) {
-        if( it->tagId==tagId ){
-            result.insert(it->csdId); // remove duplicate
-        }
+    if (tagId.isNull() || csdId.isNull()) {
+        return false;
     }
-    return result;
+    // Check just one side of the relationship
+    QSet s = tagLinks.value(tagId,{});
+    return s.contains(csdId);
 }
 
 
-// Return all the tagId that have a relationship with that csdId
-QSet<QUuid> TagCsdRelationships::getRelationshipsForCsd(const QUuid csdId)
+QSet<QUuid> TagCsdRelationships::getRelationshipsForTag(const QUuid tagId) const
 {
-    QSet<QUuid> result = {};
-    for (QSet<TagCsdRelationship>::const_iterator it = store.constBegin(); it != store.constEnd();
-        ++it) {
-        if( it->csdId==csdId ){
-            result.insert(it->tagId); // remove duplicate
-        }
+    if (tagId.isNull()) {
+        return {};
     }
-    return result;
+    return tagLinks.value(tagId,{});
 }
 
 
-// Return all the tagIds that have one or more relationsship with any csdId
-QSet<QUuid> TagCsdRelationships::getAllTagsWithRelationships()
+QSet<QUuid> TagCsdRelationships::getRelationshipsForCsd(const QUuid csdId) const
 {
-    QSet<QUuid> result = {};
-    for (QSet<TagCsdRelationship>::const_iterator it = store.constBegin(); it != store.constEnd();
-        ++it) {
-         result.insert(it->tagId) ; // remove duplicate
+    if (csdId.isNull()) {
+        return {};
     }
-    return result;
+    return csdLinks.value(csdId,{});
 }
 
 
-// Return all the csdIds that have one or more relationsship with any tagId
-QSet<QUuid> TagCsdRelationships::getAllCsdsWithRelationships()
+QList<QUuid> TagCsdRelationships::getAllTagsWithRelationships() const
 {
-    QSet<QUuid> result = {};
-    for (QSet<TagCsdRelationship>::const_iterator it = store.constBegin(); it != store.constEnd();
-        ++it) {
-        result.insert(it->csdId) ; // remove duplicate
+    return tagLinks.keys();
+}
+
+
+QList<QUuid> TagCsdRelationships::getAllCsdsWithRelationships() const
+{
+    return csdLinks.keys();
+}
+
+
+uint TagCsdRelationships::noOfRelationships() const
+{
+    uint count = 0;
+    for (const QSet<QUuid>& set : tagLinks) {
+        count += set.size();
     }
-    return result;
-}
-
-
-uint TagCsdRelationships::noOfRelationships()
-{
-    return store.size();
+    return count;
 }
 
 
 void TagCsdRelationships::addRelationship(const QUuid tagId, const QUuid csdId)
 {
-    if (store.size() >= MAX_NO_RELATIONSHIPS) {
+    if (tagId.isNull() || csdId.isNull()) {
         return;
     }
-    store.insert({.tagId=tagId, .csdId=csdId}); // add only if not already there
+
+    // Prevent self-links
+    if (tagId == csdId){
+        return;
+    }
+
+    /*
+     * In QHash<QUuid, QSet<QUuid>>, the operator[] behaves as follows:
+     *  - If the key exists: tagLinks[tagId] returns a reference to the existing QSet<QUuid>
+     *    associated with tagId.
+     *  - If the key does not exist: tagLinks[tagId] creates a new, default-constructed
+     *    QSet<QUuid> (which is empty), inserts it into the QHash with tagId as the key,
+     *    and returns a reference to this new QSet<QUuid>.
+     */
+    tagLinks[tagId].insert(csdId);
+    csdLinks[csdId].insert(tagId);
 }
 
 
-// Returns true if an item was actually removed; otherwise returns false.
-bool TagCsdRelationships::deleteRelationship(const QUuid tagId, const QUuid csdId)
+void TagCsdRelationships::deleteRelationship(const QUuid tagId, const QUuid csdId)
 {
-    return store.remove({.tagId=tagId, .csdId=csdId});
+    if (tagId.isNull() || csdId.isNull()) {
+        return;
+    }
+
+    QSet<QUuid>& refSetTag = tagLinks[tagId];// Unwanted empty set inserted if tagId do not exist.
+    QSet<QUuid>& refSetCsd = csdLinks[csdId];// Unwanted empty set inserted if csdId do not exist.
+
+    refSetTag.remove(csdId); // do nothing if csdId is not in the set
+    refSetCsd.remove(tagId); // do nothing if tagId is not in the set
+
+    // Remove entries if empty, because empty QSet is unwanted
+    if (refSetTag.isEmpty()){
+        tagLinks.remove(tagId);
+    }
+    if (refSetCsd.isEmpty()){
+        csdLinks.remove(csdId);
+    }
 }
 
 
-// Delete all the relationships involving this specific tagId
 void TagCsdRelationships::deleteRelationshipsForTag(const QUuid tagId)
 {
-    QList<TagCsdRelationship> toDelete; // List to hold entries to delete
-    // Iterate through the QSet
-    for (const TagCsdRelationship &e : store) {
-        if (e.tagId==tagId) {
-            toDelete.append(e); // Mark for deletion
+    if (tagId.isNull()) {
+        return;
+    }
+
+    // Get all csds linked
+    QSet<QUuid> linkedCsdIds = tagLinks.value(tagId,{});
+    if (linkedCsdIds.size()==0) {
+        return; // no relationship for that tagId
+    }
+
+    // Remove corresponding entries from csdLinks
+    for (const QUuid& csdId : linkedCsdIds) {
+        QSet<QUuid>& set = csdLinks[csdId];
+        set.remove(tagId);
+        if (set.isEmpty()) {
+            csdLinks.remove(csdId);
         }
     }
-    // Now remove the marked entries
-    for (const TagCsdRelationship &entry : toDelete) {
-        store.remove(entry);
-    }
+    // Remove tagId from tagLinks
+    tagLinks.remove(tagId);
 }
 
 
-// Delete all the relationships involving this specific csdId
 void TagCsdRelationships::deleteRelationshipsForCsd(const QUuid csdId)
 {
-    QList<TagCsdRelationship> toDelete; // List to hold entries to delete
-    // Iterate through the QSet
-    for (const TagCsdRelationship &e : store) {
-        if (e.csdId==csdId) {
-            toDelete.append(e); // Mark for deletion
+    if (csdId.isNull()) {
+        return;
+    }
+
+    // Get all tags linked. Empty set if tag does not exist.
+    QSet<QUuid> linkedTagIds = csdLinks.value(csdId,{});
+    if (linkedTagIds.size()==0) {
+        return; // no relationship for that csdId
+    }
+
+    // Remove corresponding entries from tagLinks
+    for (const QUuid& tagId : linkedTagIds) {
+        QSet<QUuid>& set = tagLinks[tagId];
+        set.remove(csdId);
+        if (set.isEmpty()) {
+            tagLinks.remove(tagId);
         }
     }
-    // Now remove the marked entries
-    for (const TagCsdRelationship &entry : toDelete) {
-        store.remove(entry);
-    }
+    // Remove csdId from csdLinks
+    csdLinks.remove(csdId);
 }
 
 
-// Delete all relationships
 void TagCsdRelationships::clear()
 {
-    store.clear();
+    tagLinks.clear();
+    csdLinks.clear();
 }
 
 
-// For a given sourceTag, copy all its Csd relationships to destTagId. If sourceTag has no
-// relationship, the method does nothing. All existing Csd relationships of destTagId are
-// first deleted.
 void TagCsdRelationships::cloneCsdRelationshipsForTag(QUuid sourceTagId, QUuid destTagId)
 {
-    if ( false == tagHasRelationships(sourceTagId)){
+    if (sourceTagId.isNull() || destTagId.isNull()) {
         return;
     }
+
+    // both id must be different (no self-copy)
+    if (sourceTagId==destTagId) {
+        return;
+    }
+
+    // Check if we have enough place to proceed with the duplication
+    qsizetype destSize = getRelationshipsForTag(destTagId).size();
+    qsizetype srcSize = getRelationshipsForTag(sourceTagId).size();
+    if ( (noOfRelationships() - destSize + srcSize) > MAX_NO_RELATIONSHIPS) {
+        return;
+    }
+
+    // First, delete all relationships for destTagId. If destCsdId does not exist, nothing happen.
     deleteRelationshipsForTag(destTagId);
-    QSet<QUuid> oldList = getRelationshipsForTag(sourceTagId);
-    foreach(QUuid csdId, oldList) {
-        store.insert({destTagId,csdId});
+
+    // Then check if sourceTagId has any relationship
+    QSet<QUuid> linkedCsdIds = tagLinks.value(sourceTagId,{});
+    if (linkedCsdIds.size()==0) {
+        return;
+    }
+
+    // Finally, copy
+    for (const QUuid& csdId : linkedCsdIds) {
+        addRelationship(destTagId, csdId);
     }
 }
 
 
-// For a given sourceCsd, copy all its Tag relationships to destCsdId. If sourceCsd has no
-// relationship, the method does nothing. All existing Tag relationships of destCsdId are
-// first deleted.
 void TagCsdRelationships::cloneTagRelationshipsForCsd(QUuid sourceCsdId, QUuid destCsdId)
 {
-    if ( false == csdHasRelationships(sourceCsdId)){
+    if (sourceCsdId.isNull() || destCsdId.isNull()) {
         return;
     }
+
+    // both id must be different (no self-copy)
+    if (sourceCsdId==destCsdId) {
+        return;
+    }
+
+    // Check if we have enough place to proceed with the duplication
+    qsizetype destSize = getRelationshipsForCsd(destCsdId).size();
+    qsizetype srcSize = getRelationshipsForCsd(sourceCsdId).size();
+    if ( (noOfRelationships() - destSize + srcSize) > MAX_NO_RELATIONSHIPS) {
+        return;
+    }
+
+    // First, delete all relationships for destCsdId. If destCsdId does not exist, nothing happen.
     deleteRelationshipsForCsd(destCsdId);
-    QSet<QUuid> oldList = getRelationshipsForCsd(sourceCsdId);
-    foreach(QUuid tagId, oldList) {
-        store.insert({tagId, destCsdId});
+
+    // Then check if sourceCsdId has any relationship
+    QSet<QUuid> linkedTagIds = csdLinks.value(sourceCsdId,{});
+    if (linkedTagIds.size()==0) {
+        return;
+    }
+
+    // Finally, copy
+    for (const QUuid& tagId : linkedTagIds) {
+        addRelationship(tagId, destCsdId);
     }
 }
 
@@ -250,11 +308,15 @@ void TagCsdRelationships::cloneTagRelationshipsForCsd(QUuid sourceCsdId, QUuid d
 QJsonObject TagCsdRelationships::toJson() const
 {
     QJsonArray jsonArray;
-    for (const TagCsdRelationship& entry : store) {
-        QJsonObject entryObject;
-        entryObject["TagId"] = entry.tagId.toString(QUuid::WithoutBraces);
-        entryObject["CsdId"] = entry.csdId.toString(QUuid::WithoutBraces);
-        jsonArray.append(entryObject);
+    for (auto tagIt = tagLinks.constBegin(); tagIt != tagLinks.constEnd(); ++tagIt) {
+        const QUuid& tagId = tagIt.key();
+        const QSet<QUuid>& csdSet = tagIt.value();
+        for (const QUuid& csdId : csdSet) {
+            QJsonObject entryObject;
+            entryObject["TagId"] = tagId.toString(QUuid::WithoutBraces);
+            entryObject["CsdId"] = csdId.toString(QUuid::WithoutBraces);
+            jsonArray.append(entryObject);
+        }
     }
     QJsonObject jobject;
     jobject["Set"] = jsonArray;
@@ -263,132 +325,167 @@ QJsonObject TagCsdRelationships::toJson() const
 
 
 TagCsdRelationships TagCsdRelationships::fromJson(const QJsonObject &o,
-    Util::OperationResult &result)
+    Util::ResultOfOperation &result)
 {
-    QJsonValue jsonValue;
-    result.success = false;
-    result.errorStringUI = "";
-    result.errorStringLog = "";
+    bool success;
     TagCsdRelationships r;
-    QUuid tagId;
-    QUuid csdId;
-    int ok;
 
-    jsonValue = o.value("Set");
-    if (jsonValue == QJsonValue::Undefined){
-        result.errorStringUI = tr("TagRelationship - Cannot find Set tag");
-        result.errorStringLog = "TagRelationship - Cannot find Set tag";
+    // Reset result to ERROR
+    result.init();
+
+    // Check if "Set" key exists
+    QJsonValue jsonValue = o.value("Set");
+    if (jsonValue == QJsonValue::Undefined) {
+        result.logErrorMessage = "TagRelationship: Cannot find token \"Set\"";
         return r;
     }
-    if (jsonValue.isArray()==false){
-        result.errorStringUI = tr("TagRelationship - Set tag is not an array");
-        result.errorStringLog = "TagRelationship - Set tag is not an array";
+
+    // Check if "Set" is an array
+    if (!jsonValue.isArray()) {
+        result.logErrorMessage = "TagRelationship: Set token is not an array";
         return r;
     }
-    QJsonArray arr = o["Set"].toArray();
 
+    QJsonArray arr = jsonValue.toArray();
+
+    // Check array size against MAX_NO_RELATIONSHIPS
     if (arr.size() > MAX_NO_RELATIONSHIPS) {
-        result.errorStringUI = tr("TagRelationship - Too many entries");
-        result.errorStringLog = "TagRelationship - Too many entries";
+        result.logErrorMessage = QString("TagRelationship: Too many entries, found %2 but "
+            "maximum is %3").arg(arr.size()).arg(MAX_NO_RELATIONSHIPS);
         return r;
     }
 
+    // Iterate through the array
     for (int i = 0; i < arr.size(); ++i) {
         QJsonValue value = arr.at(i);
-        if (value.isObject()) {
-            QJsonObject jsonObject = value.toObject();
-            TagCsdRelationship entry;
-
-            // Tag ID
-            bool found = jsonObject.contains("TagId");
-            if (found==false){
-                result.errorStringUI = tr("TagRelationship - TagId not found");
-                result.errorStringLog = "TagRelationship - TagId not found";
-                return r;
-            }
-            QJsonValue tagIdValue = jsonObject["TagId"];
-            if (tagIdValue.isString()) {
-                QUuid uuid (tagIdValue.toString());
-                if (uuid.isNull()) {
-                    // invalid UUID
-                    result.errorStringUI = tr("TagRelationship - TagId is not a valid UUID");
-                    result.errorStringLog = "TagRelationship - TagId is not a valid UUID";
-                    return r;
-                } else {
-                    // all is well
-                    tagId = uuid;
-                }
-            } else {
-                // Handle the case where TagId is not a string
-                result.errorStringUI = tr("TagRelationship - TagId is not a string");
-                result.errorStringLog = "TagRelationship - TagId is not a string";
-                return r;
-            }
-
-            // Csd ID
-            found = jsonObject.contains("CsdId");
-            if (found==false){
-                result.errorStringUI = tr("TagRelationship - CsdId not found");
-                result.errorStringLog = "TagRelationship - CsdId not found";
-                return r;
-            }
-            QJsonValue csdIdValue = jsonObject["CsdId"];
-            if (csdIdValue.isString()) {
-                QUuid uuid(csdIdValue.toString());
-                if (uuid.isNull()) {
-                    // invalid UUID
-                    result.errorStringUI = tr("TagRelationship - CsdId is not a valid UUID");
-                    result.errorStringLog = "TagRelationship - CsdId is not a valid UUID";
-                    return r;
-                } else {
-                    // all is well
-                    csdId = uuid;
-                }
-            } else {
-                // Handle the case where csdId is not a string
-                result.errorStringUI = tr("TagRelationship - CsdId is not a string");
-                result.errorStringLog = "TagRelationship - CsdId is not a string";
-                return r;
-            }
-
-            r.addRelationship(tagId, csdId);
+        if (!value.isObject()) {
+            result.logErrorMessage = "TagRelationship: An array element is not an object";
+            return r;
         }
+
+        QJsonObject jsonObject = value.toObject();
+
+        // Tag ID
+        if (!jsonObject.contains("TagId")) {
+            result.logErrorMessage = "TagRelationship: Token \"TagId\" not found";
+            return r;
+        }
+        QJsonValue tagIdValue = jsonObject["TagId"];
+        if (!tagIdValue.isString()) {
+            result.logErrorMessage = "TagRelationship: TagId is not a string";
+            return r;
+        }
+        QString idString = tagIdValue.toString();
+        QUuid tagId  = Util::convertStringToQuuid(idString, success);
+        if (success==false) {
+            idString.truncate(38);
+            result.logErrorMessage = QString("TagRelationship: TagId \"%1\" is not a valid UUID")
+                .arg(idString);
+            return r;
+        }
+
+        // Csd ID
+        if (!jsonObject.contains("CsdId")) {
+            result.logErrorMessage = "TagRelationship: Token \"CsdId\" not found";
+            return r;
+        }
+        QJsonValue csdIdValue = jsonObject["CsdId"];
+        if (!csdIdValue.isString()) {
+            result.logErrorMessage = "TagRelationship: CsdId is not a string";
+            return r;
+        }
+        idString = csdIdValue.toString();
+        QUuid csdId  = Util::convertStringToQuuid(idString, success);
+        if (success==false) {
+            result.logErrorMessage = QString("TagRelationship: CsdId \"%1\" is not a valid UUID")
+                .arg(idString);;
+            return r;
+        }
+
+        // Both IDs must be different
+        if (csdId==tagId) {
+            result.logErrorMessage = QString("TagRelationship: CsdId %1 is the same as TagId")
+                .arg(tagId.toString(QUuid::WithoutBraces));
+            return r;
+        }
+
+        // Add to tagLinks and csdLinks
+        r.tagLinks[tagId].insert(csdId);
+        r.csdLinks[csdId].insert(tagId);
     }
 
-    result.success = true;
+    result.status = Util::ResultOfOperationStatus::SUCCESS;
     return r;
 }
 
 
-// Qt doc says about the key : the type must provide operator==()
-bool TagCsdRelationship::operator==(const TagCsdRelationship &o) const
-{
-    if( (tagId != o.tagId) ||
-        (csdId != o.csdId) ){
-        return false;
+TagCsdRelationships::IntegrityReport TagCsdRelationships::checkIntegrity() const {
+
+    IntegrityReport report{false, QString()};
+
+    // Check tagLinks -> csdLinks consistency and self-links
+    for (auto it = tagLinks.constBegin(); it != tagLinks.constEnd(); ++it) {
+        const QUuid& tagId = it.key();
+        const QSet<QUuid>& csdIds = it.value();
+
+        // Check for empty sets
+        if (csdIds.isEmpty()) {
+            report.errorFound = true;
+            report.problem += QString("Empty set found in tagLinks for tagId %1\n")
+                .arg(tagId.toString());
+            continue;
+        }
+
+        // Check for self-links
+        if (csdIds.contains(tagId)) {
+            report.errorFound = true;
+            report.problem += QString("Self-link found in tagLinks for tagId %1\n")
+                .arg(tagId.toString());
+            continue;
+        }
+
+        // Verify each csdId in tagLinks[tagId] has tagId in csdLinks[csdId]
+        for (const QUuid& csdId : csdIds) {
+            if (!csdLinks.contains(csdId) || !csdLinks.value(csdId).contains(tagId)) {
+                report.errorFound = true;
+                report.problem += QString("tagId %1 links to csdId %2 but csdId does not link"
+                "back to tagId in csdLinks\n").arg(tagId.toString(), csdId.toString());
+            }
+        }
     }
-    return true;
+
+    // Check csdLinks -> tagLinks consistency and self-links
+    for (auto it = csdLinks.constBegin(); it != csdLinks.constEnd(); ++it) {
+        const QUuid& csdId = it.key();
+        const QSet<QUuid>& tagIds = it.value();
+
+        // Check for empty sets
+        if (tagIds.isEmpty()) {
+            report.errorFound = true;
+            report.problem += QString("Empty set found in csdLinks for csdId %1\n")
+                .arg(csdId.toString());
+            continue;
+        }
+
+        // Check for self-links
+        if (tagIds.contains(csdId)) {
+            report.errorFound = true;
+            report.problem += QString("Self-link found in csdLinks for csdId %1\n")
+                .arg(csdId.toString());
+            continue;
+        }
+
+        // Verify each tagId in csdLinks[csdId] has csdId in tagLinks[tagId]
+        for (const QUuid& tagId : tagIds) {
+            if (!tagLinks.contains(tagId) || !tagLinks.value(tagId).contains(csdId)) {
+                report.errorFound = true;
+                report.problem += QString("csdId %1 links to tagId %2 but tagId does not link"
+                " back to csdId in tagLinks\n").arg(csdId.toString(), tagId.toString());
+            }
+        }
+    }
+
+    return report;
 }
 
 
-bool TagCsdRelationship::operator!=(const TagCsdRelationship &o) const
-{
-    return !(*this==o);
-}
-
-
-TagCsdRelationship &TagCsdRelationship::operator=(const TagCsdRelationship &o)
-{
-    this->tagId = o.tagId;
-    this->csdId = o.csdId;
-    return *this;
-}
-
-
-// Create a Hash value for TagCsdRelationships::Entry, required to use QSet with
-// key = TagCsdRelationships::Entry
-// Qt doc says : "there must also be a GLOBAL qHash()
-// function that returns a hash value for an argument of the key's type."
-size_t  qHash(const TagCsdRelationship &entry, size_t seed = 0) {
-    return qHashMulti(seed, entry.tagId, entry.csdId);
-}

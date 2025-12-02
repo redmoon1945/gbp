@@ -59,8 +59,8 @@ signals:
     // For Options Edition : prepare content before edition
     void signalOptionsPrepareContent();
     // For Analysis Dialog : prepare content before edition
-    void signalAnalysisPrepareContent(QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData,
-        CurrencyInfo currInfo);
+    void signalAnalysisPrepareContent(QWeakPointer<CombinedFeStreams> chartRawDataRef,
+        Tags availabletags, CurrencyInfo currInfo, double startingAmount);
     // For DateInterval Dialog : prepare content before edition
     void signalDateIntervalPrepareContent(QDate from, QDate to);
     //
@@ -71,11 +71,23 @@ signals:
     void signalAboutDialogPrepareContent(QLocale theLocale);
 
 public slots:
-    // From SelectCountry Dialog : receive result and notification of edition completion
+    /**
+     * @brief Follow-up to "New Scenario" menu selection (2nd step). From this point, a new empty
+     * scenario will be created and will become the current scenario.
+     * @param countryCode ISO code of the country.
+     * @param currInfo Currency Information.
+     */
     void slotSelectCountryResult(QString countryCode, CurrencyInfo currInfo);
+
     void slotSelectCountryCompleted();
     // From Edit Scenario : result and edition completion notification
+
+    /**
+     * @brief Scenario Edition has been "applied" : update accordingly.
+     * @param regenerateData True means all FE list must be recalculated from scratch.
+     */
     void slotEditScenarioResult(bool regenerateData);
+
     void slotEditScenarioCompleted();
     // From Options Edit : result and edition completion notification
     void slotOptionsResult(OptionsDialog::OptionsChangesImpact impact);
@@ -85,8 +97,13 @@ public slots:
     void slotDateIntervalCompleted();
     // From ScenarioProperties : completion notification
     void slotScenarioPropertiesCompleted();
-    // to catch point selection signal in main chart
+
+    /**
+     * @brief to catch point selection signal in main chart.
+     * @param pt Selected point on the curve.
+     */
     void mypoint_clicked(QPointF pt);
+
     // to catch scale change in an axis in main chart
     void handleXaxisRangeChange(QDateTime dtFrom, QDateTime dtTo);
     void handleYaxisRangeChange(qreal min, qreal max);
@@ -96,7 +113,7 @@ protected:
 
 private slots:
 
-    void on_actionQuit_triggered();
+    void on_actionQuit_triggered(); //> this generate a "close-event"
     void on_actionAbout_triggered();
     void on_actionAbout_Qt_triggered();
     void on_actionOpen_triggered();
@@ -106,11 +123,8 @@ private slots:
     void on_actionEdit_triggered();
     void on_actionProperties_triggered();
     void on_actionNew_triggered();
-    void on_actionClear_List_triggered();
-    void on_actionRecentFile_triggered();
     void on_actionOptions_triggered();
     void on_actionAnalysis_triggered();
-    void on_toolButton_Max_clicked();
     void on_toolButton_3M_clicked();
     void on_toolButton_1M_clicked();
     void on_toolButton_6M_clicked();
@@ -123,54 +137,72 @@ private slots:
     void on_toolButton_15Y_clicked();
     void on_toolButton_20Y_clicked();
     void on_toolButton_25Y_clicked();
-    void on_toolButton_50Y_clicked();
+    void on_toolButton_Max_clicked();
     void on_toolButton_Fit_clicked();
+    void on_toolButton_EOY_clicked();
+    void on_customToolButton_clicked();
     void on_showPointsCheckBox_stateChanged(int arg1);
     void on_toolButton_Right_clicked();
     void on_toolButton_Left_clicked();
     void on_exportTextFilePushButton_clicked();
     void on_baselineDoubleSpinBox_editingFinished();
-    void on_customToolButton_clicked();
     void on_actionUser_Manual_triggered();
     void on_actionQuick_Tutorial_triggered();
     void on_actionChange_Log_triggered();
-
-
     void on_actionPV_Calculator_triggered();
+    void on_actionReload_triggered();
+
+    // We do the explicit connection, so we drop the on_... naming convention entirely
+    void actionClear_List_triggered();
+    void actionRecentFile_triggered();
+
 
 private:
 
     Ui::MainWindow *ui;
 
+    // *** Struct and enums ***
+
     enum class X_RESCALE {X_RESCALE_NONE, X_RESCALE_CUSTOM, X_RESCALE_DATA_MAX,
         X_RESCALE_SCENARIO_MAX};
+
+    /**
+     * @brief Used when comparing scenario in memory with counter part on disk.
+     */
+    enum class CompareWithScenarioFileResult {CONTENT_IDENTICAL, CONTENT_DIFFER,
+        NOT_SAVED, NO_SCENARIO_LOADED, SCENARIO_FILE_GONE, ERROR_LOADING_SCENARIO};
+
     struct xAxisRescale{
         X_RESCALE mode;
         QDateTime from; // used only when mode = X_RESCALE_CUSTOM=1
         QDateTime to;   // used only when mode = X_RESCALE_CUSTOM=1
     };
 
-    // Used when comparing scenario in memory with counter part on disk
-    enum CompareWithScenarioFileResult {CONTENT_IDENTICAL, CONTENT_DIFFER,
-        NOT_SAVED, NO_SCENARIO_LOADED, ERROR_LOADING_SCENARIO};
 
-    // Dialogs
-    EditScenarioDialog* editScenarioDlg;
+    // *** Children Dialogs pointers ***
+
+    EditScenarioDialog* editScenarioDlg; // no parent
+    PresentValueCalculatorDialog* pvCalculatorDlg; // no parent
+
     SelectCountryDialog* selectCountryDialog;
     OptionsDialog* optionsDlg;
     AboutDialog* aboutDlg;
     AnalysisDialog* analysisDlg;
     DateIntervalDialog* dateIntervalDlg;
     ScenarioPropertiesDialog* scenarioPropertiesDlg;
-    PresentValueCalculatorDialog* pvCalculatorDlg;
 
-    // variables
+
+
+    // *** misc variables ***
+
     int maxRecentFiles = 10;
     QList<QAction*> recentFileActionList;
-    double chartScalingFactor;      // see QChart. 1 means no zoom
-    QLocale locale;                 // system locale, as determined when constructor un
+    QLocale locale;                 // default locale to use, as determined at startup
 
-    // variables for the chart
+
+    // *** variables for the chart ***
+
+    double chartScalingFactor;      // see QChart. 1 means no zoom
     CustomQChartView *chartView;
     QChart *chart ;
     QLineSeries *shadowSeries;          // shadow the points just to trace line between them
@@ -178,46 +210,152 @@ private:
     QLineSeries *zeroYvalueLineSeries;  // line at y value = 0
     QDateTimeAxis *axisX;
     QValueAxis *axisY;
-    QMap<QDate,CombinedFeStreams::DailyInfo> chartRawData;
     QDateTime fullFromDateX;        // tomorrow
     QDateTime fullToDateX;          // max date of calculation for the current scenario
     uint xAxisFontSize;
     uint yAxisFontSize;
     int indexLastPointSelected = -1;
+    /**
+     * @brief The final stream of financial events generated for the scenario. This is
+     * what is displayed in the Cash Balance curve an Analysis module. MainWindow object
+     * is the owner of chartRawData.
+     */
+    QSharedPointer<CombinedFeStreams> chartRawData; // generated data for Cash Balance curve
+
 
     // *** methods ***
 
     // Chart-related stuff
+
+    /**
+     * @brief Regenerate the Scenario Flow Data (that is the chartRawData). Do not touch the chart,
+     * series or axis. All references to CSD QSharedPointers are destroyed and rebuilt.
+     * @param timeData List of final amount per day.
+     * @param shadowTimeData List of final amount per day, plus fake points to simulate steps
+     * in line curve
+     */
     void regenerateRawData(QList<QPointF>& timeData, QList<QPointF>& shadowTimeData);
+
+    /**
+     * @brief From existing chartRawData (which is not modified), rebuild chart's series and set
+     * characteristics (like Colors). data and shadowData are coming from chartRawData.
+     * Does not update the Chart (rescaling).
+     * @param data List of final amount per day.
+     * @param shadowData List of final amount per day, plus fake points to simulate steps in
+     * line curve
+     */
     void replaceChartSeries(QList<QPointF> data, QList<QPointF> shadowData);
+
+    /**
+     * @brief Rescale both axis of the chart. Y axis is always auto-scaled. Chart's data is
+     * NOT changed.A scenario must be loaded.
+     * @param xAxisRescaleMode How the xAxis will be rescaled.
+     * @param addMarginAroundXaxis Normally true. It means X axis limit are extended by the
+     * rescaling factor" set in Options, in order to prevent border point to fall directly on Y
+     * axis. For "shitfing" however, we want this turned Off (false)
+     */
     void rescaleChart(xAxisRescale xAxisRescaleMode, bool addMarginAroundXaxis);
+
+    /**
+     * @brief Used ONLY by the toolbuttons above the Cash Balance curve. A scenario must be loaded.
+     * Y axis is rescaled accordingly.
+     * @param noOfMonths No of month to rescale the X axis.
+     */
     void rescaleXaxis(uint noOfMonths);
+
     void shiftGraph(bool toTheRight);
     void themeChanged();
     void setSeriesCharacteristics();
     void reduceAxisFontSize();
     void setXaxisFontSize(uint fontSize);
     void setYaxisFontSize(uint fontSize);
+
+    /**
+     * @brief The format is set in the Options.
+     */
     void setXaxisDateFormat();
+
     void initChart();
 
     // misc
+
+    /**
+     * @brief Load a scenario file into a Scenario object.
+     * @param fileName The file name to load from.
+     * @return true if successful, false otherwise
+     */
     bool loadScenarioFile(QString fileName);
+
+    /**
+     * @brief Save current scenario under the provided filename. No error message is displayed,
+     * but loggin is performed.
+     * @param fileName Name of the file to save the scenario into.
+     * @return Info about the operation result.
+     */
     Scenario::FileResult saveScenario(QString fileName);
+
+    /**
+     * @brief Deprecated : now do nothing
+     * @param msg Message to display.
+     */
     void msgStatusbar(QString msg);
+
+    /**
+     * @brief Rebuild the menu from scratch, empty it (no recent files).
+     */
     void recentFilesMenuInit();
+
     void recentFilesMenuUpdate();
     bool eventFilter(QObject *object, QEvent *event) override;
+
+    /**
+     * @brief Fill the "Daily Info" Section related to the point selected on the Cash Balance curve.
+     * @param date Date of the selected point.
+     * @param amount Total cummultaive amount for the selected date.
+     * @param di Full info about the selected point.
+     */
     void fillDailyInfoSection(const QDate& date, double amount,
         const CombinedFeStreams::DailyInfo& di);
+
+
     void emptyDailyInfoSection();
+
+    /**
+     * @brief Refresh the content of the "General Info" section.
+     * @details A scenario must have been loaded.
+     */
     void fillGeneralInfoSection();
+
+    /**
+     * @brief Erase the content of the "General Info" section.
+     */
     void emptyGeneralInfoSection();
+
+    /**
+     * @brief Current Scenario has changed, reset the baseline widgets.
+     */
     void resetBaselineWidgets();
+
+    /**
+     * @brief Compare current scenario in memory with its counterpart on disk.
+     * @return
+     */
     CompareWithScenarioFileResult compareCurrentScenarioWithFile();
+
+    /**
+     * @brief We are about to switch the current scenario and proceeed to the next task.
+     * @details Ask the user if he wants to save the current "modified" scenario.
+     * 3 possible answers :
+     *   Yes : Save currently modified (or unsaved new) scenario and proceed to the next task.
+     *   No : Do not save currently modified (or unsaved new) scenario and proceed to the next task.
+     *   Cancel : Do nothing and do NOT proceed to the next task.
+     * @return true : we can proceeed further (user may be asked), false : do NOT proceed
+     * forward (Cancel button or ESC pressed)
+     */
     bool aboutToSwitchScenario();
+
+
     void changeYaxisLabelFormat();
-    uint calculateTotalNoOfEvents();
     void setWindowTopTitle();
     void adjustMenuItemLength();
 };

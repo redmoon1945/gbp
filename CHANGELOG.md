@@ -1,31 +1,136 @@
-# Change logs
+# Change log for GBP
+
+## 1.6.3 to 1.7.0
+
+### New features : The big ones
+
+- In Analysis module :
+  - A new section has been added, dedicated to analyze the **Tags** associations with the Cash Stream Definitions and provide useful statistics.
+  - The Relative Weight section has received several noteworthy improvements.
+- In Options module : 
+  - Add a “reset” option to set all the options to “factory settings”
+  - Add an option to follow the desktop theme for charts foreground and background colors.
+- General :
+  - For Linux :
+    - GBP can now more closely match the selected desktop theme. Dark themes will be respected on most platforms (Gnome, Kde, Cinnamon, XFCE). 
+    - Wayland support has improved
+  - For Windows :
+    - By default, GBP uses the "Cross-Platform" look. Although it does not perfectly match the native Windows 11 look, it avoids several compatibility issues present in Qt and Windows 11. This default choice may be revisited in future GBP releases. If you prefer, you can manually select the alternative Windows Vista or Windows 11 Native themes. Run gbp -h for more information. 
+  - All platforms:
+    - Colors have been optimized to look great by default on either light or dark themes. The Options dialog now also allows you to customize the colors used for income and expense amounts. With this addition, virtually all color-based elements in GBP can be personalized.
+    - Add several command line flags to customize the look or behavior of GBP : type "gbp -h" for details.
+
+### New features : The details
+
+- In Analysis Dialog :
+  - Add a new analysis module dedicated to Tags (tab "Tags"). It enables tracking the contributions of user-chosen tags over a user-specified period.
+  - For Relative Weight module
+    - Legend has been detached and put in its own listbox to the right of the Pie Chart, in order to support large no of items using scroll bar.
+    - Clicking on 1 element of the legend now makes the corresponding slice stand out and its rank, amount and percentage are displayed just below the legend.
+    - Selecting multiple legend elements show the sum of their respective amounts and percentages.
+    - The pie can be rotated using the slider control, in order to optimize the placement of outer labels.
+    - Labels can be turned off.
+    - The set of colors for slices has been improved to better support both dark and light background.
+  - For Annual and Monthly report tables, add a new column displaying the cumulative cash balance at the end of each period. This will also be added by the export to CSV files.
+- In Main Window :
+  - The Message toolbar at the bottom of the screen has been removed, thus giving more useful space for the curve. 
+  - In the upper toolbar dedicated to set the X axis range, add a "till the END of the YEAR" (EOY) button, to set the X date range from Tomorrow to EOY.
+  - A new "Reload" menu item has been added to the "Scenario" menu. It is used to reload the current scenario from disk, discarding the unsaved modifications that have been made.  
+- In Edit Scenario Dialog,
+  - Add an explicit combobox to select the "combination mode" of the selected filter tags (AND, OR, NOT). This combobox was previously located in the Tag Selection Dialog (radio buttons).
+  - "Filter Tags" string is now in blue, in order to clearly differentiate it from the other type of filters on the left.
+  - Currency name is now in English or French (in 1.6.3 and before, it was in the currency's country native language, which is inconsistent with the 2 languages supported by GBP at this moment)
+- In Edit Irregular Csd
+  - Add the option to export all the incomes/expenses defined in a CSV file.
+- In Date Edit Dialog, 
+  - Add a "Tomorrow" button for the "From" date to set it to the real tomorrow. 
+  - Add an "End-of-Year" button for the "To" date to set it to the last day of the current year.
+- In Options Dialog,
+  - Add the capability to let the user choose the colors for incomes/expenses labels or bar charts in the application. The default is optimized to provide a good compromised for both light and dark themes. This option has been added because user may which to choose a color that is optimal for his own theme (e.g. a particularly vibrant green for income in a dark theme) instead of the default one.
+  - Add a "reset" option to set all the options back to "factory settings"
+  - For Charts theme, transform the "use dark theme" checkbox into "Charts Theme" options set : 1) Force light theme 2) Force dark theme and 3) Follow system desktop theme.
+- Global : 
+  - The maximum value for an amount is now a 14-digit integer instead of 15 as for 1.6.3 and below. It means for example that for currency with 2 decimals (USD, CAD, Euro), the maximum value allowed is now  (1 trillion - 0.01). For Yen (0 decimal), it is (100 trillion -1)
+  - _Gnome/Cinnamon Wayland_ : 
+    - Because of design choices made by their respective development teams, these desktop environments do not implement Server-Side Decoration, resulting in borderless windows. Until Qt provides a reliable implementation of Client-Side Decoration, the best option for GBP when running under GNOME or Cinnamon (e.g., Ubuntu GNOME, Fedora GNOME, Linux Mint, LMDE) is to use XWayland—a compatibility layer based on X11. This is the default behavior in GBP. GBP runs perfectly well under XWayland, but it does not benefit from the additional features provided by native Wayland. If you wish to force Wayland, launch GBP with the command-line argument: -xwayland
+  - Windows :
+    - GUI look is set to "Fusion" by default. To have Windows 11 native look or Windows Vista look, see gbp -h
+  - All exports to CSV files now default to ".csv" as extension (and not .txt)
+  - Export Dialogs use as default the last export directory used.
+  - Import Dialogs use as default the last import directory used.
+  - The "alternate color mode" for most listboxes and tables have been removed, because on some platforms (e.g. Windows), it was more distracting than helpful. The only exception are tables in Analysis module for Monthly And Yearly reports.
+  - Log system has been enhanced
+    - Log files are now formatted as CSV files ready to import in a spreadsheet application (same .txt extension though) and 
+    - New available command line switches : 
+      - -logverbosity=NORMAL or -logverbosity=DEBUG  Default is NORMAL
+      - -logprivacy=PUBLIC_ONLY or -logprivacy=ALLOW_PRIVATE  Default is PUBLIC_ONLY
+- New command line options have been added : here is the whole set (old and new) for 1.7.0 : 
+  - -h, --help : Display help message and exit
+  - -usesystemfont : Force the use of the default system font (all platforms)
+  - -windowslook=fusion : Use "cross-platform" style. This is the default (Windows only)
+  - -windowslook=native : Use native Windows 11 style (Windows only)
+  - -windowslook=vista : Use Windows Vista style. This is closer to Windows 11 native look, but not quite (Windows only)
+  - -xwayland : Force XWayland instead of using native Wayland (Linux only)
+  - -noxwayland : Prevent switching to XWayland, use native Wayland only (Linux only)
+  - -locale=LANG-TERRITORY : Override system locale (e.g., -locale=en-US) (all platforms)
+  - -logprivacy=ALLOW_PRIVATE : Allow sensitive data in logs (all platforms)
+  - -logprivacy=PUBLIC_ONLY : Hide sensitive data from logs, default (all platforms)
+  - -logverbosity=DEBUG : Set verbose debug logging (all platforms)
+  - -logverbosity=NORMAL : Set normal logging verbosity, default (all platforms)
+
+
+### Fixes
+
+- Theming : For Linux Gnome/Cinnamon (e.g. Ubuntu 24 / 26, Fedora 43 Gnome, Linux Mint, etc), GBP can now detect and apply some elements of the system theming, like dark/light mode. However, it still cannot detect and adapt to the _accent color_ chosen in the system configuration. For KDE system however (e.g. Tuxedo OS, Fedora 43 KDE, OpenSuse, etc), all configuration settings related to theming are respected. 
+- A long standing (but minor) bug has been fixed : 2 error messages were written on the console when the application is started. They do not appear anymore. Although without consequence, this was annoying :
+  - .qt.core.qmetaobject.connectslotsbyname: QMetaObject::connectSlotsByName: No matching signal for on_actionClear_List_triggered()
+  - qt.core.qmetaobject.connectslotsbyname: QMetaObject::connectSlotsByName: No matching signal for on_actionRecentFile_triggered()
+- Improves the error messages displayed when trying to open a scenario file for which the user has no permission.
+- Improves French translation for Present Value Calculator
+- This version of GBP has been compiled with Qt 6.10.1, so some Wayland (on Linux) bugs have been fixed by Qt.
+
+### Known Issues
+
+- On Ubuntu Linux systems (tested on 22.04 and 24.04), secondary windows (e.g. popup dialogs) are tied by default to the Main Window and cannot be moved. To be able to move them (which is recommended as it adds flexibility), you can use the Gnome Tweaks application : go to Windows->Attach Modal Dialog and toggle to OFF. Another approach is to type the following command in a terminal : gsettings set org.gnome.mutter attach-modal-dialogs false
+- In extreme scenarios (meaning that do not correspond to expected use cases of GBP), where really extremely large data set is generated (e.g. generate many events per day, every day, for 100 years), there could be a noticeable lag between the moment you click on a point of the Cash Balance curve and the relevant info is displayed in the right panel. This depends heavily on the speed of your computer. The next 1.8 release will address the speed issue (expected end of 2026).
+
+
 ## 1.6.2 to 1.6.3
+
 ### New features
+
 - Change reference to the new repo site (now on Github : https://github.com/redmoon1945/gbp)
 - Add a Present Value Calculator in "Tools" menu"
 
 ## 1.6.1 to 1.6.2
+
 ### Fixes
+
 - Correct the "too-small" width of menu items when a very big font is used. The problem was due to Qt, but a workaround has been found.
 
 ## 1.6.0 to 1.6.1
+
 ### New features
+
 - Analysis - Annual and monthly graphical report
   - Add Statiscal Info (Mean, Standard deviation and Sum) to the displayed data
   - Change slightly the layout to add more vertical space for the graph, which is useful when large font are used (Y axis label have more space to extend and show the labels)
 
 ### Fixes
+
 - A change in 1.6.0 introduced a bug that made the Main Window "inactive" when the Edit Scenario Dialog was hidden.
 
 ## 1.5.3 to 1.6.0
+
 ### New Features
+
 - **Introducing the notion of tags**, which is a way to implement categories of incomes/expenses, but in a much more flexible and powerful way.
   - In Edit Scenario Dialog, add a **Manage Tags** buttons in the bottom left, which pops up a Dialog allowing to edit tags and their relationships with Cash Stream Definitions
   - In Edit Scenario Dialog, add a new filter "**Tag Filtered**", allowing to see only Cash Stream Definitions that are linked to a modifiable user-defined set of tags
   - In Edit Periodic and Irregular Cash Stream Definitions, show the associated tags (read only)
 - In About Dialog, add a new Contact tab for those who wish to know how to contact directly the author(s) of this software.
 - In MainWindow,
-  -  Add a line at value Y=0, with user-specified color. This helps to identify rapidly if a point is above or below 0. Can be turned off in Options Dialog.
+  - Add a line at value Y=0, with user-specified color. This helps to identify rapidly if a point is above or below 0. Can be turned off in Options Dialog.
   - Add the file name of the scenario file opened in the top window title (chopped to 50 char max)
 - In Options Dialog,
   - Reformat the Chart tab layout for better clarity
@@ -36,39 +141,47 @@
   - Make the Dialog modal
 - In Edit Scenario Dialog
   - Rework the filters controls, so it is easier to
- undertand and it takes less visual space.
+    undertand and it takes less visual space.
   - It is now possible to select several Cash Stream Definitions and in one shot set the color of theirs names ("Set Color" button)
 - In several Dialogs, optimize the spacing and position of the UI components to provide more space to the list of incomes/expenses, while maintaining the same window size.
 - In all Dialogs, use short format for dates, because the long one takes up too much space when big fonts are used.
 
-
 ### Fixes
+
 - When no scenario is loaded and a change is made on the Start Amount, the program crashes.
 
 ### Known Issues
+
 - On Ubuntu systems (tested on 22.04 and 24.04), secondary windows (e.g. popup dialogs) are tied by default to the Main Window and cannot be moved. To be able to move them (which is recommended as it adds flexibility), you can use the Gnome Tweaks application : go to Windows->Attach Modal Dialog and toggle to OFF. Another approach is to type the following command in a terminal : gsettings set org.gnome.mutter attach-modal-dialogs false
 - When a very large font is used as the application font (e.g. size 24), the menu in the Main Window is not wide enough to show the menu items texts. This is an issue with Qt itself and no solution has been found at the moment.
 - In extreme scenarios (meaning that do not correspond to expected use cases of GBP), where really extremely large data set is generated (e.g. generate many events per day, every day, for 100 years), there could be a noticeable lag between the moment you click on a point of the Cash Balance curve and the relevant info is displayed in the right panel. This depends heavily on the speed of your computer. There is no easy way to speed up things internally, so I do not expect any improvement on this behavior.
 - GBP is a Qt 6 application. Unfortunately, at the time of this writing, theme setting in some Gnome-based distributions (like Ubuntu 22.04) cannot be understood by Qt 6 application (they wont react to the change made to the theme). You can alleviate the problem by using the "Dark/light mode" settings in GBP Options menu : this will affect the rendering of all the charts in the application.
 
 ## 1.5.2 to 1.5.3
+
 ### Fixes
+
 - Minor UI adjustments to better support very big fonts
 - Improve the way GBP detects the default system font on Linux
 - When no scenario is loaded, trying to launch the Analysis Module craches the application
 
-
 ## 1.5.1 to 1.5.2
+
 ### Fixes
+
 - When a new scenario is created right after the launch of the program (without loading first an existing scenario), trying to see the occurences
-for a new income/expense would crash the program.
+  for a new income/expense would crash the program.
 
 ## 1.5.0 to 1.5.1
+
 ### Fixes
+
 - In MainWindow, set limits to zoom in/out operations for the Cash Balance curve, in order to prevent insane levels (like zooming out 10000 years)
 
 ## 1.4.1 to 1.5.0
+
 ### New Features
+
 - In MainWindow, change the zooming mechanism with middle mouse button, so that the zoom is made around the mouse position and not the center of the chart
 - In MainWindow, upper toolbar, add the button "4Y"
 - In MainWindow, add a new horizontal-only zooming, by pressing the SHIFT key when rotating the mouse wheel.
@@ -77,16 +190,21 @@ for a new income/expense would crash the program.
 - In Option Dialog, add the option to localize the dates for all CSV exports. 
 
 ### Fixes
+
 - In MainWindow, change the Y axis font of the Cash Balance chart to "mono" type, to prevent small jittering when values change.
 - In MainWindow, export to CSV, localize the date format according to System Locale.
- 
+
 ## 1.4.0 to 1.4.1
+
 ### Fixes
+
 - In EditScenario, when "Apply" button is clicked, refresh the Cash Balance curve while maintaining the X axis scaling as it was.
 - In MainWindow, when baseline amount is changed, refresh the Cash Balance curve while maintaining the X axis scaling as it was.
 
 ## 1.3.0 to 1.4.0
+
 ### New Features
+
 - Moved from Qt 6.2.4 to 6.8.0
 - The Cash Balance chart component has been completely re-written (moved from QCustomPlot to standard QT QChart). This remove the bug related to incorrect X axis tick marks from time to time. 
 - Mouse wheel can be used to zoom in/out the Cash Balance curve. Options allow to set if moving away the wheel zoom in or out.
@@ -103,17 +221,19 @@ for a new income/expense would crash the program.
 - In Help menu, add a new option to see the Change Log for all versions of GBP since 1.0.0
 - In About Dialog, add the name of the Locale used by GBP
 
-
 ### Impacts on compatibility with older versions of GBP
+
 - Concerning the scenario file format change, gbp 1.4 and later will read without any problem the old format (1.0.0) and update transparently the file format to 2.0.0 when opening it. No data is lost or altered. However, older gbp 1.3 and previous versions wont be able to read scenario files created with gbp 1.4 and above, which are of version 2.0.0
 
 ### Fixes
+
 - For a Period Stream Definition of type "END-OF-MONTHLY", if the start date was not on an end of month, it was still part of the generated stream (which is wrong). It is now removed. 
 - In the Analysis : Monthly and Yearly Tables, all months/years are now shown, even if there is no income/expense (value of 0).
 
-
 ## 1.2.0 to 1.3.0
+
 ### New Features
+
 - In menu "Help", it is now possible to consult the full User Manual in PDF format, using the new menu item "User Manual"
 - In menu "Help", it is now possible to consult the a Quick Tutorial in PDF format, using the new menu item "Quick Tutorial"
 - In menu "Help", add to the "About" tab the full name of Config file and current Log file
@@ -126,21 +246,28 @@ for a new income/expense would crash the program.
 - Add a Scenario Properties Dialog in the Main Window, that provides some useful info like the file name, full path, format version, etc.
 
 ## 1.1.5 to 1.2.0
+
 ### New features
+
 - Implement the option to have all calculated amounts converted to Present Values using a user-defined discount rate set in Options Dialog
 - Have Config file location displayed on the terminal at start-up
 - Rename "Close" to "Hide" the Cancel button in EditScenario Dialog
- 
+
 ### Fixes
+
 - In EditScenario, when creating a new income/expense or duplicating an existing one, make sure the duplicated item is made visible (appearing in the view port of the table) after the operation
 
 ## 1.1.4 to 1.1.5
+
 ### New features
+
 * Adopt AGPL V 3.0 or later as licence
 * Add Codeberg URL in the About box, under a new tab ("Source Code")
 
 ## 1.1.3 to 1.1.4
+
 ### New features
+
 * Change RGB to Red Green Blue, remove smart color name because no localized version available
 * Resize gray border for charts in Analysis Dialog to 1 pixel, no round corners
 * Reduce font size for both X and Y axis for monthly and yearly charts in Analysis Dialog (does not work for KDE...)
@@ -153,24 +280,32 @@ for a new income/expense would crash the program.
 * Switch to native Color Chooser, to be able to support Locale language in OS (supported only in Windows and MacOS)
 
 ### Fixes
+
 * Fix translation for Analysis Dialog
 * Fix percentage symbol not displayed sometimes in Edit Growth Dialog
 
 ## 1.1.2 to 1.1.3
+
 ### New features
+
 * Improve About box
 * Remove options to set image export type and quality, always save in PNG quality=100
 
 ## 1.1.0 to 1.1.1
+
 ### New features
+
 * in Edit Perodic Stream Def, change Validity Range date format to MMM from MMMM
 * in Edit Irregular Stream Def, change date format for a shorter version
 
 ### Fixes
+
 * fixe bug in calculation of variable growth
 
 ## 1.0.2 to 1.1.0
+
 ### New features
+
 * add option to set "today" value in "Options" window
 * remove support for command-line argument -today=<date>
 * When requesting new scenario, switching scenario or quitting application, ask to save current scenario if changes have been made but not saved yet
@@ -179,26 +314,14 @@ for a new income/expense would crash the program.
 * Improve sorting of StreamDef name by enabling locale-aware sorting
 
 ### Fixes
+
 * Implement a mechanism to ensure settings is loaded just once
 
-
 ## 1.0.1 to 1.0.2
+
 ### New features
+
 * display today's date in bottom startAmountLabel
 * timeout of 5 sec on status bar message
 * change main and editscenario window size to 1250 x 700
 * adjust layouts of some windows
-
-
-
-
-
-
-
-
-
-
-
-
-
-

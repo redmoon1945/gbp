@@ -25,8 +25,8 @@
 #include <QLocale>
 #include <QCoreApplication>
 #include <QFont>
-#include "irregularfestreamdef.h"
-#include "periodicfestreamdef.h"
+#include "irregularcsd.h"
+#include "periodiccsd.h"
 #include "currencyhelper.h"
 #include "tagcsdrelationships.h"
 #include "tags.h"
@@ -63,12 +63,13 @@ public:
     // *** methods ***
 
     // Send all the data required to rebuild internal data and completey refresh the table's content
-    void refresh(CurrencyInfo curInfo, QMap<QUuid,PeriodicFeStreamDef> incomesDefPeriodic,
-        QMap<QUuid,IrregularFeStreamDef> incomesDefIrregular, QMap<QUuid,PeriodicFeStreamDef>
-        expensesDefPeriodic, QMap<QUuid,IrregularFeStreamDef> expensesDefIrregular, Tags tags,
-        TagCsdRelationships tagsRelationships, bool showIncomes, bool showExpenses,
+    void refresh(CurrencyInfo curInfo, QHash<QUuid,QSharedPointer<PeriodicCsd>> incomesDefPeriodic,
+        QHash<QUuid,QSharedPointer<IrregularCsd>> incomesDefIrregular,
+        QHash<QUuid,QSharedPointer<PeriodicCsd>> expensesDefPeriodic,
+        QHash<QUuid,QSharedPointer<IrregularCsd>> expensesDefIrregular,
+        Tags tags, TagCsdRelationships tagsRelationships, bool showIncomes, bool showExpenses,
         bool showPeriodic, bool showIrregular, bool showActive, bool showInactive,
-        FilterTags filterTags);
+        FilterTags filterTags, bool tagFilteringEnabled);
 
     // Misc querries
     int getRow(QUuid id, bool &found);
@@ -109,7 +110,7 @@ private:
 
     // methods
     bool isItemPassTagFilter(QUuid csdId, TagCsdRelationships tagCsdRelationships,
-        FilterTags filterTags);
+        FilterTags filterTags, bool tagFilteringEnabled);
 };
 
 #endif // SCENARIOCSDTABLEMODEL_H

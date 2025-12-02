@@ -21,7 +21,7 @@
 
 #include "currencyhelper.h"
 #include "customqchartview.h"
-#include "festreamdef.h"
+#include "festream.h"
 #include "growth.h"
 #include "fe.h"
 #include <QDialog>
@@ -44,9 +44,21 @@ public:
     ~VisualizeOccurrencesDialog();
 
 public slots:
+
+    /**
+     * @brief scenarioInflation is used only when csd is a Periodic Csd.
+     * @param currInfo
+     * @param adjustedInflation
+     * @param maxDateScenario
+     * @param csd
+     */
     void slotPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation,
-        QDate maxDateScenario, FeStreamDef* streamDef );
-    // to catch point selection signal in chart
+        QDate maxDateScenario, QWeakPointer<Csd> csd );
+
+    /**
+     * @brief To catch point selection signal in chart.
+     * @param pt
+     */
     void mypoint_clicked(const QPointF pt);
 
 signals:
@@ -57,17 +69,17 @@ private slots:
     void on_closePushButton_clicked();
     void on_VisualizeOccurrencesDialog_rejected();
     void on_fitPushButton_clicked();
-
     void on_exportPushButton_clicked();
 
 private:
     Ui::VisualizeOccurrencesDialog *ui;
 
     // *** Variables ***
+
     QLocale locale;
     CurrencyInfo currInfo;
     // last event limit date according to scenario (could not be in use). Limit set by Periodic
-    // Stream def could override that value (if it is smaller)
+    // Cds could override that value (if it is smaller)
     QDate maxDateScenarioFeGeneration;
     // Curve
     CustomQChartView *chartView;
@@ -81,11 +93,45 @@ private:
     std::vector<double> searchVector;
     int indexLastPointSelected = -1;
 
-    // Methods
+    // *** Methods ***
+
+
     bool eventFilter(QObject *object, QEvent *event) override;
-    QList<Fe> generateFinancialEvents(Growth scenarioInflation, FeStreamDef *streamDef, uint& saturationCount, FeMinMaxInfo& minMax);
-    void updateTextTab(QList<Fe> feList, uint saturationCount, Growth scenarioInflation,  FeStreamDef *streamDef);
-    void updateChartTab(QList<Fe> feList, uint saturationCount, Growth scenarioInflation,  FeStreamDef *streamDef,FeMinMaxInfo minMax);
+
+    /**
+     * @brief Generate the financial events for that Csd (whether Periodic or Irregular). Return
+     * the no of saturations that occurred.
+     * @param scenarioInflation Inflation for the scenario (used only for Periodic).
+     * @param weakCsdPtr A QWeakPointer<Csd> reference to the Csd.
+     * @param saturationCount Saturation count that occurred during the generation.
+     * @param minMax Min/Max of the value generated.
+     * @return The generated Fe Stream.
+     */
+    FeStream generateFinancialEvents(Growth scenarioInflation, QWeakPointer<Csd> weakCsdPtr,
+        uint& saturationCount, FeMinMaxInfo& minMax);
+
+    /**
+     * @brief Using the generated FeStream, display the results in the PlainText Widget, with a header
+    // providing some useful information.
+     * @param feStream The generated Fe Stream.
+     * @param saturationCount Saturation count that occurred during the generation.
+     * @param scenarioInflation Inflation for the scenario (used only for Periodic).
+     * @param weakCsdPtr A QWeakPointer<Csd> reference to the Csd.
+     */
+    void updateTextTab(FeStream& feStream, uint saturationCount, Growth scenarioInflation,
+        QWeakPointer<Csd> weakCsdPtr);
+
+    /**
+     * @brief Using the generated FeStream, update the chart data with representation in proper
+     * currency.
+     * @param feStream The generated Fe Stream.
+     * @param saturationCount Saturation count that occurred during the generation.
+     * @param scenarioInflation Inflation for the scenario (used only for Periodic).
+     * @param minMax Min/Max of the value generated.
+     */
+    void updateChartTab(FeStream& feStream, uint saturationCount, Growth scenarioInflation,
+        FeMinMaxInfo minMax);
+
     void initChart();
     void reduceAxisFontSize();
     void setXaxisFontSize(uint fontSize);
