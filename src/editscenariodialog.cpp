@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,18 @@
  */
 
 #include "editscenariodialog.h"
+#include <QTimer>
 #include "ui_editscenariodialog.h"
 #include "gbpcontroller.h"
 #include "gbplogger.h"
 #include "currencyhelper.h"
 #include <QMessageBox>
-#include <QFontDatabase>
 #include <QColorDialog>
 #include <QCoreApplication>
 #include "choosetagsdialog.h"
 #include "gbpqmessage.h"
 #include "constants.h"
+#include "uiutil.h"
 
 
 EditScenarioDialog::EditScenarioDialog(QLocale locale) :
@@ -38,6 +39,25 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale) :
 {
     // Qt UI build-up
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
+    connect(ui->addPeriodicPushButton, &QPushButton::clicked,
+        this, &EditScenarioDialog::onAddMenuPeriodicClicked);
+    connect(ui->addIrregularPushButton, &QPushButton::clicked,
+        this, &EditScenarioDialog::onAddMenuIrregularClicked);
+
+    auto *periodicAction = new QAction(tr("Periodic"), this);
+    periodicAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P));
+    connect(periodicAction, &QAction::triggered,
+        this, &EditScenarioDialog::onAddMenuPeriodicClicked);
+    auto *irregularAction = new QAction(tr("Irregular"), this);
+    irregularAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_I));
+    connect(irregularAction, &QAction::triggered,
+        this, &EditScenarioDialog::onAddMenuIrregularClicked);
+    this->addAction(periodicAction);
+    this->addAction(irregularAction);
 
     // reset min max of constant inflation spinbox programmatically (annual value !!)
     ui->inflationConstantDoubleSpinBox->setMinimum(Growth::MIN_GROWTH_DOUBLE);
@@ -55,35 +75,37 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale) :
     ui->maxDurationSpinBox->setMaximum(Constants::MAX_DURATION_FE_GENERATION);
     ui->maxDurationSpinBox->setMinimum(Constants::MIN_DURATION_FE_GENERATION);
 
+    QFont appFont = QApplication::font();
+
     // tweak Item Table fonts
     //
-    QFont defaultTableFont = ui->itemsTableView->font();
+    QFont defaultTableFont = appFont;
     //
-    QFont monoTableFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    monoTableFont.setPointSize(defaultTableFont.pointSize());
+    QFont amountTableFont = appFont;
     //
-    QFont strikeOutTableFont = ui->itemsTableView->font();
+    QFont strikeOutTableFont = appFont;
     strikeOutTableFont.setStrikeOut(true);
     strikeOutTableFont.setItalic(true);
     //
-    QFont monoInactiveTableFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    monoInactiveTableFont.setPointSize(defaultTableFont.pointSize());
-    monoInactiveTableFont.setStrikeOut(true);
-    monoInactiveTableFont.setItalic(true);
+    QFont amountInactiveTableFont = appFont;
+    amountInactiveTableFont.setStrikeOut(true);
+    amountInactiveTableFont.setItalic(true);
     //
-    QFont infoActiveTableFont = ui->itemsTableView->font();
+    QFont infoActiveTableFont = appFont;
     infoActiveTableFont.setItalic(true);
-    Util::changeFontSize(infoActiveTableFont, Util::FontResizeIntensity::WEAK, true);
+    Util::changeFontSize(infoActiveTableFont, Util::FontResizeIntensity::WEAK, true,
+        "EditScenarioDialog - infoActiveTableFont");
     //
-    QFont infoInactiveTableFont = ui->itemsTableView->font();
+    QFont infoInactiveTableFont = appFont;
     infoInactiveTableFont.setStrikeOut(true);
     infoInactiveTableFont.setItalic(true);
-    Util::changeFontSize(infoInactiveTableFont, Util::FontResizeIntensity::WEAK, true);
+    Util::changeFontSize(infoInactiveTableFont, Util::FontResizeIntensity::WEAK, true,
+        "EditScenarioDialog - infoInactiveTableFont");
 
     // set up the list model for items ListView : in UI form, filtering buttons must have been set
     // according to model's default
     itemTableModel = new ScenarioCsdTableModel(
-        locale, defaultTableFont, strikeOutTableFont, monoTableFont, monoInactiveTableFont,
+        locale, defaultTableFont, strikeOutTableFont, amountTableFont, amountInactiveTableFont,
         infoActiveTableFont, infoInactiveTableFont,
         GbpController::getInstance().getAllowDecorationColor());
     ui->itemsTableView->setModel(itemTableModel);
@@ -93,19 +115,24 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale) :
     ui->itemsTableView->setColumnWidth(0,fm2.averageCharWidth()*12);    // type
     ui->itemsTableView->setColumnWidth(1,fm2.averageCharWidth()*40);    // name
     ui->itemsTableView->setColumnWidth(2,fm2.averageCharWidth()*18);    // amount
+    // Horizontal header: minimum height derived from font so text is never clipped on Windows.
+    ui->itemsTableView->horizontalHeader()->setFont(appFont);
+    ui->itemsTableView->horizontalHeader()->setMinimumHeight(fm2.height() + 10);
 
     // use smaller font for description text
-    QFont descFont = ui->DescPlainTextEdit->font();
-    Util::changeFontSize(descFont, Util::FontResizeIntensity::AVERAGE, true);
+    QFont descFont = appFont;
+    Util::changeFontSize(descFont, Util::FontResizeIntensity::AVERAGE, true,
+        "EditScenarioDialog - description");
     ui->DescPlainTextEdit->setFont(descFont);
 
     // force description widget to be small (cant do it in Qt Designer...)
     QFontMetrics fm(ui->DescPlainTextEdit->font());
-    ui->DescPlainTextEdit->setFixedHeight(fm.height()*(3*1.2)); // 3 lines
+    ui->DescPlainTextEdit->setFixedHeight(fm.height()*(2*1.2)); // 2 lines
 
     // use smaller font for filter controls
-    QFont filterButtonFont = ui->filterPeriodicsCheckBox->font();
-    Util::changeFontSize(filterButtonFont, Util::FontResizeIntensity::AVERAGE, true);
+    QFont filterButtonFont = appFont;
+    Util::changeFontSize(filterButtonFont, Util::FontResizeIntensity::AVERAGE, true,
+        "EditScenarioDialog - filter controls");
     ui->filterPeriodicsCheckBox->setFont(filterButtonFont);
     ui->filterIrregularsCheckBox->setFont(filterButtonFont);
     ui->filterEnabledCheckBox->setFont(filterButtonFont);
@@ -117,8 +144,9 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale) :
     ui->filterTagsPushButton->setVisible(false);
 
     // use much smaller font for tag filter button and combo
-    QFont filterTagButtonFont = ui->filterTagsPushButton->font();
-    Util::changeFontSize(filterTagButtonFont, Util::FontResizeIntensity::AVERAGE, true);
+    QFont filterTagButtonFont = appFont;
+    Util::changeFontSize(filterTagButtonFont, Util::FontResizeIntensity::AVERAGE, true,
+        "EditScenarioDialog - tag filter buton and combo");
     ui->filterTagsPushButton->setFont(filterTagButtonFont);
     ui->filterTagsCombinationComboBox->setFont(filterTagButtonFont);
 
@@ -128,12 +156,11 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale) :
     ui->expensesRadioButton->setStyleSheet(Util::getStyleSheetStringForColor(
         GbpController::getInstance().getExpenseColor()));
 
-    // Update text for "new" buttons
-    updateNewButtonsText();
 
     // use smaller font for action buttons
-    QFont actionButtonFont = ui->addPeriodicPushButton->font();
-    Util::changeFontSize(actionButtonFont, Util::FontResizeIntensity::WEAK, true);
+    QFont actionButtonFont = appFont;
+    Util::changeFontSize(actionButtonFont, Util::FontResizeIntensity::WEAK, true,
+        "EditScenarioDialog - action buttons");
     ui->addPeriodicPushButton->setFont(actionButtonFont);
     ui->addIrregularPushButton->setFont(actionButtonFont);
     ui->deletePushButton->setFont(actionButtonFont);
@@ -144,6 +171,18 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale) :
     ui->disablePushButton->setFont(actionButtonFont);
     ui->selectAllPushButton->setFont(actionButtonFont);
     ui->unselectAllPushButton->setFont(actionButtonFont);
+
+    // Make full description view button smaller
+    QFont descFullViewFont = appFont;
+    Util::changeFontSize(descFullViewFont, Util::FontResizeIntensity::WEAK, true,
+        "EditScenarioDialog - desc full view button");
+    ui->fullViewPushButton->setFont(descFullViewFont);
+
+    // Make variable inflation edit button smaller
+    QFont varInflationEditFont = appFont;
+    Util::changeFontSize(varInflationEditFont, Util::FontResizeIntensity::WEAK, true,
+        "EditScenarioDialog - variable inflation edit button");
+    ui->editGrowthPushButton->setFont(varInflationEditFont);
 
     // Filter by tags is disabled
     filterTags.clear();
@@ -257,8 +296,7 @@ void EditScenarioDialog::allowColoredCsdNames(bool value)
 }
 
 
-void EditScenarioDialog::slotPrepareContent(QString countryCode,
-    CurrencyInfo newCurrInfo)
+void EditScenarioDialog::slotPrepareContent(CurrencyInfo newCurrInfo)
 {
     // Get current scenario, if any. There must be one.
     QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
@@ -273,7 +311,7 @@ void EditScenarioDialog::slotPrepareContent(QString countryCode,
     // *** the current one scenario. Some properties will go directly in UI components when
     // *** it is possible
 
-    this->countryCode = countryCode;
+    this->currencyIsoCode = newCurrInfo.isoCode;
     this->currInfo = newCurrInfo;
     tempVariableInflation = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>());
 
@@ -323,10 +361,12 @@ void EditScenarioDialog::slotPrepareContent(QString countryCode,
 
 
     this->setWindowTitle(tr("Edit current scenario"));
-    ui->scenarioNameLineEdit->setFocus();
 
     // refresh the table content
     refreshCsdTableContent();
+
+    ui->scenarioNameLineEdit->setFocus();
+
 }
 
 
@@ -491,26 +531,26 @@ void EditScenarioDialog::on_editGrowthPushButton_clicked()
 }
 
 
-// Create a new Period FSD
-void EditScenarioDialog::on_addPeriodicPushButton_clicked()
+void EditScenarioDialog::onAddMenuPeriodicClicked()
 {
     bool isIncome = ui->incomesRadioButton->isChecked();
     QDate maxDate = GbpController::getInstance().getToday().addYears(
         ui->maxDurationSpinBox->value());
     // launch the edit dialog to create a new Periodic FSD
     emit signalEditPeriodicCsdPrepareContent(true, isIncome, QWeakPointer<PeriodicCsd>(),
-        currInfo, getInflationCurrentlyDefined(), maxDate,{},tags);
+                                             currInfo, getInflationCurrentlyDefined(), maxDate,{},tags);
     psCsdDialog->show();
 }
 
 
-void EditScenarioDialog::on_addIrregularPushButton_clicked()
+void EditScenarioDialog::onAddMenuIrregularClicked()
 {
+    // TODO
     bool isIncome = ui->incomesRadioButton->isChecked();
     QDate maxDate = GbpController::getInstance().getToday().addYears(
         ui->maxDurationSpinBox->value());
     emit signalEditIrregularCsdPrepareContent(true, isIncome, QWeakPointer<IrregularCsd>(),
-        currInfo, maxDate,{},tags);
+                                              currInfo, maxDate,{},tags);
     irCsdDialog->show();
 }
 
@@ -609,7 +649,7 @@ void EditScenarioDialog::on_applyPushButton_clicked()
     QSharedPointer<Scenario> newScenario;
     try {
         newScenario = QSharedPointer<Scenario>(new Scenario(
-            Scenario::LATEST_VERSION, name, desc, maxDuration, inflation, countryCode,
+            Scenario::LATEST_VERSION, name, desc, maxDuration, inflation, currencyIsoCode,
             incomesPeriodicCsd, incomesIrregularCsd, expensesPeriodicCsd, expensesIrregularCsd,
             tags, tagCsdRelationships));
     } catch (const std::exception& e) {
@@ -617,7 +657,8 @@ void EditScenarioDialog::on_applyPushButton_clicked()
         QString errorString = QString(tr("An unexpected error has occurred while creating a "
             "scenario.\n\nDetails : %1"))
             .arg(e.what());
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         LOG_ERROR( QString("    Modification to this existing scenario failed, unexpected"
             " exception occurred : %1").arg(e.what()));
         LOG_INFO("Apply changes has completed");
@@ -664,7 +705,8 @@ void EditScenarioDialog::on_applyPushButton_clicked()
                 QSharedPointer<PeriodicCsd> newCsd =
                     newHash.value(id,QSharedPointer<PeriodicCsd>());
                 if (newCsd.isNull() || curCsd.isNull()) { // Should never happen
-                    LOG_ERROR(QString("    newCsd.isNull() || curCsd.isNull()").arg(id.toString()));
+                    LOG_ERROR(QString("    CSD id=%1 : newCsd.isNull() || curCsd.isNull()")
+                        .arg(id.toString()));
                     LOG_INFO("Apply changes has completed");
                     return;
                 }
@@ -683,7 +725,8 @@ void EditScenarioDialog::on_applyPushButton_clicked()
                 QSharedPointer<IrregularCsd>newCsd =
                     newHash.value(id,QSharedPointer<IrregularCsd>());
                 if (newCsd.isNull() || curCsd.isNull()) { // Should never happen
-                    LOG_ERROR(QString("    newCsd.isNull() || curCsd.isNull()").arg(id.toString()));
+                    LOG_ERROR(QString("    CSD id=%1 : newCsd.isNull() || curCsd.isNull()")
+                        .arg(id.toString()));
                     LOG_INFO("Apply changes has completed");
                     return;
                 }
@@ -702,7 +745,8 @@ void EditScenarioDialog::on_applyPushButton_clicked()
                 QSharedPointer<PeriodicCsd> newCsd =
                     newHash.value(id,QSharedPointer<PeriodicCsd>());
                 if (newCsd.isNull() || curCsd.isNull()) { // Should never happen
-                    LOG_ERROR(QString("    newCsd.isNull() || curCsd.isNull()").arg(id.toString()));
+                    LOG_ERROR(QString("    CSD id=%1 : newCsd.isNull() || curCsd.isNull()")
+                        .arg(id.toString()));
                     LOG_INFO("Apply changes has completed");
                     return;
                 }
@@ -721,7 +765,8 @@ void EditScenarioDialog::on_applyPushButton_clicked()
                 QSharedPointer<IrregularCsd>newCsd =
                     newHash.value(id,QSharedPointer<IrregularCsd>());
                 if (newCsd.isNull() || curCsd.isNull()) { // Should never happen
-                    LOG_ERROR(QString("   newCsd.isNull() || curCsd.isNull()").arg(id.toString()));
+                    LOG_ERROR(QString("    CSD id=%1 : newCsd.isNull() || curCsd.isNull()")
+                        .arg(id.toString()));
                     LOG_INFO("Apply changes has completed");
                     return;
                 }
@@ -751,8 +796,8 @@ void EditScenarioDialog::on_applyPushButton_clicked()
         "(but not saved yet)");
     LOG_DEBUG_INFO( QString("      Name = %1")
         .arg(REDACT(currScenario->getName())));
-    LOG_DEBUG_INFO( QString("      Country ISO code = %1")
-        .arg(currScenario->getCountryCode()));
+    LOG_DEBUG_INFO( QString("      Currency ISO code = %1")
+        .arg(currScenario->getCurrencyIsoCode()));
     LOG_DEBUG_INFO( QString("      Version = %1")
         .arg(currScenario->getVersion()));
     LOG_DEBUG_INFO( QString("      Fe Generation Duration = %1")
@@ -820,27 +865,6 @@ void EditScenarioDialog::updateNoItemsLabel()
 }
 
 
-// When Incomes or Expenses filters change, we want the "New Periodic" and "New Irregular"
-// buttons have their text change accordingly
-// *** From 1.7.0, we change the text to shorten it, they are now idential
-void EditScenarioDialog::updateNewButtonsText()
-{
-    if(ui->incomesRadioButton->isChecked()==true){
-        ui->addPeriodicPushButton->setText(tr("New periodic..."));
-        ui->addIrregularPushButton->setText(tr("New irregular..."));
-    } else {
-        ui->addPeriodicPushButton->setText(tr("New periodic..."));
-        ui->addIrregularPushButton->setText(tr("New irregular..."));
-    }
-}
-
-
-
-/**
- * @brief Check if each tag in Filter Tags set does still exist in the current available Tags set.
- * If not, remove it. Combination mode is not touched in anycase.
- * @return True if the filterTags has changed, false otherwise.
- */
 bool EditScenarioDialog::checkAndAdjustFilterTags()
 {
     bool changed = false;
@@ -994,7 +1018,8 @@ void EditScenarioDialog::on_editPushButton_clicked()
         // make sure exactly 1 row is selected and get the ID of the seleted Csd
         QList<QUuid> selectedIdList = getSelection();
         if (selectedIdList.size()!=1){
-            QMessageBox::critical(this,tr("Error"),tr("Select exactly one row"));
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Select exactly one row"), {tr("OK")}, 0, 0);
             ui->itemsTableView->setFocus();    // fix the strange behavior
             return;
         }
@@ -1042,7 +1067,8 @@ void EditScenarioDialog::on_duplicatePushButton_clicked()
     // make sure exactly 1 row is selected
     QList<QUuid> selectedIdList = getSelection();
     if (selectedIdList.size()==0){
-        QMessageBox::critical(this,tr("Error"),tr("Select at least 1 item"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select at least 1 item"), {tr("OK")}, 0, 0);
         ui->itemsTableView->setFocus();    // fix the strange behavior
         return;
     }
@@ -1082,7 +1108,8 @@ void EditScenarioDialog::on_deletePushButton_clicked()
     // make sure at least 1 row is selected
     QList<QUuid> selectedIdList = getSelection();
     if (selectedIdList.size()==0){
-        QMessageBox::critical(this,tr("Error"),tr("Select at least one item"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select at least one item"), {tr("OK")}, 0, 0);
         ui->itemsTableView->setFocus();    // fix the strange behavior
         return;
     }
@@ -1117,7 +1144,8 @@ void EditScenarioDialog::on_enablePushButton_clicked()
     // make sure at least 1 row is selected
     QList<QUuid> selectedIdList = getSelection();
     if (selectedIdList.size()==0){
-        QMessageBox::critical(this,tr("Error"),tr("Select at least one item"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select at least one item"), {tr("OK")}, 0, 0);
         ui->itemsTableView->setFocus();    // fix the strange behavior
         return;
     }
@@ -1138,7 +1166,8 @@ void EditScenarioDialog::on_disablePushButton_clicked()
     // make sure at least 1 row is selected
     QList<QUuid> selectedIdList = getSelection();
     if (selectedIdList.size()==0){
-        QMessageBox::critical(this,tr("Error"),tr("Select at least one item"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select at least one item"), {tr("OK")}, 0, 0);
         ui->itemsTableView->setFocus();    // fix the strange behavior
         return;
     }
@@ -1160,7 +1189,8 @@ void EditScenarioDialog::on_setColorPushButton_clicked()
     // make sure at least 1 row is selected
     QList<QUuid> selectedIdList = getSelection();
     if (selectedIdList.size()==0){
-        QMessageBox::critical(this,tr("Error"),tr("Select at least one item"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select at least one item"), {tr("OK")}, 0, 0);
         ui->itemsTableView->setFocus();    // fix the strange behavior
         return;
     }
@@ -1217,7 +1247,6 @@ void EditScenarioDialog::on_setColorPushButton_clicked()
 
 void EditScenarioDialog::on_incomesRadioButton_toggled(bool checked)
 {
-    updateNewButtonsText();
     refreshCsdTableContent();
 }
 
@@ -1298,9 +1327,9 @@ void EditScenarioDialog::on_filterTagsCheckBox_checkStateChanged(const Qt::Check
         // *** Current filterTag is re-used ***
         // *** There must be at least one tag defined ***
         if (tags.size()==0) {
-            QMessageBox::critical(nullptr,tr("Warning"),
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Warning"),
                 tr("There are no tag defined for this scenario, so you cannot "
-                    "use Tag-based filtering."));
+                    "use Tag-based filtering."), {tr("OK")}, 0, 0);
             // revert the state of the checkbox, a new state signal will be emitted and received
             // by this function. Use setCheckState because setChecked does not work as expected
             ui->filterTagsCheckBox->setCheckState(Qt::CheckState::Unchecked);
@@ -1413,5 +1442,20 @@ void EditScenarioDialog::on_filterTagsCombinationComboBox_currentIndexChanged(in
 
     // update accordingly the CSD list
     refreshCsdTableContent();
+}
+
+
+void EditScenarioDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    // QTimer::singleShot(0) defers execution until after all show-related events have been
+    // processed, including the platform style's focusInEvent which calls selectAll() on the
+    // focused QLineEdit. Calling deselect() directly in slotPrepareContent() has no effect
+    // because that slot runs before the dialog is shown.
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("EditScenarioDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+        ui->scenarioNameLineEdit->deselect();
+    });
 }
 

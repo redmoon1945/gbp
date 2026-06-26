@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -99,7 +99,7 @@ public:
      * @param isIncome Whether the IrregularCsd represents income.
      * @param decorationColor Color for UI decoration.
      */
-    IrregularCsd(QMap<QDate,AmountInfo> amountSet, const QUuid &id,
+    IrregularCsd(const QMap<QDate,AmountInfo> &amountSet, const QUuid &id,
         const QString &name, const QString &desc, bool active, bool isIncome,
         const QColor& decorationColor);
     virtual ~IrregularCsd();
@@ -204,13 +204,19 @@ public:
 
 
 
-    // *** getters ***
+    // *** getters/setters ***
 
     /**
      * @brief Gets the amount set.
      * @return Map of dates to AmountInfo objects.
      */
     QMap<QDate, AmountInfo> getAmountSet() const;
+
+    /**
+     * @brief Sets the amount set.
+     * @param newAmountSet Map of dates to AmountInfo objects.
+     */
+    void setAmountSet(const QMap<QDate, AmountInfo> &newAmountSet);
 
 
 private:

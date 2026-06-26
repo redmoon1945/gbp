@@ -28,6 +28,9 @@ private slots:
     void on_closePushButton_clicked();
     void on_ScenarioPropertiesDialog_rejected();
 
+protected:
+    void showEvent(QShowEvent* event) override;
+
 private:
     Ui::ScenarioPropertiesDialog *ui;
     QLocale locale;

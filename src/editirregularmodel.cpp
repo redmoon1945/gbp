@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 #include <QCoreApplication>
 
 
-EditIrregularModel::EditIrregularModel(QLocale aLocale, QObject *parent)
+EditIrregularModel::EditIrregularModel(const QLocale &aLocale, QObject *parent)
     : QAbstractTableModel(parent)
 {
     this->theLocale = aLocale;
@@ -31,10 +31,16 @@ EditIrregularModel::EditIrregularModel(QLocale aLocale, QObject *parent)
     // *** WARNING ***
     // CurrencyInfo & fonts must be set before using the model (it changes with the scenario loaded)
     // we initialize it with dummy value so nothing crash
-    this->currInfo = {.name="US Dollar", .symbol="$", .isoCode="USD", .noOfDecimal=2, };
-    defaultTableFont = QFont(); // app default font
-    monoTableFont = defaultTableFont;
-    italicTableFont = defaultTableFont;
+    this->currInfo = CurrencyInfo();
+
+    // default font, will be overridden by setters
+    QFont defaultTableFont = QFont(); // app default font
+    dateTableFont = defaultTableFont;
+    dateDisabledTableFont = defaultTableFont;
+    amountTableFont = defaultTableFont;
+    amountDisabledTableFont = defaultTableFont;
+    noteTableFont = defaultTableFont;
+    noteDisabledTableFont = defaultTableFont;
 }
 
 
@@ -82,9 +88,8 @@ QVariant EditIrregularModel::data(const QModelIndex &index, int role) const
         QList<QDate> listKeys = items.keys();
         if ( row <= (listKeys.size()-1) ){
             QDate key = listKeys.at(row);
-            if (col==0){    // *** date ***
-                return theLocale.toString(key,QLocale::FormatType::ShortFormat);
-                //return theLocale.toString(key,"yyyy-MMM-dd (ddd)");
+            if (col==0){    // *** date, long format ***
+                return theLocale.toString(key,QLocale::FormatType::LongFormat);
             } else if (col==1){ //*** Amount ***
                 IrregularCsd::AmountInfo ai = items.value(key);
                 int result;
@@ -108,12 +113,31 @@ QVariant EditIrregularModel::data(const QModelIndex &index, int role) const
         }
     } else if (role==Qt::FontRole){
 
-        if (col==1) { // amount
-            return monoTableFont;
-        } else if (col==2){ // description
-            return italicTableFont;
-        } else {
-            return defaultTableFont;
+        QList<QDate> listKeys = items.keys();
+        QDate key = listKeys.at(row) ;
+
+        if (key < GbpController::getInstance().getTomorrow()){
+            // *** too old, discarded ***
+            if(col==0){  // date
+                return dateDisabledTableFont;
+            }  else if (col==1) { // amount
+                return amountDisabledTableFont;
+            } else if (col==2){ // description
+                return noteDisabledTableFont;
+            } else {
+                return dateTableFont;
+            }
+        } else  {
+            // *** valid ***
+            if(col==0){  // date
+                return dateTableFont;
+            }  else if (col==1) { // amount
+                return amountTableFont;
+            } else if (col==2){ // description
+                return noteTableFont;
+            } else {
+                return dateTableFont;
+            }
         }
 
     } else if (role == Qt::ForegroundRole){
@@ -176,32 +200,65 @@ void EditIrregularModel::setCurrInfo(const CurrencyInfo &newCurrInfo)
     currInfo = newCurrInfo;
 }
 
-QFont EditIrregularModel::getDefaultTableFont() const
+
+QFont EditIrregularModel::getDateTableFont() const
 {
-    return defaultTableFont;
+    return dateTableFont;
 }
 
-void EditIrregularModel::setDefaultTableFont(const QFont &newDefaultTableFont)
+void EditIrregularModel::setDateTableFont(const QFont &newDateTableFont)
 {
-    defaultTableFont = newDefaultTableFont;
+    dateTableFont = newDateTableFont;
 }
 
-QFont EditIrregularModel::getMonoTableFont() const
+QFont EditIrregularModel::getDateDisabledTableFont() const
 {
-    return monoTableFont;
+    return dateDisabledTableFont;
 }
 
-void EditIrregularModel::setMonoTableFont(const QFont &newMonoTableFont)
+void EditIrregularModel::setDateDisabledTableFont(const QFont &newDateDisabledTableFont)
 {
-    monoTableFont = newMonoTableFont;
+    dateDisabledTableFont = newDateDisabledTableFont;
 }
 
-QFont EditIrregularModel::getItalicTableFont() const
+QFont EditIrregularModel::getAmountTableFont() const
 {
-    return italicTableFont;
+    return amountTableFont;
 }
 
-void EditIrregularModel::setItalicTableFont(const QFont &newItalicTableFont)
+void EditIrregularModel::setAmountTableFont(const QFont &newAmountTableFont)
 {
-    italicTableFont = newItalicTableFont;
+    amountTableFont = newAmountTableFont;
 }
+
+QFont EditIrregularModel::getAmountDisabledTableFont() const
+{
+    return amountDisabledTableFont;
+}
+
+void EditIrregularModel::setAmountDisabledTableFont(const QFont &newAmountDisabledTableFont)
+{
+    amountDisabledTableFont = newAmountDisabledTableFont;
+}
+
+QFont EditIrregularModel::getNoteTableFont() const
+{
+    return noteTableFont;
+}
+
+void EditIrregularModel::setNoteTableFont(const QFont &newNoteTableFont)
+{
+    noteTableFont = newNoteTableFont;
+}
+
+QFont EditIrregularModel::getNoteDisabledTableFont() const
+{
+    return noteDisabledTableFont;
+}
+
+void EditIrregularModel::setNoteDisabledTableFont(const QFont &newNoteDisabledTableFont)
+{
+    noteDisabledTableFont = newNoteDisabledTableFont;
+}
+
+

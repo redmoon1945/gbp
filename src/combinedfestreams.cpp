@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -23,11 +23,13 @@
 CombinedFeStreams::CombinedFeStreams(quint32 noOfDays)
 {
     if(noOfDays==0){
-        throw std::invalid_argument("maxNoOfDays is zero");
+        throw std::invalid_argument(QString("%1: maxNoOfDays is zero")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     // Must not exceed the max size
     if (noOfDays > FeStream::MAX_DAYS) {
-        throw std::invalid_argument("maxNoOfDays is over the maximum allowed");
+        throw std::invalid_argument(QString("%1: maxNoOfDays is over the maximum allowed")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     this->noOfDays = noOfDays;
 
@@ -82,18 +84,19 @@ CombinedFeStreams::~CombinedFeStreams()
 }
 
 
-void CombinedFeStreams::addStream(const FeStream theStream, CurrencyInfo currInfo)
+void CombinedFeStreams::addStream(const FeStream &theStream, const CurrencyInfo &currInfo)
 {
     // convert weak reference of theStream to strong reference.
-    // The Csd must exist.
-    auto csdStrongRefPtr = theStream.getCsdPtr().toStrongRef();
+    // The Csd must exist. Read only operation.
+    QSharedPointer<const Csd> csdStrongRefPtr = theStream.getCsdPtr().toStrongRef();
     if (csdStrongRefPtr==nullptr){
         return; // Csd does not exist anymore
     }
 
     // Check that theStream has the same no of elements than combinedStreams
     if (theStream.getNoOfDays() != noOfDays) {
-        throw std::invalid_argument("New FeStream has not the right no of elements");
+        throw std::invalid_argument(QString("%1: New FeStream has not the right no of elements")
+            .arg(Q_FUNC_INFO).toStdString());
     }
 
     // Make sure this CSD has not already contributed, otherwise add it to the contributors.
@@ -104,14 +107,16 @@ void CombinedFeStreams::addStream(const FeStream theStream, CurrencyInfo currInf
     }
 
     // merge
-    QList<qint64> newFEList = theStream.getAmountSet();
-    for (uint i = 0; i < noOfDays; ++i) {
-        if (newFEList[i] != -1) {
+    uint feSize = theStream.size();
+    for (uint i = 0; i < feSize; ++i) {
+        if (theStream.contains(i) == true) {
+            qint64 amountInt = theStream.get(i);
+
             // This is one more financial event in comb
             noOfFe++;
             // convert the amount from decimal to double (currency unit)
             int convResult;
-            double amount = CurrencyHelper::amountQint64ToDouble(newFEList[i], currInfo.noOfDecimal,
+            double amount = CurrencyHelper::amountQint64ToDouble(amountInt, currInfo.noOfDecimal,
                 convResult) ;
             if (convResult != 0){
                 continue; // should never happen
@@ -140,18 +145,16 @@ void CombinedFeStreams::addStream(const FeStream theStream, CurrencyInfo currInf
                 }
             } else {
                 // this is a existing entry for that day.
-                // WARNING : a "double" cumulative value will loose precision if a lot of
-                // "big amount" values are cumulated. We dont really care are we insist to keep the
-                // calculated amounts in double (to speed up things), which are uncapped.
-
                 if (csdStrongRefPtr->getIsIncome()) {
                     // additional income
-                    combinedStreams[i].totalIncomes += amount;
+                    combinedStreams[i].totalIncomes = CurrencyHelper::add(
+                        combinedStreams[i].totalIncomes, amount, currInfo.noOfDecimal);
                     combinedStreams[i].incomesList.append(
                         {.amount=amount, .csdPtr=theStream.getCsdPtr()});
                 } else {
                     // additional expense
-                    combinedStreams[i].totalExpenses += (-amount);
+                    combinedStreams[i].totalExpenses = CurrencyHelper::add(
+                        combinedStreams[i].totalExpenses, -amount, currInfo.noOfDecimal);
                     combinedStreams[i].expensesList.append(
                         {.amount=(-amount), .csdPtr=theStream.getCsdPtr()});
                 }

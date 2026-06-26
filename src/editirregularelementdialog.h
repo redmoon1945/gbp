@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -33,12 +33,14 @@ class EditIrregularElementDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit EditIrregularElementDialog(QLocale aLocale, QWidget *parent = nullptr);
+    explicit EditIrregularElementDialog(const QLocale &aLocale, QWidget *parent = nullptr);
     ~EditIrregularElementDialog();
 
 public slots:
     // From client of EditIrregularElementDialog : Prepare Dialog before edition
-    void slotPrepareContent(bool isIncome, bool newEditMode, CurrencyInfo cInfo, QList<QDate> newExistingDates, QDate currentDate, double amount, QString notes);
+    void slotPrepareContent(bool isIncome, bool newEditMode, const CurrencyInfo &cInfo,
+        const QList<QDate> &newExistingDates, QDate currentDate, double amount,
+        const QString &notes);
 
 signals:
     // For client of EditIrregularElementDialog : Send results of edition and notify of edition completion
@@ -50,6 +52,18 @@ private slots:
     void on_closePushButton_clicked();
     void on_EditIrregularElementDialog_rejected();
 
+
+protected:
+    /**
+     * @brief Defers deselection of notesLineEdit until after the platform style has finished
+     * processing focus-in events.
+     * @details On many platforms (e.g. KDE Breeze), the style calls selectAll() inside
+     * focusInEvent when a QLineEdit gains focus, which fires during the show sequence.
+     * A direct deselect() in slotPrepareContent() is overridden by that call. Using
+     * QTimer::singleShot(0) posts the deselect to the end of the event queue, after all
+     * show-related events have completed.
+     */
+    void showEvent(QShowEvent* event) override;
 
 private:
     Ui::EditIrregularElementDialog *ui;

@@ -16,12 +16,19 @@ public:
     explicit PresentValueCalculatorDialog(QLocale locale);
     ~PresentValueCalculatorDialog();
 
+public slots:
+    // For client of PresentValueCalculatorDialog : prepare Dialog before edition
+    void slotPrepareContent();
+
 private slots:
     void on_closePushButton_clicked();
     void on_PresentValueCalculatorDialog_rejected();
     void on_pvToFvPushButton_clicked();
     void on_fvToPvPushButton_clicked();
     void on_annualDiscountRateDoubleSpinBox_valueChanged(double arg1);
+
+protected:
+    void showEvent(QShowEvent* event) override;
 
 private:
     Ui::PresentValueCalculatorDialog *ui;

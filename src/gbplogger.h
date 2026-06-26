@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -143,10 +143,30 @@ public:
 
     /**
      * @brief Clean up old log files to prevent accumulation.
-     * @details Removes log files older than 100 days before an arbitrary "today".
+     * @details Removes log files older than 100 days before an arbitrary "today", regardless
+     * of workspace. Both default and workspace-specific logs are deleted based on age alone.
      * @param today Reference date for calculating file age
      */
     void cleanUpLogs(const QDate& today);
+
+    /**
+     * @brief Get the log folder path.
+     * @details Returns the folder where log files are stored, as determined during construction.
+     * @return Absolute path to the log folder.
+     */
+    QString getLogFolder() const;
+
+    /**
+     * @brief Remove log files for specified workspaces.
+     * @details Deletes all log files whose names match the workspace suffix pattern for each
+     * given workspace. Log filenames follow the format yyyy-MM-dd__hh_mm_ss_WORKSPACE.txt
+     * (25 + workspace length characters).
+     * @param workspaces List of workspace names to remove logs for. If empty, nothing is deleted.
+     * @param deleted Populated with filenames that were successfully deleted.
+     * @param failed Populated with filenames that could not be deleted.
+     */
+    void removeWorkspaceLogs( const QStringList& workspaces, QStringList& deleted,
+        QStringList& failed);
 
     // Getters
     QString getLogFullFileName() const;

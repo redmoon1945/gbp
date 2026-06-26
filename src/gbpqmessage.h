@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -25,28 +25,48 @@
 
 
 /**
- * @brief Version of "Question" QMessageBox with localized buttons texts.
+ * @brief Utility class for displaying customisable application-modal message boxes.
  *
+ * Wraps QMessageBox to provide a uniform look across all message prompts: the
+ * application font is enforced, button labels are fully caller-controlled, and
+ * up to five buttons are supported. The return value is the zero-based index of
+ * the button the user clicked, or -1 if the dialog was dismissed without a choice.
  */
 class GbpQMessage
 {
 public:
+
+    /** @brief Constructs a GbpQMessage instance (stateless; all functionality is static). */
     GbpQMessage();
 
-    enum class Type{INFORMATION, WARNING, QUESTION, ERROR};
     /**
-     * @brief Custom QMesssage question. Support 1,2,3,4 or 5 buttons.
-     * @param parent The parent QWidget.
-     * @param msgType Type of message (used to select the icon displayed).
-     * @param title Title of the QMessageBox.
-     * @param message Message inside the QMessageBox.
-     * @param buttonsText Text for each button, beginning from the left.
-     * @param defaultButtonIndex Index of the default button.
-     * @param escapeButtonIndex Index of the escape button.
-     * @return Return index of the button selected (0 being the first) or -1 if cancel.
+     * @brief Severity / intent of the message, used to select the dialog icon.
      */
-    int static messageBoxQuestion(QWidget *parent, GbpQMessage::Type msgType, QString title,
-        QString message, QStringList buttonsText, uint defaultButtonIndex, uint escapeButtonIndex);
+    enum class Type {
+        INFORMATION, ///< Informational message (blue i icon).
+        WARNING,     ///< Non-critical warning (yellow triangle icon).
+        QUESTION,    ///< Decision prompt (question-mark icon).
+        ERROR        ///< Critical error (red X icon).
+    };
+
+    /**
+     * @brief Display a modal message box and return the index of the clicked button.
+     *
+     * @param parent            Parent widget; the dialog is centred over it.
+     * @param msgType           Icon shown in the dialog (see Type).
+     * @param title             Text displayed in the window title bar.
+     * @param message           Body text of the message (rich text / HTML supported).
+     * @param buttonsText       Labels for the buttons, left to right (1–5 entries).
+     * @param defaultButtonIndex Zero-based index of the button activated by Enter.
+     * @param escapeButtonIndex  Zero-based index of the button activated by Escape.
+     * @return Zero-based index of the clicked button, or -1 if the dialog was closed
+     *         without a button click.
+     * @throws std::invalid_argument if @p buttonsText is empty, has more than 5 entries,
+     *         or if @p defaultButtonIndex / @p escapeButtonIndex are out of range.
+     */
+    int static messageBoxQuestion(QWidget *parent, GbpQMessage::Type msgType,
+        const QString &title, const QString &message, const QStringList &buttonsText,
+        uint defaultButtonIndex, uint escapeButtonIndex);
 
 };
 

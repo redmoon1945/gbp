@@ -1,6 +1,10 @@
 #include "scenariopropertiesdialog.h"
+#include "gbplogger.h"
+#include <QTimer>
 #include "ui_scenariopropertiesdialog.h"
 #include "gbpcontroller.h"
+#include "util.h"
+#include "uiutil.h"
 #include <qfileinfo.h>
 #
 
@@ -10,6 +14,10 @@ ScenarioPropertiesDialog::ScenarioPropertiesDialog(QLocale theLocale, QWidget *p
     , ui(new Ui::ScenarioPropertiesDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
     locale = theLocale;
     QFontMetrics fm(ui->pathPlainTextEdit->font());
     ui->pathPlainTextEdit->setFixedHeight(fm.height()*5); // 5 lines min
@@ -84,8 +92,8 @@ void ScenarioPropertiesDialog::slotPrepareContent()
             theScenario->getNoOfIrregularExpenses(false)));
 
         bool found;
-        CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(
-            theScenario->getCountryCode(), locale.language(), found);
+        CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromIsoCode(
+            theScenario->getCurrencyIsoCode(), locale.language(), found);
         if(found){
             ui->currencyLabel->setText(QString("%1 (%2)").arg(currInfo.name,currInfo.isoCode));
         } else {
@@ -103,6 +111,8 @@ void ScenarioPropertiesDialog::slotPrepareContent()
         ui->feGenerationDurationLabel->setText(QString::number(theScenario->getFeGenerationDuration()));
 
     }
+
+    ui->closePushButton->setFocus();
 }
 
 
@@ -116,5 +126,15 @@ void ScenarioPropertiesDialog::on_closePushButton_clicked()
 void ScenarioPropertiesDialog::on_ScenarioPropertiesDialog_rejected()
 {
     on_closePushButton_clicked();
+}
+
+
+void ScenarioPropertiesDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("ScenarioPropertiesDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

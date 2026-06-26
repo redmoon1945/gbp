@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -35,11 +35,15 @@ class GbpController
 public:
 
     /**
-     * @brief Define ow the QtChart theming will be set. From 1.7.0.
+     * @brief Define how the QtChart theming will be set. From 1.7.0.
      * @note 1.6.3- uses a bool with true that is equivalent to FORCE_DARK and
      * false that is equivalent to FORCE_LIGHT. FOLLOW_DESKTOP_THEME does not exist in 1.6.3-.
      */
-    enum class ChartTheming {FORCE_LIGHT, FORCE_DARK, FOLLOW_DESKTOP_THEME};
+    enum class ChartTheming {
+        FORCE_LIGHT,           ///< Always use light theme for charts, regardless of desktop theme
+        FORCE_DARK,            ///< Always use dark theme for charts, regardless of desktop theme
+        FOLLOW_DESKTOP_THEME   ///< Automatically match the desktop/system theme (light or dark)
+    };
 
 
     /**
@@ -54,7 +58,7 @@ public:
         QColor lightModePointColor = QColor(0, 0, 255);
         QColor darkModeSelectedPointColor = QColor(0, 255, 0);
         QColor lightModeSelectedPointColor = QColor(0, 128, 0);
-        bool exportTextAmountLocalized = false;
+        bool exportTextNumberLocalized = false;
         bool exportTextDateLocalized = false;
         uint percentageMainChartScaling = 5;
         bool useDefaultSystemFont = true;
@@ -68,6 +72,8 @@ public:
         bool showYzeroLine = true;
         QColor yZeroLineLightModeColor = QColor(0, 128,128);
         QColor yZeroLineDarkModeColor = QColor(0, 128, 128);
+        QColor gridlinesDarkModeColor = QColor(60, 60, 60);
+        QColor gridlinesLightModeColor = QColor(232, 232, 232);
         uint xAxisDateFormat =0;
         bool showTooltips = true;
         QColor incomeColor = Util::getOptimizedGreen();
@@ -171,8 +177,8 @@ public:
     void setDarkModeSelectedPointColor(const QColor &newDarkModeSelectedPointColor);
     QColor getLightModeSelectedPointColor() const;
     void setLightModeSelectedPointColor(const QColor &newLightModeSelectedPointColor);
-    bool getExportTextAmountLocalized() const;
-    void setExportTextAmountLocalized(bool newExportTextAmountLocalized);
+    bool getExportTextNumberLocalized() const;
+    void setExportTextNumberLocalized(bool newExportTextNumberLocalized);
     bool getExportTextDateLocalized() const;
     void setExportTextDateLocalized(bool newExportTextDateLocalized);
     QString getLastDir() const;
@@ -204,6 +210,10 @@ public:
     void setYZeroLineLightModeColor(const QColor &newYZeroLineLightModeColor);
     QColor getYZeroLineDarkModeColor() const;
     void setYZeroLineDarkModeColor(const QColor &newYZeroLineDarkModeColor);
+    QColor getGridlinesDarkModeColor() const;
+    void setGridlinesDarkModeColor(const QColor &newGridlinesDarkModeColor);
+    QColor getGridlinesLightModeColor() const;
+    void setGridlinesLightModeColor(const QColor &newGridlinesLightModeColor);
     uint getXAxisDateFormat() const;
     void setXAxisDateFormat(uint newXAxisDateFormat);
     bool getShowTooltips() const;
@@ -227,6 +237,8 @@ public:
     bool getSystemDesktopDarkTheme() const;
     void setSystemDesktopDarkTheme(bool newSystemDesktopDarkTheme);
 
+    QString getWorkspace() const;
+
 private:
 
     // immutable instance
@@ -249,9 +261,10 @@ private:
     QColor lightModeSelectedPointColor;
 
     // Specifies if amounts in Exported CSV file should be localized
-    bool exportTextAmountLocalized;
+    bool exportTextNumberLocalized;
 
-    // Specifies if dates in Exported CSV file should be localized
+    // Specifies if dates in Exported CSV file should be localized. This applies
+    // only when using full short format (year,month,day)
     bool exportTextDateLocalized;
 
     // last dir used for opening/saving scenario.
@@ -297,6 +310,10 @@ private:
     QColor yZeroLineLightModeColor;
     QColor yZeroLineDarkModeColor;
 
+    // Color of X and Y grid lines on the main chart
+    QColor gridlinesDarkModeColor;
+    QColor gridlinesLightModeColor;
+
     // X-Axis Date format. 0=Locale  1=ISO  2=ISO with 2-digits year
     uint xAxisDateFormat;
 
@@ -324,9 +341,10 @@ private:
      */
     QSharedPointer<Scenario> scenario;
 
+    // *************************************************************************************
 
 
-    // ***** misc other variables NOT stored in settings, with getter only ****
+    // ***** misc other variables NOT stored in settings, with getter only ****************
 
     bool noSettingsFileAtStartup;   // indicates if no ini file were found when gbp started
     // Date of "today" in local time, set ONCE, when the settings is loaded
@@ -339,10 +357,17 @@ private:
     QString settingsFullFileName;
     // Indicate if system desktop has a dark theme
     bool systemDesktopDarkTheme;
+    // Store the current workspace
+    QString workspace;
 
-    // ***** Purely internal variables without getters/setters *****
+
+    // ***********************************************************************************
+
+
+    // ***** Purely internal variables without getters/setters **************************
     std::unique_ptr<QSettings> settingsPtr;
     bool settingsLoaded=false;  // to prevent more than 1 loading
+    // **********************************************************************************
 
     // *** methods ***
     GbpController();

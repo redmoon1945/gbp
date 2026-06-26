@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,9 @@
  */
 
 #include <QLocale>
+#include <QFontMetrics>
+#include <cmath>
+#include <limits>
 #include "currencyhelper.h"
 #include "util.h"
 
@@ -30,6 +33,17 @@ const double CurrencyHelper::MAX_VALUE_ALLOWED_4_DECIMAL =     9999999999.9999;
 const qint8 CurrencyHelper::MAX_NO_OF_DECIMALS = 4; // CLF and UYW have 4 fractional decimal units
 
 CurrencyHelper::CurrencyHelper()
+{
+}
+
+
+CurrencyInfo::CurrencyInfo()
+    : name("US Dollar"), symbol("$"), isoCode("USD"), noOfDecimal(2)
+{
+}
+
+CurrencyInfo::CurrencyInfo(QString aName, QString aSymbol, QString aIsoCode, int aNoOfDecimal)
+    : name(aName), symbol(aSymbol), isoCode(aIsoCode), noOfDecimal(aNoOfDecimal)
 {
 }
 
@@ -54,7 +68,9 @@ double CurrencyHelper::maxValueAllowedForAmountInDouble(quint8 noOfDecimalDigits
         case 2: return MAX_VALUE_ALLOWED_2_DECIMAL;
         case 3: return MAX_VALUE_ALLOWED_3_DECIMAL;
         case 4: return MAX_VALUE_ALLOWED_4_DECIMAL;
-        default: throw std::invalid_argument("noOfDigits is too big");
+        default:
+            throw std::invalid_argument(QString("%1: noOfDigits is too big")
+                .arg(Q_FUNC_INFO).toStdString());
     }
 }
 
@@ -68,9 +84,10 @@ uint CurrencyHelper::maxCharForMaxAmountInDouble(quint8 noOfDecimalDigits)
         case 3: return 15;
         case 4: return 15;
         default:
-            QString s = QString("noOfDigits %1 is too big").arg(noOfDecimalDigits);
+            QString fString = QString("%1").arg(Q_FUNC_INFO);
+            QString s = QString("%1: noOfDigits %2 is too big")
+                .arg(fString).arg(noOfDecimalDigits);
             throw std::invalid_argument(s.toStdString());
-
     }
 }
 
@@ -124,8 +141,8 @@ QString CurrencyHelper::quint64ToDoubleString(qint64 amount, CurrencyInfo cInfo,
 }
 
 
-QString CurrencyHelper::formatAmount(double amount, CurrencyInfo cInfo, QLocale locale,
-    bool addISOcode)
+QString CurrencyHelper::formatAmount(double amount, const CurrencyInfo &cInfo,
+    const QLocale &locale, bool addISOcode)
 {
     if (cInfo.noOfDecimal > MAX_NO_OF_DECIMALS) {
         return "";
@@ -133,34 +150,106 @@ QString CurrencyHelper::formatAmount(double amount, CurrencyInfo cInfo, QLocale 
     if (fabs(amount) > maxValueAllowedForAmountInDouble(cInfo.noOfDecimal)) {
         return "";
     }
-    QString s = locale.toString(amount,'f',cInfo.noOfDecimal);
+    QString s = Util::formatDouble(amount, locale, Util::DoubleFormatMode::Standard,
+        {.standard={.noOfDecimals=cInfo.noOfDecimal}});
     if (addISOcode) {
-        return QString("%1 %2").arg(s).arg(cInfo.isoCode);
-    } else{
-        return s;
+        return s + ' ' + cInfo.isoCode;
     }
+    return s;
+}
+
+
+QString CurrencyHelper::formatAmount(qint64 amount, const CurrencyInfo &cInfo,
+    const QLocale &locale, bool addISOcode)
+{
+    int result;
+    double d = amountQint64ToDouble(amount, cInfo.noOfDecimal, result);
+    if (result != 0) {
+        return "";
+    }
+    return formatAmount(d, cInfo, locale, addISOcode);
 }
 
 
 qint64 CurrencyHelper::add(qint64 a, qint64 b)
 {
-    // potential for saturation here...but 2 "max allowed" added will be below max(qint64)
-    qint64 r = a + b;
+    constexpr qint64 MAX = NATIVE_MAX_VALUE_ALLOWED;
+    constexpr qint64 QMIN = std::numeric_limits<qint64>::min();
 
-    // Handle overflow
-    if(r<0){
-        if (r < -NATIVE_MAX_VALUE_ALLOWED){
-            return -NATIVE_MAX_VALUE_ALLOWED ;
-        } else {
-            return r;
+    // Both non-negative
+    if (a >= 0 && b >= 0) {
+        if (a > MAX - b) {
+            return MAX;
         }
-    } else {
-        if (r > NATIVE_MAX_VALUE_ALLOWED){
-            return NATIVE_MAX_VALUE_ALLOWED ;
-        } else {
-            return r;
-        }
+        return a + b;
     }
+
+    // Both negative
+    if (a < 0 && b < 0) {
+        if (a == QMIN || b == QMIN) {
+            return -MAX;
+        }
+        if (a < -MAX - b) {
+            return -MAX;
+        }
+        return a + b;
+    }
+
+    // Mixed signs: no overflow possible
+    qint64 r = a + b;
+    if (r > MAX) {
+        return MAX;
+    }
+    if (r < -MAX) {
+        return -MAX;
+    }
+    return r;
+
+    // OLD VERSION
+    // // potential for saturation here...but 2 "max allowed" added will be below max(qint64)
+    // qint64 r = a + b;
+    // // Handle overflow
+    // if(r<0){
+    //     if (r < -NATIVE_MAX_VALUE_ALLOWED){
+    //         return -NATIVE_MAX_VALUE_ALLOWED ;
+    //     } else {
+    //         return r;
+    //     }
+    // } else {
+    //     if (r > NATIVE_MAX_VALUE_ALLOWED){
+    //         return NATIVE_MAX_VALUE_ALLOWED ;
+    //     } else {
+    //         return r;
+    //     }
+    // }
+}
+
+
+double CurrencyHelper::add(double a, double b, uint noOfDecimalDigits)
+{
+    double theMax = maxValueAllowedForAmountInDouble(noOfDecimalDigits);
+
+    // Handle NaN inputs explicitly
+    if (std::isnan(a) || std::isnan(b)) {
+        return 0.0;
+    }
+
+    double result = a + b;
+
+    // Handle NaN result (e.g., +Inf + -Inf)
+    if (std::isnan(result)) {
+        return 0.0;
+    }
+
+    // Clamp to allowed range (also handles ±Inf)
+    if (result > theMax){
+        return theMax;
+    }
+    if (result < -theMax) {
+        return -theMax;
+    }
+
+    return result;
 }
 
 
@@ -203,14 +292,63 @@ bool CurrencyHelper::countryExists(QString countryCode)
 }
 
 
+int CurrencyHelper::currencyAmountMaxPixelWidth(const CurrencyInfo &cInfo,
+    const QLocale &locale, const QFontMetrics &fm)
+{
+    qint64 maxAmount = static_cast<qint64>(NATIVE_MAX_VALUE_ALLOWED);
+    QString s = formatAmount(maxAmount, cInfo, locale, false);
+    for (QChar &c : s) {
+        if (c.isDigit()) c = '8';
+    }
+    return fm.horizontalAdvance(s);
+}
+
+
+CurrencyInfo CurrencyHelper::getCurrencyInfoFromIsoCode(
+    const QString &isoCode, QLocale::Language language, bool& found)
+{
+    found = false;
+    for (auto it = countries.constBegin(); it != countries.constEnd(); ++it) {
+        bool tmpFound;
+        CurrencyInfo ci = getCurrencyInfoFromCountryCode(it.key(), language, tmpFound);
+        if (tmpFound && ci.isoCode == isoCode) {
+            found = true;
+            return ci;
+        }
+    }
+    CurrencyInfo dummy("Unknown", "---", isoCode, 2);
+    return dummy;
+}
+
+
+bool CurrencyHelper::currencyIsoCodeExists(QString isoCode)
+{
+    return currencyNamesEnglish.contains(isoCode);
+}
+
+
+QString CurrencyHelper::getRepresentativeCountryForCurrency(const QString &isoCode)
+{
+    for (auto it = countries.constBegin(); it != countries.constEnd(); ++it) {
+        bool found;
+        CurrencyInfo ci = getCurrencyInfoFromCountryCode(it.key(), QLocale::Language::English,
+            found);
+        if (found && ci.isoCode == isoCode) {
+            return it.key();
+        }
+    }
+    return "";
+}
+
+
 CurrencyInfo CurrencyHelper::getCurrencyInfoFromCountryCode(
-    QString countryCode, QLocale::Language language, bool& found)
+    const QString &countryCode, QLocale::Language language, bool& found)
 {
     found = false;
     CurrencyInfo currInfo;
     QLocale::Territory country = QLocale::codeToTerritory(countryCode);
     if (country==QLocale::AnyTerritory){
-        CurrencyInfo dummy = {.name="Unknown", .symbol="---", .isoCode="---", .noOfDecimal=2};
+        CurrencyInfo dummy("Unknown", "---", "---", 2);
         return dummy;
     }
     found = true;
@@ -231,7 +369,6 @@ CurrencyInfo CurrencyHelper::getCurrencyInfoFromCountryCode(
         currInfo.name = "Unknown";
     }
 
-    // Special handling for symbols
     if (currInfo.symbol.isEmpty()) {
         currInfo.symbol = "Unknown";
     }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -19,10 +19,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "anonymizedialog.h"
 #include "editscenariodialog.h"
 #include "presentvaluecalculatordialog.h"
 #include "scenariopropertiesdialog.h"
-#include "selectcountrydialog.h"
+#include "selectcurrencydialog.h"
 #include "optionsdialog.h"
 #include "aboutdialog.h"
 #include "analysisdialog.h"
@@ -50,12 +51,25 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    /**
+     * @brief Constructs the main window and initializes the full UI.
+     * @details Builds all child dialogs, sets up chart series, connects signals/slots,
+     * and adjusts fonts for widget groups that require a size reduction relative to the
+     * base font. QApplication::font() is always used as the base for all calculations,
+     * and fonts are set explicitly on every widget group including toolbar buttons and
+     * menus. This ensures consistent behaviour across all platforms and desktop
+     * environments: on KDE, QToolButton and QMenuBar/QMenu would otherwise be overridden
+     * with separate Toolbar/Menu font roles that ignore QApplication::setFont().
+     * @param systemLocale Locale derived from the system or from a command-line override,
+     *        used for number and date formatting throughout the application.
+     * @param parent Optional parent widget; nullptr makes this a top-level window.
+     */
     MainWindow(QLocale systemLocale, QWidget *parent = nullptr);
     ~MainWindow();
 
 signals:
     // For Edit Scenario : prepare content before edition
-    void signalEditScenarioPrepareContent(QString countryCode, CurrencyInfo currInfo);
+    void signalEditScenarioPrepareContent(CurrencyInfo currInfo);
     // For Options Edition : prepare content before edition
     void signalOptionsPrepareContent();
     // For Analysis Dialog : prepare content before edition
@@ -69,15 +83,18 @@ signals:
     void signalScenarioPropertiesPrepareContent();
     // For About Dialog : prepare content before edition
     void signalAboutDialogPrepareContent(QLocale theLocale);
+    // For PV Dialog : prepare content before edition
+    void signalPvDialogPrepareContent();
+    // For AnonymizeDialog : : prepare content before edition
+    void signalAnonymizePrepareContent();
 
 public slots:
     /**
      * @brief Follow-up to "New Scenario" menu selection (2nd step). From this point, a new empty
      * scenario will be created and will become the current scenario.
-     * @param countryCode ISO code of the country.
      * @param currInfo Currency Information.
      */
-    void slotSelectCountryResult(QString countryCode, CurrencyInfo currInfo);
+    void slotSelectCountryResult(CurrencyInfo currInfo);
 
     void slotSelectCountryCompleted();
     // From Edit Scenario : result and edition completion notification
@@ -97,7 +114,9 @@ public slots:
     void slotDateIntervalCompleted();
     // From ScenarioProperties : completion notification
     void slotScenarioPropertiesCompleted();
-
+    // From Anonymize Edit : result and edition completion notification
+    void slotAnonymizeResult(AnonymizeDialog::AnonymizeOptions opts);
+    void slotAnonymizeCompleted();
     /**
      * @brief to catch point selection signal in main chart.
      * @param pt Selected point on the curve.
@@ -110,6 +129,7 @@ public slots:
 
 protected:
     void closeEvent(QCloseEvent * event) override;
+    void showEvent(QShowEvent * event) override;
 
 private slots:
 
@@ -142,6 +162,7 @@ private slots:
     void on_toolButton_EOY_clicked();
     void on_customToolButton_clicked();
     void on_showPointsCheckBox_stateChanged(int arg1);
+    void on_showGridlinesCheckBox_stateChanged(int arg1);
     void on_toolButton_Right_clicked();
     void on_toolButton_Left_clicked();
     void on_exportTextFilePushButton_clicked();
@@ -151,6 +172,7 @@ private slots:
     void on_actionChange_Log_triggered();
     void on_actionPV_Calculator_triggered();
     void on_actionReload_triggered();
+    void on_actionAnonymize_triggered();
 
     // We do the explicit connection, so we drop the on_... naming convention entirely
     void actionClear_List_triggered();
@@ -183,14 +205,13 @@ private:
 
     EditScenarioDialog* editScenarioDlg; // no parent
     PresentValueCalculatorDialog* pvCalculatorDlg; // no parent
-
-    SelectCountryDialog* selectCountryDialog;
+    SelectCurrencyDialog* selectCurrencyDialog;
     OptionsDialog* optionsDlg;
     AboutDialog* aboutDlg;
     AnalysisDialog* analysisDlg;
     DateIntervalDialog* dateIntervalDlg;
     ScenarioPropertiesDialog* scenarioPropertiesDlg;
-
+    AnonymizeDialog* anonymizeDlg;
 
 
     // *** misc variables ***

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -76,6 +76,20 @@
   *                         CFG is now at 1 - 10% =  0.9)
   *            1 jan 2005 : 810 (growth is -10% as lastly defined in 1 jan 2002, CFG is now
   *                         at 0.9 - 10% = 0.81)
+  *
+  * **Key Concepts:**
+  * - **CGF (Cumulative Growth Factor):** The multiplicative factor applied to amounts over time.
+  *   For constant 5% annual growth, after 1 year CGF = 1.05, after 2 years CGF = 1.1025.
+  * - **Annual Basis:** Growth rates are specified annually but applied monthly (on day 1).
+  * - **Decimal Form:** Internal representation uses integers with NO_OF_DECIMALS precision
+  *   (e.g., 500000 = 5.00000% with 5 decimals).
+  * - **First Event Exception:** Growth is never applied to the first financial event.
+  *
+  * @see adjustForGrowth() Main method for applying growth to amounts
+  * @see fromConstantAnnualPercentageDouble() Factory for constant growth
+  * @see fromVariableDataAnnualBasisDouble() Factory for variable growth
+  * @see PeriodicCsd::generateEventStream() Uses Growth to adjust recurring amounts
+  * @see IrregularCsd::generateEventStream() Uses Growth to adjust irregular amounts
   */
 class Growth
 {
@@ -106,7 +120,12 @@ public:
     /// @brief Minimum annual growth in decimal form. Negative number.
     static qint64 MIN_GROWTH_DECIMAL ;
 
-    /// @brief For variable growth, this is the maximum no of values that can be defined.
+    /**
+     * @brief Maximum number of variable growth entries allowed.
+     * @details If this limit is exceeded when creating a Growth object with variable rates,
+     * a std::domain_error exception will be thrown. This limit prevents excessive memory usage
+     * and ensures reasonable computation time for growth calculations.
+     */
     static constexpr double VARIABLE_MAX_NO_OF_ENTRIES = 10000;
 
     /**
@@ -164,17 +183,19 @@ public:
      * E.g., 500000 for 5% with 5 decimals. If empty, no growth is ever applied.
      * No more than VARIABLE_MAX_NO_OF_ENTRIES entries.
      * @return Growth object with variable growth.
-     * @throws std::domain_error If growth values or dates are invalid.
+     * @throws std::domain_error If growth values or dates are invalid, or if the number of
+     * entries exceeds VARIABLE_MAX_NO_OF_ENTRIES.
      */
-    static Growth fromVariableDataAnnualBasisDecimal(const QMap<QDate,qint64> newVariableGrowth);
+    static Growth fromVariableDataAnnualBasisDecimal(const QMap<QDate,qint64> &newVariableGrowth);
     /**
      * @brief Creates a Growth object with variable growth rates.
-     * @param newVariableGrowth Map of dates to annual growth percentages. No more than
+     * @param newVariableGrowth Map of dates to annual growth percentages.
      * No more than VARIABLE_MAX_NO_OF_ENTRIES entries.
      * @return Growth object with variable growth. If empty, no growth is ever applied.
-     * @throws std::domain_error If growth values or dates are invalid.
+     * @throws std::domain_error If growth values or dates are invalid, or if the number of
+     * entries exceeds VARIABLE_MAX_NO_OF_ENTRIES.
      */
-    static Growth fromVariableDataAnnualBasisDouble(const QMap<QDate,double> newVariableGrowth);
+    static Growth fromVariableDataAnnualBasisDouble(const QMap<QDate,double> &newVariableGrowth);
 
     // operators
     Growth& operator=(const Growth &o);
@@ -194,10 +215,10 @@ public:
      * Growth is never applied for the first date in occurrenceDates, which is the reference date
      * for that amount (first occurrence). It is also not applied whole the whole month
      * corresponding to that date. There is NO LIMITATION on the timespan of the occurrence dates
-     * list, because growth need to be calculated from the first occurrence, event if it is before
+     * list, because growth need to be calculated from the first occurrence, even if it is before
      * "today".
      * @param amount Initial amount to adjust (must be >= 0).
-     * @param occurrenceDates Sorted list of dates for amount occurrences. Max no of entries if
+     * @param occurrenceDates Sorted list of dates for amount occurrences. No of entries if
      * NOT limited.
      * @param appStrategy Strategy defining how growth is applied.
      * @param pvDiscountRate Annual discount rate for present value calculation (percentage, >= 0).
@@ -205,7 +226,7 @@ public:
      * @param ok Result of the operation, including success and error details.
      * @return List of adjusted amounts (>=0), with matching indexes with occurrenceDates.
      */
-    QList<quint64> adjustForGrowth(quint64 amount, QList<QDate> occurrenceDates,
+    QList<quint64> adjustForGrowth(quint64 amount, const QList<QDate> &occurrenceDates,
         ApplicationStrategy appStrategy, double pvDiscountRate, QDate pvCalculationReferenceDate,
         AdjustForGrowthResult &ok) const;
 
@@ -329,17 +350,35 @@ private:
     QList<long double> buildMonthlyMultiplierVector(uint noOfMonthSpan, QDate from) const;
 
     /**
-     * @brief Builds a vector of present value multipliers for a date range.
-     * @details Warning : first occurrence date will probably be different from PV present date
-     * (before or after). It means we have to find the first value of the PV factor to be assigned
-     * to the first value of the vector.
-     * @param annualDiscountrate Annual discount rate (percentage).
-     * @param noOfMonthSpan Number of months to cover from (and including) firstOccurrence.
-     * Must be > 0.
-     * @param firstOccurrence Start date of occurrences.
-     * @param pvPresent Present value reference date.
-     * @return An array of present value multipliers.
-     * @throws std::domain_error If inputs are invalid.
+     * @brief Builds a vector of present value conversion factors for a date range.
+     * @details Creates a vector of monthly conversion factors that transform values
+     * from their occurrence dates to the present value reference date. The vector
+     * contains one factor per month, starting from firstOccurrence and spanning
+     * noOfMonthSpan months.
+     * The conversion depends on whether each occurrence is before or after pvPresent:
+     *   **Past values** (occurrence before pvPresent, negative period):
+     *     - Converted to present by compounding forward
+     *     - Formula: PV = PastValue × (1 + r)^n
+     *     - Factor = (1 + r)^n
+     *   **Future values** (occurrence after pvPresent, positive period):
+     *     - Converted to present by discounting backward
+     *     - Formula: PV = FutureValue / (1 + r)^n
+     *     - Factor = 1 / (1 + r)^n
+     *   **Present values** (occurrence equals pvPresent):
+     *     - No conversion needed
+     *     - Factor = 1
+     * Where r is the monthly discount rate derived from annualDiscountRate.
+     * @param annualDiscountRate Annual discount rate as a percentage (e.g., 5.0 for 5%).
+     * @param noOfMonthSpan Number of months to cover starting from firstOccurrence. Must be > 0.
+     * @param firstOccurrence Start date for the occurrence range. May be before, equal to,
+     * or after pvPresent.
+     * @param pvPresent Reference date for present value calculations.     *
+     * @return Vector of present value conversion factors, one per month. To convert an occurrence
+     * value to present value: PV[i] = OccurrenceValue[i] × factor[i]
+     * @throws std::domain_error If annualDiscountRate < 0 or noOfMonthSpan <= 0.
+     * @note The firstOccurrence date can be any date relative to pvPresent. The function
+     * automatically determines the correct conversion direction (compounding or discounting)
+     * for each month in the range.
      */
     QList<long double> buildPvMonthlyMultiplierVector(double annualDiscountrate,
         uint noOfMonthSpan, QDate firstOccurrence, QDate pvPresent) const;

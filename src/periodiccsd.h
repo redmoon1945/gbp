@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -114,7 +114,7 @@ public:
      * @param useScenarioForEndDate Whether to use scenario's end date.
      * @param inflationAdjustmentFactor Factor to adjust scenario inflation.
      */
-    PeriodicCsd(PeriodType periodicType, quint16 periodMultiplier, qint64 amount,
+    PeriodicCsd(PeriodType periodicType, quint16 periodMultiplier, quint64 amount,
         const Growth &growth, const GrowthStrategy &growthStrategy, quint16 growthApplicationPeriod,
         const QUuid &id, const QString &name, const QString &desc, bool active, bool isIncome,
         const QColor& decorationColor, const QDate &startDate, const QDate &endDate,
@@ -256,7 +256,13 @@ public:
      * @brief Gets the amount (decimal form).
      * @return Amount in smallest currency unit.
      */
-    qint64 getAmount() const;
+    quint64 getAmount() const;
+
+    /**
+     * @brief Sets the amount.
+     * @param newAmount Amount in smallest currency unit.
+     */
+    void setAmount(quint64 newAmount);
 
     /**
      * @brief Gets the growth pattern.
@@ -352,7 +358,7 @@ private:
      * @brief Amount to be repeated, expressed in the smallest currency unit. Always a non negative
      * number even if this is an expense.
      */
-    qint64 amount;
+    quint64 amount;
 
     /// @brief Grow Strategy.
     GrowthStrategy growthStrategy;

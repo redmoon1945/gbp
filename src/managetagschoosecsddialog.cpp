@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,28 @@
 
 
 #include "managetagschoosecsddialog.h"
+#include "gbplogger.h"
+#include <QTimer>
 #include "ui_managetagschoosecsddialog.h"
 #include "gbpcontroller.h"
+#include "uiutil.h"
 
 ManageTagsChooseCsdDialog::ManageTagsChooseCsdDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ManageTagsChooseCsdDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
+    // Set smaller font for action buttons
+    QFont appFont = QApplication::font();
+    QFont font = appFont;
+    Util::changeFontSize(font, Util::FontResizeIntensity::WEAK, true,
+        "ManageTagsChooseCsdDialog - action buttons");
+    ui->selectAllPushButton->setFont(font);
+    ui->unselectAllPushButton->setFont(font);
 }
 
 
@@ -39,6 +53,8 @@ void ManageTagsChooseCsdDialog::slotPrepareContent(QSet<managetags::CsdItem> new
 {
     csdSet = newCsdSet;
     updateList();
+
+    ui->csdListWidget->setFocus();
 }
 
 
@@ -124,5 +140,15 @@ void ManageTagsChooseCsdDialog::on_incomesRadioButton_toggled(bool checked)
 void ManageTagsChooseCsdDialog::on_expensesRadioButton_toggled(bool checked)
 {
     updateList();
+}
+
+
+void ManageTagsChooseCsdDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("ManageTagsChooseCsdDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

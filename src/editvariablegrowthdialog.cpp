@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,9 @@
  */
 
 #include "editvariablegrowthdialog.h"
+#include "gbplogger.h"
+#include "loadvariablegrowthtextfiledialog.h"
+#include <QTimer>
 #include "ui_editvariablegrowthdialog.h"
 #include <QString>
 #include <QMessageBox>
@@ -24,6 +27,8 @@
 #include <QCoreApplication>
 #include "editvariablegrowthmodel.h"
 #include "gbpcontroller.h"
+#include "uiutil.h"
+#include "gbpqmessage.h"
 
 
 EditVariableGrowthDialog::EditVariableGrowthDialog(QString newGrowthName, QLocale locale,
@@ -32,19 +37,46 @@ EditVariableGrowthDialog::EditVariableGrowthDialog(QString newGrowthName, QLocal
     this->locale = locale;
     ui->setupUi(this);
 
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
+    growthName = newGrowthName;
+
     // set the model (no internal data for now)
-    tableModel = new EditVariableGrowthModel(newGrowthName, this->locale);
+    tableModel = new EditVariableGrowthModel(growthName, this->locale);
     ui->growthTableView->setModel(tableModel);
     // force equal with of columns
+    ui->growthTableView->setFont(QApplication::font());
     ui->growthTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    QFont appFont = QApplication::font();
+    ui->growthTableView->horizontalHeader()->setFont(appFont);
+    ui->growthTableView->horizontalHeader()->setMinimumHeight(
+        QFontMetrics(appFont).height() + 10);
+
     // Makes note characters smaller and italic
-    QFont noteFont = ui->noteLabel->font();
-    Util::changeFontSize(noteFont, Util::FontResizeIntensity::WEAK, true);
+    QFont noteFont = appFont;
+    Util::changeFontSize(noteFont, Util::FontResizeIntensity::AVERAGE, true,
+        "EditVariableGrowthDialog - note");
     ui->noteLabel->setFont(noteFont);
+
+    // Make action buttons smaller
+    QFont actionFont = appFont;
+    Util::changeFontSize(actionFont, Util::FontResizeIntensity::WEAK, true,
+        "EditVariableGrowthDialog - action buttons");
+    ui->SelectAllPushButton->setFont(actionFont);
+    ui->unselectAllPushButton->setFont(actionFont);
+    ui->addPushButton->setFont(actionFont);
+    ui->deletePushButton->setFont(actionFont);
+    ui->editPushButton->setFont(actionFont);
 
     // the edit add element dialog
     ege = new EditGrowthElementDialog(newGrowthName,locale,this);        // auto-destroyed by Qt
     ege->setModal(true);
+
+    // the import dialog
+    importDlg = new LoadVariableGrowthTextFileDialog(newGrowthName, locale, this);  // auto-destroyed by Qt
+    importDlg->setModal(true);
 
     // connections with edition of growth element
     QObject::connect(this, &EditVariableGrowthDialog::signalEditElementPrepareContent, ege,
@@ -53,6 +85,14 @@ EditVariableGrowthDialog::EditVariableGrowthDialog(QString newGrowthName, QLocal
         &EditVariableGrowthDialog::slotEditElementResult);
     QObject::connect(ege, &EditGrowthElementDialog::signalEditElementCompleted, this,
         &EditVariableGrowthDialog::slotEditElementCompleted);
+
+    // connections with import dialog
+    QObject::connect(this, &EditVariableGrowthDialog::signalImportPrepareContent,
+        importDlg, &LoadVariableGrowthTextFileDialog::slotPrepareContent);
+    QObject::connect(importDlg, &LoadVariableGrowthTextFileDialog::signalImportResult,
+        this, &EditVariableGrowthDialog::slotImportResult);
+    QObject::connect(importDlg, &LoadVariableGrowthTextFileDialog::signalImportCompleted,
+        this, &EditVariableGrowthDialog::slotImportCompleted);
 }
 
 
@@ -65,7 +105,7 @@ EditVariableGrowthDialog::~EditVariableGrowthDialog()
 
 // Prepare for a new editing session.
 // To be called before displaying the EditComplexGrowthDialog window, to setup content
-void EditVariableGrowthDialog::slotPrepareContent(Growth newGrowth)
+void EditVariableGrowthDialog::slotPrepareContent(const Growth newGrowth)
 {
     QString tmp = Util::wordCapitalize(true,QString(tr("Edit variable %1"))
         .arg(tableModel->getGrowthName()));
@@ -79,8 +119,7 @@ void EditVariableGrowthDialog::slotPrepareContent(Growth newGrowth)
     // update model (the view will be automatically updated)
     tableModel->setGrowthData(newGrowth);
 
-    // Set focus on "Apply"
-    ui->applyPushButton->setFocus();
+    ui->growthTableView->setFocus();
 }
 
 
@@ -120,6 +159,24 @@ void EditVariableGrowthDialog::slotEditElementCompleted()
 }
 
 
+void EditVariableGrowthDialog::slotImportResult(QMap<QDate,qint64> factors)
+{
+    Growth newGrowth = Growth::fromVariableDataAnnualBasisDecimal(factors);
+    tableModel->setGrowthData(newGrowth);
+}
+
+
+void EditVariableGrowthDialog::slotImportCompleted()
+{
+}
+
+
+void EditVariableGrowthDialog::on_importPushButton_clicked()
+{
+    emit signalImportPrepareContent();
+    importDlg->show();
+}
+
 
 void EditVariableGrowthDialog::on_applyPushButton_clicked()
 {
@@ -152,7 +209,8 @@ void EditVariableGrowthDialog::on_editPushButton_clicked()
     QList<QDate> existingDates = factors.keys();
     QList<int> selectedRows = getSelectedRows();
     if (selectedRows.size()!=1){
-        QMessageBox::critical(this,tr("Error"),tr("Select exactly one row"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select exactly one row"), {tr("OK")}, 0, 0);
         ui->growthTableView->setFocus(); // fix strange behavior
         return;
     }
@@ -170,7 +228,8 @@ void EditVariableGrowthDialog::on_deletePushButton_clicked()
     QList<QDate> existingDates = factors.keys();
     QList<int> selectedRows = getSelectedRows();
     if (selectedRows.size()==0){
-        QMessageBox::critical(this,tr("Error"),tr("Select at least one row"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select at least one row"), {tr("OK")}, 0, 0);
         ui->growthTableView->setFocus(); // fix strange behavior
         return;
     }
@@ -220,5 +279,15 @@ void EditVariableGrowthDialog::on_SelectAllPushButton_clicked()
 void EditVariableGrowthDialog::on_unselectAllPushButton_clicked()
 {
     ui->growthTableView->clearSelection();
+}
+
+
+void EditVariableGrowthDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("EditVariableGrowthDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

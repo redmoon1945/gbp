@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -105,6 +105,9 @@ private slots:
     void on_csdsViewUnlinkPushButton_clicked();
     void on_csdsViewLinkPushButton_clicked();
     void on_csdsViewCsdsListWidget_itemSelectionChanged();
+
+protected:
+    void showEvent(QShowEvent* event) override;
 
 private:
     Ui::ManageTagsDialog *ui;

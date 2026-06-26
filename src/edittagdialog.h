@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ class EditTagDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit EditTagDialog(QLocale aLocale, QWidget *parent = nullptr);
+    explicit EditTagDialog(const QLocale &aLocale, QWidget *parent = nullptr);
     ~EditTagDialog();
 
 signals:
@@ -62,7 +62,7 @@ signals:
 
 public slots:
     // From client of EditTagDialog : Prepare edition. Call this before show()
-    void slotPrepareContent(Tags currentTags, Tag tagIdToEdit, bool isForNewTag);
+    void slotPrepareContent(const Tags &currentTags, const Tag &tagIdToEdit, bool isForNewTag);
     // PlainTextEdition child Dialog : receive result and edition completion notification
     void slotPlainTextEditionResult(QString result);
     void slotPlainTextEditionCompleted();
@@ -76,6 +76,18 @@ private slots:
     void on_incomesRadioButton_toggled(bool checked);
     void on_expensesRadioButton_toggled(bool checked);
     void on_suggestionsListWidget_itemSelectionChanged();
+
+protected:
+    /**
+     * @brief Defers deselection of nameLineEdit until after the platform style has finished
+     * processing focus-in events.
+     * @details On many platforms (e.g. KDE Breeze), the style calls selectAll() inside
+     * focusInEvent when a QLineEdit gains focus, which fires during the show sequence.
+     * A direct deselect() in slotPrepareContent() is overridden by that call. Using
+     * QTimer::singleShot(0) posts the deselect to the end of the event queue, after all
+     * show-related events have completed.
+     */
+    void showEvent(QShowEvent* event) override;
 
 private:
     Ui::EditTagDialog *ui;

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ inline const QString APP_NAME = QString("graphical-budget-planner");
 /**
  * @brief Version of the application.
  */
-inline const QString APP_VERSION  = QString("1.7.0");
+inline const QString APP_VERSION  = QString("1.8.0");
 
 
 }

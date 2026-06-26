@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -89,11 +89,26 @@ private slots:
     void on_lightModeSelectedPointColorPushButton_clicked();
     void on_darkModeYzeroLineColorPushButton_clicked();
     void on_lightModeYzeroLineColorPushButton_clicked();
+    void on_darkModeGridlinesColorPushButton_clicked();
+    void on_lightModeGridlinesColorPushButton_clicked();
+    void on_lightModeCurveColorResetPushButton_clicked();
+    void on_lightModePointColorResetPushButton_clicked();
+    void on_lightModeSelectedPointColorResetPushButton_clicked();
+    void on_lightModeYzeroLineColorResetPushButton_clicked();
+    void on_lightModeGridlinesColorResetPushButton_clicked();
+    void on_darkModeCurveColorResetPushButton_clicked();
+    void on_darkModePointColorResetPushButton_clicked();
+    void on_darkModeSelectedPointColorResetPushButton_clicked();
+    void on_darkModeYzeroLineColorResetPushButton_clicked();
+    void on_darkModeGridlinesColorResetPushButton_clicked();
     void on_incomeColorPushButton_clicked();
     void on_expenseColorPushButton_clicked();
     void on_incomeColorResetPushButton_clicked();
     void on_expenseColorResetPushButton_clicked();
     void on_resetPushButton_clicked();
+
+protected:
+    void showEvent(QShowEvent* event) override;
 
 private:
     Ui::OptionsDialog *ui;
@@ -103,6 +118,7 @@ private:
      */
     enum ColorItem {CI_CURVE_DT, CI_CURVE_LT, CI_POINT_DT, CI_POINT_LT, CI_SELECTED_POINT_DT,
         CI_SELECTED_POINT_LT, CI_YZERO_LINE_DT, CI_YZERO_LINE_LT,
+        CI_GRIDLINES_DT, CI_GRIDLINES_LT,
         CI_INCOME_COLOR, CI_EXPENSE_COLOR};
 
     // *** VARIABLES ***
@@ -117,6 +133,8 @@ private:
     QColor lightModeSelectedPointColor;
     QColor yZeroLineDarkModeColor;
     QColor yZeroLineLightModeColor;
+    QColor gridlinesDarkModeColor;
+    QColor gridlinesLightModeColor;
     QColor incomeColor;
     QColor expenseColor;
 

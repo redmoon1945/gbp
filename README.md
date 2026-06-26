@@ -2,23 +2,16 @@
 
 ## What's new ?
 
-Version **1.7.0** is out (December 2025) ! Here are the main changes compared to 1.6.3 :
+Version **1.8.0** is out (July 2026) ! This is a big release, with many new features and several improvements. Here are the main changes compared to 1.7.0 :
 
-- In Analysis module :
-  - A new section has been added, dedicated to analyze the **Tags** associations with the Cash Stream Definitions and provide useful statistics.
-  - The Relative Weight section has received several noteworthy improvements.
-- In Options module : 
-  - Add a “reset” option to set all the options to “factory settings”
-  - Add an option to follow the desktop theme for charts foreground and background colors.
-- General :
-  - For Linux :
-    - GBP can now more closely match the selected desktop theme. Dark themes will be respected on most platforms (Gnome, Kde, Cinnamon, XFCE). 
-    - Wayland support has improved
-  - For Windows :
-    - By default, GBP uses the "Cross-Platform" look. Although it does not perfectly match the native Windows 11 look, it avoids several compatibility issues present in Qt and Windows 11. This default choice may be revisited in future GBP releases. If you prefer, you can manually select the alternative Windows Vista or Windows 11 Native themes. Run gbp -h for more information. 
-  - All platforms:
-    - Colors have been optimized to look great by default on either light or dark themes. The Options dialog now also allows you to customize the colors used for income and expense amounts. With this addition, virtually all color-based elements in GBP can be personalized.
-    - Add several command line flags to customize the look or behavior of GBP : type "gbp -h" for details. 
+ - **Analysis Dialog** has been significantly expanded with two new tabs:
+   - **Period — Heatmap** : visualizes incomes, expenses, or the income/expense delta as a color-coded grid at monthly or yearly granularity, with configurable colors, adjustable cell sizes, and rich tooltips.
+   - **Compare CSD** : overlays up to 10 CSDs on a single line chart for direct side-by-side comparison, with persistent per-CSD color assignment and optional event markers.
+   - The existing Period report and chart tabs have been consolidated (monthly and annual views merged into single tabs with a radio-button selector).
+- **Workspace support** : multiple isolated instances of the application can now run side-by-side using the `-workspace=NAME` command-line argument. Each workspace keeps its own settings and log files.
+- **Anonymize** feature (menu Scenario) : replaces sensitive scenario data with placeholder values, with optional amount randomization. Changes remain in-memory until explicitly saved.
+- **CSD breakdown** : both Periodic and Irregular CSD edit dialogs now offer a button to visualize the period-by-period totals for that CSD until the end of its validity period.
+- **Windows UI** : many improvements to the Windows version for the behavior of the UI, specially regarding layouts with misc fonts (including big ones).
 
 ## Screenshots
 
@@ -42,6 +35,10 @@ Analysis - Annual Report Chart
 
 ![](doc/images/e.png)
 
+Analysis - Heatmap
+
+![](doc/images/f.png)
+
 ## Installation
 
 ### On Linux
@@ -62,27 +59,24 @@ Download the ".zip" file binary from the repository mentioned above and unzip it
 
 ## Supported Platforms and Languages, System Requirements
 
-GBP is intended to be run first and foremost on the Linux Operating System. But since it is built using the Qt cross platform toolkit, a version of GBP for the Windows® Operating System is also provided. Tests have been conducted on Windows® 11 Home edition. A version for MAC would be easy to produce, if a MAC platform is made available to the developers.
+GBP is intended to be run first and foremost on the Linux Operating System. But since it is built using the Qt cross platform toolkit, a version of GBP for the Windows® Operating System is also provided and fully tested. A version for MAC could be easily produced if requested.
 
-GBP does not use a lot of RAM (the absolute worst case ever seen is 200 MB for an extremely demanding testing scenario) and necessitate roughly 50 MB of disk space (not taken into account the scenario files that you will create and GBP log files, which are all pretty small anyways).
+GBP does not use a lot of RAM (the absolute worst case ever seen is 300 MB for an extremely demanding testing scenario) and necessitate roughly 50 MB of disk space (not taken into account the scenario files that you will create and GBP log files, which are all pretty small anyways).
 
-As of December 2025, GBP has been extensively tested on the following Linux platforms :
+As of July 2026, GBP has been extensively tested on the following platforms : 
 
-* Tuxedo OS with KDE Plasma 6.5.2, kernel 6.14.0, Wayland
-* Linux Mint Debian Edition 7, Cinnamon 6.4.13, X11, Kernel 6.12.57
-* Fedora 43, KDE Plasma 6.5.3, Wayland, Kernel 6.17.8
-* Fedora 43, Gnome 49, Wayland, Kernel 6.17.8
-* Ubuntu 24.04.03 LTS, Gnome 46, Wayland, Kernel 6.14.0
-* MX linux 25, XFCE 4.20.1, X11, Kernel 6.16.12
-
-It has also been tested, but not extensively, on the following platforms :
-
+* Kubuntu 26.04 LTS, KDE 6.6.4, Wayland, Kernel 7.0.0-22
+* Linux Mint Debian Edition 7, Cinnamon 6.4.13, X11, Kernel 6.12.94
 * Windows® 11 Home Edition
-* PopOS 22.04 LTS, Gnome 42.9, X11, Kernel 6.17.4
+
+It has also been tested, but not as extensively, on the following platforms :
+
+* MX linux 25, XFCE 4.20.1, X11, Kernel 6.16.12
+* Fedora 43, KDE Plasma 6.6.5, Wayland, Kernel 7.0.11-100
 * OpenMandriva Lx 5.0, X11, KDE Plasma 5.27.9, kernel 6.6.2
+* Ubuntu 24.04.04 LTS, Gnome 46, Kernel 6.7.0-35
 * Ubuntu 22.04.5 LTS, Gnome 42.9, X11, Kernel 6.8.0-52
 * Ubuntu 22.04.5 LTS, Gnome 42.9, Wayland, Kernel 6.8.0-52
-
 
 GBP supports English and French languages. By default, English is used, but if the host Operating System is in French (whatever the country), then GBP will switch to French. More languages will hopefully be added in the future, if resources to translate are available.
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -59,7 +59,7 @@ public:
      * @param t The tag to be inserted/replaced.
      * @return False if max no of tags has been reached and prevents insertion. True otherwise.
      */
-    bool insert(Tag t);
+    bool insert(const Tag &t);
 
     /**
      * @brief Remove the tag from the set if the tag key already exists.
@@ -96,7 +96,7 @@ public:
      * @param name Name of a tag
      * @return No of time "name" is used as a name for a tag in the set.
      */
-    quint16 containsTagName(QString name) const;
+    quint16 containsTagName(const QString &name) const;
 
     /**
      * @brief Get the number of Tags contained in this object.

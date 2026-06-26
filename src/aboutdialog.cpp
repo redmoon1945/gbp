@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,16 +17,26 @@
  */
 
 #include "aboutdialog.h"
+#include <QTimer>
 #include "ui_aboutdialog.h"
 #include "gbpcontroller.h"
 #include "gbplogger.h"
+#include "uiutil.h"
+#include <QApplication>
 #include <QDesktopServices>
+#include <QDir>
 
 AboutDialog::AboutDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
+    ui->plainTextEdit->document()->setDefaultFont(QApplication::font());
+
     ui->appLabel->setText(QCoreApplication::applicationName() + "  " +
         QCoreApplication::applicationVersion());
     QString builtOn = QString(tr("Built on : %1 %2")).arg(__DATE__).arg(__TIME__);
@@ -35,6 +45,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     QFontMetrics fm(ui->configFilePlainTextEdit->font());
     ui->configFilePlainTextEdit->setFixedHeight(fm.height()*3); // 2 lines min
     ui->logFilePlainTextEdit->setFixedHeight(fm.height()*3); // 2 lines min
+
     // set first tab as current
     ui->tabWidget->setCurrentIndex(0);
 }
@@ -46,12 +57,13 @@ AboutDialog::~AboutDialog()
 }
 
 
-void AboutDialog::slotAboutDialogPrepareContent(QLocale theLocale)
+void AboutDialog::slotAboutDialogPrepareContent(const QLocale &theLocale)
 {
     ui->configFilePlainTextEdit->setPlainText(
-        GbpController::getInstance().getSettingsFullFileName());
+        QDir::toNativeSeparators(GbpController::getInstance().getSettingsFullFileName()));
     ui->logFilePlainTextEdit->setPlainText(
-        GbpLogger::getInstance().getLogFullFileName());
+        QDir::toNativeSeparators(GbpLogger::getInstance().getLogFullFileName()));
+    ui->workspaceLineEdit->setText(GbpController::getInstance().getWorkspace());
 
     // Locale
     QString locString = QString("%1 (%2 %3)").
@@ -59,6 +71,18 @@ void AboutDialog::slotAboutDialogPrepareContent(QLocale theLocale)
         arg(theLocale.nativeLanguageName()).
         arg(theLocale.nativeTerritoryName());
     ui->localeLineEdit->setText(locString);
+
+    // Log verbosity
+    GbpLogger::LogVerbosity verbosity = GbpLogger::getInstance().getLogVerbosity();
+    QString verbosityStr = (verbosity == GbpLogger::LogVerbosity::DEBUG)
+        ? tr("Debug") : tr("Normal");
+    ui->logVerbosityLineEdit->setText(verbosityStr);
+
+    // Log privacy
+    GbpLogger::LogPrivacy privacy = GbpLogger::getInstance().getLogPrivacy();
+    QString privacyStr = (privacy == GbpLogger::LogPrivacy::ALLOW_PRIVATE)
+        ? tr("Allow private") : tr("Public only");
+    ui->logPrivacyLineEdit->setText(privacyStr);
 
     ui->closePushButton->setFocus();
 
@@ -79,13 +103,18 @@ void AboutDialog::on_closePushButton_clicked()
 
 void AboutDialog::on_viewLogPushButton_clicked()
 {
-    // then, use the system defaut application to read the file
-    bool success = QDesktopServices::openUrl(QUrl::fromLocalFile(
-        ui->logFilePlainTextEdit->toPlainText()));
-    if (success==true) {
-        LOG_INFO(QString("Viewing log file : Viewer launch succeeded"));
-    } else {
-        LOG_ERROR(QString("Viewing log file : Viewer launch failed"));
-    }
+    QDesktopServices::openUrl(
+        QUrl::fromLocalFile(GbpLogger::getInstance().getLogFullFileName()));
+}
+
+
+
+void AboutDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("AboutDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

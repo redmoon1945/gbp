@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -52,7 +52,7 @@ GbpController::GbpController()
     lightModePointColor = factorySettings.lightModePointColor;
     darkModeSelectedPointColor = factorySettings.darkModeSelectedPointColor;
     lightModeSelectedPointColor = factorySettings.lightModeSelectedPointColor;
-    exportTextAmountLocalized = factorySettings.exportTextAmountLocalized;
+    exportTextNumberLocalized = factorySettings.exportTextNumberLocalized;
     exportTextDateLocalized = factorySettings.exportTextDateLocalized;
     percentageMainChartScaling = factorySettings.percentageMainChartScaling;
     useDefaultSystemFont = factorySettings.useDefaultSystemFont;
@@ -66,6 +66,8 @@ GbpController::GbpController()
     showYzeroLine = factorySettings.showYzeroLine;
     yZeroLineLightModeColor = factorySettings.yZeroLineLightModeColor;
     yZeroLineDarkModeColor = factorySettings.yZeroLineDarkModeColor;
+    gridlinesDarkModeColor = factorySettings.gridlinesDarkModeColor;
+    gridlinesLightModeColor = factorySettings.gridlinesLightModeColor;
     xAxisDateFormat = factorySettings.xAxisDateFormat;
     showTooltips = factorySettings.showTooltips;
 
@@ -82,15 +84,46 @@ GbpController::GbpController()
 
     // *** SETTINGS ***
 
+    // Parse workspace argument from command line
+    QString workspace;
+    QStringList argList = QCoreApplication::arguments();
+    for (int i = 0; i < argList.size(); ++i) {
+        if (argList.at(i).startsWith("-workspace=")) {
+            QString temp = argList.at(i).mid(11);  // Remove "-workspace=" prefix
+            // Validate: 1-20 characters, alphanumeric only
+            if (temp.length() >= 1 && temp.length() <= 20) {
+                bool valid = true;
+                for (const QChar &ch : temp) {
+                    if (!ch.isLetterOrNumber()) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid) {
+                    workspace = temp;
+                }
+            }
+        }
+    }
+    this->workspace = workspace;  // save for later retrieval
+
     // define default path for settings before creating GbpController (we dont want OrganizationName
     // be part of the path). One choose INI file structure (favor decentralization, portability and
     // human readability)
-    settingsFullFileName = QString("%1/%2.ini").arg(QStandardPaths::writableLocation(
-        QStandardPaths::ConfigLocation)).arg(QCoreApplication::applicationName());
+    if (workspace.isEmpty()) {
+        settingsFullFileName = QString("%1/%2.ini").arg(
+            QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)).arg(
+            QCoreApplication::applicationName());
+    } else {
+        settingsFullFileName = QString("%1/%2_%3.ini").arg(
+            QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)).arg(
+            QCoreApplication::applicationName()).arg(workspace);
+    }
     QFile iniFile(settingsFullFileName);
     if (iniFile.exists()==false){
         noSettingsFileAtStartup = true;
     }
+
     // Create QSettings using std::unique_ptr with std::make_unique
     settingsPtr = std::make_unique<QSettings>(settingsFullFileName, QSettings::IniFormat);
     // Check if it failed
@@ -115,14 +148,17 @@ GbpController::GbpController()
                     statusErrorString = "Unknown error";
                     break;
             }
-            QString errorString = QString("A problem occurred when trying to read or create the "
-                "settings from file %1 : %2").arg(settingsFullFileName).arg(statusErrorString);
+            QString fInfo = QString("%1").arg(Q_FUNC_INFO);
+            QString errorString = QString("%1: A problem occurred when trying to read or create the "
+                "settings from file %2 : %3")
+                .arg(fInfo).arg(settingsFullFileName).arg(statusErrorString);
             throw std::logic_error(errorString.toStdString());
         }
     } else {
         // Weird fatal error...
-        QString errorString = QString("Cannot create or read ini file (null pointer returned)"
-            " from %1").arg(settingsFullFileName);
+        QString fInfo = QString("%1").arg(Q_FUNC_INFO);
+        QString errorString = QString("%1: Cannot create or read ini file (null pointer returned)"
+            " from %1").arg(fInfo).arg(settingsFullFileName);
         throw std::logic_error(errorString.toStdString());
     }
 
@@ -335,22 +371,22 @@ void GbpController::loadSettings()
     LOG_INFO(QString("    selected_point_light_mode = %1")
         .arg(lightModeSelectedPointColor.name(QColor::HexRgb)));
 
-    // Amounts in exported text are localized or not (in which case format is : no thousand
+    // Numbers in exported text are localized or not (in which case format is : no thousand
     // separator, decimal sep = "."
     if (settingsPtr->contains("export_text_amount_localized")){
         v = settingsPtr->value("export_text_amount_localized");
         bool ok = Util::isValidBoolString(v.toString());
         if(ok){
-            exportTextAmountLocalized = v.toBool();
+            exportTextNumberLocalized = v.toBool();
         } else {
-            exportTextAmountLocalized = factorySettings.exportTextAmountLocalized;
+            exportTextNumberLocalized = factorySettings.exportTextNumberLocalized;
         }
 
     } else{
-        exportTextAmountLocalized = factorySettings.exportTextAmountLocalized;
+        exportTextNumberLocalized = factorySettings.exportTextNumberLocalized;
     }
     LOG_INFO(QString("    export_text_amount_localized = %1")
-        .arg(exportTextAmountLocalized));
+        .arg(exportTextNumberLocalized));
 
     // Dates in exported text are localized or not (in which case format is : YYYY-MM-DD
     if (settingsPtr->contains("export_text_date_localized")){
@@ -628,6 +664,34 @@ void GbpController::loadSettings()
         .arg(yZeroLineLightModeColor
                                                                                               .name(QColor::HexRgb)));
 
+    // Gridlines dark color
+    if (settingsPtr->contains("gridlines_color_dark_mode")){
+        v = settingsPtr->value("gridlines_color_dark_mode");
+        QString s = v.toString();
+        gridlinesDarkModeColor = QColor(s);
+        if (gridlinesDarkModeColor.isValid()==false) {
+            gridlinesDarkModeColor = factorySettings.gridlinesDarkModeColor;
+        }
+    } else{
+        gridlinesDarkModeColor = factorySettings.gridlinesDarkModeColor;
+    }
+    LOG_INFO(QString("    gridlines_color_dark_mode = %1")
+        .arg(gridlinesDarkModeColor.name(QColor::HexRgb)));
+
+    // Gridlines light color
+    if (settingsPtr->contains("gridlines_color_light_mode")){
+        v = settingsPtr->value("gridlines_color_light_mode");
+        QString s = v.toString();
+        gridlinesLightModeColor = QColor(s);
+        if (gridlinesLightModeColor.isValid()==false) {
+            gridlinesLightModeColor = factorySettings.gridlinesLightModeColor;
+        }
+    } else{
+        gridlinesLightModeColor = factorySettings.gridlinesLightModeColor;
+    }
+    LOG_INFO(QString("    gridlines_color_light_mode = %1")
+        .arg(gridlinesLightModeColor.name(QColor::HexRgb)));
+
     // X-Axis Date Format
     if (settingsPtr->contains("xaxis_date_format")){
         bool ok;
@@ -718,7 +782,7 @@ void GbpController::saveSettings()
         lightModeSelectedPointColor.name(QColor::HexRgb));
     settingsPtr->setValue("chart_dark_mode_selected_point_color",
         darkModeSelectedPointColor.name(QColor::HexRgb));
-    settingsPtr->setValue("export_text_amount_localized",exportTextAmountLocalized);
+    settingsPtr->setValue("export_text_amount_localized",exportTextNumberLocalized);
     settingsPtr->setValue("export_text_date_localized",exportTextDateLocalized);
     settingsPtr->setValue("last_dir",lastDir);
     settingsPtr->setValue("last_dir_import",lastDirImport);
@@ -737,6 +801,8 @@ void GbpController::saveSettings()
         .name(QColor::HexRgb));
     settingsPtr->setValue("y_zero_line_light_mode_color", yZeroLineLightModeColor
         .name(QColor::HexRgb));
+    settingsPtr->setValue("gridlines_color_dark_mode", gridlinesDarkModeColor.name(QColor::HexRgb));
+    settingsPtr->setValue("gridlines_color_light_mode", gridlinesLightModeColor.name(QColor::HexRgb));
     settingsPtr->setValue("xaxis_date_format",xAxisDateFormat);
     settingsPtr->setValue("show_tooltips",showTooltips);
     settingsPtr->setValue("income_color", incomeColor.name(QColor::HexRgb));
@@ -795,7 +861,8 @@ int GbpController::chartThemingFromEnumToInt(ChartTheming theme)
         case ChartTheming::FOLLOW_DESKTOP_THEME:
             return 2;
         default:
-            throw std::invalid_argument("unknown chart theme");// Should never happen
+            throw std::invalid_argument(QString("%1: unknown chart theme")
+                .arg(Q_FUNC_INFO).toStdString());// Should never happen
     }
 }
 
@@ -828,7 +895,8 @@ QString GbpController::chartThemingToString(ChartTheming theme)
         case ChartTheming::FOLLOW_DESKTOP_THEME:
             return "Follow desktop theme";
         default:
-            throw std::invalid_argument("unknown chart theme");// Should never happen
+            throw std::invalid_argument(QString("%1: unknown chart theme")
+                .arg(Q_FUNC_INFO).toStdString());// Should never happen
     }
 }
 
@@ -926,14 +994,14 @@ void GbpController::setLightModeSelectedPointColor(const QColor &newLightModeSel
     lightModeSelectedPointColor = newLightModeSelectedPointColor;
 }
 
-bool GbpController::getExportTextAmountLocalized() const
+bool GbpController::getExportTextNumberLocalized() const
 {
-    return exportTextAmountLocalized;
+    return exportTextNumberLocalized;
 }
 
-void GbpController::setExportTextAmountLocalized(bool newExportTextAmountLocalized)
+void GbpController::setExportTextNumberLocalized(bool newExportTextNumberLocalized)
 {
-    exportTextAmountLocalized = newExportTextAmountLocalized;
+    exportTextNumberLocalized = newExportTextNumberLocalized;
 }
 
 QString GbpController::getLastDir() const
@@ -1101,6 +1169,11 @@ void GbpController::setSystemDesktopDarkTheme(bool newSystemDesktopDarkTheme)
     systemDesktopDarkTheme = newSystemDesktopDarkTheme;
 }
 
+QString GbpController::getWorkspace() const
+{
+    return workspace;
+}
+
 QString GbpController::getLastDirImport() const
 {
     return lastDirImport;
@@ -1140,6 +1213,26 @@ QColor GbpController::getYZeroLineDarkModeColor() const
 void GbpController::setYZeroLineDarkModeColor(const QColor &newYZeroLineDarkModeColor)
 {
     yZeroLineDarkModeColor = newYZeroLineDarkModeColor;
+}
+
+QColor GbpController::getGridlinesDarkModeColor() const
+{
+    return gridlinesDarkModeColor;
+}
+
+void GbpController::setGridlinesDarkModeColor(const QColor &newGridlinesDarkModeColor)
+{
+    gridlinesDarkModeColor = newGridlinesDarkModeColor;
+}
+
+QColor GbpController::getGridlinesLightModeColor() const
+{
+    return gridlinesLightModeColor;
+}
+
+void GbpController::setGridlinesLightModeColor(const QColor &newGridlinesLightModeColor)
+{
+    gridlinesLightModeColor = newGridlinesLightModeColor;
 }
 
 bool GbpController::getShowTooltips() const

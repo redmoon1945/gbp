@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@
 #include <QLocale>
 #include <QCoreApplication>
 #include <QMap>
+#include <qfontmetrics.h>
 
 
 /**
@@ -35,6 +36,8 @@ struct CurrencyInfo{
     QString symbol;     // currency code, e.g. "$"
     QString isoCode;    // 3 char currency ISO code, e.g. "USD"
     int noOfDecimal;    // No of fractional decimal for that currency
+    CurrencyInfo();     // default: USD
+    CurrencyInfo(QString name, QString symbol, QString isoCode, int noOfDecimal);
 };
 
 
@@ -146,24 +149,72 @@ public:
      * @brief Convert an amount from natural (double) representation to a String version. Included
      * are the decimal separator and thousands separator, determined by the locale passed.
      * @details Amount cannot be bigger than the max allowed.
-     * @param amount The double amount to be converted into a String.
+     * @param amount The double amount to be converted into a currency String.
+     * @param cInfo Info about the currency to use.
+     * @param locale The QLocale to use to determine the decimal separator and thousands separator.
+     * @param addISOcode If true, currency ISO code will be added at the end of the String.
+     * @return The String representation of amount.
+     */
+    static QString formatAmount(double amount, const CurrencyInfo &cInfo, const QLocale &locale,
+        bool addISOcode);
+
+    /**
+     * @brief Convert an amount from decimal representation to a String version. Included
+     * are the decimal separator and thousands separator, determined by the locale passed.
+     * @details Amount cannot be bigger than the max allowed.
+     * @param amount The qint64 amount to be converted into a currency String.
      * @param cInfo Info about the currency to use.
      * @param locale The QLocale to use to determine the decimal separator and thousands separator.
      * @param addISOcode If true, currency ISO code ill be added at the end of the String.
      * @return The String representation of amount.
      */
-    static QString formatAmount(double amount, CurrencyInfo cInfo, QLocale locale, bool addISOcode)  ;
+    static QString formatAmount(qint64 amount, const CurrencyInfo &cInfo, const QLocale &locale,
+        bool addISOcode);
 
     /**
-     * @brief Add 2 amounts (positive or negative) expressed in their native (qint64) format.
-     * The result is capped to the maximum allowed for amount (negative or positive depending
-     * on the result).
-     * @param a First amount to add.
-     * @param b Second amount to add.
-     * @return Resulting amount, potentially capped to max value allowed (negative or positive
-     * depending on the result).
+     * @brief Adds two qint64 currency values with overflow protection and clamping
+     *
+     * Performs a safe addition of two signed 64-bit integers, ensuring:
+     * - No undefined behavior from signed integer overflow
+     * - Result is always clamped to ±NATIVE_MAX_VALUE_ALLOWED
+     *
+     * @param[in] a First operand (any qint64 value)
+     * @param[in] b Second operand (any qint64 value)
+     *
+     * @return The sum of @p a and @p b, clamped to the range
+     *         [-NATIVE_MAX_VALUE_ALLOWED, +NATIVE_MAX_VALUE_ALLOWED]
+     *
+     * @note This function handles all edge cases including qint64 min/max values
+     *       without triggering undefined behavior.
+     *
+     * @par Example:
+     * @code
+     * qint64 result = CurrencyHelper::add(1000, 2000);        // returns 3000
+     * qint64 clamped = CurrencyHelper::add(MAX, 1);           // returns MAX
+     * qint64 negative = CurrencyHelper::add(-MAX, -1);        // returns -MAX
+     * qint64 mixed = CurrencyHelper::add(2 * MAX, -MAX);      // returns MAX
+     * @endcode
      */
     static qint64 add(qint64 a, qint64 b );
+
+    /**
+     * @brief Adds two double currency values with clamping and NaN/Inf protection
+     *
+     * Performs a safe addition of two double values, ensuring:
+     * - Result is always clamped to ±maxValueAllowedForAmountInDouble()
+     * - NaN inputs or results are treated as zero
+     * - Infinity inputs are correctly clamped
+     *
+     * @param[in] a First operand (any double value)
+     * @param[in] b Second operand (any double value)
+     * @param[in] noOfDecimalDigits Number of decimal digits for the currency,
+     *                              used to determine the maximum value allowed.
+     *
+     * @return The sum of @p a and @p b, clamped to the range
+     *         [-maxValueAllowedForAmountInDouble(), +maxValueAllowedForAmountInDouble()].
+     *         Returns 0.0 if any input or the result is NaN.
+     */
+    static double add(double a, double b, uint noOfDecimalDigits);
 
     /**
      * @brief Return a list of 2-letter ISO 3166 alpha-2 country codes (key) and their
@@ -191,6 +242,20 @@ public:
     static bool countryExists(QString countryCode);
 
     /**
+     * @brief Calculate the maximum pixel width of a formatted currency amount string.
+     * @details Internally formats the maximum allowed amount and replaces all digits with '8'
+     * (the widest digit in most fonts) to obtain the true worst-case pixel width. The result
+     * accounts for locale-specific formatting including decimal separator, thousands group
+     * separator, and the number of decimal digits of the currency.
+     * @param cInfo Info about the currency (used for number of decimals).
+     * @param locale The locale used for formatting (determines separators and grouping).
+     * @param fm The font metrics used to compute the pixel width.
+     * @return The maximum pixel width of any formatted amount string.
+     */
+    static int currencyAmountMaxPixelWidth(const CurrencyInfo &cInfo,
+        const QLocale &locale, const QFontMetrics &fm);
+
+    /**
      * @brief Get CurrencyInfo for the currency tied to a specific country.
      * @details The info returned are:
      * - currency 3-letter ISO 3166 currency code.
@@ -202,8 +267,34 @@ public:
      * @param found True if the country has been found, false otherwise.
      * @return The currency info.
      */
-    static CurrencyInfo getCurrencyInfoFromCountryCode(QString countryCode,
+    static CurrencyInfo getCurrencyInfoFromCountryCode(const QString &countryCode,
         QLocale::Language language, bool& found );
+
+    /**
+     * @brief Get CurrencyInfo directly from a 3-letter ISO 4217 currency code.
+     * @param isoCode The 3-letter ISO 4217 currency code (e.g. "USD").
+     * @param language The language for the currency name (English or French).
+     * @param found True if the currency has been found, false otherwise.
+     * @return The currency info.
+     */
+    static CurrencyInfo getCurrencyInfoFromIsoCode(const QString &isoCode,
+        QLocale::Language language, bool& found);
+
+    /**
+     * @brief Indicates if a currency ISO code exists in the GBP list of currencies.
+     * @param isoCode The 3-letter ISO 4217 currency code.
+     * @return True if it exists, false otherwise.
+     */
+    static bool currencyIsoCodeExists(QString isoCode);
+
+    /**
+     * @brief Return a representative 2-letter country code for a given currency ISO code.
+     * @details Used for backward-compatibility when writing scenario files. Returns the
+     * alphabetically first country in the GBP country list that uses the given currency.
+     * @param isoCode The 3-letter ISO 4217 currency code.
+     * @return The country code, or empty string if none found.
+     */
+    static QString getRepresentativeCountryForCurrency(const QString &isoCode);
 
 
 private:

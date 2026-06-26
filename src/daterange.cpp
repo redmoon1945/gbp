@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -40,8 +40,8 @@ DateRange::DateRange(const DateRange &o)
 
 DateRange::DateRange(Type r){
     if (r == Type::BOUNDED) {
-        throw std::invalid_argument("BOUNDED DateRange must be constructed with start "
-            "and end dates");
+        throw std::invalid_argument(QString("%1: BOUNDED DateRange must be constructed with start "
+            "and end dates").arg(Q_FUNC_INFO).toStdString());
     }
     this->type = r;
     // dummy values, to keep compatibility with 1.6.3 and earlier
@@ -53,21 +53,26 @@ DateRange::DateRange(Type r){
 
 DateRange::DateRange(const QDate from, const QDate to){
     if (from.isValid()==false){
-        throw std::invalid_argument("from is invalid");
+        throw std::invalid_argument(QString("%1: from is invalid").arg(Q_FUNC_INFO).toStdString());
     }
     if (to.isValid()==false){
-        throw std::invalid_argument("to is invalid");
+        throw std::invalid_argument(QString("%1: to is invalid").arg(Q_FUNC_INFO).toStdString());
     }
     if (from.year() < MIN_YEAR || to.year() < MIN_YEAR) {
-        throw std::invalid_argument("Dates before year " + std::to_string(MIN_YEAR) +
-        " are not allowed");
+        QString fInfo = QString("%1").arg(Q_FUNC_INFO);
+        QString s = QString("%1: Dates before year %2 are not allowed")
+            .arg(fInfo).arg(std::to_string(MIN_YEAR));
+        throw std::invalid_argument(s.toStdString());
     }
     if (from > to){
-        throw std::invalid_argument("from must not be greater than to");
+        throw std::invalid_argument(QString("%1: from must not be greater than to")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     if ( (to.year()-from.year()+1) > MAX_YEARS){
-        throw std::invalid_argument("Range cannot span more than " +
-                std::to_string(MAX_YEARS)+" years");
+        QString fInfo = QString("%1").arg(Q_FUNC_INFO);
+        QString s = QString("%1: Range cannot span more than %2 years")
+            .arg(fInfo).arg(std::to_string(MAX_YEARS));
+        throw std::invalid_argument(s.toStdString());
     }
     this->start = from;
     this->end = to;
@@ -98,7 +103,8 @@ int DateRange::GetNoOfYearsSpanned() const {
     if (this->type == Type::EMPTY){
         return 0;
     } else if (this->type==Type::INFINITE){
-        throw std::out_of_range("DateRange is infinite");
+        throw std::out_of_range(QString("%1: DateRange is infinite")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     return (end.year()-start.year()+1);
 }
@@ -170,7 +176,8 @@ QList<QDate> DateRange::getDateList() const{
     if ( this->type==Type::EMPTY){
          return list;
     } else if (this->type==Type::INFINITE){
-        throw std::out_of_range("DateRange is infinite");
+        throw std::out_of_range(QString("%1: DateRange is infinite")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     QDate date = start;
     while (!(date>end)) {
@@ -377,7 +384,8 @@ int DateRange::convertTypeFromEnumToInt(Type t)
         case Type::INFINITE:
             return 2;
         default:
-            throw std::invalid_argument("Unknown DateRange::Type value");
+            throw std::invalid_argument(QString("%1: Unknown DateRange::Type value")
+                .arg(Q_FUNC_INFO).toStdString());
     }
 }
 

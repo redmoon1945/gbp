@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,8 @@ class EditVariableGrowthModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    explicit EditVariableGrowthModel(QString newGrowthName, QLocale aLocale, QObject *parent = nullptr);
+    explicit EditVariableGrowthModel(const QString &newGrowthName, const QLocale &aLocale,
+        QObject *parent = nullptr);
 
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -44,7 +45,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     // methods
-    int getPositionForDate(QDate aDate);
+    int getPositionForDate(QDate aDate) const;
 
     // Getters/setters
     Growth getGrowthData() const;

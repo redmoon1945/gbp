@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,17 @@ class DateHelper
 {
 public:
 
-    enum class TimeUnitType {Day, Week, Month, EndOfMonth, Year};
+    /**
+     * @brief Time unit types for date calculations.
+     * @details Defines different time intervals that can be used to advance or retreat dates.
+     */
+    enum class TimeUnitType {
+        Day,         ///< Calendar day interval (24-hour period)
+        Week,        ///< 7-day interval
+        Month,       ///< Calendar month interval, preserving the day-of-month when possible
+        EndOfMonth,  ///< Calendar month interval, always landing on the last day of the month
+        Year         ///< 12-month interval (one calendar year)
+    };
 
     /**
      * @brief From a given date "X", calculates the next or previous date by adding or subtracting

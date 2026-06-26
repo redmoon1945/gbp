@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,8 @@
  */
 
 #include "plaintexteditiondialog.h"
+#include "gbplogger.h"
+#include <QTimer>
 #include "ui_plaintexteditiondialog.h"
 
 PlainTextEditionDialog::PlainTextEditionDialog(QWidget *parent)
@@ -48,6 +50,8 @@ void PlainTextEditionDialog::slotPrepareContent(QString title, QString content, 
         ui->cancelPushButton->setText("Cancel");
     }
 
+    ui->plainTextEdit->setFocus();
+
 }
 
 
@@ -71,6 +75,16 @@ void PlainTextEditionDialog::on_cancelPushButton_clicked()
 
 void PlainTextEditionDialog::on_PlainTextEditionDialog_rejected()
 {
-        on_cancelPushButton_clicked();
+    on_cancelPushButton_clicked();
+}
+
+
+void PlainTextEditionDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("PlainTextEditionDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

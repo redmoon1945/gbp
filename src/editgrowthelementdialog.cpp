@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,19 @@
  */
 
 #include "editgrowthelementdialog.h"
+#include "gbplogger.h"
+#include <QTimer>
 #include "ui_editgrowthelementdialog.h"
 #include "growth.h"
 #include "gbpcontroller.h"
+#include "uiutil.h"
 
 #include <QMessageBox>
 #include <QCoreApplication>
+#include "gbpqmessage.h"
 
-EditGrowthElementDialog::EditGrowthElementDialog(QString newGrowthName,QLocale aLocale,
+EditGrowthElementDialog::EditGrowthElementDialog(const QString &newGrowthName,
+    const QLocale &aLocale,
     QWidget *parent) :
     QDialog(parent), ui(new Ui::EditGrowthElementDialog)
 {
@@ -32,9 +37,14 @@ EditGrowthElementDialog::EditGrowthElementDialog(QString newGrowthName,QLocale a
     locale = aLocale;
     ui->setupUi(this);
 
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
     // Makes note characters smaller and italic
-    QFont noteFont = ui->notesLabel->font();
-    Util::changeFontSize(noteFont, Util::FontResizeIntensity::WEAK,true);
+    QFont font = QApplication::font();
+    QFont noteFont = font;
+    Util::changeFontSize(noteFont, Util::FontResizeIntensity::AVERAGE,true,
+        "EditGrowthElementDialog - notes");
     noteFont.setItalic(true);
     ui->notesLabel->setFont(noteFont);
 
@@ -64,7 +74,8 @@ EditGrowthElementDialog::~EditGrowthElementDialog()
 
 
 // growthInPercentage is monthly growth in percentage, but expressed on an annual basis
-void EditGrowthElementDialog::slotPrepareContent(bool newEditMode, QList<QDate> newExistingDates,
+void EditGrowthElementDialog::slotPrepareContent(bool newEditMode,
+    const QList<QDate> &newExistingDates,
     QDate currentDate, double growthInPercentage)
 {
     editMode = newEditMode;
@@ -107,8 +118,7 @@ void EditGrowthElementDialog::slotPrepareContent(bool newEditMode, QList<QDate> 
         updateMonthlyGrowthEquivalentValue();
     }
 
-    //  set focus on Apply
-    ui->applyPushButton->setFocus();
+    ui->yearSpinBox->setFocus();
 }
 
 
@@ -127,18 +137,21 @@ void EditGrowthElementDialog::on_applyPushButton_clicked(){
 
     // validate date
     if ( !newDate.isValid() ){
-        QMessageBox::critical(this,tr("Error"),QString(tr("Date entered is invalid")));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            QString(tr("Date entered is invalid")), {tr("OK")}, 0, 0);
         return;
     }
     // validate growth
     if (growthValueAnnualBasis<Growth::MIN_GROWTH_DOUBLE){
-        QMessageBox::critical(this,tr("Error"),QString(tr("%1 value is smaller "
-            "than the minimum allowed of %2")).arg(growthName).arg(Growth::MIN_GROWTH_DOUBLE));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            QString(tr("%1 value is smaller "
+            "than the minimum allowed of %2")).arg(growthName).arg(Growth::MIN_GROWTH_DOUBLE), {tr("OK")}, 0, 0);
         return;
     }
     if (growthValueAnnualBasis>Growth::MAX_GROWTH_DOUBLE){
-        QMessageBox::critical(this,tr("Error"),QString(tr("%1 value is bigger "
-            "than the maximum allowed of %2")).arg(growthName).arg(Growth::MAX_GROWTH_DOUBLE));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            QString(tr("%1 value is bigger "
+            "than the maximum allowed of %2")).arg(growthName).arg(Growth::MAX_GROWTH_DOUBLE), {tr("OK")}, 0, 0);
         return;
     }
     // date must not exist for Element Creation
@@ -147,7 +160,8 @@ void EditGrowthElementDialog::on_applyPushButton_clicked(){
         if(existingDates.contains(newDate)){
             QString errorString = QString(tr("A %1 value is already defined for that date"))
                 .arg(growthName);
-            QMessageBox::critical(this,tr("Error"),errorString);
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                errorString, {tr("OK")}, 0, 0);
             return;
         } else {
             // add to the list of existing years
@@ -211,5 +225,15 @@ void EditGrowthElementDialog::updateMonthlyGrowthEquivalentValue()
 void EditGrowthElementDialog::on_growthDoubleSpinBox_valueChanged(double arg1)
 {
     updateMonthlyGrowthEquivalentValue();
+}
+
+
+void EditGrowthElementDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("EditGrowthElementDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

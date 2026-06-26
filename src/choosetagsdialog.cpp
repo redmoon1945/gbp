@@ -1,6 +1,10 @@
 #include "choosetagsdialog.h"
+#include "gbplogger.h"
+#include <QTimer>
 #include "ui_choosetagsdialog.h"
+#include "uiutil.h"
 #include <QMessageBox>
+#include "gbpqmessage.h"
 
 
 ChooseTagsDialog::ChooseTagsDialog(QWidget *parent)
@@ -8,6 +12,18 @@ ChooseTagsDialog::ChooseTagsDialog(QWidget *parent)
     , ui(new Ui::ChooseTagsDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
+    // Set smaller font for action buttons
+    QFont appFont = QApplication::font();
+    QFont font = appFont;
+    Util::changeFontSize(font, Util::FontResizeIntensity::WEAK, true,
+        "ChooseTagsDialog - action buttons");
+    ui->listWidget->setFont(appFont);
+    ui->selectAllPushButton->setFont(font);
+    ui->unselectAllPushButton->setFont(font);
 }
 
 
@@ -21,14 +37,13 @@ ChooseTagsDialog::~ChooseTagsDialog()
 // Input parameters :
 //  tags : the set of all tags available for selection
 //  preSelectedTags : list of Tags that must be pre-selected when the Dialog is displayed
-void ChooseTagsDialog::slotPrepareContent(Tags tags, QSet<QUuid> preSelectedTags)
+void ChooseTagsDialog::slotPrepareContent(const Tags &tags, const QSet<QUuid> &preSelectedTags)
 {
     this->tags = tags;
 
     updateList(preSelectedTags);
 
-    // Set focus on Apply
-    ui->applyPushButton->setFocus();
+    ui->listWidget->setFocus();
 }
 
 
@@ -39,7 +54,7 @@ void ChooseTagsDialog::on_ChooseTagsDialog_rejected()
 
 
 // Update the content of the listbox
-void ChooseTagsDialog::updateList(QSet<QUuid> preSelectedTags)
+void ChooseTagsDialog::updateList(const QSet<QUuid> &preSelectedTags)
 {
     ui->listWidget->clear();
 
@@ -80,8 +95,8 @@ void ChooseTagsDialog::on_applyPushButton_clicked()
     // Get selected items and make sure at least one tag is selected
     QList<QListWidgetItem *> selection = ui->listWidget->selectedItems();
     if (selection.size()==0) {
-        QMessageBox::critical(nullptr,tr("Error"),
-            tr("You must select at leat one tag."));
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("You must select at leat one tag."), {tr("OK")}, 0, 0);
         return;
     }
 
@@ -108,5 +123,15 @@ void ChooseTagsDialog::on_selectAllPushButton_clicked()
 void ChooseTagsDialog::on_unselectAllPushButton_clicked()
 {
     ui->listWidget->clearSelection();
+}
+
+
+void ChooseTagsDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("ChooseTagsDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

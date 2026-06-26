@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,31 +17,36 @@
  */
 
 #include "gbpqmessage.h"
+#include <QApplication>
 #include <qmessagebox.h>
 
 GbpQMessage::GbpQMessage() {}
 
 
-int GbpQMessage::messageBoxQuestion(QWidget *parent, GbpQMessage::Type msgType, QString title,
-    QString message, QStringList buttonsText, uint defaultButtonIndex, uint escapeButtonIndex)
+int GbpQMessage::messageBoxQuestion(QWidget *parent, GbpQMessage::Type msgType,
+    const QString &title, const QString &message, const QStringList &buttonsText,
+    uint defaultButtonIndex, uint escapeButtonIndex)
 {
     // check integrity of parameters
     if (buttonsText.size() < 1) {
-        throw std::invalid_argument("Custom Message Box : buttonsText "
-            "must contain at least one item");
+        throw std::invalid_argument(QString("%1: Custom Message Box : buttonsText "
+            "must contain at least one item").arg(Q_FUNC_INFO).toStdString());
     }
     if (buttonsText.size() > 5) {
-        throw std::invalid_argument("Custom Message Box : buttonsText "
-            "exceeds the max no of buttons supported (5)");
+        throw std::invalid_argument(QString("%1: Custom Message Box : buttonsText "
+            "exceeds the max no of buttons supported (5)").arg(Q_FUNC_INFO).toStdString());
     }
     if (buttonsText.size() <= defaultButtonIndex) {
-        throw std::invalid_argument("Custom Message Box : invalid defaultButtonIndex");
+        throw std::invalid_argument(QString("%1: Custom Message Box : invalid defaultButtonIndex")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     if (buttonsText.size() <= escapeButtonIndex) {
-        throw std::invalid_argument("Custom Message Box : invalid escapeButtonIndex");
+        throw std::invalid_argument(QString("%1: Custom Message Box : invalid escapeButtonIndex")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     // Display the messagebox
     QMessageBox msgBox(parent);
+    msgBox.setFont(QApplication::font());
     msgBox.setWindowTitle(title);
     msgBox.setText(message);
     msgBox.setTextFormat(Qt::RichText);

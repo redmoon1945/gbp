@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -18,25 +18,45 @@
 
 
 #include "edittagdialog.h"
+#include <QTimer>
 #include "gbpcontroller.h"
 #include "gbplogger.h"
 #include "ui_edittagdialog.h"
+#include "uiutil.h"
 #include <QMessageBox>
 #include <QListWidgetItem>
+#include "gbpqmessage.h"
 
 quint64 EditTagDialog::MAX_NO_SUGGESTIONS = 1000;
 
-EditTagDialog::EditTagDialog(QLocale aLocale, QWidget *parent)
+EditTagDialog::EditTagDialog(const QLocale &aLocale, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::EditTagDialog), locale(aLocale)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
     ui->nameLineEdit->setMaxLength(Tag::MAX_NAME_LEN);
 
+    QFont appFont = QApplication::font();
+
     // use smaller font for description list
-    QFont descFont = ui->descPlainTextEdit->font();
-    Util::changeFontSize(descFont, Util::FontResizeIntensity::WEAK, true);
+    QFont descFont = appFont;
+    Util::changeFontSize(descFont, Util::FontResizeIntensity::AVERAGE, true,
+        "EditTagDialog - description");
     ui->descPlainTextEdit->setFont(descFont);
+
+    // make action buttons smaller
+    QFont actionFont = appFont;
+    Util::changeFontSize(actionFont, Util::FontResizeIntensity::WEAK, true,
+        "EditTagDialog - action buttons");
+    ui->bothRadioButton->setFont(actionFont);
+    ui->incomesRadioButton->setFont(actionFont);
+    ui->expensesRadioButton->setFont(actionFont);
+
+    ui->suggestionsListWidget->setFont(appFont);
 
     // force description widget to be small (cant do it in Qt Designer...)
     QFontMetrics fm(ui->descPlainTextEdit->font());
@@ -66,7 +86,8 @@ EditTagDialog::~EditTagDialog()
 
 
 // tagToEdit must be in currentTags
-void EditTagDialog::slotPrepareContent(Tags currentTags, Tag tagToEdit, bool isForNewTag)
+void EditTagDialog::slotPrepareContent(const Tags &currentTags, const Tag &tagToEdit,
+    bool isForNewTag)
 {
     existingTags = currentTags;
     newTag = isForNewTag;
@@ -86,14 +107,16 @@ void EditTagDialog::slotPrepareContent(Tags currentTags, Tag tagToEdit, bool isF
         Tag tag = currentTags.getTag(tagToEdit.getId(), found);
         if (found==false) {
             // we have been passed an inexisting tag ID, this is invalid
-            throw std::domain_error("Tag passed is invalid");
+            throw std::domain_error(QString("%1: Tag passed is invalid")
+                .arg(Q_FUNC_INFO).toStdString());
         }
         ui->nameLineEdit->setText(tagToEdit.getName());
         ui->descPlainTextEdit->setPlainText(tagToEdit.getDescription());
         tagBeingEdited = tagToEdit;
     }
-    ui->nameLineEdit->setFocus();
     ui->suggestionsListWidget->clearSelection();
+
+    ui->nameLineEdit->setFocus();
 }
 
 
@@ -127,8 +150,8 @@ void EditTagDialog::on_applyPushButton_clicked()
 
         // be sure the name does not already exist
         if (duplicateNameNo > 0) {
-            QMessageBox::critical(this,tr("Error"),
-                tr("An existing tag already uses this name"));
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("An existing tag already uses this name"), {tr("OK")}, 0, 0);
             return;
         }
         // create the tag (adjust the name)
@@ -150,8 +173,8 @@ void EditTagDialog::on_applyPushButton_clicked()
         if (cleanedName!=tagBeingEdited.getName()) {
             // name has changed, make sure the new value does not already exist
             if (duplicateNameNo > 0) {
-                QMessageBox::critical(this,tr("Error"),
-                    tr("An existing tag already uses this name"));
+                GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                    tr("An existing tag already uses this name"), {tr("OK")}, 0, 0);
                 return;
             }
         }
@@ -386,5 +409,20 @@ void EditTagDialog::on_suggestionsListWidget_itemSelectionChanged()
         // should never happen
         return;
     }
+}
+
+
+void EditTagDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    // QTimer::singleShot(0) defers execution until after all show-related events have been
+    // processed, including the platform style's focusInEvent which calls selectAll() on the
+    // focused QLineEdit. Calling deselect() directly in slotPrepareContent() has no effect
+    // because that slot runs before the dialog is shown.
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("EditTagDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+        ui->nameLineEdit->deselect();
+    });
 }
 

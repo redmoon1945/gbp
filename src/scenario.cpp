@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ Scenario::Scenario(const Scenario &o){
     this->description = o.description;
     this->feGenerationDuration = o.feGenerationDuration;
     this->inflation = o.inflation;
-    this->countryCode = o.countryCode;
+    this->currencyIsoCode = o.currencyIsoCode;
     this->incomePeriodicCsds = o.incomePeriodicCsds;
     this->incomeIrregularCsds = o.incomeIrregularCsds;
     this->expensePeriodicCsds = o.expensePeriodicCsds;
@@ -54,7 +54,7 @@ Scenario::~Scenario()
 
 
 Scenario::Scenario(const QString version, const QString name, const QString description,
-    const quint16 feGenerationDuration, const Growth inflation, QString countryCode,
+    const quint16 feGenerationDuration, const Growth inflation, const QString &currencyIsoCode,
     QHash<QUuid,QSharedPointer<PeriodicCsd>> incomePeriodicCsdSet,
     QHash<QUuid,QSharedPointer<IrregularCsd>> incomeIrregularCsdSet,
     QHash<QUuid,QSharedPointer<PeriodicCsd>> expensePeriodicCsdSet,
@@ -62,7 +62,8 @@ Scenario::Scenario(const QString version, const QString name, const QString desc
     const Tags newTags, const TagCsdRelationships newtagCsdRelationships) :
     version(version.left(VERSION_MAX_LEN)),
     name(name.left(NAME_MAX_LEN)), description(description.left(DESC_MAX_LEN)),
-    feGenerationDuration(feGenerationDuration), inflation(inflation), countryCode(countryCode),
+    feGenerationDuration(feGenerationDuration), inflation(inflation),
+    currencyIsoCode(currencyIsoCode),
     incomePeriodicCsds(incomePeriodicCsdSet), incomeIrregularCsds(incomeIrregularCsdSet),
     expensePeriodicCsds(expensePeriodicCsdSet),expenseIrregularCsds(expenseIrregularCsdSet),
     tags(newTags), tagCsdRelationships(newtagCsdRelationships)
@@ -76,7 +77,7 @@ Scenario &Scenario::operator=(const Scenario &o)
     this->description = o.description.left(DESC_MAX_LEN);
     this->feGenerationDuration = o.feGenerationDuration;
     this->inflation = o.inflation;
-    this->countryCode = o.countryCode;
+    this->currencyIsoCode = o.currencyIsoCode;
     this->incomePeriodicCsds = o.incomePeriodicCsds;
     this->incomeIrregularCsds = o.incomeIrregularCsds;
     this->expensePeriodicCsds = o.expensePeriodicCsds;
@@ -94,7 +95,7 @@ bool Scenario::operator==(const Scenario &o) const
         !(this->description==o.description) ||
         !(this->feGenerationDuration==o.feGenerationDuration) ||
         !(this->inflation==o.inflation) ||
-        !(this->countryCode==o.countryCode) ){
+        !(this->currencyIsoCode==o.currencyIsoCode) ){
         return false;
     }
 
@@ -135,7 +136,9 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
     jobject["Description"] = description;
     jobject["FeGenerationDuration"] = feGenerationDuration;
     jobject["Inflation"] = inflation.toJson();
-    jobject["CountryCode"] = countryCode;
+    jobject["CurrencyCode"] = currencyIsoCode;
+    // Also write CountryCode for backward compatibility with GBP 1.7 and below
+    jobject["CountryCode"] = CurrencyHelper::getRepresentativeCountryForCurrency(currencyIsoCode);
 
     try {
         // incomes - Periodic
@@ -384,23 +387,51 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
         }
     }
 
-    // country code
-    buf = root.value("CountryCode");
-    if (buf == QJsonValue::Undefined){
-        result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.logErrorMessage = QString("Cannot find token \"CountryCode\"");
-        return result;
-    }
-    if (buf.isString()==false){
-        result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.logErrorMessage = QString("CountryCode token is not a string");
-        return result;
-    }
-    QString countryCode = buf.toString();
-    if ( !(CurrencyHelper::countryExists(countryCode)) ){
-        result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-        result.logErrorMessage = QString("CountryCode %1 is invalid").arg(countryCode);
-        return result;
+    // currency code (GBP 1.8+: CurrencyCode field; GBP 1.7 and below: derive from CountryCode)
+    QString currencyIsoCode;
+    buf = root.value("CurrencyCode");
+    if (buf != QJsonValue::Undefined) {
+        if (buf.isString() == false) {
+            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            result.logErrorMessage = QString("CurrencyCode token is not a string");
+            return result;
+        }
+        currencyIsoCode = buf.toString();
+        if (!CurrencyHelper::currencyIsoCodeExists(currencyIsoCode)) {
+            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            result.logErrorMessage = QString("CurrencyCode %1 is invalid").arg(currencyIsoCode);
+            return result;
+        }
+    } else {
+        // Legacy format: read CountryCode and derive the currency from it
+        buf = root.value("CountryCode");
+        if (buf == QJsonValue::Undefined) {
+            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            result.logErrorMessage =
+                QString("Cannot find token \"CurrencyCode\" or \"CountryCode\"");
+            return result;
+        }
+        if (buf.isString() == false) {
+            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            result.logErrorMessage = QString("CountryCode token is not a string");
+            return result;
+        }
+        QString countryCode = buf.toString();
+        if (!CurrencyHelper::countryExists(countryCode)) {
+            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            result.logErrorMessage = QString("CountryCode %1 is invalid").arg(countryCode);
+            return result;
+        }
+        bool found;
+        CurrencyInfo ci = CurrencyHelper::getCurrencyInfoFromCountryCode(
+            countryCode, QLocale::Language::English, found);
+        if (!found) {
+            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            result.logErrorMessage = QString("Cannot derive currency from CountryCode %1")
+                .arg(countryCode);
+            return result;
+        }
+        currencyIsoCode = ci.isoCode;
     }
 
     // inflation
@@ -763,7 +794,7 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
     QSharedPointer<Scenario> ptr;
     try {
         ptr = QSharedPointer<Scenario>(new Scenario(version, name, desc, feGenDuration, inflation,
-            countryCode, incPsMap, incIrMap, expPsMap, expIrMap, theTags, rel));
+            currencyIsoCode, incPsMap, incIrMap, expPsMap, expIrMap, theTags, rel));
     } catch (...) {
         // should never happen
         result.code = FileResultCode::LOAD_ERROR;
@@ -797,8 +828,8 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
 
 
 QSharedPointer<CombinedFeStreams> Scenario::generateFinancialEvents(QDate today,
-    QLocale systemLocale, DateRange fromto, double pvAnnualDiscountRate, QDate pvPresent,
-    uint &saturationCount) const
+    const QLocale &systemLocale, DateRange fromto, double pvAnnualDiscountRate,
+    QDate pvPresent, uint &saturationCount) const
 {
     // check input parameters
     if (pvAnnualDiscountRate < 0 ) {
@@ -825,7 +856,7 @@ QSharedPointer<CombinedFeStreams> Scenario::generateFinancialEvents(QDate today,
 
     // Build the shared FeStream to be reused by all the Csds.
     // Reference to the proper Csd will be set when appropriate, so now we set a null value.
-    FeStream sharedFeStream(maxNoOfdays, QWeakPointer<Csd>());
+    FeStream sharedFeStream(maxNoOfdays, QWeakPointer<Csd>(), tomorrow);
 
     uint saturationNo;
     saturationCount = 0;
@@ -833,8 +864,8 @@ QSharedPointer<CombinedFeStreams> Scenario::generateFinancialEvents(QDate today,
     bool found;
 
     // We dont care about the currency name language here, because we are not going to use it.
-    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromCountryCode(
-        countryCode, QLocale::Language::English, found);
+    CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromIsoCode(
+        currencyIsoCode, QLocale::Language::English, found);
     if (!found){
         // should never happen
         return comb;
@@ -1051,11 +1082,11 @@ bool Scenario::evaluateIfSameFeStream(QSharedPointer<Scenario> o, QString& diff)
 }
 
 
-QSharedPointer<Scenario> Scenario::createBlankScenario(QString countryCode)
+QSharedPointer<Scenario> Scenario::createBlankScenario(QString currencyIsoCode)
 {
     QSharedPointer<Scenario> newScenario = QSharedPointer<Scenario>(new Scenario(
         Scenario::LATEST_VERSION, tr("No name"), "", Constants::DEFAULT_DURATION_FE_GENERATION,
-        Growth::fromConstantAnnualPercentageDouble(0), countryCode, {},{},{},{},
+        Growth::fromConstantAnnualPercentageDouble(0), currencyIsoCode, {},{},{},{},
         Tags(), TagCsdRelationships()));
     return newScenario;
 }
@@ -1308,14 +1339,14 @@ void Scenario::setInflation(const Growth &newInflation)
     inflation = newInflation;
 }
 
-QString Scenario::getCountryCode() const
+QString Scenario::getCurrencyIsoCode() const
 {
-    return countryCode;
+    return currencyIsoCode;
 }
 
-void Scenario::setCountryCode(const QString &newCountryCode)
+void Scenario::setCurrencyIsoCode(const QString &newIsoCode)
 {
-    countryCode = newCountryCode;
+    currencyIsoCode = newIsoCode;
 }
 
 QHash<QUuid, QSharedPointer<PeriodicCsd>> Scenario::getIncomePeriodicCsds() const

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -34,11 +34,12 @@ Tag::Tag(const Tag& o) {
 }
 
 
-Tag::Tag(QString aName, QString aDescription) : Tag(QUuid::createUuid(),aName, aDescription) {
+Tag::Tag(const QString &aName, const QString &aDescription)
+    : Tag(QUuid::createUuid(), aName, aDescription) {
 }
 
 
-Tag::Tag(QUuid anId, QString aName, QString aDescription) {
+Tag::Tag(QUuid anId, const QString &aName, const QString &aDescription) {
     if(anId.isNull()){
         throw std::domain_error("QUuid is invalid");
     }
@@ -79,7 +80,7 @@ Tag &Tag::operator=(const Tag &o)
 }
 
 
-bool Tag::isNameIdentical(QString aName)
+bool Tag::isNameIdentical(const QString &aName)
 {
     return (this->name==aName);
 }

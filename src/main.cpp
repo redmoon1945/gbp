@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,12 @@
 #include <QStyleFactory>
 #include "constants.h"
 #include <QProcess>
+#include <QLoggingCategory>
+#include <QToolTip>
 #include <iostream>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 
 // Enum for system theme mode
@@ -293,6 +298,164 @@ static bool detectDarkTheme(const QString& desktop = "")
 }
 
 
+/**
+ * @brief List all workspaces found in the config directory.
+ * @details Scans .ini files matching the application name pattern and extracts workspace names.
+ * Shows last modified date for each workspace. The default workspace is always listed first.
+ */
+static void listWorkspaces()
+{
+    // Note: We can't use QStandardPaths yet because QCoreApplication hasn't
+    // been initialized. We need to create a temporary QCoreApplication first.
+    int dummyArgc = 1;
+    char appName[] = "gbp";
+    char* dummyArgv[] = {appName, nullptr};
+    QCoreApplication tempApp(dummyArgc, dummyArgv);
+    QCoreApplication::setApplicationName(Constants::APP_NAME);
+
+    // This is the same path as the one that will later be used by GbpController
+    QString configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+    QString appNameStr = Constants::APP_NAME;
+
+    std::cout << Constants::APP_NAME.toStdString() << " - Workspaces\n";
+    std::cout << "====================================================================\n\n";
+
+    QDir dir(configPath);
+    if (!dir.exists()) {
+        std::cout << "  No workspaces found.\n";
+        std::cout << "  (Workspaces are created on first application run)\n";
+        exit(0);
+    }
+
+    QStringList filters;
+    filters << appNameStr + ".ini" << appNameStr + "_*.ini";
+    QFileInfoList files = dir.entryInfoList(filters, QDir::Files, QDir::Name);
+
+    if (files.isEmpty()) {
+        std::cout << "  No workspaces found.\n";
+        std::cout << "  (Workspaces are created on first application run)\n";
+    } else {
+        std::cout << "Found " << files.size() << " workspace(s):\n\n";
+
+        for (const QFileInfo &fileInfo : files) {
+            QString fileName = fileInfo.fileName();
+            QString modified = fileInfo.lastModified().toString("yyyy-MM-dd hh:mm:ss");
+
+            // Extract workspace name if present
+            // Pattern: graphical-budget-planner_WORKSPACE.ini
+            QString prefix = appNameStr + "_";
+            if (fileName.startsWith(prefix) && fileName.endsWith(".ini")) {
+                int start = prefix.length();
+                int len = fileName.length() - start - 4;
+                std::cout << "  " << fileName.mid(start, len).toStdString()
+                          << "  (last modified: " << modified.toStdString() << ")\n";
+            } else {
+                std::cout << "  (default)"
+                          << "  (last modified: " << modified.toStdString() << ")\n";
+            }
+        }
+
+        std::cout << "\nUse -workspace_cleanup to remove all non-default workspaces.\n\n";
+    }
+
+    exit(0);
+}
+
+/**
+ * @brief Remove all non-default workspace config and log files.
+ * @details Deletes all .ini files except the default configuration file (without workspace
+ * suffix), and deletes all associated log files for each removed workspace. Helps users clean
+ * up unused workspaces.
+ */
+static void cleanupWorkspaces()
+{
+    // Note: We can't use QStandardPaths yet because QCoreApplication hasn't
+    // been initialized. We need to create a temporary QCoreApplication first.
+    int dummyArgc = 1;
+    char appName[] = "gbp";
+    char* dummyArgv[] = {appName, nullptr};
+    QCoreApplication tempApp(dummyArgc, dummyArgv);
+    QCoreApplication::setApplicationName(Constants::APP_NAME);
+
+    // This is the same path as the one that will later be used by GbpController
+    QString configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+    QString appNameStr = Constants::APP_NAME;
+
+    std::cout << Constants::APP_NAME.toStdString() << " - Workspace Cleanup\n";
+    std::cout << "====================================================================\n";
+    std::cout << "Location: " << configPath.toStdString() << "\n\n";
+
+    QDir dir(configPath);
+    if (!dir.exists()) {
+        std::cout << "  Configuration directory does not exist yet.\n";
+        std::cout << "  Nothing to clean up.\n";
+        exit(0);
+    }
+
+    QStringList filters;
+    filters << appNameStr + ".ini" << appNameStr + "_*.ini";
+    QFileInfoList files = dir.entryInfoList(filters, QDir::Files, QDir::Name);
+
+    if (files.isEmpty()) {
+        std::cout << "  No configuration files found.\n";
+        std::cout << "  Nothing to clean up.\n";
+        exit(0);
+    }
+
+    QString defaultConfigName = appNameStr + ".ini";
+    int deletedCount = 0;
+    int skippedCount = 0;
+    QStringList deletedWorkspaces;
+
+    std::cout << "Scanning configuration files...\n\n";
+
+    for (const QFileInfo &fileInfo : files) {
+        QString fileName = fileInfo.fileName();
+
+        // Skip the default configuration file
+        if (fileName == defaultConfigName) {
+            std::cout << "  Keeping: " << fileName.toStdString() << " (default config)\n";
+            skippedCount++;
+            continue;
+        }
+
+        // Delete workspace-specific config files
+        QFile file(fileInfo.absoluteFilePath());
+        if (file.remove()) {
+            std::cout << "  Deleted: " << fileName.toStdString() << "\n";
+            deletedCount++;
+            // Extract workspace name for log cleanup
+            QString prefix = appNameStr + "_";
+            if (fileName.startsWith(prefix) && fileName.endsWith(".ini")) {
+                int start = prefix.length();
+                int len = fileName.length() - start - 4;
+                deletedWorkspaces.append(fileName.mid(start, len));
+            }
+        } else {
+            std::cout << "  Failed to delete: " << fileName.toStdString() << "\n";
+        }
+    }
+
+    // Delete associated log files for removed workspaces
+    QStringList deletedLogs;
+    QStringList failedLogs;
+    if (!deletedWorkspaces.isEmpty()) {
+        std::cout << "\nDeleting associated log files...\n";
+        GbpLogger::getInstance().removeWorkspaceLogs(deletedWorkspaces, deletedLogs, failedLogs);
+        for (const QString& n : failedLogs) {
+            std::cout << "  Failed to delete: " << n.toStdString() << "\n";
+        }
+    }
+
+    std::cout << "\n====================================================================\n";
+    std::cout << "Cleanup complete:\n";
+    std::cout << "  Config files kept:    " << skippedCount << "\n";
+    std::cout << "  Config files deleted: " << deletedCount << "\n";
+    std::cout << "  Log files deleted:    " << deletedLogs.size() << "\n\n";
+
+    exit(0);
+}
+
 void showWelcomeScreen(bool french);
 
 /**
@@ -316,14 +479,52 @@ static QString getWindowsLookStyle(int argc, char *argv[])
 }
 
 /**
- * @brief Check if -h or --help was passed and display help, then exit.
+ * @brief Check if -h, --help, -workspace_list, or -workspace_cleanup was passed and handle them.
+ * @details Rejects multiple workspace commands (-workspace=, -workspace_list, -workspace_cleanup)
+ * if used simultaneously.
  * @param argc Number of command-line arguments
  * @param argv Array of command-line arguments
  */
 static void checkHelpArgument(int argc, char *argv[])
 {
+#ifdef _WIN32
+    // GUI subsystem has no console. Attach to the parent (cmd/PowerShell) so that
+    // --help and workspace commands can print. Fails silently when launched without
+    // a console (e.g. double-click), leaving stdout unconnected as usual.
+    if (AttachConsole(ATTACH_PARENT_PROCESS)) {
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+        std::cout << "\n";
+    }
+#endif
+    // Count workspace-related commands and reject if more than one
+    int workspaceCmdCount = 0;
     for (int i = 1; i < argc; ++i) {
         QString arg = QString::fromUtf8(argv[i]);
+        if (arg == "-workspace_list" || arg == "-workspace_cleanup"
+            || arg.startsWith("-workspace=")) {
+            workspaceCmdCount++;
+        }
+    }
+    if (workspaceCmdCount > 1) {
+        std::cerr << "Error: only one workspace command (-workspace=, "
+                     "-workspace_list, -workspace_cleanup) can be used at a time.\n";
+        exit(1);
+    }
+
+    for (int i = 1; i < argc; ++i) {
+        QString arg = QString::fromUtf8(argv[i]);
+
+        // Handle -workspace_list (needs special initialization)
+        if (arg == "-workspace_list") {
+            listWorkspaces();  // This function calls exit(0)
+        }
+
+        // Handle -workspace_cleanup (needs special initialization)
+        if (arg == "-workspace_cleanup") {
+            cleanupWorkspaces();  // This function calls exit(0)
+        }
+
         if (arg == "-h" || arg == "--help") {
             std::string appName = Constants::APP_NAME.toStdString();
             std::string appVer = Constants::APP_VERSION.toStdString();
@@ -357,7 +558,20 @@ static void checkHelpArgument(int argc, char *argv[])
             std::cout << "  -logverbosity=DEBUG\n";
             std::cout << "    Set verbose debug logging (all platforms)\n";
             std::cout << "  -logverbosity=NORMAL\n";
-            std::cout << "    Set normal logging verbosity, default (all platforms)\n\n";
+            std::cout << "    Set normal logging verbosity, default (all platforms)\n";
+            std::cout << "\n  WORKSPACE OPTIONS:\n";
+            std::cout << "  -workspace=WORKSPACE\n";
+            std::cout << "    Specify workspace identifier (1-20 alphanumeric characters)\n";
+            std::cout << "    Appends WORKSPACE to log and settings file names\n";
+            std::cout << "    Each workspace uses separate settings and logs (all platforms)\n";
+            std::cout << "  -workspace_list\n";
+            std::cout << "    List all workspace configuration files and exit\n";
+            std::cout << "    Shows location, size, and last modified date for each config\n";
+            std::cout << "  -workspace_cleanup\n";
+            std::cout << "    Remove all non-default workspace .ini files and their\n";
+            std::cout << "    associated log files, then exit\n";
+            std::cout << "    Only keeps the default configuration file\n";
+            std::cout << "    Use -workspace_list to preview before cleaning\n\n";
 
             exit(0);
         }
@@ -523,6 +737,12 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(Constants::APP_NAME);         // used by QSettings
     QCoreApplication::setApplicationVersion(Constants::APP_VERSION);
 
+    // Suppress Qt font-database fallback warnings. These are emitted whenever Qt searches for
+    // a font capable of rendering a script it has no dedicated font for (e.g. Arabic, CJK).
+    // They are purely informational — rendering still works via system fallback fonts — but
+    // they flood the console when the currency picker populates its list of all world currencies.
+    QLoggingCategory::setFilterRules("qt.text.font.db=false");
+
     // *** Dark theme detection  ***
     bool darkThemeDetected = detectDarkTheme(desktop);
     if (darkThemeDetected) {
@@ -642,6 +862,72 @@ int main(int argc, char *argv[])
     } else {
         LOG_INFO("Default system font forced to be used as the application font");
     }
+
+    // Log default mono font
+
+
+    /*!
+     * @note Item-view font on Windows: Qt's Windows platform theme registers a class-specific
+     * font for @c QAbstractItemView (the icon-title font, typically Segoe UI 9pt on Windows 11).
+     * Class-specific fonts have higher priority than the application-wide font set by
+     * @c QApplication::setFont(), so every @c QTableWidget, @c QListWidget and @c QTreeWidget
+     * in the app would silently inherit Segoe UI 9pt regardless of the configured application
+     * font — making item-view text visibly smaller than all other widgets.
+     *
+     * This call re-registers the current application font as the class-specific font for
+     * @c QAbstractItemView immediately after the application font has been finalised. Because a
+     * class-specific registration always beats the app-wide default, this overrides the
+     * platform's Segoe UI 9pt with the user's chosen font.
+     *
+     * @note This global override is a best-effort fix. In practice it is not sufficient on its
+     * own: Qt's item delegate resolves cell fonts through a path that can still fall back to the
+     * platform's class-specific entry, so cell text may still render at Segoe UI 9pt.
+     * Each dialog therefore also calls @c widget->setFont(appFont) explicitly in its constructor
+     * for every affected item view. A widget-level font has the highest priority in Qt's
+     * resolution chain and cannot be overridden by any class-specific or platform font.
+     * If a new item-view widget is added to a dialog, its constructor must include the same
+     * explicit @c setFont(QApplication::font()) call.
+     *
+     * Trade-off: native Windows convention uses a smaller font in lists and tables to show more
+     * rows at once. By overriding this we depart from that convention, which is acceptable here
+     * because the app already uses Fusion style (not the native Windows style), so there is no
+     * broader native consistency to preserve, and the user's font choice should apply everywhere.
+     */
+    QApplication::setFont(QApplication::font(), "QAbstractItemView");
+    LOG_INFO(QString("QAbstractItemView font override applied : \"%1\"")
+        .arg(QApplication::font().toString()));
+    QToolTip::setFont(QApplication::font());
+
+    /*!
+     * @note Spacer scaling strategy: fixed-pixel QSpacerItem sizes defined in .ui files are
+     * overridden in each form constructor via QSpacerItem::changeSize(), using values derived
+     * from QFontMetrics. This makes spacing proportional to the application font, so the UI
+     * remains visually consistent across different font sizes, DPI settings, and HiDPI displays.
+     * Hardcoded pixel spacers appear too small at high DPI or large font sizes, whereas
+     * font-metric-based spacers scale automatically.
+     *
+     * Each constructor reads the original pixel size directly from the spacer at runtime via
+     * sizeHint(), then scales it using the following linear rules
+     * (mA = fm.horizontalAdvance("M"), mH = fm.height(), fm = QFontMetrics(font())):
+     *   - Horizontal spacers: newWidth  = qRound(sizeHint().width()  * mA / 20.0)
+     *   - Vertical spacers:   newHeight = qRound(sizeHint().height() * mH / 30.0)
+     * Reading from sizeHint() means resizing a spacer in Qt Designer automatically reflects
+     * here with no code change required.
+     */
+    // log font metrics that are used as the spacing unit in the layouts
+    QFontMetrics appFontFm(a.font());
+    int mh = appFontFm.height();
+    int mw = appFontFm.horizontalAdvance("M");
+    QString appFontString = QString("Application system font applied : "
+        " Width of capital M=%1  Full line height=%2").arg(mw).arg(mh);
+    LOG_INFO(appFontString);
+
+    // Scale checkbox and radio button indicators to match the application font size.
+    // Qt styles use hardcoded pixel sizes for indicators that don't follow font changes.
+    int indicatorSize = QFontMetrics(QApplication::font()).height() / 2;
+    a.setStyleSheet(a.styleSheet() +
+        QString("QCheckBox::indicator { width: %1px; height: %1px; }"
+                "QRadioButton::indicator { width: %1px; height: %1px; }").arg(indicatorSize));
 
     // Useful info to log
     LOG_INFO("Application's current directory : " + REDACT(QDir::currentPath()));

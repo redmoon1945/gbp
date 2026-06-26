@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -71,7 +71,7 @@ public:
      * @param aName Name if the tag (trimmed and then cut to MAX_NAME_LEN max char).
      * @param aDescription Description of the tag (trimmed and then cut to MAX_DESC_LEN max char).
      */
-    Tag(QString aName, QString aDescription="");
+    Tag(const QString &aName, const QString &aDescription="");
 
     /**
      * @brief Full detailed constructor.
@@ -79,7 +79,7 @@ public:
      * @param aName Name of the tag (trimmed and then cut to MAX_NAME_LEN max char).
      * @param aDescription Description of the tag (trimmed and then cut to MAX_DESC_LEN max char).
      */
-    Tag(QUuid anId, QString aName, QString aDescription="");
+    Tag(QUuid anId, const QString &aName, const QString &aDescription="");
 
 
     virtual ~Tag();
@@ -97,7 +97,7 @@ public:
      * @param aName The name to compare to.
      * @return true if the name of this object equals aName, false otherwise.
      */
-    bool isNameIdentical(QString aName);
+    bool isNameIdentical(const QString &aName);
 
     /**
      * @brief toJson Convert this object into a JSON object.

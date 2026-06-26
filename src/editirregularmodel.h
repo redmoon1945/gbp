@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ class EditIrregularModel: public QAbstractTableModel
 
 
 public:
-    explicit EditIrregularModel(QLocale aLocale, QObject *parent = nullptr);
+    explicit EditIrregularModel(const QLocale &aLocale, QObject *parent = nullptr);
 
     // Methods to override
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -56,12 +56,18 @@ public:
     void setTheLocale(const QLocale &newTheLocale);
     CurrencyInfo getCurrInfo() const;
     void setCurrInfo(const CurrencyInfo &newCurrInfo);
-    QFont getDefaultTableFont() const;
-    void setDefaultTableFont(const QFont &newDefaultTableFont);
-    QFont getMonoTableFont() const;
-    void setMonoTableFont(const QFont &newMonoTableFont);
-    QFont getItalicTableFont() const;
-    void setItalicTableFont(const QFont &newItalicTableFont);
+    QFont getDateTableFont() const;
+    void setDateTableFont(const QFont &newDateTableFont);
+    QFont getDateDisabledTableFont() const;
+    void setDateDisabledTableFont(const QFont &newDateDisabledTableFont);
+    QFont getAmountTableFont() const;
+    void setAmountTableFont(const QFont &newAmountTableFont);
+    QFont getAmountDisabledTableFont() const;
+    void setAmountDisabledTableFont(const QFont &newAmountDisabledTableFont);
+    QFont getNoteTableFont() const;
+    void setNoteTableFont(const QFont &newNoteTableFont);
+    QFont getNoteDisabledTableFont() const;
+    void setNoteDisabledTableFont(const QFont &newNoteDisabledTableFont);
 
 private:
     // Model Data - key order corresponds to display order
@@ -70,9 +76,14 @@ private:
     // misc variables
     QLocale theLocale;
     CurrencyInfo currInfo;  // must be set by setter before model is used
-    QFont defaultTableFont;
-    QFont monoTableFont;
-    QFont italicTableFont;
+
+    // tabe font, set by setters
+    QFont dateTableFont;
+    QFont dateDisabledTableFont;
+    QFont amountTableFont;
+    QFont amountDisabledTableFont;
+    QFont noteTableFont;
+    QFont noteDisabledTableFont;
 };
 
 #endif // EDITIRREGULARMODEL_H

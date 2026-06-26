@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
  */
 
 #include <QFileDialog>
+#include <QTimer>
 #include <QDir>
 #include <QRegularExpression>
 #include <QMessageBox>
@@ -27,6 +28,8 @@
 #include "ui_loadirregulartextfiledialog.h"
 #include "currencyhelper.h"
 #include "gbplogger.h"
+#include "uiutil.h"
+#include "gbpqmessage.h"
 
 
 LoadIrregularTextFileDialog::LoadIrregularTextFileDialog(QLocale aLocale, QWidget *parent)
@@ -34,6 +37,16 @@ LoadIrregularTextFileDialog::LoadIrregularTextFileDialog(QLocale aLocale, QWidge
     , ui(new Ui::LoadIrregularTextFileDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
+    // Make smaller the font used in the instructions panel
+    QFont appFont = QApplication::font();
+    QFont font = appFont;
+    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true,
+        "LoadIrregularTextFileDialog - instructions");
+    ui->instructionsPlainTextEdit->setFont(font);
 
     theLocale = aLocale;
 }
@@ -47,6 +60,8 @@ LoadIrregularTextFileDialog::~LoadIrregularTextFileDialog()
 void LoadIrregularTextFileDialog::slotPrepareContent(CurrencyInfo currencyInfo)
 {
     currInfo = currencyInfo;
+
+    ui->fileNameLineEdit->setFocus();
 }
 
 
@@ -72,7 +87,8 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
     if (!file.exists()){
         userErrorMessage = QString(tr("File %1 does not exist")).arg(fileName);
         logErrorMessage = QString("File %1 does not exist").arg(fileName);
-        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            userErrorMessage, {tr("OK")}, 0, 0);
         LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
         return;
     }
@@ -96,7 +112,9 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             "is not 3 or 2, but %2).").arg(lineNo).arg(tokens.size());
                         logErrorMessage = QString("Bad format for line no %1 (no of tokens is "
                             "not 3 or 2, but %2).").arg(lineNo).arg(tokens.size());
-                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        GbpQMessage::messageBoxQuestion(nullptr,
+                            GbpQMessage::Type::ERROR, tr("Error"),
+                            userErrorMessage, {tr("OK")}, 0, 0);
                         LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
@@ -107,7 +125,9 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             .arg(tokens[0]).arg(lineNo);
                         logErrorMessage = QString("Date \"%1\" is invalid at line no %2.")
                             .arg(tokens[0]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        GbpQMessage::messageBoxQuestion(nullptr,
+                            GbpQMessage::Type::ERROR, tr("Error"),
+                            userErrorMessage, {tr("OK")}, 0, 0);
                         LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
@@ -119,7 +139,9 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             .arg(tokens[1]).arg(lineNo);
                         logErrorMessage = QString("Amount \"%1\" is not a valid number "
                             "at line no %2.").arg(tokens[1]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        GbpQMessage::messageBoxQuestion(nullptr,
+                            GbpQMessage::Type::ERROR, tr("Error"),
+                            userErrorMessage, {tr("OK")}, 0, 0);
                         LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
@@ -128,7 +150,9 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             .arg(tokens[1]).arg(lineNo);
                         logErrorMessage = QString("Amount \"%1\" is smaller than 0 at line %2.")
                             .arg(tokens[1]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        GbpQMessage::messageBoxQuestion(nullptr,
+                            GbpQMessage::Type::ERROR, tr("Error"),
+                            userErrorMessage, {tr("OK")}, 0, 0);
                         LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
@@ -143,7 +167,9 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                         logErrorMessage = QString("Amount \"%1\" is bigger than the maximum"
                             " allowed of %2 at line %3.").arg(tokens[1]).arg(maxAllowedString)
                             .arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        GbpQMessage::messageBoxQuestion(nullptr,
+                            GbpQMessage::Type::ERROR, tr("Error"),
+                            userErrorMessage, {tr("OK")}, 0, 0);
                         LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
@@ -155,7 +181,9 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             .arg(tokens[1]).arg(lineNo);
                         logErrorMessage = QString("Amount \"%1\" cannot be processed at line %2.")
                             .arg(tokens[1]).arg(lineNo);
-                        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                        GbpQMessage::messageBoxQuestion(nullptr,
+                            GbpQMessage::Type::ERROR, tr("Error"),
+                            userErrorMessage, {tr("OK")}, 0, 0);
                         LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                         return;
                     }
@@ -170,7 +198,9 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             logErrorMessage = QString("Notes length (%1 char.) is longer than"
                                 " the max allowed of %2 at line %3.").arg(notes.length())
                                 .arg(IrregularCsd::AmountInfo::NOTES_MAX_LEN).arg(lineNo);
-                            QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+                            GbpQMessage::messageBoxQuestion(nullptr,
+                            GbpQMessage::Type::ERROR, tr("Error"),
+                                userErrorMessage, {tr("OK")}, 0, 0);
                             LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
                             return;
                         }
@@ -185,17 +215,21 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
             }
 
             // send back the result and close the window
-            QMessageBox::information(nullptr,tr("Information"),QString(
-                tr("Import succeeded, %1 entries have been imported.")).arg(data.size()));
+            GbpQMessage::messageBoxQuestion(nullptr,
+                GbpQMessage::Type::INFORMATION, tr("Information"),
+                QString(
+                tr("Import succeeded, %1 entries have been imported.")).arg(data.size()),
+                {tr("OK")}, 0, 0);
             emit signalImportResult(data);
             this->hide();
             LOG_INFO( QString("Import succeeded") );
 
         } catch (const std::exception& e) {
-            userErrorMessage = tr("An unexpected error has occurred.\n\nDetails : %1").arg(e.what());
+            userErrorMessage = tr("An unexpected error has occurred.<br><br>Details : %1").arg(e.what());
             logErrorMessage = QString("An unexpected error has occurred.\n\nDetails : %1")
                 .arg(e.what());
-            QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                userErrorMessage, {tr("OK")}, 0, 0);
             LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
             return;
         }
@@ -204,7 +238,8 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
         userErrorMessage = tr("Cannot open file %1 in read-only mode").arg(fileName);
         logErrorMessage = QString("Cannot open file %1 in read-only mode")
             .arg(REDACT(fileName));
-        QMessageBox::critical(nullptr,tr("Error"), userErrorMessage);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            userErrorMessage, {tr("OK")}, 0, 0);
         LOG_ERROR(  QString("Import failed : %1").arg(logErrorMessage) );
         return ;
     }
@@ -224,7 +259,8 @@ void LoadIrregularTextFileDialog::on_browsePushButton_clicked()
         QFile file(fileName);
         if (!file.exists()){
             errorString = tr("File %1 does not exist").arg(fileName);
-            QMessageBox::critical(nullptr,tr("Error"), errorString);
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                errorString, {tr("OK")}, 0, 0);
             return;
         } else {
             ui->fileNameLineEdit->setText(file.fileName());
@@ -240,3 +276,14 @@ void LoadIrregularTextFileDialog::on_LoadIrregularTextFileDialog_rejected()
 {
     on_cancelPushButton_clicked();
 }
+
+
+void LoadIrregularTextFileDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("LoadIrregularTextFileDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
+}
+

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -29,6 +29,22 @@
  * @brief Abstract base class for Cash Stream Definitions (CSDs), which is a declarative definition
  * of an income or expense stream.
  * @details Every Csd has a unique identifier (UUID), but not necessarily unique name.
+ *
+ * **Inheritance Hierarchy:**
+ * ```
+ * Csd (abstract)
+ *  ├─ PeriodicCsd   - Regular recurring cash flows (daily, weekly, monthly, yearly)
+ *  └─ IrregularCsd  - Irregular/one-time cash flows with specific occurrence dates
+ * ```
+ *
+ * All CSDs can generate Financial Events (FEs) via generateEventStream() which populates
+ * an FeStream with dated amounts according to the specific subclass's schedule.
+ *
+ * @see PeriodicCsd For regular recurring streams
+ * @see IrregularCsd For irregular/one-time streams
+ * @see FeStream Container for generated financial events
+ * @see Fe Individual financial event structure
+ * @see Scenario Container that manages multiple CSDs
  */
 class Csd
 {

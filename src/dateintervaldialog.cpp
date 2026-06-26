@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,14 @@
  */
 
 #include "dateintervaldialog.h"
+#include "gbplogger.h"
+#include <QTimer>
 #include "ui_dateintervaldialog.h"
 #include "gbpcontroller.h"
+#include "uiutil.h"
 #include <QMessageBox>
 #include <QDate>
+#include "gbpqmessage.h"
 
 
 
@@ -29,14 +33,20 @@ DateIntervalDialog::DateIntervalDialog(QWidget *parent)
     , ui(new Ui::DateIntervalDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
     QDate from = GbpController::getInstance().getTomorrow();
     QDate to = from.addYears(1).addDays(-1);
     ui->fromDateEdit->setDate(from);
     ui->toDateEdit->setDate(to);
 
     // Make buttons' font smaller
-    QFont font = ui->setEoyPushButton->font();
-    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true);
+    QFont appFont = QApplication::font();
+    QFont font = appFont;
+    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true,
+        "Date interval dialog - buttons");
     ui->setEoyPushButton->setFont(font);
     ui->setTomorrowPushButton->setFont(font);
 }
@@ -51,8 +61,8 @@ DateIntervalDialog::~DateIntervalDialog()
 void DateIntervalDialog::slotPrepareContent(QDate from, QDate to)
 {
     if (to<=from) {
-        QMessageBox::critical(nullptr,tr("Error"),
-            tr("\"To\" date must occur after \"From\" date"));
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("\"To\" date must occur after \"From\" date"), {tr("OK")}, 0, 0);
         return;
     }
     if( (from.isValid()==false) || (to.isValid()==false) ){
@@ -60,6 +70,8 @@ void DateIntervalDialog::slotPrepareContent(QDate from, QDate to)
     }
     ui->fromDateEdit->setDate(from);
     ui->toDateEdit->setDate(to);
+
+    ui->fromDateEdit->setFocus();
 }
 
 
@@ -68,8 +80,8 @@ void DateIntervalDialog::on_applyPushButton_clicked()
     QDate from = ui->fromDateEdit->date();
     QDate to = ui->toDateEdit->date();
     if (to<=from) {
-        QMessageBox::critical(nullptr,tr("Error"),
-            tr("\"To\" date must occur after \"From\" date"));
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("\"To\" date must occur after \"From\" date"), {tr("OK")}, 0, 0);
         return;
     }
     emit signalDateIntervalResult(from, to);
@@ -102,5 +114,15 @@ void DateIntervalDialog::on_setEoyPushButton_clicked()
 {
     QDate to = ui->toDateEdit->date();
     ui->toDateEdit->setDate(QDate(to.year(),12,31));
+}
+
+
+void DateIntervalDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("DateIntervalDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

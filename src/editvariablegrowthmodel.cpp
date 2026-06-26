@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -20,8 +20,8 @@
 #include <QCoreApplication>
 
 
-EditVariableGrowthModel::EditVariableGrowthModel(QString newGrowthName, QLocale aLocale,
-    QObject *parent) : QAbstractTableModel(parent)
+EditVariableGrowthModel::EditVariableGrowthModel(const QString &newGrowthName,
+    const QLocale &aLocale, QObject *parent) : QAbstractTableModel(parent)
 {
     this->growthName = newGrowthName;
     this->theLocale = aLocale;
@@ -97,7 +97,7 @@ QVariant EditVariableGrowthModel::data(const QModelIndex &index, int role) const
 
 // get position in the list of (date,growth) items for the provided date
 // Return -1 if not found.
-int EditVariableGrowthModel::getPositionForDate(QDate aDate)
+int EditVariableGrowthModel::getPositionForDate(QDate aDate) const
 {
     QMap<QDate,qint64> map = growthData.getAnnualVariableGrowth();
     QList<QDate> keys = map.keys();
@@ -117,7 +117,8 @@ void EditVariableGrowthModel::setGrowthData(const Growth &newGrowthData)
 {
     // Must be variable type
     if (newGrowthData.getType()!=Growth::Type::VARIABLE){
-        throw std::invalid_argument("Growth must be of type \"complex\"");
+        throw std::invalid_argument(QString("%1: Growth must be of type \"complex\"")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     // we assume model has completely changed (easier that way)
     emit beginResetModel();

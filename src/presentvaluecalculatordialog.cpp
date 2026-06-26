@@ -1,6 +1,9 @@
 #include "presentvaluecalculatordialog.h"
+#include "gbplogger.h"
+#include <QTimer>
 #include "ui_presentvaluecalculatordialog.h"
 #include "util.h"
+#include "uiutil.h"
 
 PresentValueCalculatorDialog::PresentValueCalculatorDialog(QLocale locale)
     : QDialog(NULL) // By passing NULL, we make this window independant, but MainWindow must close
@@ -8,6 +11,10 @@ PresentValueCalculatorDialog::PresentValueCalculatorDialog(QLocale locale)
     , ui(new Ui::PresentValueCalculatorDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
     this->locale = locale;
     ui->pvDoubleSpinBox->setFocus();
     // set monthly discount rate
@@ -18,12 +25,19 @@ PresentValueCalculatorDialog::PresentValueCalculatorDialog(QLocale locale)
 
     // "pack" the dialog to fit the font. This is required when there is no "expanding" widgets
     this->adjustSize();
+
 }
 
 
 PresentValueCalculatorDialog::~PresentValueCalculatorDialog()
 {
     delete ui;
+}
+
+
+void PresentValueCalculatorDialog::slotPrepareContent()
+{
+    ui->pvDoubleSpinBox->setFocus();
 }
 
 
@@ -101,5 +115,15 @@ QString PresentValueCalculatorDialog::makeStringFromMonthlyRate(double value)
         .arg(QString::number(value, 'f', 8))
         .arg("%");
     return s;
+}
+
+
+void PresentValueCalculatorDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("PresentValueCalculatorDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

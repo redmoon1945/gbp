@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -62,7 +62,7 @@ Tags &Tags::operator=(const Tags &o)
 }
 
 
-bool Tags::insert(Tag t)
+bool Tags::insert(const Tag &t)
 {
     // Have we reached the max no of tags ?
     if (tags.count()>= MAX_NO_TAGS) {
@@ -120,7 +120,7 @@ bool Tags::cleanIdList(QSet<QUuid> &idList) const
 }
 
 
-quint16 Tags::containsTagName(QString name) const
+quint16 Tags::containsTagName(const QString &name) const
 {
     quint16 no=0;
     QHash<QUuid, Tag>::const_iterator it = tags.begin();

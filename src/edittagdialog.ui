@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>741</width>
-    <height>600</height>
+    <width>900</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -64,11 +64,6 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <italic>true</italic>
-            </font>
            </property>
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Description of the tag. Limited to 1000 characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -142,7 +137,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Suggestions</string>
+          <string>Name suggestions</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -198,7 +193,7 @@
        <item>
         <widget class="QRadioButton" name="incomesRadioButton">
          <property name="text">
-          <string>Incomes</string>
+          <string>Income</string>
          </property>
          <attribute name="buttonGroup">
           <string notr="true">buttonGroup</string>

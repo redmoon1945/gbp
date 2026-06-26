@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,7 @@ Growth Growth::fromConstantAnnualPercentageDecimal(qint64 annualPercentage)
 }
 
 
-Growth Growth::fromVariableDataAnnualBasisDecimal(const QMap<QDate, qint64> newVariableGrowth)
+Growth Growth::fromVariableDataAnnualBasisDecimal(const QMap<QDate, qint64> &newVariableGrowth)
 {
     Growth g;
 
@@ -93,7 +93,7 @@ Growth Growth::fromVariableDataAnnualBasisDecimal(const QMap<QDate, qint64> newV
 }
 
 
-Growth Growth::fromVariableDataAnnualBasisDouble(const QMap<QDate, double> newVariableGrowth)
+Growth Growth::fromVariableDataAnnualBasisDouble(const QMap<QDate, double> &newVariableGrowth)
 {
     Growth g;
 
@@ -402,7 +402,7 @@ long double Growth::fromDecimalToDouble(qint64 i)
 }
 
 
-QList<quint64> Growth::adjustForGrowth(quint64 amount,  QList<QDate> occurrenceDates,
+QList<quint64> Growth::adjustForGrowth(quint64 amount, const QList<QDate> &occurrenceDates,
     ApplicationStrategy appStrategy, double pvDiscountRate,
     QDate pvPresent, AdjustForGrowthResult &ok) const
 {
@@ -461,7 +461,7 @@ QList<quint64> Growth::adjustForGrowth(quint64 amount,  QList<QDate> occurrenceD
     // GROWTH : build monthly cumulative growth multiplier vector.
     // From first occurrence to last, this will provide a cumulative growth factor
     // we can use to multiply the originally fix amount to get the growth-adjusted amount
-    int noOfMonthCovered = 1 + Util::noOfMonthDifference(occurrenceDates.first(),
+    int noOfMonthCovered = 1 + Util::noOfMonthsDifference(occurrenceDates.first(),
         occurrenceDates.last()); // No of month spanned in the occurrenceVector : 1 to infinity
     QList<long double> multiplierVector = buildMonthlyMultiplierVector(
         noOfMonthCovered,occurrenceDates.first());  // Index 0 is first month of occurrence
@@ -469,7 +469,7 @@ QList<quint64> Growth::adjustForGrowth(quint64 amount,  QList<QDate> occurrenceD
     // PRESENT VALUE : build monthly Present Value multiplier.
     // Computed from "Present", but applied from first occurrence to last, this will provide a
     // "future to present value" factor we can use to multiply the originally fix amount
-    int pvNoOfMonthCovered = 1 + Util::noOfMonthDifference(occurrenceDates.first(),
+    int pvNoOfMonthCovered = 1 + Util::noOfMonthsDifference(occurrenceDates.first(),
         occurrenceDates.last());
     QList<long double> pvMultiplierVector = buildPvMonthlyMultiplierVector(
         pvDiscountRate, pvNoOfMonthCovered, occurrenceDates.first(),pvPresent);
@@ -482,7 +482,7 @@ QList<quint64> Growth::adjustForGrowth(quint64 amount,  QList<QDate> occurrenceD
     uint occurrenceCounter = 0;
     for(const QDate& date : occurrenceDates){
         occurrenceCounter++;
-        int multiplierVectorIndex = Util::noOfMonthDifference(occurrenceDates.first(), date);
+        int multiplierVectorIndex = Util::noOfMonthsDifference(occurrenceDates.first(), date);
 
         // Incorrect solution proposed by AI...Calculate number of application periods
         // int applicationPeriods = multiplierVectorIndex / noOfMonthsCycle; // frac part dropped
@@ -615,24 +615,27 @@ QList<long double> Growth::buildPvMonthlyMultiplierVector(double annualDiscountr
     uint noOfMonths, QDate firstOccurrence, QDate pvPresent) const
 {
     if (noOfMonths==0){
-        throw std::domain_error("noOfMonth must be > 0");
+        throw std::domain_error(QString("%1: noOfMonth must be > 0")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     if (pvPresent.isValid()==false){
-        throw std::domain_error("PV date is invalid");
+        throw std::domain_error(QString("%1: PV date is invalid").arg(Q_FUNC_INFO).toStdString());
     }
     if (firstOccurrence.isValid()==false){
-        throw std::domain_error("First occurrence date is invalid");
+        throw std::domain_error(QString("%1: First occurrence date is invalid")
+            .arg(Q_FUNC_INFO).toStdString());
     }
 
     long double monthlyDiscountRate = Util::annualToMonthlyGrowth(annualDiscountrate); // in %
     QList<long double> multiplierVector;
     multiplierVector.resize(noOfMonths,1);
 
-    // how many PV periods are already passed before reaching the first occurrence
-    int pvPeriodOffset = Util::noOfMonthDifference(pvPresent, firstOccurrence);
+    // how many PV periods are already passed before reaching the first occurrence.
+    // Return a negative period if pvPresent > firstOccurrence
+    int pvPeriodOffset = Util::noOfMonthsDifference(pvPresent, firstOccurrence);
 
     for(uint i=0; i < noOfMonths; i++){
-        long double temp = Util::presentValueConversionFactor(monthlyDiscountRate,pvPeriodOffset+i);
+        long double temp = Util::toPvConversionFactor(monthlyDiscountRate,pvPeriodOffset+i);
         multiplierVector[i] = temp; // temp is to ease debugging
     }
 
@@ -786,7 +789,7 @@ long double Growth::calculateNewAmountConstantGrowth(QDate from, QDate to,
     if(to<from){
         throw std::invalid_argument("to is before from");
     }
-    int noOfMonth = Util::noOfMonthDifference(from, to);
+    int noOfMonth = Util::noOfMonthsDifference(from, to);
     return originalAmount*pow((long double)(1+(monthlyGrowth/100.0)), noOfMonth);
 }
 

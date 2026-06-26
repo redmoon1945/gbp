@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,12 @@
 QDate DateHelper::getNextDate(const QDate& date, TimeUnitType noOfTimeUnits, int multiplier)
 {
     if ( !date.isValid() ) {
-        throw std::invalid_argument("Invalid date");
+        throw std::invalid_argument(QString("%1: Invalid date")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     if ( multiplier==0 ) {
-        throw std::invalid_argument("Invalid multiplier");
+        throw std::invalid_argument(QString("%1: Invalid multiplier")
+            .arg(Q_FUNC_INFO).toStdString());
     }
 
     switch (noOfTimeUnits) {
@@ -48,7 +50,8 @@ QDate DateHelper::getNextDate(const QDate& date, TimeUnitType noOfTimeUnits, int
 QDate DateHelper::getNextDateEndOfMonth(const QDate& date, int multiplier)
 {
     if ( (!date.isValid()) || (multiplier==0)) {
-        throw std::invalid_argument("Invalid input arguments");
+        throw std::invalid_argument(QString("%1: Invalid input arguments")
+            .arg(Q_FUNC_INFO).toStdString());
     }
 
     QDate d = date;
@@ -66,7 +69,10 @@ QDate DateHelper::getNextDateEndOfMonth(const QDate& date, int multiplier)
 bool DateHelper::isEndOfMonth(QDate date)
 {
     if (!date.isValid()) {
-        throw std::invalid_argument("Invalid date: " + date.toString().toStdString());
+        QString s1 = QString("%1").arg(Q_FUNC_INFO);
+        QString s2 = QString("%1").arg(date.toString());
+        QString s3 = QString("%1: Invalid date %2").arg(s1, s2);
+        throw std::invalid_argument(s3.toStdString());
     }
     return (date.day()==date.daysInMonth());
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,14 @@
  */
 
 #include "managetagsdialog.h"
+#include <QTimer>
 #include "gbpcontroller.h"
 #include "gbpqmessage.h"
 #include "ui_managetagsdialog.h"
 #include <QMessageBox>
 #include <QFileDialog>
 #include "gbplogger.h"
+#include "uiutil.h"
 
 
 //----- GENERAL ------------------------------------------------------------------------------------
@@ -34,9 +36,8 @@ ManageTagsDialog::ManageTagsDialog(QLocale aLocale,QWidget *parent)
 {
     ui->setupUi(this);
 
-    // *** TAB : Tags Definition ***
-
-    // *** General ***
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
 
     // EditTag dialog
     editTagDlg = new EditTagDialog(aLocale, this); // auto-destroyed by Qt because it is a child
@@ -53,17 +54,46 @@ ManageTagsDialog::ManageTagsDialog(QLocale aLocale,QWidget *parent)
     // Always Select the fist tab
     ui->tagsTabWidget->setCurrentIndex(0);
 
+    QFont appFont = QApplication::font();
+
     // set up the list model for tags in the TagsDef table view
-    QFont descFont = ui->tagsDefTableView->font();
-    Util::changeFontSize(descFont, Util::FontResizeIntensity::WEAK, true);
+    QFont descFont = appFont;
+    Util::changeFontSize(descFont, Util::FontResizeIntensity::WEAK, true,"Manage Tag - TagsDef");
     descFont.setItalic(true);
-    QFont nameFont = ui->tagsDefTableView->font();
+    QFont nameFont = appFont;
     itemTableModel = new ManageTagsTagsDefModel(locale, nameFont, descFont);
+    ui->tagsDefTableView->setFont(appFont);
     ui->tagsDefTableView->setModel(itemTableModel);
+    ui->tagsViewTagsListWidget->setFont(appFont);
+    ui->tagsViewCsdListWidget->setFont(appFont);
+    ui->csdsViewCsdsListWidget->setFont(appFont);
+    ui->csdsViewTagsListWidget->setFont(appFont);
 
     // it appears this must be done AFTER setting the model (don't know why...)
     QFontMetrics fm2 = ui->tagsDefTableView->fontMetrics();
     ui->tagsDefTableView->setColumnWidth(0,fm2.averageCharWidth()*50);    // name
+    ui->tagsDefTableView->horizontalHeader()->setFont(appFont);
+    ui->tagsDefTableView->horizontalHeader()->setMinimumHeight(fm2.height() + 10);
+
+    // Set smaller font for action buttons, in all the tabs
+    QFont font = appFont;
+    Util::changeFontSize(font, Util::FontResizeIntensity::WEAK, true,
+        "ManageTagsDialog - action buttons");
+    ui->tagsDefAddPushButton->setFont(font);
+    ui->tagsDefDeletePushButton->setFont(font);
+    ui->tagsDefDuplicatePushButton->setFont(font);
+    ui->tagsDefEditPushButton->setFont(font);
+    ui->tagsDefImportPushButton->setFont(font);
+    ui->tagsDefSelectAllPushButton->setFont(font);
+    ui->tagsDefUnselectAllPushButton->setFont(font);
+    ui->tagsViewAddLinkPushButton->setFont(font);
+    ui->tagsViewDeleteLinksPushButton->setFont(font);
+    ui->tagsViewSelectAllLinksPushButton->setFont(font);
+    ui->tagsViewUnselectAllLinksPushButton->setFont(font);
+    ui->csdsViewLinkPushButton->setFont(font);
+    ui->csdsViewUnlinkPushButton->setFont(font);
+    ui->csdsViewSelectAllPushButton->setFont(font);
+    ui->csdsViewUnselectPushButton->setFont(font);
 
     // connect emitters & receivers for Dialogs : Tag Edition
     QObject::connect(this, &ManageTagsDialog::signalEditTagPrepareContent, editTagDlg,
@@ -107,12 +137,17 @@ void ManageTagsDialog::slotPrepareContent(Tags newTags, TagCsdRelationships newR
     relationships = newRelationships;
     allCsds = newCsdItems;
 
-    // First, update atgs definitions
+    // First, update tags definitions
     tagsDef_UpdateTagList();
 
     // Csds could have changed since last time we enter this dialog : UI has to be updated.
     tagsView_Refresh();
     csdsView_Refresh();
+
+    // go back to first tab
+    ui->tagsTabWidget->setCurrentIndex(0);
+
+    ui->tagsDefTableView->setFocus();
 
 }
 
@@ -270,7 +305,8 @@ void ManageTagsDialog::on_tagsDefAddPushButton_clicked()
     if (tags.size() >= Tags::MAX_NO_TAGS) {
         QString errorString = QString(tr("The maximum no of tags has been reached (%1).")
             .arg(Tags::MAX_NO_TAGS));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -287,7 +323,8 @@ void ManageTagsDialog::on_tagsDefDeletePushButton_clicked()
     if (selectedTagsIds.count()==0) {
         // no tag selected
         QString errorString = QString(tr("At least 1 tag must be selected."));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -308,7 +345,8 @@ void ManageTagsDialog::on_tagsDefEditPushButton_clicked()
     if (selection.count()!=1) {
         // no tag selected
         QString errorString = QString(tr("Exactly 1 tag must be selected."));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
     // edit the tag
@@ -317,7 +355,8 @@ void ManageTagsDialog::on_tagsDefEditPushButton_clicked()
     if (found==false) {
         // should never happen
         QString errorString = QString(tr("Unknown tag id : %1.").arg(selection[0].toString()));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
     emit signalEditTagPrepareContent(tags, toBeEdited, false);
@@ -335,7 +374,8 @@ void ManageTagsDialog::on_tagsDefDuplicatePushButton_clicked()
     if (selection.count()==0) {
         // no tag selected
         QString errorString = QString(tr("At least 1 tag must be selected."));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -343,7 +383,8 @@ void ManageTagsDialog::on_tagsDefDuplicatePushButton_clicked()
     if ( (tags.size() + selection.count()) > Tags::MAX_NO_TAGS) {
         QString errorString = QString(tr("The maximum no of tags would be exceeded (%1).")
             .arg(Tags::MAX_NO_TAGS));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -602,7 +643,8 @@ void ManageTagsDialog::on_tagsViewAddLinkPushButton_clicked()
     QList<QUuid> selectionTags = tagsView_GetSelectedTagsIds();
     if (selectionTags.count() != 1) {
         QString errorString = QString(tr("A tag must be selected."));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return; // should never happen
     }
 
@@ -610,7 +652,8 @@ void ManageTagsDialog::on_tagsViewAddLinkPushButton_clicked()
         // no Csds defined yet in the scenario
         QString errorString = QString(tr("No cash stream definition in the scenario. "
             "Cannot link to Tag"));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -630,7 +673,8 @@ void ManageTagsDialog::on_tagsViewAddLinkPushButton_clicked()
         // all Fsds are already in relationship with the selected tag
         QString errorString = QString(tr("No more cash stream definition to link. All the existing "
             "ones defined the scenario have already been linked to this tag."));
-        QMessageBox::warning(nullptr,tr("Warning"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::WARNING, tr("Warning"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -646,7 +690,8 @@ void ManageTagsDialog::on_tagsViewDeleteLinksPushButton_clicked()
     if (selectionCsds.size() == 0) {
         // no selection
         QString errorString = QString(tr("Select at least 1 cash stream definition."));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -860,7 +905,8 @@ void ManageTagsDialog::on_csdsViewUnlinkPushButton_clicked()
     if (selectionTags.size() == 0) {
         // no selection
         QString errorString = QString(tr("Select at least 1 tag."));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -886,7 +932,8 @@ void ManageTagsDialog::on_csdsViewLinkPushButton_clicked()
     QList<QUuid> selectionCsds= csdsView_GetSelectedCsdsIds();
     if (selectionCsds.count() != 1) {
         QString errorString = QString(tr("A cash stream definition must be selected."));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -894,7 +941,8 @@ void ManageTagsDialog::on_csdsViewLinkPushButton_clicked()
         // no Tag defined yet in the scenario
         QString errorString = QString(tr("No tag defined in the scenario. "
             "Cannot link to cash stream definition"));
-        QMessageBox::critical(nullptr,tr("Error"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -915,7 +963,8 @@ void ManageTagsDialog::on_csdsViewLinkPushButton_clicked()
         // all Tags are already in relationship with the selected csd
         QString errorString = QString(tr("No more tags to link. All the existing "
             "ones defined the scenario have already been linked to this cash stream definition."));
-        QMessageBox::information(nullptr,tr("Information"), errorString);
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::INFORMATION, tr("Information"),
+            errorString, {tr("OK")}, 0, 0);
         return;
     }
 
@@ -933,5 +982,15 @@ void ManageTagsDialog::on_csdsViewCsdsListWidget_itemSelectionChanged()
 void ManageTagsDialog::on_tagsDefTableView_doubleClicked(const QModelIndex &index)
 {
     on_tagsDefEditPushButton_clicked();
+}
+
+
+void ManageTagsDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("ManageTagsDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

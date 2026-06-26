@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,18 @@
  */
 
 #include "editperiodicdialog.h"
+#include <QTimer>
 #include "ui_editperiodicdialog.h"
 #include "gbpcontroller.h"
 #include "gbplogger.h"
 #include "util.h"
+#include "uiutil.h"
 #include "periodiccsd.h"
 #include <QMessageBox>
 #include <QCoreApplication>
 #include <QColorDialog>
+#include "fe.h"
+#include "gbpqmessage.h"
 
 EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     QDialog(parent),
@@ -33,6 +37,8 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
 {
     ui->setupUi(this);
 
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
 
     // fill Period combobox
     ui->periodComboBox->insertItem(0,PeriodicCsd::getPeriodName(PeriodicCsd::PeriodType::YEARLY,
@@ -69,14 +75,23 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     ui->growthTypePostLabel->setText(tr(" on annual basis"));
 
     // use smaller font for description list
-    QFont font = ui->descPlainTextEdit->font();
-    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true);
+    QFont appFont = QApplication::font();
+    QFont font = appFont;
+    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true,
+        "EditPeriodicDialog - description");
     ui->descPlainTextEdit->setFont(font);
 
     // use smaller font for tag list
-    font = ui->tagsEdit->font();
-    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true);
+    font = appFont;
+    Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true,
+        "EditPeriodicDialog - tag list");
     ui->tagsEdit->setFont(font);
+
+    // Make full description view button smaller
+    QFont descFullViewFont = appFont;
+    Util::changeFontSize(descFullViewFont, Util::FontResizeIntensity::WEAK, true,
+        "EditPeriodicDialog - desc full view button");
+    ui->editDescriptionPushButton->setFont(descFullViewFont);
 
     // make the description list not too high and fixed (must be done after font setting)
     QFontMetrics fm(ui->descPlainTextEdit->font());
@@ -123,12 +138,18 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     // Stream Def variable growth edit dialog
     editVariableGrowthDlg = new EditVariableGrowthDialog(tr("Growth"),locale,this);// auto-destroyed
     editVariableGrowthDlg->setModal(true);
+
     // Visualize occurrences  Dialog
     visualizeoccurrencesDialog = new VisualizeOccurrencesDialog(locale,this);// auto-destroyed by Qt
     visualizeoccurrencesDialog->setModal(true);
+
     // Plain Text Edition Dialog
     editDescriptionDialog = new PlainTextEditionDialog(this);  // auto-destroyed by Qt
     editDescriptionDialog->setModal(true);
+
+    // Csd Breakdown Dialog
+    csdBreakdownDialog = new CsdBreakdownDialog(locale,this);// auto-destroyed by Qt
+    csdBreakdownDialog->setModal(true);
 
     // Set the color of the StartWarning label to "optimized orange"
     ui->startWarningLabel->setText("\u26A0");
@@ -160,7 +181,12 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     QObject::connect(visualizeoccurrencesDialog,
         &VisualizeOccurrencesDialog::signalCompleted, this,
         &EditPeriodicDialog::slotVisualizeOccurrencesCompleted);
-
+    // connect emitters & receivers for Dialogs : Csd Breakdown
+    QObject::connect(this, &EditPeriodicDialog::signalCsdBreakdownPrepareContent,
+        csdBreakdownDialog, &CsdBreakdownDialog::slotPrepareContent);
+    QObject::connect(csdBreakdownDialog,
+        &CsdBreakdownDialog::signalCompleted, this,
+        &EditPeriodicDialog::slotCsdBreakdownCompleted);
 }
 
 
@@ -171,11 +197,11 @@ EditPeriodicDialog::~EditPeriodicDialog()
 
 
 void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
-    QWeakPointer<PeriodicCsd> pCsd, CurrencyInfo newCurrInfo, Growth inflation,
-    QDate theMaxDateFeGeneration, QSet<QUuid> associatedTagIds, Tags availTags)
+    QWeakPointer<PeriodicCsd> pCsd, const CurrencyInfo &newCurrInfo, const Growth &inflation,
+    QDate theMaxDateFeGeneration, const QSet<QUuid> &associatedTagIds, const Tags &availTags)
 {
     // Convert csd to strong pointer if editing an existing csd
-    QSharedPointer<PeriodicCsd> psCsd;
+    QSharedPointer<const PeriodicCsd> psCsd;
     if (isNewCsd==false) {
         psCsd = pCsd.toStrongRef();
         if(psCsd.isNull()){
@@ -185,7 +211,8 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
 
     // check input values
     if ( theMaxDateFeGeneration.isValid()==false ) {
-        throw std::invalid_argument("Invalid max date for FeGenerationDuration");
+        throw std::invalid_argument(QString("%1: Invalid max date for FeGenerationDuration")
+            .arg(Q_FUNC_INFO).toStdString());
     }
 
     // remember some variables
@@ -241,7 +268,8 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
         ui->nameLineEdit->setText(psCsd->getName());
         ui->descPlainTextEdit->setPlainText(psCsd->getDesc());
         int result;
-        double amountDouble = CurrencyHelper::amountQint64ToDouble(psCsd->getAmount(),
+        double amountDouble = CurrencyHelper::amountQint64ToDouble(
+            static_cast<qint64>(psCsd->getAmount()),
             currInfo.noOfDecimal, result);
         if(result!=0){
             // should never happen
@@ -375,7 +403,14 @@ void EditPeriodicDialog::slotShowResultCompleted()
 void EditPeriodicDialog::slotVisualizeOccurrencesCompleted()
 {
     // Log the operation
-    LOG_INFO("Visualize occurrences completed");
+    LOG_INFO("\"Visualize occurrences\" dialog completed");
+}
+
+
+void EditPeriodicDialog::slotCsdBreakdownCompleted()
+{
+    // Log the operation
+    LOG_INFO("\"Csd breakdown\" dialog completed");
 }
 
 
@@ -389,32 +424,32 @@ void EditPeriodicDialog::on_applyPushButton_clicked()
             .arg(REDACT(ui->nameLineEdit->text())));
     }
 
-    BuildFromFormDataResult result;
-    buildPeriodicCsdFromFormData(result);
-    if (result.result.status==Util::ResultOfOperationStatus::ERROR){
-        QMessageBox::critical(nullptr,tr("Error"),result.result.userErrorMessage);
-        LOG_WARNING( QString("    Changes not applied : Invalid data entered (%1)")
-            .arg(result.result.logErrorMessage));
+    BuildFromFormDataResult r;
+    buildPeriodicCsdFromFormData(r);
+    if (r.result.status==Util::ResultOfOperationStatus::ERROR){
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            r.result.userErrorMessage, {tr("OK")}, 0, 0);
+        LOG_WARNING( QString("Changes not applied : Invalid data entered (%1)")
+            .arg(r.result.logErrorMessage));
         LOG_INFO("End of edition");
         return;
     }
 
     // send back result
-    emit signalEditPeriodicCsdResult (isIncome, result.pCsd);
+    emit signalEditPeriodicCsdResult (isIncome, r.sharedPtrCsd);
 
-    // if editing an existing Stream Def, then this is the end of it. For create,
-    // then stay right there to facilitate the rapid creation of multiple Stream Def
+    // if editing an existing Csd, then this is the end of it. For create,
+    // then stay right there to facilitate the rapid creation of multiple Csd
     if(editingExistingStreamDef){
         hide();
         emit signalEditPeriodicCsdCompleted();
-        LOG_INFO("    Modifications applied to periodic csd");
+        LOG_INFO("Modifications applied to periodic csd");
     } else{
         // reset some parameters so we are ready to create yet another Stream Def
         prepareDataToCreateANewStreamDef(false);
         ui->nameLineEdit->setFocus();
-        LOG_INFO("    New periodic csd created");
+        LOG_INFO("New periodic csd created");
     }
-    LOG_INFO("End of edition");
 }
 
 // Set form's widgets contents for creation of a new Stream Def
@@ -522,7 +557,8 @@ void EditPeriodicDialog::buildPeriodicCsdFromFormData(BuildFromFormDataResult &r
     PeriodicCsd::PeriodType periodicType;
     if ( false == PeriodicCsd::intToPeriodType( selectedData.toInt(), periodicType ) ){
         // should never happen
-        throw std::invalid_argument("Unknown Periodic Type value");
+        throw std::invalid_argument(QString("%1:Unknown Periodic Type value")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     int resultConv;
     qint64 amount = CurrencyHelper::amountDoubleToQint64(ui->amountDoubleSpinBox->value(),
@@ -589,16 +625,16 @@ void EditPeriodicDialog::buildPeriodicCsdFromFormData(BuildFromFormDataResult &r
 
     // build item
     try {
-        result.pCsd = QSharedPointer<PeriodicCsd>( new PeriodicCsd(periodicType, periodMultiplier, amount, growth, gs,
+        result.sharedPtrCsd = QSharedPointer<PeriodicCsd>( new PeriodicCsd(periodicType, periodMultiplier, amount, growth, gs,
             gap, initialId, (ui->nameLineEdit->text().trimmed()).left(Csd::NAME_MAX_LEN),
             ui->descPlainTextEdit->toPlainText().left(Csd::DESC_MAX_LEN),
             ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, from, to,
             ui->toScenarioRadioButton->isChecked(),inflationModifFactor));
     } catch (const std::exception& e) {
         // unexpected error, should never happen
-        result.result.userErrorMessage = QString(tr("An unexpected error has occurred.\n\nDetails : %1"))
-            .arg(e.what());
-        result.result.logErrorMessage = QString("An unexpected error has occurred.\n\nDetails : %1")
+        result.result.userErrorMessage = QString(tr("An unexpected error has occurred. "
+            "Details : %1")).arg(e.what());
+        result.result.logErrorMessage = QString("An unexpected error has occurred. Details : %1")
             .arg(e.what());
         return;
     }
@@ -790,6 +826,36 @@ void EditPeriodicDialog::setVisibilityStartDateWarningSign()
 }
 
 
+QSharedPointer<FeStream> EditPeriodicDialog::generateFinancialEvents(
+    const Growth &scenarioInflation, QWeakPointer<Csd> weakCsdPtr,
+    uint &saturationCount, FeMinMaxInfo &minMax)
+{
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+    DateRange fromto = DateRange(tomorrow, maxDateFeGeneration);
+    int maxNoOfdays = fromto.getNoOfDays();
+    QSharedPointer<FeStream> result = QSharedPointer<FeStream>::create(maxNoOfdays, weakCsdPtr,
+        tomorrow);
+
+    // info on PV conversion
+    bool usePvConversion = GbpController::getInstance().getUsePresentValue();
+    double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
+
+    // Generate financial events build for the maximum range set by scenario,
+    // but if the Periodic Csd set its own limit date arealier, the latter will take precedence
+    QSharedPointer<PeriodicCsd> pPtr = qSharedPointerDynamicCast<PeriodicCsd>(weakCsdPtr);
+    if (pPtr != nullptr) {
+        pPtr->generateEventStream(*result, tomorrow, fromto, maxDateFeGeneration,
+            scenarioInflation,(usePvConversion)?(pvAnnualDiscountRate):(0), tomorrow,
+            saturationCount, minMax);
+    } else {
+        return result; // should never happen
+    }
+
+    return result;
+}
+
+
+
 void EditPeriodicDialog::on_closePushButton_clicked()
 {
     hide();
@@ -844,22 +910,31 @@ void EditPeriodicDialog::on_visualizeOccurrencesPushButton_clicked()
 {
     QString amountString;
 
-    // build the Stream Def from the data entered in the form (can be valid or not)
-    BuildFromFormDataResult result;
-    buildPeriodicCsdFromFormData(result);
-    if (result.result.status==Util::ResultOfOperationStatus::ERROR){
-        QMessageBox::critical(nullptr,tr("Error"),result.result.userErrorMessage);
-        return;
+    // From the form data, build a temporary Periodic CSD (found in r.sharedPtrCsd) that
+    // will stay alive only for the duration of this method.
+    BuildFromFormDataResult r;
+    buildPeriodicCsdFromFormData(r);
+    if (r.result.status==Util::ResultOfOperationStatus::ERROR){
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            r.result.userErrorMessage, {tr("OK")}, 0, 0);
+        return ;
     }
 
+    // Generate the FeStream for this Csd
+    uint saturationCount;
+    FeMinMaxInfo minMax;
+    QSharedPointer<FeStream> feStream = generateFinancialEvents(scenarioInflation,
+        r.sharedPtrCsd.toWeakRef(), saturationCount, minMax);
+
     // Log the operation
-    LOG_INFO( QString("About to visualize occurrences for Periodic item name=%1")
+    LOG_INFO( QString("About to visualize occurrences for periodic item name = %1")
         .arg(REDACT(ui->nameLineEdit->text())));
 
-
-    // send for display
-    emit signalVisualizeOccurrencesPrepareContent(currInfo, scenarioInflation, maxDateFeGeneration,
-        result.pCsd.toWeakRef());
+    // Prepare display of Visualization. The slotPrepareContent must do all the calculation because
+    // both CSD and FeStream are own by this method on_visualizeOccurrencesPushButton_clicked
+    // and will disappear when it completes.
+    emit signalVisualizeOccurrencesPrepareContent(currInfo, feStream, saturationCount,
+        scenarioInflation, minMax, maxDateFeGeneration);
     visualizeoccurrencesDialog->show();
 }
 
@@ -926,7 +1001,7 @@ EditPeriodicDialog::BuildFromFormDataResult::BuildFromFormDataResult()
 void EditPeriodicDialog::BuildFromFormDataResult::init()
 {
     result.init();
-    pCsd = QSharedPointer<PeriodicCsd>(); // null
+    sharedPtrCsd = QSharedPointer<PeriodicCsd>(); // null
 }
 
 void EditPeriodicDialog::on_fromDateEdit_userDateChanged(const QDate &date)
@@ -938,5 +1013,52 @@ void EditPeriodicDialog::on_fromDateEdit_userDateChanged(const QDate &date)
 void EditPeriodicDialog::on_toDateEdit_userDateChanged(const QDate &date)
 {
     setVisibilityStartDateWarningSign();
+}
+
+
+void EditPeriodicDialog::on_breakdownPushButton_clicked()
+{
+    QString amountString;
+
+    // From the form data, build a temporary Periodic CSD (found in r.sharedPtrCsd) that
+    // will stay alive only for the duration of this method.
+    BuildFromFormDataResult r;
+    buildPeriodicCsdFromFormData(r);
+    if (r.result.status==Util::ResultOfOperationStatus::ERROR){
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            r.result.userErrorMessage, {tr("OK")}, 0, 0);
+        return ;
+    }
+
+    // Generate the FeStream for this Csd
+    uint saturationCount;
+    FeMinMaxInfo minMax;
+    QSharedPointer<FeStream> feStream = generateFinancialEvents(scenarioInflation,
+        r.sharedPtrCsd.toWeakRef(), saturationCount, minMax);
+
+    // Log the operation
+    LOG_INFO( QString("About to view Csd breakdown for periodic item name = %1")
+        .arg(REDACT(ui->nameLineEdit->text())));
+
+    // Prepare display of Breakdown view. The slotPrepareContent must do all the calculation
+    // because both CSD and FeStream are own by this method on_breakdownPushButton_clicked
+    // and will disappear when it completes.
+    emit signalCsdBreakdownPrepareContent(currInfo, feStream, maxDateFeGeneration);
+    csdBreakdownDialog->show();
+}
+
+
+void EditPeriodicDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    // QTimer::singleShot(0) defers execution until after all show-related events have been
+    // processed, including the platform style's focusInEvent which calls selectAll() on the
+    // focused QLineEdit. Calling deselect() directly in slotPrepareContent() has no effect
+    // because that slot runs before the dialog is shown.
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("EditPeriodicDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+        ui->nameLineEdit->deselect();
+    });
 }
 

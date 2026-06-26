@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ Fe &Fe::operator=(const Fe &o)
 
 
 
-QString Fe::toString(QString streamDefName, const CurrencyInfo& currInfo,
+QString Fe::toString(const QString &streamDefName, const CurrencyInfo& currInfo,
     const QLocale& locale) const {
     QString amountString = locale.toString(amount,'f', currInfo.noOfDecimal);
     QString s = QString("%1 : %2").arg(amountString).arg(streamDefName);

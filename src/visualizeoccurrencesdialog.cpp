@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,15 +17,19 @@
  */
 
 #include "visualizeoccurrencesdialog.h"
+#include <QTimer>
+#include "csvexporter.h"
 #include "customqchartview.h"
 #include "ui_visualizeoccurrencesdialog.h"
 #include "gbpcontroller.h"
 #include "gbplogger.h"
+#include "uiutil.h"
 #include <qdatetimeaxis.h>
 #include <qgraphicslayout.h>
 #include <qvalueaxis.h>
 #include <QMessageBox>
 #include <QFileDialog>
+#include "gbpqmessage.h"
 
 
 VisualizeOccurrencesDialog::VisualizeOccurrencesDialog(QLocale locale, QWidget *parent)
@@ -33,6 +37,10 @@ VisualizeOccurrencesDialog::VisualizeOccurrencesDialog(QLocale locale, QWidget *
     , ui(new Ui::VisualizeOccurrencesDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
     ui->widget->installEventFilter(this);   // pass resize event received by "widget" to the Chart widget
     this->locale = locale;
     initChart();
@@ -47,27 +55,28 @@ VisualizeOccurrencesDialog::~VisualizeOccurrencesDialog()
 }
 
 
-void VisualizeOccurrencesDialog::slotPrepareContent(CurrencyInfo currInfo, Growth scenarioInflation,
-    QDate maxDateScenario, QWeakPointer<Csd> csd)
+void VisualizeOccurrencesDialog::slotPrepareContent(CurrencyInfo currInfo, QSharedPointer<FeStream>
+    feStream, uint noOfSaturations, Growth scenarioInflation, FeMinMaxInfo minMax,
+    QDate maxDateScenario)
 {
     this->currInfo = currInfo;
-    uint noOfSaturations;
-    FeMinMaxInfo minMax;
     maxDateScenarioFeGeneration = maxDateScenario;
     indexLastPointSelected = -1;
 
-    // Generate the flow of Fe.
-    FeStream feStream = generateFinancialEvents(scenarioInflation, csd, noOfSaturations, minMax);
+    // Make sure the FeStream is valid
+    if (feStream.isNull()==true) {
+        return; // should never happen
+    }
 
-    updateTextTab(feStream, noOfSaturations, scenarioInflation, csd);
-    updateChartTab(feStream, noOfSaturations, scenarioInflation,minMax);
+    updateTextTab(feStream, noOfSaturations, scenarioInflation);
+    updateChartTab(feStream, noOfSaturations, scenarioInflation, minMax);
 
     // Set focus on Close button
     ui->closePushButton->setFocus();
 }
 
 
-// Need some improvement toi optimize speed
+// Need some improvement to optimize speed
 void VisualizeOccurrencesDialog::mypoint_clicked(const QPointF pt)
 {
     // find the index of the point in the series
@@ -117,13 +126,12 @@ void VisualizeOccurrencesDialog::mypoint_clicked(const QPointF pt)
 
 void VisualizeOccurrencesDialog::on_closePushButton_clicked()
 {
-    // clean some objects we dont need
+    // clean some objects we dont need (they will be regenerated before the form is re-shown)
     ui->plainTextEdit->clear(); // dont hold the text, no use for that now
     chart->removeAllSeries();
 
     this->hide();
     emit signalCompleted();
-
 }
 
 
@@ -133,43 +141,8 @@ void VisualizeOccurrencesDialog::on_VisualizeOccurrencesDialog_rejected()
 }
 
 
-FeStream VisualizeOccurrencesDialog::generateFinancialEvents(Growth scenarioInflation,
-    QWeakPointer<Csd> weakCsdPtr, uint& saturationCount, FeMinMaxInfo& minMax){
-
-    QDate tomorrow = GbpController::getInstance().getTomorrow();
-    DateRange fromto = DateRange(tomorrow, maxDateScenarioFeGeneration);
-    int maxNoOfdays = fromto.getNoOfDays();
-    FeStream result(maxNoOfdays, weakCsdPtr);
-
-    // info on PV conversion
-    bool usePvConversion = GbpController::getInstance().getUsePresentValue();
-    double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
-
-    // Generate financial events
-    // build for the maximum range set by scenario, but if the Periodic Csd set its own
-    // limit date arealier, the latter will take precedence
-    if (QSharedPointer<PeriodicCsd> pPtr =
-        qSharedPointerDynamicCast<PeriodicCsd>(weakCsdPtr)) {
-        // This is Periodic Csd
-        pPtr->generateEventStream(result, tomorrow, fromto, maxDateScenarioFeGeneration,
-            scenarioInflation,(usePvConversion)?(pvAnnualDiscountRate):(0), tomorrow,
-            saturationCount, minMax);
-    } else if (QSharedPointer<IrregularCsd> iPtr =
-        qSharedPointerDynamicCast<IrregularCsd>(weakCsdPtr) ){
-        // This is Irregular Csd
-        iPtr->generateEventStream(result, tomorrow, fromto, maxDateScenarioFeGeneration,
-            (usePvConversion)?(pvAnnualDiscountRate):(0), tomorrow, saturationCount, minMax);
-    } else {
-        return result; // should never happen
-    }
-
-    return result;
-}
-
-
-
-void VisualizeOccurrencesDialog::updateTextTab(FeStream& feStream, uint saturationCount, Growth
-    scenarioInflation, QWeakPointer<Csd> weakCsdPtr)
+void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream,
+    uint saturationCount, Growth scenarioInflation)
 {
 
     QString amountString;
@@ -177,9 +150,9 @@ void VisualizeOccurrencesDialog::updateTextTab(FeStream& feStream, uint saturati
     QStringList resultStringList;
     int ok;
 
-    // First, make a strong pointer
-    QSharedPointer<Csd> strongCsdPtr = weakCsdPtr.toStrongRef();
-    if (strongCsdPtr.isNull()) {
+    // First, make a strong pointer to the underlying Csd
+    QSharedPointer<Csd> strongCsdPtr = feStream->getCsdPtr().toStrongRef();
+    if (strongCsdPtr.isNull()==true) {
         return; // should not happen
     }
 
@@ -204,14 +177,17 @@ void VisualizeOccurrencesDialog::updateTextTab(FeStream& feStream, uint saturati
             bool capped;
             adjustedInflation.changeByFactor(psd->getInflationAdjustmentFactor(),capped);
 
-
             if (Growth::Type::CONSTANT == scenarioInflation.getType()) {
                 QString infString = QString("%1%").arg(static_cast<double>(
                     Growth::fromDecimalToDouble(adjustedInflation.getAnnualConstantGrowth())));
                 resultStringList.append( tr("Using constant adjusted annual inflation"
-                    " of %1 percent.").arg(infString)) ;
+                    " of %1.").arg(colorizeStringWithHtml(infString,
+                    Util::getOptimizedBlue()))) ;
                 resultStringList.append( tr("Inflation can be applied from %1.").
-                    arg(locale.toString(nextEventDate, locale.dateFormat(QLocale::ShortFormat))) );
+                    arg( colorizeStringWithHtml(
+                            locale.toString(nextEventDate, locale.dateFormat(QLocale::ShortFormat))
+                            , Util::getOptimizedBlue())
+                    ));
             } else if (Growth::Type::VARIABLE == scenarioInflation.getType()) {
                 resultStringList.append(tr("Using variable inflation."));
             } else{
@@ -219,11 +195,14 @@ void VisualizeOccurrencesDialog::updateTextTab(FeStream& feStream, uint saturati
             }
         } else if (psd->getGrowthStrategy()==PeriodicCsd::GrowthStrategy::CUSTOM) {
             if (psd->getGrowth().getType()==Growth::Type::CONSTANT) {
-                resultStringList.append( tr("Using custom constant growth of %1 percent.")
-                    .arg( static_cast<double>(Growth::fromDecimalToDouble(
-                        psd->getGrowth().getAnnualConstantGrowth()))));
+                QString growthString = QString("%1%")
+                    .arg(static_cast<double>(Growth::fromDecimalToDouble(
+                        psd->getGrowth().getAnnualConstantGrowth())));
+                resultStringList.append( tr("Using custom constant annual growth of %1.")
+                    .arg(colorizeStringWithHtml(growthString,Util::getOptimizedBlue())));
                 resultStringList.append( tr("Growth can be applied from %1")
-                    .arg(locale.toString(nextEventDate, locale.dateFormat(QLocale::ShortFormat))));
+                        .arg(colorizeStringWithHtml(locale.toString(nextEventDate,
+                        locale.dateFormat(QLocale::ShortFormat)),Util::getOptimizedBlue()))   );
             } else if (psd->getGrowth().getType()==Growth::Type::VARIABLE){
                 resultStringList.append(tr("Using custom variable growth."));
             } else {
@@ -237,22 +216,36 @@ void VisualizeOccurrencesDialog::updateTextTab(FeStream& feStream, uint saturati
         bool usePvConversion = GbpController::getInstance().getUsePresentValue();
         double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
         if ((usePvConversion==true)&&(pvAnnualDiscountRate!=0)) {
+            QString adrString = QString("%1%")
+                .arg(Util::formatDouble(pvAnnualDiscountRate, locale,
+                    Util::DoubleFormatMode::Standard, {}));
             QString s = tr("Converting Future Values to Present Values using an annual discount "
-                " rate of %1 percent.").arg(pvAnnualDiscountRate);
+                " rate of %1.").arg(colorizeStringWithHtml(adrString, Util::getOptimizedBlue()));
             resultStringList.append(s);
         }
         if(saturationCount > 0){
+            QString satCountrStr = Util::formatDouble(saturationCount, locale,
+                Util::DoubleFormatMode::Standard, {.standard={.noOfDecimals=0}});
+            QString maxSatStr = CurrencyHelper::formatAmount(
+                (qint64)CurrencyHelper::maxValueAllowedForAmount(),
+                currInfo, locale, false);
             resultStringList.append(tr("Amount was too big %1 times and have been capped to %2.")
-                .arg(saturationCount)
-                .arg(CurrencyHelper::formatAmount(CurrencyHelper::maxValueAllowedForAmountInDouble(
-                    currInfo.noOfDecimal), currInfo, locale, true)));
+                .arg( colorizeStringWithHtml(satCountrStr, Util::getOptimizedBlue()) )
+                .arg( colorizeStringWithHtml(maxSatStr,Util::getOptimizedBlue()) )
+                );
         }
-        resultStringList.append(tr("No financial event will be generated before tomorrow %1 and past %2.")
-            .arg(locale.toString(tomorrow, locale.dateFormat(QLocale::ShortFormat)) ,
-            locale.toString(psd->getRealEndDate(maxDateScenarioFeGeneration),
-                locale.dateFormat(QLocale::ShortFormat))));
-        resultStringList.append(tr("%1 %2 event(s) have been generated.\n")
-            .arg(feStream.getNoOfElementsUsed())
+        QString tomStr = locale.toString(tomorrow, locale.dateFormat(QLocale::ShortFormat));
+        QString toStr = locale.toString(psd->getRealEndDate(maxDateScenarioFeGeneration),
+            locale.dateFormat(QLocale::ShortFormat));
+        resultStringList.append(tr("No financial event will be generated before "
+            "tomorrow %1 and past %2.")
+            .arg(colorizeStringWithHtml(tomStr, Util::getOptimizedBlue()))
+            .arg(colorizeStringWithHtml(toStr, Util::getOptimizedBlue()))
+            );
+        QString noEventStr = Util::formatDouble(feStream->getNoOfElementsUsed(), locale,
+            Util::DoubleFormatMode::Standard, {.standard={.noOfDecimals=0}});
+        resultStringList.append(tr("%1 event(s) of type \"%2\" have been generated.")
+            .arg(colorizeStringWithHtml(noEventStr, Util::getOptimizedBlue()))
             .arg((psd->getIsIncome())?(tr("income")):(tr("expense"))));
 
     } else {
@@ -262,67 +255,88 @@ void VisualizeOccurrencesDialog::updateTextTab(FeStream& feStream, uint saturati
         bool usePvConversion = GbpController::getInstance().getUsePresentValue();
         double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
         if ((usePvConversion==true)&&(pvAnnualDiscountRate!=0)) {
+            QString adrString = QString("%1%")
+                .arg(Util::formatDouble(pvAnnualDiscountRate, locale,
+                    Util::DoubleFormatMode::Standard, {}));
             QString s = tr("Converting Future Values to Present Values using an annual discount "
-                " rate of %1 percent.").arg(pvAnnualDiscountRate);
+                " rate of %1.").arg(colorizeStringWithHtml(adrString, Util::getOptimizedBlue()));
             resultStringList.append(s);
         }
         if(saturationCount > 0){
+            QString satCountrStr = Util::formatDouble(saturationCount, locale,
+                Util::DoubleFormatMode::Standard, {.standard={.noOfDecimals=0}});
+            QString maxSatStr = CurrencyHelper::formatAmount(
+                (qint64)CurrencyHelper::maxValueAllowedForAmount(),
+                currInfo, locale, false);
             resultStringList.append(tr("Amount was too big %1 times and have been capped to %2.")
-                .arg(saturationCount)
-                .arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)));
-        }
-        resultStringList.append(
-            tr("No financial event will be generated before tomorrow %1 and past %2.").arg(
-                locale.toString(tomorrow, locale.dateFormat(QLocale::ShortFormat)) ,
-                locale.toString(maxDateScenarioFeGeneration,locale.dateFormat(QLocale::ShortFormat))
-            )
-        );
-        resultStringList.append(
-            tr("%1 %2 event(s) have been generated.\n")
-                .arg(feStream.getNoOfElementsUsed())
-                .arg((isd->getIsIncome())?(tr("income")):(tr("expense")))
+                .arg( colorizeStringWithHtml(satCountrStr, Util::getOptimizedBlue()) )
+                .arg( colorizeStringWithHtml(maxSatStr,Util::getOptimizedBlue()) )
             );
+        }
+
+        QString tomStr = locale.toString(tomorrow, locale.dateFormat(QLocale::ShortFormat));
+        QString toStr = locale.toString(maxDateScenarioFeGeneration,
+            locale.dateFormat(QLocale::ShortFormat));
+        resultStringList.append(tr("No financial event will be generated before "
+            "tomorrow %1 and past %2.")
+            .arg(colorizeStringWithHtml(tomStr, Util::getOptimizedBlue()))
+            .arg(colorizeStringWithHtml(toStr, Util::getOptimizedBlue()))
+        );
+
+
+        QString noEventStr = Util::formatDouble(feStream->getNoOfElementsUsed(), locale,
+            Util::DoubleFormatMode::Standard, {.standard={.noOfDecimals=0}});
+        resultStringList.append(tr("%1 %2 event(s) have been generated.")
+            .arg(colorizeStringWithHtml(noEventStr, Util::getOptimizedBlue()))
+            .arg((isd->getIsIncome())?(tr("income")):(tr("expense"))));
     }
 
+    resultStringList.append("");
 
     // Print values into text widget
-    long double cummul = 0;
-    const QList<qint64> list = feStream.getAmountSet();
-    const qsizetype size = feStream.getNoOfDays();
-    for (int var = 0; var < size; ++var) {
-        if (list[var] == -1) {
-            continue; // unused
+    double cummul = 0;
+    uint size = feStream->size();
+    uint eventIndex = 0;
+    for (int var = 0; var < size; var++) {
+        if (feStream->contains(var)==false) {
+            continue;
         }
+
+        // Build the index string
+        eventIndex++;
+        QString indexStr = colorizeStringWithHtml(
+            QString("[%1]").arg( QString::number(eventIndex).rightJustified(5, '0') ) ,
+            Util::getOptimizedPurple());
+
+        qint64 amount = feStream->get(var);
+
         QDate date = tomorrow.addDays(var);
-        if (abs(list[var]) > CurrencyHelper::maxValueAllowedForAmount() ){ // should not happen
-            resultStringList.append(QString("%1 : %2").
-                arg(locale.toString(date, locale.dateFormat(QLocale::ShortFormat)) ,
-                tr("Amount is bigger than the maximum allowed")));
+        if ( amount > CurrencyHelper::maxValueAllowedForAmount() ){ // should not happen
+            resultStringList.append(QString("%1 %2 : %3").arg(
+                indexStr,
+                locale.toString(date, locale.dateFormat(QLocale::ShortFormat)) ,
+                tr("Amount is bigger than the maximum allowed")
+            ));
         } else {
-            double amountDouble = CurrencyHelper::amountQint64ToDouble(list[var],
+            double amountDouble = CurrencyHelper::amountQint64ToDouble(amount,
                 currInfo.noOfDecimal, ok);
             if (ok != 0){
-                resultStringList.append(QString("%1 : %2")
+                resultStringList.append(QString("%1 %2 : %3")
+                    .arg(indexStr)
                     .arg(date.toString(Qt::ISODate) , tr("Error during amount conversion")));
             } else {
-                amountString = CurrencyHelper::formatAmount(amountDouble, currInfo, locale, true);
-                cummul += amountDouble;
-                QString cummulString;
-                if (cummul > CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)) {
-                    cummulString = CurrencyHelper::formatAmount(
-                        CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal),
-                        currInfo, locale, true);
-                } else {
-                    cummulString = CurrencyHelper::formatAmount(static_cast<double>(cummul),
-                        currInfo, locale, true);
-                }
+                amountString = CurrencyHelper::formatAmount(amountDouble, currInfo, locale, false);
+                cummul = CurrencyHelper::add(cummul, amountDouble, currInfo.noOfDecimal);
+                QString cummulString = CurrencyHelper::formatAmount(cummul,
+                    currInfo, locale, false);
                 QString s;
                 if (date<tomorrow){
                     // if event is in the past, mention it
-                    s = s.append(tr("  *** PAST -> discarded ***"));
+                    s = s.append(tr("%1 *** PAST -> discarded ***").arg(indexStr));
                 } else {
-                    s = tr("%1 : %2 (cummul=%3)").arg(locale.toString(date,locale.dateFormat(
-                        QLocale::ShortFormat)) , amountString , cummulString);
+                    s = tr("%1 %2 : %3").arg(indexStr,
+                        locale.toString(date,locale.dateFormat(
+                            QLocale::ShortFormat)) , amountString);
                 }
                 resultStringList.append(s);
             }
@@ -330,13 +344,18 @@ void VisualizeOccurrencesDialog::updateTextTab(FeStream& feStream, uint saturati
     }
 
     // Update the PlainText content
-    QString r = resultStringList.join("\n");
-    ui->plainTextEdit->setPlainText(r);
+    QString r = resultStringList.join("<br>");
+    ui->plainTextEdit->clear();
+    ui->plainTextEdit->appendHtml(r);
+
+    //  scroll to the beginning
+    ui->plainTextEdit->moveCursor(QTextCursor::Start);
+    ui->plainTextEdit->ensureCursorVisible();
 }
 
 
-void VisualizeOccurrencesDialog::updateChartTab(FeStream& feStream, uint saturationCount,
-    Growth scenarioInflation, FeMinMaxInfo minMax)
+void VisualizeOccurrencesDialog::updateChartTab(QSharedPointer<FeStream> feStream,
+    uint saturationCount, Growth scenarioInflation, FeMinMaxInfo minMax)
 {
     QDate tomorrow = GbpController::getInstance().getTomorrow();
 
@@ -346,14 +365,14 @@ void VisualizeOccurrencesDialog::updateChartTab(FeStream& feStream, uint saturat
     int convResult;
     double amount;
     QDateTime momentInTime;
-    QList<qint64> feList = feStream.getAmountSet();
-    const qsizetype size = feList.count();
+    const qsizetype size = feStream->size();
     for (int var = 0; var < size; ++var) {
-        if (feList[var]==-1) {
+        if (feStream->contains(var)==false) {
             continue;
         }
+        qint64 amountInt = feStream->get(var);
         momentInTime.setDate(tomorrow.addDays(var));
-        amount = CurrencyHelper::amountQint64ToDouble(feList[var], currInfo.noOfDecimal,
+        amount = CurrencyHelper::amountQint64ToDouble(amountInt, currInfo.noOfDecimal,
             convResult);
         if (convResult==0) {
             timeData.append({static_cast<qreal>(momentInTime.toMSecsSinceEpoch()), amount});
@@ -439,12 +458,14 @@ void VisualizeOccurrencesDialog::reduceAxisFontSize()
 {
     // X axis
     QFont xAxisFont = axisX->labelsFont();
-    Util::changeFontSize(xAxisFont, Util::FontResizeIntensity::AVERAGE, true);
+    Util::changeFontSize(xAxisFont, Util::FontResizeIntensity::AVERAGE, true,
+        "VisualizeOccurrencesDialog - X Axis");
     setXaxisFontSize(xAxisFont.pointSize());
 
     //  Y axis
     QFont yAxisFont = axisY->labelsFont();
-    Util::changeFontSize(yAxisFont, Util::FontResizeIntensity::AVERAGE, true);
+    Util::changeFontSize(yAxisFont, Util::FontResizeIntensity::AVERAGE, true,
+        "VisualizeOccurrencesDialog - Y Axis");
     setYaxisFontSize(yAxisFont.pointSize());
 }
 
@@ -617,66 +638,71 @@ void VisualizeOccurrencesDialog::changeYaxisLabelFormat()
 }
 
 
+QString VisualizeOccurrencesDialog::colorizeStringWithHtml(QString t, QColor color)
+{
+    if(color.isValid()==false){
+        return "";
+    }
+    QString result = QString("<span style='color:%1'>%2</span>").arg(color.name()).arg(t);
+    return result;
+}
+
+
 void VisualizeOccurrencesDialog::on_exportPushButton_clicked()
 {
-    // *** get a file name ***
-    QString defaultExtensionUsed = "CSV files (*.csv *.CSV)";
-    QString filter = tr("CSV files (*.csv *.CSV);;Text files (*.txt *.TXT);;All files (*)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a file"),
-        GbpController::getInstance().getLastDirExport(), filter, &defaultExtensionUsed);
-    if (fileName == ""){
-        return;
-    }
-    // *** fix the filename to add the proper suffix ***
-    QFileInfo fi(fileName);
-    if(fi.suffix()==""){    // user has not specified an extension
-        fileName.append(".csv");
-    }
-    GbpController::getInstance().setLastDirExport(fi.absolutePath());
-    LOG_INFO(QString("Attempting to export occurences to text file \"%1\" ...")
-        .arg(REDACT(fileName)));
 
-    QFile file(fileName);
-    if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
-        QMessageBox::critical(nullptr,tr("Error"),tr("Cannot open the file for writing"));
-        LOG_ERROR("Export failed : Cannot open the file for saving");
-        return;
-    }
+    // *** STEP 1 : Build the columns definitions ***
+    QList<CsvColumnDescriptor> columns;
+    columns.append({tr("Date"), CsvColumnType::date(CsvDateFormat::YearMonthDay,
+        GbpController::getInstance().getExportTextDateLocalized())});
+    columns.append({tr("Amount"), CsvColumnType::currency(
+        GbpController::getInstance().getExportTextNumberLocalized())});
+    columns.append({tr("Cumulative"), CsvColumnType::currency(
+        GbpController::getInstance().getExportTextNumberLocalized())});
 
-    // *** export to the file ***
-
-    // write header
-    QString s = QString("%1\t%2\n").arg(tr("Date"),tr("Amount"));
-    file.write(s.toUtf8());
-
-    // set date format
-    QString dateFormat = "yyyy-MM-dd"; // ISO
-    if (GbpController::getInstance().getExportTextDateLocalized()==true) {
-        dateFormat = locale.dateFormat(QLocale::ShortFormat);
-    }
-
-    // write data
-    QString valueString;
-    QString dateString;
-    QDate date;
+    // *** STEP 2 : Populate rows ***
+    QList<QList<QVariant>> data;
     QList<QPointF> timeData = series->points();
+    double cumul;
     foreach(QPointF pt, timeData){
-        date = (QDateTime::fromMSecsSinceEpoch(pt.x())).date();
+        QDate date = (QDateTime::fromMSecsSinceEpoch(pt.x())).date();
         double value = pt.y();
-        dateString = locale.toString(date, dateFormat);
-        if (GbpController::getInstance().getExportTextAmountLocalized()) {
-            // Localized
-            valueString = CurrencyHelper::formatAmount(value, currInfo, locale, false);
-        } else {
-            // not localized
-            valueString = QString::number(value,'f', currInfo.noOfDecimal);
-        }
-
-        s = QString("%1\t%2\n").arg(dateString,valueString);
-        file.write(s.toUtf8());
+        cumul = CurrencyHelper::add(cumul, value, currInfo.noOfDecimal);
+        data.append({date, value, cumul});
     }
-    file.close();
-    LOG_INFO("Exporting occurences succeeded");
 
+    // *** STEP 3 : Call exportToCsv() and handle the result ***
+    CsvExportResult result = CsvExporter::exportToCsv(
+        "Visualize occurence", columns, data, locale, currInfo, '\t' );
+    switch (result.status) {
+        case CsvExportResult::Status::Success:
+            break;
+        case CsvExportResult::Status::Canceled:
+            return; // user closed the dialog — nothing to do
+        case CsvExportResult::Status::FileOpenError:
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Export process failed. Cannot open the "
+                "file for saving"), {tr("OK")}, 0, 0);
+            return;
+        case CsvExportResult::Status::WriteError:
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Export process failed. Write error."), {tr("OK")}, 0, 0);
+            return;
+        case CsvExportResult::Status::DataError:
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Export process failed. Data error."), {tr("OK")}, 0, 0);
+            return;
+    }
+
+}
+
+
+void VisualizeOccurrencesDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("VisualizeOccurrencesDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,15 +22,17 @@
 #include "util.h"
 #include "float.h"
 #include "qregularexpression.h"
+#include <algorithm>
+#include <cmath>
+#include <stdexcept>
 #include <QRandomGenerator64>
 #include <iomanip>
 #include <qfont.h>
 #include <quuid.h>
+#include "gbplogger.h"
 
 
 QStringList Util::qtColorNames = {};
-
-
 
 
 Util::Util()
@@ -47,7 +49,7 @@ void Util::init()
 }
 
 
-QString Util::elideText(QString str, int maxNoOfChar, bool elideRight)
+QString Util::elideText(const QString &str, int maxNoOfChar, bool elideRight)
 {
     static QString elideText = "...";
     if ( (str.length()==0) || (maxNoOfChar<elideText.length()) ){
@@ -73,7 +75,8 @@ qint64 Util::quickPow10(uint n)
         10000000000,100000000000,1000000000000,10000000000000,100000000000000
     };
     if (n>14){
-        throw std::out_of_range("must be within range [0..14]");
+        throw std::out_of_range(QString("%1: must be within range [0..14]")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     return pow10[n];
 }
@@ -170,6 +173,75 @@ QString Util::longDoubleToQString(long double value)
     return QString::fromStdString(stream.str());
 }
 
+
+QString Util::formatDouble(double amount, const QLocale &locale, DoubleFormatMode mode,
+    DoubleFormatParams params)
+{
+    if (params.mixed.maxThreshold < 0.0)
+        throw std::invalid_argument("maxThreshold must not be negative");
+    if (params.mixed.minThreshold < 0.0)
+        throw std::invalid_argument("minThreshold must not be negative");
+    if (params.exponential.significantDigits == 0)
+        throw std::invalid_argument("exponential.significantDigits must be at least 1");
+
+    QString result;
+
+    bool useExp = (mode == DoubleFormatMode::Exponential) ||
+                  (mode == DoubleFormatMode::Mixed &&
+                   ((params.mixed.maxThreshold > 0.0 &&
+                     std::abs(amount) >= params.mixed.maxThreshold) ||
+                    (params.mixed.minThreshold > 0.0 && amount != 0.0 &&
+                     std::abs(amount) < params.mixed.minThreshold)));
+
+    bool includeExpSign = false;
+    std::optional<quint8> noOfDecimals;
+
+    if (mode == DoubleFormatMode::Exponential) {
+        includeExpSign = params.exponential.includeExpSign;
+        // 'e' precision = digits after decimal point = significantDigits - 1
+        result = locale.toString(amount, 'e', params.exponential.significantDigits - 1);
+    } else if (useExp) { // Mixed, exponential branch — reuse exponential params
+        includeExpSign = params.exponential.includeExpSign;
+        result = locale.toString(amount, 'e', params.exponential.significantDigits - 1);
+    } else if (mode == DoubleFormatMode::Mixed) { // Mixed, standard branch — reuse standard params
+        noOfDecimals = params.standard.noOfDecimals;
+    } else {
+        noOfDecimals = params.standard.noOfDecimals;
+    }
+
+    if (!useExp && mode != DoubleFormatMode::Exponential) {
+        if (!noOfDecimals.has_value()) {
+            // 'g' format prints all significant digits, strips trailing zeros and produce
+            // shortest version
+            result = locale.toString(amount, 'g', QLocale::FloatingPointShortest);
+        } else {
+            result = locale.toString(amount, 'f', noOfDecimals.value());
+        }
+    }
+
+    int eIdx = result.indexOf(QLatin1Char('e')); // local version of exponent char does not work
+    if (eIdx != -1) {
+        int i = eIdx + 1;
+        if (!includeExpSign && i < result.size() && result[i] == locale.positiveSign())
+            result.remove(i, 1);
+        else if (i < result.size() &&
+                 (result[i] == locale.positiveSign() || result[i] == locale.negativeSign()))
+            i++;
+        // Strip leading zeros from exponent digits, keeping at least one
+        int start = i;
+        while (i < result.size() - 1 && result[i] == locale.zeroDigit())
+            i++;
+        if (i > start)
+            result.remove(start, i - start);
+    }
+
+    if (params.includePlusSign && amount > 0.0)
+        result.prepend(locale.positiveSign());
+
+    return result;
+}
+
+
 // Useful for debugging onnly
 QList<double> Util::doubleArrayToQlist(double *data, uint noElements)
 {
@@ -212,10 +284,11 @@ long double Util::futureValue(long double presentValue, double discountRate, int
 }
 
 
-long double Util::presentValueConversionFactor(long double discountRate, int period)
+long double Util::toPvConversionFactor(long double discountRate, int period)
 {
     if (discountRate<0){
-        throw std::out_of_range("Discount rate must be >= 0");
+        throw std::out_of_range(QString("%1: Discount rate must be >= 0")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     if (discountRate==0){
         return 1;
@@ -284,7 +357,8 @@ uint Util::calculateFontResize(Util::FontResizeIntensity intensity, bool decreas
     uint newSize;
 
     if (originalSize==0) {
-        throw std::invalid_argument("Invalid original font size of 0");
+        throw std::invalid_argument(QString("%1: Invalid original font size of 0")
+            .arg(Q_FUNC_INFO).toStdString());
     }
 
     switch (intensity) {
@@ -317,7 +391,8 @@ uint Util::calculateFontResize(Util::FontResizeIntensity intensity, bool decreas
             }
             break;
         default:
-            throw std::invalid_argument("Unknown intensity factor"); // should never happen
+            throw std::invalid_argument(QString("%1: Unknown intensity factor")
+                .arg(Q_FUNC_INFO).toStdString()); // should never happen
             break;
         }
 
@@ -331,7 +406,7 @@ uint Util::calculateFontResize(Util::FontResizeIntensity intensity, bool decreas
 
 
 
-QString Util::getColorSmartName(QColor color, bool &found)
+QString Util::getColorSmartName(const QColor &color, bool &found)
 {
     found = false;
     QColor cmp;
@@ -346,9 +421,12 @@ QString Util::getColorSmartName(QColor color, bool &found)
 }
 
 
-QString Util::buildColorDisplayName(QColor color)
+QString Util::buildColorDisplayName(const QColor &color)
 {
-    QString s = QString(tr("Red:%1  Green:%2  Blue:%3")).arg(color.red()).arg(color.green()).arg(color.blue());
+    QString s = QString(tr("R:%1 G:%2 B:%3"))
+        .arg(color.red(), 3, 10, QChar('0'))
+        .arg(color.green(), 3, 10, QChar('0'))
+        .arg(color.blue(), 3, 10, QChar('0'));
     bool found;
 
     // we disable smart color names, because Qt does not offer a localized version
@@ -386,24 +464,49 @@ quint32 Util::bitCheck(quint32 number, quint32 n)
 }
 
 
-// Calculate the difference in months between 2 dates. Dates's year must be > 0.
-// Result is negative if "to" occurs before "from".
-// 2 dates inside the same month produce a result of 0.
-int Util::noOfMonthDifference(QDate from, QDate to)
+int Util::noOfMonthsDifference(QDate reference, QDate target)
 {
-    if (from.isValid()==false){
-        throw std::invalid_argument("from is an invalid date");
+    if (reference.isValid()==false){
+        throw std::invalid_argument(QString("%1: reference is an invalid date")
+            .arg(Q_FUNC_INFO).toStdString());
     }
-    if (from.year()<0){
-        throw std::invalid_argument("from year must not be < 0");
+    if (target.isValid()==false){
+        throw std::invalid_argument(QString("%1: target is an invalid date")
+            .arg(Q_FUNC_INFO).toStdString());
     }
-    if (to.isValid()==false){
-        throw std::invalid_argument("to is an invalid date");
+    if (reference.year()<0){
+        throw std::invalid_argument(QString("%1: reference year must not be < 0")
+            .arg(Q_FUNC_INFO).toStdString());
     }
-    if (to.year()<0){
-        throw std::invalid_argument("to year must not be < 0");
+    if (target.year()<0){
+        throw std::invalid_argument(QString("%1: target year must not be < 0")
+            .arg(Q_FUNC_INFO).toStdString());
     }
-    return ( (12*to.year())+to.month()) - ( (12*from.year())+from.month()) ;
+
+    return ( (12*target.year())+target.month()) - ( (12*reference.year())+reference.month()) ;
+}
+
+
+int Util::noOfYearsDifference(QDate reference, QDate target)
+{
+    if (reference.isValid()==false){
+        throw std::invalid_argument(QString("%1: reference is an invalid date")
+            .arg(Q_FUNC_INFO).toStdString());
+    }
+    if (target.isValid()==false){
+        throw std::invalid_argument(QString("%1: target is an invalid date")
+            .arg(Q_FUNC_INFO).toStdString());
+    }
+    if (reference.year()<0){
+        throw std::invalid_argument(QString("%1: reference year must not be < 0")
+            .arg(Q_FUNC_INFO).toStdString());
+    }
+    if (target.year()<0){
+        throw std::invalid_argument(QString("%1: target year must not be < 0")
+            .arg(Q_FUNC_INFO).toStdString());
+    }
+
+    return ( target.year() - reference.year() ) ;
 }
 
 
@@ -416,9 +519,8 @@ QLocale Util::getLocale(QStringList arguments, bool& systemLocale){
 
     for (int i = 0; i < arguments.size(); ++i) {
         QString arg = arguments.at(i);
-        int index = arg.indexOf("-locale");
-        if ( (0==index) && ((arg.length()==13)||(arg.length()==14)||(arg.length()==15)) ) {
-            QString sub = arg.right(arg.length()-8);
+        if (arg.startsWith("-locale=")) {
+            QString sub = arg.mid(8);
             QStringList subList = sub.split('-');
             if (subList.length()!=2) {
                 break;
@@ -448,7 +550,8 @@ void Util::calculateZoomXaxis( QDateTime &min, QDateTime &max, double expansionF
 {
     // make sure min is not more recent than max. Should never happen.
     if (max < min) {
-        throw std::invalid_argument("Max is smaller than Min");
+        throw std::invalid_argument(QString("%1: Max is smaller than Min")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     if( (expansionFactor < 0) || (expansionFactor > 0.1) ){
         throw std::invalid_argument("expansionFactor is invalid");
@@ -482,7 +585,8 @@ void Util::calculateZoomYaxis(double &min, double &max, double expansionFactor)
     }
 
     if (max < min) {
-        throw std::invalid_argument("Max is smaller than Min");
+        throw std::invalid_argument(QString("%1: Max is smaller than Min")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     if( (expansionFactor < 0) || (expansionFactor > 0.1) ){
         throw std::invalid_argument("expansionFactor is invalid");
@@ -566,12 +670,14 @@ QString Util::wordCapitalize(bool upper, QString s)
 }
 
 
-void Util::changeFontSize(QFont &font, Util::FontResizeIntensity intensity, bool decreaseSize)
+void Util::changeFontSize(QFont &font, Util::FontResizeIntensity intensity, bool decreaseSize,
+    const QString& context)
 {
     int oldFontSize = font.pointSize();
     if (oldFontSize==0) {
         // this is illegal
-        throw std::invalid_argument("Invalid font size of 0");
+        throw std::invalid_argument(QString("%1: Invalid font size of 0")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     int newFontSize = Util::calculateFontResize(intensity, decreaseSize, oldFontSize);
     if (newFontSize==0) {
@@ -579,6 +685,11 @@ void Util::changeFontSize(QFont &font, Util::FontResizeIntensity intensity, bool
         return;
     }
     font.setPointSize(newFontSize);
+
+    // logging if in debug mode
+    QString msg = QString("Changing font, context=\"%1\", from size=%2 to size=%3")
+        .arg(context).arg(oldFontSize).arg(newFontSize);
+    LOG_DEBUG_INFO(msg);
 }
 
 QDate Util::isValidISO8601Date(const QString& dateStr, bool &valid)
@@ -632,7 +743,28 @@ QColor Util::getOptimizedBlue()
 }
 
 
-QString Util::getStyleSheetStringForColor(QColor color)
+QColor Util::getOptimizedOrange()
+{
+    static const QColor claudeOrange("#E67E22");  // from Claude
+    return claudeOrange;
+}
+
+
+QColor Util::getOptimizedPurple()
+{
+    static const QColor claudePurple("#9B59B6");  // from Claude
+    return claudePurple;
+}
+
+
+QColor Util::getOptimizedTeal()
+{
+    static const QColor claudeTeal("#16A085");  // from Claude
+    return claudeTeal;
+}
+
+
+QString Util::getStyleSheetStringForColor(const QColor &color)
 {
     if (color.isValid()==false) {
         return "Invalid color";
@@ -643,14 +775,17 @@ QString Util::getStyleSheetStringForColor(QColor color)
 }
 
 
-QUuid Util::convertStringToQuuid(QString s, bool& success)
+QUuid Util::convertStringToQuuid(const QString &s, bool& success)
 {
     success = false;
 
     QString newString = s.trimmed();
 
-    // if String is bigger than 36, it cannot be a QUuid (no braces allowed)
-    if(newString.length()>36){
+    if (s.startsWith('{') || s.endsWith('}')) {
+        return QUuid();  // Return null UUID to indicate failure
+    }
+
+    if(newString.length() != 36){
         return QUuid(); // invalid QUuid
     }
 
@@ -662,6 +797,62 @@ QUuid Util::convertStringToQuuid(QString s, bool& success)
     return id;
 }
 
+
+void Util::calculateStats(const QList<double> data, double &mean, double &stdDeviation,
+    double &median, double &sum)
+{
+    // Initialize output parameters
+    mean = 0;
+    stdDeviation = 0;
+    median = 0;
+    sum = 0;
+
+    if (data.size() == 0) {
+        return;
+    }
+
+    // Welford's online algorithm for numerically stable mean and variance calculation.
+    // This avoids catastrophic cancellation that occurs with the naive two-pass
+    // algorithm when dealing with large values or small variances.
+    // Reference: Donald Knuth, The Art of Computer Programming Vol 2, section 4.2.2
+    double M2 = 0.0;  // Running sum of squared differences from the current mean
+    int n = 0;
+
+    for (double value : data) {
+        sum += value;
+        n++;
+        double delta = value - mean;  // Difference from old mean
+        mean += delta / n;            // Incrementally update mean
+        double delta2 = value - mean; // Difference from new mean
+        M2 += delta * delta2;         // Update sum of squared differences
+    }
+
+    double variance = M2 / n;  // Population variance
+    stdDeviation = std::sqrt(variance);
+
+    // Calculate the median
+    QList<double> sortedData = data;
+    std::sort(sortedData.begin(), sortedData.end());
+    int size = sortedData.size();
+    if (size % 2 == 0) {
+        // Even number of elements: average of the two middle values
+        median = (sortedData[size/2 - 1] + sortedData[size/2]) / 2.0;
+    } else {
+        // Odd number of elements: middle value
+        median = sortedData[size/2];
+    }
+}
+
+
+double Util:: percentageChange(double P, double C, bool &undefinedResult)
+{
+    if (P == 0.0 || !std::isfinite(P) || !std::isfinite(C)) {
+        undefinedResult = true;
+        return 0.0;
+    }
+    undefinedResult = false;
+    return ((C - P) / std::abs(P)) * 100.0;
+}
 
 
 QString Util::getFontResizeIntensityNames(Util::FontResizeIntensity intensity)
@@ -697,4 +888,36 @@ void Util::ResultOfOperation::init()
     status = ResultOfOperationStatus::ERROR;
     logErrorMessage = "";
     userErrorMessage = "";
+}
+
+
+QString Util::buildStringForDoubles(const QList<double> values, const QList<QString> names,
+    const QList<QColor> colors, const CurrencyInfo& currInfo, const QLocale& locale)
+{
+    // Check that all input lists have the same size
+    if (values.size() != names.size() || values.size() != colors.size()) {
+        return "";
+    }
+
+    QStringList parts;
+
+    for (int i = 0; i < values.size(); ++i) {
+        QString valueString = CurrencyHelper::formatAmount(values[i], currInfo, locale, false);
+
+        // Apply color if provided and valid
+        if (colors[i].isValid()) {
+            valueString = QString("<span style='color: %1;'>%2</span>")
+                .arg(colors[i].name()).arg(valueString);
+        }
+
+        QString part;
+        if (names[i].length()==0) {
+            part = QString("%1").arg(valueString);
+        } else {
+            part = QString("%1 = %2").arg(names[i]).arg(valueString);
+        }
+        parts.append(part);
+    }
+
+    return parts.join(" , ");
 }

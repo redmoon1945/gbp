@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -63,15 +63,12 @@ PeriodicCsd::PeriodicCsd(const PeriodicCsd &o) :
 
 
 PeriodicCsd::PeriodicCsd(PeriodicCsd::PeriodType periodicType,  quint16 periodMultiplier,
-    qint64 amount, const Growth &growth, const GrowthStrategy &growthStrategy,
+    quint64 amount, const Growth &growth, const GrowthStrategy &growthStrategy,
     quint16 growthApplicationPeriod, const QUuid &id, const QString &name, const QString &desc,
     bool active, bool isIncome, const QColor& decorationColor, const QDate &startDate,
     const QDate &endDate, bool useScenarioForEndDate, double inflationAdjustmentFactor)
     : Csd(id, name,desc,CsdType::PERIODIC,active,isIncome, decorationColor)
 {
-    if (amount<0){
-        throw std::invalid_argument("Amount must not be negative");
-    }
     if (amount>CurrencyHelper::maxValueAllowedForAmount()){
         throw std::invalid_argument("Amount is too big");
     }
@@ -247,7 +244,7 @@ void PeriodicCsd::generateEventStream(FeStream& feStream, QDate tomorrow, DateRa
     //    Growth is calculated from realValidityRange.start, even if it is before
     //    fromto.start or tomorrow. For now, keep amount positive even if this is an expense.
     //    Also transform future values into present values, if requested (pvDiscountRate > 0).
-    qint64 am = this->amount;
+    quint64 am = this->amount;
     QList<quint64> adjustedAmounts; // this will hold the resulting FE amounts
     Growth::ApplicationStrategy appStrategy = {.noOfMonths=growthApplicationPeriod};
     Growth::AdjustForGrowthResult afgResult;
@@ -299,7 +296,7 @@ void PeriodicCsd::generateEventStream(FeStream& feStream, QDate tomorrow, DateRa
     for (int i=0; i<s; i++) {
         if( occurrenceDates[i] >= fromStart ){
             // Set value for the proper day
-            feStream.add(occurrenceDates[i].toJulianDay()-tomorrowJulianDays, adjustedAmounts[i]);
+            feStream.set(occurrenceDates[i].toJulianDay()-tomorrowJulianDays, adjustedAmounts[i]);
             // set min max for amount
             if( adjustedAmounts[i] > minMaxInfo.yMax){
                 minMaxInfo.yMax = adjustedAmounts[i];
@@ -417,7 +414,6 @@ QSharedPointer<PeriodicCsd> PeriodicCsd::fromJson(const QJsonObject &jsonObject,
 {
     QJsonValue jsonValue;
     int convResult;
-    bool success;
     double d;
     QSharedPointer<PeriodicCsd> nullResult; // Null by default
 
@@ -512,20 +508,22 @@ QSharedPointer<PeriodicCsd> PeriodicCsd::fromJson(const QJsonObject &jsonObject,
         return nullResult;
     }
     d = jsonValue.toDouble();
-    qint64 amount = Util::extractQint64FromDoubleWithNoFractionalPart(d,convResult);
+    qint64 amountInitial = Util::extractQint64FromDoubleWithNoFractionalPart(d,convResult);
     if ( convResult != 0 ){
         result.logErrorMessage = QString("PeriodicCsd %1: Amount value \"%2\" is not a valid "
             "integer (code=%3)")
             .arg(id.toString(QUuid::WithoutBraces)).arg(d).arg(convResult);
         return nullResult;
     }
-    if ( amount > CurrencyHelper::maxValueAllowedForAmount() ){
-        result.logErrorMessage = QString("PeriodicCsd %1: Amount value %2 is too big")
+    if ( amountInitial < 0 ){
+        result.logErrorMessage = QString("PeriodicCsd %1: Amount value %2 is negative")
             .arg(id.toString(QUuid::WithoutBraces)).arg(d);
         return nullResult;
     }
-    if ( amount < 0 ){
-        result.logErrorMessage = QString("PeriodicCsd %1: Amount value %2 is negative")
+    quint64 amount = static_cast<quint64>(amountInitial);
+    const quint64 zMax = CurrencyHelper::maxValueAllowedForAmount();
+    if ( amount > zMax ){
+        result.logErrorMessage = QString("PeriodicCsd %1: Amount value %2 is too big")
             .arg(id.toString(QUuid::WithoutBraces)).arg(d);
         return nullResult;
     }
@@ -756,7 +754,8 @@ QSharedPointer<PeriodicCsd> PeriodicCsd::fromJson(const QJsonObject &jsonObject,
 
     // *** build and return ***
     result.status = Util::ResultOfOperationStatus::SUCCESS;
-    PeriodicCsd* p = new PeriodicCsd( periodType, periodMultiplier, amount, growth, gs, gap,id,
+    PeriodicCsd* p = new PeriodicCsd( periodType, periodMultiplier, static_cast<quint64>(amount),
+        growth, gs, gap, id,
         name, desc,active, isIncome, decoColor, sDate, eDate, useScenarioDef, infAdjFactor);
     return QSharedPointer<PeriodicCsd>(p);
 }
@@ -843,7 +842,7 @@ QString PeriodicCsd::toStringForDisplay(CurrencyInfo currInfo, QLocale locale) c
             s = tr("Growth: None");
             break;
         case GrowthStrategy::INFLATION:
-            s = tr("Growth: Inflation");
+            s = tr("Growth: %1x Inflation").arg(inflationAdjustmentFactor);
             break;
         case GrowthStrategy::CUSTOM:
             s = tr("Growth: Custom");
@@ -1033,9 +1032,15 @@ quint16 PeriodicCsd::getPeriodMultiplier() const
 }
 
 
-qint64 PeriodicCsd::getAmount() const
+quint64 PeriodicCsd::getAmount() const
 {
     return amount;
+}
+
+
+void PeriodicCsd::setAmount(quint64 newAmount)
+{
+    amount = newAmount;
 }
 
 

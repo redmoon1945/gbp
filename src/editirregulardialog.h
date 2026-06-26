@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@
 #include <QDialog>
 #include <QUuid>
 #include <QLocale>
+#include "csdbreakdowndialog.h"
 #include "irregularcsd.h"
 #include "currencyhelper.h"
 #include "plaintexteditiondialog.h"
@@ -59,9 +60,12 @@ signals:
     // show result : prepare Dialog before edition
     void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
     // Visualize occurrences : prepare Dialog before edition
-    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation,
-        QDate maxDateScenarioFeGeneration, QWeakPointer<Csd> iCsd);
-
+    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, QSharedPointer<FeStream>
+        feStream, uint noOfSaturations, Growth scenarioInflation, FeMinMaxInfo minMax,
+        QDate maxDateScenario);
+    // Csd Breakdown : prepare Dialog before edition
+    void signalCsdBreakdownPrepareContent(CurrencyInfo currInfo,  QSharedPointer<FeStream> feStream,
+        QDate maxDateScenario);
 
 public slots:
 
@@ -77,8 +81,8 @@ public slots:
      * @param availTags All the Tags defined in the scenario.
      */
     void slotPrepareContent(bool isNewCsd, bool isIncome, QWeakPointer<IrregularCsd> psCsd,
-        CurrencyInfo newCurrInfo, QDate maxDateScenarioFeGeneration,
-        QSet<QUuid> associatedTagIds, Tags availTags);
+        const CurrencyInfo &newCurrInfo, QDate maxDateScenarioFeGeneration,
+        const QSet<QUuid> &associatedTagIds, const Tags &availTags);
 
     // PlainTextEdition child Dialog : receive result and edition completion notification
     void slotPlainTextEditionResult(QString result);
@@ -98,11 +102,16 @@ public slots:
         QString editedNotes);// Edit element result
 
     void slotEditElementCompleted();    // Edit Element process is completed
+
     // For irregular import : getting result and completion notification
-    void slotImportResult(QMap<QDate,IrregularCsd::AmountInfo> amountSet);
+    void slotImportResult(const QMap<QDate,IrregularCsd::AmountInfo> &amountSet);
     void slotImportCompleted();
+
     // Visualize occurrences child Dialog : receive completion notification
     void slotVisualizeOccurrencesCompleted();
+
+    // Csd Breakdown child Dialog : receive completion notification
+    void slotCsdBreakdownCompleted();
 
 
 private slots:
@@ -121,8 +130,39 @@ private slots:
     void on_decorationColorCheckBox_clicked();
     void on_visualizeOccurrencesPushButton_clicked();
     void on_exportPushButton_clicked();
+    void on_breakdownPushButton_clicked();
+
+protected:
+    /**
+     * @brief Defers deselection of nameLineEdit until after the platform style has finished
+     * processing focus-in events.
+     * @details On many platforms (e.g. KDE Breeze), the style calls selectAll() inside
+     * focusInEvent when a QLineEdit gains focus, which fires during the show sequence.
+     * A direct deselect() in slotPrepareContent() is overridden by that call. Using
+     * QTimer::singleShot(0) posts the deselect to the end of the event queue, after all
+     * show-related events have completed.
+     */
+    void showEvent(QShowEvent* event) override;
 
 private:
+
+    // *** PRIVATE STRCUT AND ENUM ***
+
+    /**
+     * @struct BuildFromFormDataResult
+     * @brief Contains the resulting IrregularCsd built from the data in the
+     * form and result of the build operation.
+     */
+    struct BuildFromFormDataResult{
+        Util::ResultOfOperation result;
+        QSharedPointer<IrregularCsd> sharedPtrCsd;
+        BuildFromFormDataResult();
+        void init();
+    };
+
+
+    // *** PRIVATE VARIABLES ***
+
     Ui::EditIrregularDialog *ui;
 
     QLocale locale;
@@ -140,16 +180,36 @@ private:
     EditIrregularElementDialog* eie;
     LoadIrregularTextFileDialog* importDlg;
     VisualizeOccurrencesDialog* visualizeOccurrencesDialog;
+    CsdBreakdownDialog* csdBreakdownDialog;
 
     // table model
     EditIrregularModel* tableModel;
 
-    // private methods
+
+    // *** PRIVATE METHODS ***
+
     QList<int> getSelectedRows();
     void cleanUpForNewCsd();
     void setDecorationColorInfo();
     QString convertTagIDSetToString();
     void updateTagListTextBox();
+
+    /**
+     * @brief Use the data in the form to build a new Csd.
+     * @param result The result of the operation.
+     */
+    void buildIrregularCsdFromFormData(BuildFromFormDataResult &result);
+
+    /**
+     * @brief Generate the financial events for that Csd with the current parameters
+     * of the form. Return the no of saturations that occurred.
+     * @param weakCsdPtr A QWeakPointer<Csd> reference to the Csd.
+     * @param saturationCount Saturation count that occurred during the generation.
+     * @param minMax Min/Max of the value generated.
+     * @return The generated Fe Stream, wrapped by a QSharedPointer.
+     */
+    QSharedPointer<FeStream> generateFinancialEvents(QWeakPointer<Csd> weakCsdPtr,
+        uint& saturationCount, FeMinMaxInfo& minMax);
 };
 
 #endif // EDITIRREGULARDIALOG_H

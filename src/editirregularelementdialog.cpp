@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,24 +17,40 @@
  */
 
 #include "editirregularelementdialog.h"
+#include "gbplogger.h"
+#include <QTimer>
 #include "ui_editirregularelementdialog.h"
 #include <QMessageBox>
 #include <QCoreApplication>
 #include "irregularcsd.h"
 #include "gbpcontroller.h"
+#include "uiutil.h"
+#include "gbpqmessage.h"
 
 
-EditIrregularElementDialog::EditIrregularElementDialog(QLocale aLocale,QWidget *parent)
+EditIrregularElementDialog::EditIrregularElementDialog(const QLocale &aLocale, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::EditIrregularElementDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
     this->locale = aLocale;
     ui->notesLineEdit->setMaxLength(IrregularCsd::AmountInfo::NOTES_MAX_LEN);
 
     // widen Date Widget
     QFontMetrics fm = ui->dateEdit->fontMetrics();
     ui->dateEdit->setMinimumWidth(fm.averageCharWidth()*20);
+
+    QFont appFont = QApplication::font();
+
+    // Make note font smaller
+    QFont noteFont = appFont;
+    Util::changeFontSize(noteFont, Util::FontResizeIntensity::AVERAGE, true,
+        "EditIrregularElementDialog - note");
+    ui->notesLineEdit->setFont(noteFont);
 }
 
 
@@ -46,8 +62,8 @@ EditIrregularElementDialog::~EditIrregularElementDialog()
 
 // For "Create", currentDate is not used
 void EditIrregularElementDialog::slotPrepareContent(bool isIncome, bool newEditMode,
-    CurrencyInfo cInfo, QList<QDate> newExistingDates, QDate currentDate, double amount,
-    QString notes)
+    const CurrencyInfo &cInfo, const QList<QDate> &newExistingDates, QDate currentDate,
+    double amount, const QString &notes)
 {
 
     editMode = newEditMode;
@@ -89,6 +105,8 @@ void EditIrregularElementDialog::slotPrepareContent(bool isIncome, bool newEditM
             ui->dateEdit->setDate(GbpController::getInstance().getTomorrow());
         }
     }
+
+    ui->dateEdit->setFocus();
 }
 
 
@@ -99,18 +117,21 @@ void EditIrregularElementDialog::on_applyPushButton_clicked()
 
     // validate the new date
     if ( !newDate.isValid() ){
-        QMessageBox::critical(this,tr("Error"),tr("Date entered is invalid"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Date entered is invalid"), {tr("OK")}, 0, 0);
         return;
     }
     // validate amount
     if (amount<0){
-        QMessageBox::critical(this,tr("Error"),tr("Amount cannot be smaller than 0"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Amount cannot be smaller than 0"), {tr("OK")}, 0, 0);
         return;
     }
     if (amount>CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal) ) {
-        QMessageBox::critical(this,tr("Error"),QString(tr("Amount is bigger than the "
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            QString(tr("Amount is bigger than the "
             "maximum allowed of %1"))
-            .arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)));
+            .arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)), {tr("OK")}, 0, 0);
         return;
     }
 
@@ -119,7 +140,8 @@ void EditIrregularElementDialog::on_applyPushButton_clicked()
         // date must not exist for Element Creation
         if(existingDates.contains(newDate)){
             QString errorString = tr("This date has already an amount defined");
-            QMessageBox::critical(this,tr("Error"),errorString);
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                errorString, {tr("OK")}, 0, 0);
             return;
         } else{
             // add to the list of existing dates
@@ -166,5 +188,20 @@ void EditIrregularElementDialog::on_closePushButton_clicked()
 void EditIrregularElementDialog::on_EditIrregularElementDialog_rejected()
 {
     on_closePushButton_clicked();
+}
+
+
+void EditIrregularElementDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    // QTimer::singleShot(0) defers execution until after all show-related events have been
+    // processed, including the platform style's focusInEvent which calls selectAll() on the
+    // focused QLineEdit. Calling deselect() directly in slotPrepareContent() has no effect
+    // because that slot runs before the dialog is shown.
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("EditIrregularElementDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+        ui->notesLineEdit->deselect();
+    });
 }
 

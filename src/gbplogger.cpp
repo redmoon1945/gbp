@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -32,8 +32,20 @@ GbpLogger::GbpLogger()
     logPrivacy = LogPrivacy::PUBLIC_ONLY;
     logVerbosity = LogVerbosity::NORMAL;
 
-    // Parse command-line arguments for log level and privacy
+    // Parse command-line arguments for log level, privacy, and workspace
     QStringList argList = QCoreApplication::arguments();
+    QString workspace;
+
+    // Reject multiple workspace commands (defense-in-depth, also checked in main)
+    int workspaceCmdCount = 0;
+    for (int i = 0; i < argList.size(); ++i) {
+        if (argList.at(i).startsWith("-workspace")) {
+            workspaceCmdCount++;
+        }
+    }
+    if (workspaceCmdCount > 1) {
+        qWarning().noquote() << "Multiple workspace commands found, only one is allowed";
+    }
 
     // Process log arguments
     for (int i = 0; i < argList.size(); ++i) {
@@ -50,6 +62,28 @@ GbpLogger::GbpLogger()
         } else if (argList.at(i) == "-logverbosity=NORMAL") {
             logVerbosity = LogVerbosity::NORMAL;
             qInfo().noquote() << "Log verbosity: NORMAL";
+        } else if (argList.at(i).startsWith("-workspace=")) {
+            QString temp = argList.at(i).mid(11);  // Remove "-workspace=" prefix
+            // Validate: 1-20 characters, alphanumeric only
+            if (temp.length() >= 1 && temp.length() <= 20) {
+                bool valid = true;
+                for (const QChar &ch : temp) {
+                    if (!ch.isLetterOrNumber()) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid) {
+                    workspace = temp;
+                    qInfo().noquote() << "Workspace:" << workspace;
+                } else {
+                    qWarning().noquote() << "Invalid workspace (must be "
+                        "alphanumeric):" << temp;
+                }
+            } else {
+                qWarning().noquote() << "Invalid workspace (must be 1-20 "
+                    "characters):" << temp;
+            }
         }
     }
 
@@ -59,7 +93,8 @@ GbpLogger::GbpLogger()
     // Otherwise use QDir::tempPath()/gbp
     bool success = false;
 
-    QString p = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString p = QStandardPaths::writableLocation(
+        QStandardPaths::AppDataLocation);
     if (!p.isEmpty()) {
         QDir dir(p);
         if (dir.mkpath("logs")) {
@@ -79,10 +114,18 @@ GbpLogger::GbpLogger()
 
     // Create log file with timestamp
     QDate today = QDateTime::currentDateTime().toLocalTime().date();
-    logFullFileName = QString("%1/%2__%3.txt")
-        .arg(logFolder)
-        .arg(today.toString("yyyy-MM-dd"))
-        .arg(QTime::currentTime().toString("hh_mm_ss"));
+    if (workspace.isEmpty()) {
+        logFullFileName = QString("%1/%2__%3.txt")
+            .arg(logFolder)
+            .arg(today.toString("yyyy-MM-dd"))
+            .arg(QTime::currentTime().toString("hh_mm_ss"));
+    } else {
+        logFullFileName = QString("%1/%2__%3_%4.txt")
+            .arg(logFolder)
+            .arg(today.toString("yyyy-MM-dd"))
+            .arg(QTime::currentTime().toString("hh_mm_ss"))
+            .arg(workspace);
+    }
 
     logFile.setFileName(logFullFileName);
     success = logFile.open(QIODevice::Append | QIODevice::WriteOnly | QIODevice::Text);
@@ -175,7 +218,54 @@ void GbpLogger::log(LogVerbosity verbosity, LogType type, const QString& message
 
 QString GbpLogger::redact(const QString& privateData, const QString& redactedText) const
 {
-    return (logPrivacy == LogPrivacy::ALLOW_PRIVATE) ? privateData : redactedText;
+    return (logPrivacy == LogPrivacy::ALLOW_PRIVATE)
+        ? privateData : redactedText;
+}
+
+QString GbpLogger::getLogFolder() const
+{
+    return logFolder;
+}
+
+void GbpLogger::removeWorkspaceLogs( const QStringList& workspaces, QStringList& deleted,
+    QStringList& failed)
+{
+    deleted.clear();
+    failed.clear();
+
+    if (workspaces.isEmpty() || logFolder.isEmpty()) {
+        return;
+    }
+
+    QDir logDir(logFolder);
+    if (!logDir.exists()) {
+        return;
+    }
+
+    // Log filename format:
+    //   yyyy-MM-dd__hh_mm_ss_WORKSPACE.txt
+    // The date+time prefix is always exactly 20 chars
+    QFileInfoList logFiles = logDir.entryInfoList(
+        {"*.txt"}, QDir::Files);
+
+    for (const QString& ws : workspaces) {
+        QString suffix = "_" + ws + ".txt";
+        for (const QFileInfo& logInfo : logFiles) {
+            QString name = logInfo.fileName();
+            if (!name.endsWith(suffix)
+                || name.length()
+                    != 20 + suffix.length()) {
+                continue;
+            }
+            QString path =
+                logInfo.absoluteFilePath();
+            if (QFile::remove(path)) {
+                deleted.append(name);
+            } else {
+                failed.append(name);
+            }
+        }
+    }
 }
 
 void GbpLogger::cleanUpLogs(const QDate& today)

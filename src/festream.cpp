@@ -4,28 +4,37 @@
 
 
 
-FeStream::FeStream(quint32 noOfDays, QWeakPointer<Csd> csdPtr)
+FeStream::FeStream(quint32 noOfDays, QWeakPointer<Csd> csdPtr, const QDate& firstDate)
 {
     // Must have at least 1 element
     if (noOfDays == 0) {
-        throw std::invalid_argument("noOfDays is 0");
+        throw std::invalid_argument(QString("%1: noOfDays is 0").arg(Q_FUNC_INFO).toStdString());
     }
     // Must not exceed the max size
     if (noOfDays > MAX_DAYS) {
-        throw std::invalid_argument("noOfDays is over the maximum allowed");
+        throw std::invalid_argument(QString("%1: noOfDays is over the maximum allowed")
+            .arg(Q_FUNC_INFO).toStdString());
     }
+    // check that firstDate is valid
+    if (!firstDate.isValid()) {
+        throw std::invalid_argument(QString("%1: firstDate is invalid")
+            .arg(Q_FUNC_INFO).toStdString());
+    }
+
     // check that the Csd still exist (required at creation time)
     // auto testPtr = csdPtr.toStrongRef();
     // if(testPtr==nullptr){
     //     throw std::invalid_argument("refered Csd does not exist");
     // }
 
-    this->csdPtr = csdPtr; // Simple weak pointer duplication
+    this->csdPtr = csdPtr; // Simple weak pointer duplication. May be invalid at this point.
     this->noOfDays = noOfDays;
+    this->firstDate = firstDate;
 
     // Allocate the array at full size.
-    // resize() changes the list’s size(), not just its capacity.
+    // resize() changes the list's size(), not just its capacity.
     amountSet.resize(noOfDays);
+
     // Init the array
     amountSet.fill(-1); // all elements marked unused.
     noOfElementsUsed = 0;
@@ -33,12 +42,9 @@ FeStream::FeStream(quint32 noOfDays, QWeakPointer<Csd> csdPtr)
 
 
 FeStream::FeStream(QDate tomorrow, quint32 noOfDays, QWeakPointer<Csd> csdPtr,
-    QMap<QDate, double> data) : FeStream(noOfDays, csdPtr)
+    const QMap<QDate, double> &data) : FeStream(noOfDays, csdPtr, tomorrow)
 {
-    // Tomorrow must be a valid date
-    if (tomorrow.isValid()==false) {
-        throw std::invalid_argument("Tomorrow date is invalid");
-    }
+    // Tomorrow must be a valid date (already checked in delegating constructor)
 
     // convert map data to index entries in amountSet
     qint64 tomorrowJulianDays = tomorrow.toJulianDay();
@@ -47,10 +53,12 @@ FeStream::FeStream(QDate tomorrow, quint32 noOfDays, QWeakPointer<Csd> csdPtr,
         double value = it.value();
         qint64 index = date.toJulianDay() - tomorrowJulianDays;
         if (index < 0) {
-            throw std::invalid_argument("date cannot occur tomorrow");
+            throw std::invalid_argument(QString("%1: date cannot occur tomorrow")
+                .arg(Q_FUNC_INFO).toStdString());
         }
         if (index >= noOfDays) {
-            throw std::invalid_argument("date is above the maximum expected");
+            throw std::invalid_argument(QString("%1: date is above the maximum expected")
+                .arg(Q_FUNC_INFO).toStdString());
         }
         amountSet[index] = value;
         noOfElementsUsed++;
@@ -72,6 +80,9 @@ bool FeStream::operator==(const FeStream &o) const
     if ( this->noOfElementsUsed!=o.noOfElementsUsed ) {
         return false;
     }
+    if ( this->firstDate!=o.firstDate ) {
+        return false;
+    }
     return true;
 }
 
@@ -89,6 +100,7 @@ FeStream &FeStream::operator=(const FeStream &o)
         this->noOfDays = o.noOfDays;
         this->noOfElementsUsed = o.noOfElementsUsed;
         this->csdPtr = o.csdPtr; // weak reference can be copied
+        this->firstDate = o.firstDate;
     }
     return *this;
 }
@@ -101,15 +113,31 @@ void FeStream::reset()
 }
 
 
-void FeStream::add(quint32 day, quint64 amount)
+qint64 FeStream::get(quint32 day) const
+{
+    if (day >= noOfDays) {
+        throw std::out_of_range(QString("%1: day is out of range").arg(Q_FUNC_INFO).toStdString());
+    }
+    return amountSet[day];
+}
+
+
+qint64 FeStream::get(const QDate& date) const
+{
+    return amountSet[dateToIndex(date)];
+}
+
+
+void FeStream::set(quint32 day, quint64 amount)
 {
     // Check out of range day
-    if ( day > (noOfDays - 1) ) {
-        throw std::invalid_argument("day is out of range");
+    if (day >= noOfDays) {
+        throw std::out_of_range(QString("%1: day is out of range").arg(Q_FUNC_INFO).toStdString());
     }
     // check out max value
     if ( amount > static_cast<quint64>(CurrencyHelper::maxValueAllowedForAmount()) ) {
-        throw std::invalid_argument("amount is too big");
+        throw std::invalid_argument(QString("%1: amount is too big")
+            .arg(Q_FUNC_INFO).toStdString());
     }
     // Set
     if (amountSet[day] == -1) {
@@ -119,17 +147,62 @@ void FeStream::add(quint32 day, quint64 amount)
 }
 
 
+void FeStream::set(const QDate& date, quint64 amount)
+{
+    set(dateToIndex(date), amount);
+}
+
+
 void FeStream::remove(quint32 day)
 {
     // Check out of range day
-    if ( day > (noOfDays - 1) ) {
-        throw std::invalid_argument("day is out of range");
+    if (day >= noOfDays) {
+        throw std::out_of_range(QString("%1: day is out of range").arg(Q_FUNC_INFO).toStdString());
     }
     // Set
     if (amountSet[day] != -1) {
         noOfElementsUsed--;
         amountSet[day] = -1;
     }
+}
+
+
+void FeStream::remove(const QDate& date)
+{
+    remove(dateToIndex(date));
+}
+
+
+bool FeStream::contains(quint32 day) const
+{
+    if (day >= noOfDays) {
+        throw std::out_of_range(QString("%1: day is out of range").arg(Q_FUNC_INFO).toStdString());
+    }
+    return amountSet[day] != -1;
+}
+
+
+bool FeStream::contains(const QDate& date) const
+{
+    return amountSet[dateToIndex(date)] != -1;
+}
+
+
+bool FeStream::isEmpty() const
+{
+    return noOfElementsUsed == 0;
+}
+
+
+quint32 FeStream::size() const
+{
+    return noOfDays;
+}
+
+
+quint32 FeStream::count() const
+{
+    return noOfElementsUsed;
 }
 
 
@@ -146,9 +219,25 @@ QString FeStream::toString()
 }
 
 
-QList<qint64> FeStream::getAmountSet() const
+quint32 FeStream::dateToIndex(const QDate& date) const
 {
-    return amountSet;
+    if (!date.isValid()) {
+        throw std::invalid_argument(QString("%1: date is invalid").arg(Q_FUNC_INFO).toStdString());
+    }
+
+    qint64 daysDiff = firstDate.daysTo(date);
+
+    if (daysDiff < 0) {
+        throw std::invalid_argument(QString("%1: date is before firstDate")
+            .arg(Q_FUNC_INFO).toStdString());
+    }
+
+    if (daysDiff >= static_cast<qint64>(noOfDays)) {
+        throw std::invalid_argument(QString("%1: date is beyond the range of this stream")
+            .arg(Q_FUNC_INFO).toStdString());
+    }
+
+    return static_cast<quint32>(daysDiff);
 }
 
 
@@ -171,3 +260,15 @@ quint32 FeStream::getNoOfDays() const
 {
     return noOfDays;
 }
+
+QDate FeStream::getFirstDate() const
+{
+    return firstDate;
+}
+
+QDate FeStream::getLastDate() const
+{
+    return firstDate.addDays(noOfDays - 1);
+}
+
+

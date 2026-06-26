@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -62,6 +62,8 @@ public:
     /**
      * @brief Max no of Csd for a combination of (incomes/expense, Periodic/Irregular). It means
      * a scenario can have a total maximum of 4 * MAX_NO_STREAM_DEF Csds.
+     * @details If this limit is reached, the application will prevent adding new CSDs and display
+     * an error message to the user. This limit ensures reasonable performance and memory usage.
      */
     static constexpr quint16 MAX_NO_CSDS= 200;
 
@@ -69,12 +71,26 @@ public:
      * @brief Possibles values for success/error code when loading or saving a scenario from/to
      * a file.
      */
-    enum class FileResultCode { SUCCESS, ERROR_OTHER,
-        SAVE_ERROR_CREATING_FILE_FOR_WRITING, SAVE_ERROR_OPENING_FILE_FOR_WRITING,
-        SAVE_ERROR_WRITING_TO_FILE, SAVE_ERROR_JSON_CREATION,
-        LOAD_FILE_DOES_NOT_EXIST, LOAD_FILE_IS_NOT_READABLE, LOAD_CANNOT_OPEN_FILE,
-        LOAD_JSON_PARSING_ERROR, LOAD_JSON_SEMANTIC_ERROR, LOAD_CANNOT_UPGRADE, LOAD_ERROR,
-        LOAD_UNKNOWN_VERSION};
+    enum class FileResultCode {
+        SUCCESS,  ///< Operation completed successfully
+        ERROR_OTHER,  ///< Generic error (catch-all)
+
+        // Save errors (fatal - file write failed)
+        SAVE_ERROR_CREATING_FILE_FOR_WRITING,  ///< Cannot create file for writing
+        SAVE_ERROR_OPENING_FILE_FOR_WRITING,   ///< Cannot open existing file for writing
+        SAVE_ERROR_WRITING_TO_FILE,            ///< Write operation to file failed
+        SAVE_ERROR_JSON_CREATION,              ///< JSON document creation failed
+
+        // Load errors (fatal - cannot load scenario)
+        LOAD_FILE_DOES_NOT_EXIST,    ///< File not found at specified path
+        LOAD_FILE_IS_NOT_READABLE,   ///< File exists but cannot be read (permissions?)
+        LOAD_CANNOT_OPEN_FILE,       ///< Cannot open file for reading
+        LOAD_JSON_PARSING_ERROR,     ///< JSON syntax error in file
+        LOAD_JSON_SEMANTIC_ERROR,    ///< JSON is valid but content is semantically incorrect
+        LOAD_CANNOT_UPGRADE,         ///< Cannot upgrade from older file version
+        LOAD_ERROR,                  ///< Generic load error
+        LOAD_UNKNOWN_VERSION         ///< File version is unknown or unsupported
+    };
 
     /**
      * @struct FileResult
@@ -110,7 +126,7 @@ public:
      * @param feGenerationDuration Max no of years the FE can be generated, starting from
      * "tomorrow".
      * @param inflation Inflation growth pattern.
-     * @param countryCode ISO country code.
+     * @param currencyIsoCode 3-letter ISO 4217 currency code.
      * @param incomePeriodicCsdSet The set of periodic income Csds.
      * @param incomeIrregularCsdSet The set of irregular income Csds.
      * @param expensePeriodicCsdSet The set of periodic expense Csds.
@@ -119,7 +135,7 @@ public:
      * @param newTagFsdRelationships Relationship between tags and Csds.
      */
     Scenario(const QString version, const QString name, const QString description,
-        const quint16 feGenerationDuration, const Growth inflation, QString countryCode,
+        const quint16 feGenerationDuration, const Growth inflation, const QString &currencyIsoCode,
         QHash<QUuid,QSharedPointer<PeriodicCsd>> incomePeriodicCsdSet,
         QHash<QUuid,QSharedPointer<IrregularCsd>> incomeIrregularCsdSet,
         QHash<QUuid,QSharedPointer<PeriodicCsd>> expensePeriodicCsdSet,
@@ -150,9 +166,9 @@ public:
      * @param saturationCount Number of times the FE amount calculated was over the maximum allowed.
      * @return The full set of FE for each day, packaged under a QSharedPointer.
      */
-    QSharedPointer<CombinedFeStreams> generateFinancialEvents(QDate today, QLocale systemLocale,
-        DateRange fromto, double pvAnnualDiscountRate, QDate pvPresent, uint &saturationCount)
-        const;
+    QSharedPointer<CombinedFeStreams> generateFinancialEvents(QDate today,
+        const QLocale &systemLocale, DateRange fromto, double pvAnnualDiscountRate,
+        QDate pvPresent, uint &saturationCount) const;
 
     /**
      * @brief Find the name and the decoration color of a Csd using its ID.
@@ -204,10 +220,10 @@ public:
 
     /**
      * @brief Create an empty scenario. No inflation, no Csd, no tag.
-     * @param countryCode The ISO country code for the new blank scenario.
+     * @param currencyIsoCode The 3-letter ISO 4217 currency code for the new blank scenario.
      * @return The new blank scenario.
      */
-    static QSharedPointer<Scenario> createBlankScenario(QString countryCode);
+    static QSharedPointer<Scenario> createBlankScenario(QString currencyIsoCode);
 
     /**
      * @brief Get no of Csds of type Periodic Income.
@@ -248,8 +264,8 @@ public:
     void setDescription(const QString &newDescription);
     Growth getInflation() const;
     void setInflation(const Growth &newInflation);
-    QString getCountryCode() const;
-    void setCountryCode(const QString &newCountryCode);
+    QString getCurrencyIsoCode() const;
+    void setCurrencyIsoCode(const QString &newIsoCode);
     QHash<QUuid, QSharedPointer<PeriodicCsd>> getIncomePeriodicCsds() const;
     void setIncomePeriodicCsds(const QHash<QUuid,
         QSharedPointer<PeriodicCsd>> &newIncomesDefPeriodic);
@@ -287,10 +303,9 @@ private:
     Growth inflation;
 
     /**
-     * @brief ISO 3166 alpha-2 (used to derive currency and hence no of decimals).
-     * Cannot be changed once set
+     * @brief 3-letter ISO 4217 currency code (e.g. "USD"). Cannot be changed once set.
      */
-    QString countryCode;
+    QString currencyIsoCode;
 
     /**
      * @brief Periodic Income Csds. We use QSharedPointer, because Csds are referenced elsewhere.

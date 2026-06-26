@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,8 @@ IrregularCsd::IrregularCsd() : Csd()
 }
 
 
-IrregularCsd::IrregularCsd(QMap<QDate,AmountInfo> amountSet, const QUuid &id, const QString &name,
+IrregularCsd::IrregularCsd(const QMap<QDate,AmountInfo> &amountSet, const QUuid &id,
+    const QString &name,
     const QString &desc, bool active, bool isIncome, const QColor& decorationColor)
     : Csd(id, name,desc,CsdType::IRREGULAR,active,isIncome, decorationColor)
 {
@@ -105,28 +106,30 @@ void IrregularCsd::generateEventStream(FeStream& feStream, QDate tomorrow,
 
     long double monthlyDiscountRate = Util::annualToMonthlyGrowth(pvAnnualDiscountRate);
 
-    // iterate once in the set to generate Fes and convert future values to present values
+    // iterate once in the set to generate Fes and convert values to present values. Values
+    // can occur before tomorrow, equal or after.
     minMaxInfo.yMin =std::numeric_limits<qint64>::max();
     minMaxInfo.yMax = std::numeric_limits<qint64>::min();
     QList<QDate> zeKeys = amountSet.keys();
     qint64 tomorrowJulianDays = tomorrow.toJulianDay();
     foreach (const QDate date, zeKeys) {
-        // still in the validity range of this stream def ? Still in the fromto range ? Still under the max allowed ?
+        // still in the validity range of this stream def ?
+        // Still in the fromto range ? Still under the max allowed ?
         if ( fromto.includeDate(date) && (date<=maxDateScenarioFeGeneration) ){
             quint64 temp = amountSet.value(date).amount;
 
             // *** convert to present value (applied on a monthly basis) ***
             // how many PV periods (months) have already passed before reaching the event date
-            int pvPeriods = Util::noOfMonthDifference(pvPresent, date);
+            int pvPeriods = Util::noOfMonthsDifference(pvPresent, date);
             // calculate FV to PV factor
-            long double factor = Util::presentValueConversionFactor(monthlyDiscountRate,pvPeriods);
+            long double factor = Util::toPvConversionFactor(monthlyDiscountRate,pvPeriods);
             // calculate the PV (in integer). Never a negative value.
             quint64 pv = static_cast<quint64>(std::round((static_cast<long double>(temp)
                 * factor)));
             // *********************************
 
             // build Fe and insert in the result list
-            feStream.add(date.toJulianDay()-tomorrowJulianDays, pv);
+            feStream.set(date.toJulianDay()-tomorrowJulianDays, pv);
             // set min max for amount
             if( pv > minMaxInfo.yMax){
                 minMaxInfo.yMax = pv;
@@ -435,4 +438,10 @@ IrregularCsd::AmountInfo IrregularCsd::AmountInfo::fromJson(const QJsonObject &j
 QMap<QDate, IrregularCsd::AmountInfo> IrregularCsd::getAmountSet() const
 {
     return amountSet;
+}
+
+
+void IrregularCsd::setAmountSet(const QMap<QDate, AmountInfo> &newAmountSet)
+{
+    amountSet = newAmountSet;
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -28,8 +28,20 @@
 
 
 /**
- * @struct Fe.
- * @brief Financial Event. 16 bytes.
+ * @struct Fe
+ * @brief Represent one Financial Event (FE), which is a dated amount.
+ * @details A Financial Event is the fundamental unit in GBP representing money flow at a
+ * specific date. FEs are generated from Cash Stream Definitions (CSDs) and collected into
+ * streams for analysis and visualization. Each FE contains an amount (positive for income,
+ * negative for expenses) and a reference to the CSD that generated it.
+ *
+ * Size: 16 bytes (optimized for performance in large collections).
+ *
+ * @see Csd Base class that generates Financial Events
+ * @see PeriodicCsd Generates FEs on regular schedule
+ * @see IrregularCsd Generates FEs from irregular occurrences
+ * @see FeStream Container for collections of FEs
+ * @see Growth Pattern used to adjust FE amounts over time
  */
 struct Fe{
     /**
@@ -74,13 +86,20 @@ struct Fe{
     Fe &operator=(const Fe &o) ;
 
     // For display purpose, in the list box of the Daily Info of the Main Window.
-    QString toString(QString streamDefName, const CurrencyInfo& currInfo, const QLocale& locale) const;
+    QString toString(const QString &streamDefName, const CurrencyInfo& currInfo,
+        const QLocale& locale) const;
 };
 
-// structure to hold absolute y values min/max of a QList<Fe>
+
+/**
+ * @struct FeMinMaxInfo
+ * @brief Structure to hold min/max absolute y values for financial event stream visualization.
+ * @details Used to track the range of financial event amounts for chart scaling and display
+ * purposes. Values are always non-negative (absolute values).
+ */
 struct FeMinMaxInfo{
-    quint64 yMin;    // 0 or positive
-    quint64 yMax;    // 0 or positive
+    quint64 yMin;  ///< Minimum absolute value in the financial event stream
+    quint64 yMax;  ///< Maximum absolute value in the financial event stream
 };
 
 

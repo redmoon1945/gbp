@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -113,10 +113,9 @@ public slots:
      * @details This is actually creatig a copy of the current scenario parameters.
      * There is always a current scenario when this is called, even in the case
      * of a new scenario.
-     * @param countryCode ISO code of the country for the scenario to edit.
-     * @param newCurrInfo Currency info of the country for the scenario to edit.
+     * @param newCurrInfo Currency info for the scenario to edit.
      */
-    void slotPrepareContent(QString countryCode, CurrencyInfo newCurrInfo);
+    void slotPrepareContent(CurrencyInfo newCurrInfo);
 
 private slots:
 
@@ -125,8 +124,6 @@ private slots:
     void on_fullViewPushButton_clicked();
     void on_cancelPushButton_clicked();
     void on_editGrowthPushButton_clicked();
-    void on_addPeriodicPushButton_clicked();
-    void on_addIrregularPushButton_clicked();
     void on_applyPushButton_clicked();
     void on_EditScenarioDialog_rejected();
     void on_editPushButton_clicked();
@@ -140,6 +137,8 @@ private slots:
     void on_itemsTableView_doubleClicked(const QModelIndex &index);
     void on_maxDurationSpinBox_valueChanged(int arg1);
     void on_manageTagsPushButton_clicked();
+    void onAddMenuPeriodicClicked();
+    void onAddMenuIrregularClicked();
     // filter change events
     void on_incomesRadioButton_toggled(bool checked);
     void on_filterPeriodicsCheckBox_checkStateChanged(const Qt::CheckState &arg1);
@@ -149,6 +148,18 @@ private slots:
     void on_filterTagsCheckBox_checkStateChanged(const Qt::CheckState &arg1);
     void on_filterTagsPushButton_clicked();
     void on_filterTagsCombinationComboBox_currentIndexChanged(int index);
+
+protected:
+    /**
+     * @brief Defers deselection of scenarioNameLineEdit until after the platform style has
+     * finished processing focus-in events.
+     * @details On many platforms (e.g. KDE Breeze), the style calls selectAll() inside
+     * focusInEvent when a QLineEdit gains focus, which fires during the show sequence.
+     * A direct deselect() in slotPrepareContent() is overridden by that call. Using
+     * QTimer::singleShot(0) posts the deselect to the end of the event queue, after all
+     * show-related events have completed.
+     */
+    void showEvent(QShowEvent* event) override;
 
 private:
     Ui::EditScenarioDialog *ui;
@@ -193,7 +204,7 @@ private:
     QHash<QUuid,QSharedPointer<IrregularCsd>> expensesIrregularCsd;
 
     Growth tempVariableInflation;           // to hold the inflation data for Variable type
-    QString countryCode;
+    QString currencyIsoCode;
     CurrencyInfo currInfo;
 
     // Tags and relationships
@@ -214,7 +225,12 @@ private:
     Growth getInflationCurrentlyDefined();
     void selectRowsInTableView(QList<QUuid> idList);
     void updateNoItemsLabel();
-    void updateNewButtonsText();
+
+    /**
+    * @brief Check if each tag in Filter Tags set does still exist in the current available Tags set.
+    * If not, remove it. Combination mode is not touched in anycase.
+    * @return True if the filterTags has changed, false otherwise.
+    */
     bool checkAndAdjustFilterTags();
 
     /**

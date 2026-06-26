@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 #include <QScatterSeries>
 #include <qvalueaxis.h>
 
+
 namespace Ui {
 class VisualizeOccurrencesDialog;
 }
@@ -46,14 +47,24 @@ public:
 public slots:
 
     /**
-     * @brief scenarioInflation is used only when csd is a Periodic Csd.
-     * @param currInfo
-     * @param adjustedInflation
-     * @param maxDateScenario
-     * @param csd
+     * @brief To be called just before showing the Dialog.
+     * @param currInfo Currency info.
+     * @param feStreamGrowth The FeStream to visualize.
      */
-    void slotPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation,
-        QDate maxDateScenario, QWeakPointer<Csd> csd );
+
+    /**
+     * @brief To be called just before showing the Dialog. All the required calculations are
+     * performed in this method. The Csd refered to by the FeStream must exist.
+     * @param currInfo Currency info.
+     * @param feStream The FeStream to visualize.
+     * @param saturationCount No of saturationthat occurred when the FeStream was calculated.
+     * @param scenarioInflation Scenario's inflation. Used only for Period Csd.
+     * @param minMax Min/max value for the FeStream
+     * @param maxDateScenario Maximum date above which the scenario prevents any financial event
+     * to be generated.
+     */
+    void slotPrepareContent(CurrencyInfo currInfo, QSharedPointer<FeStream> feStream,
+        uint saturationCount, Growth scenarioInflation, FeMinMaxInfo minMax, QDate maxDateScenario);
 
     /**
      * @brief To catch point selection signal in chart.
@@ -71,6 +82,9 @@ private slots:
     void on_fitPushButton_clicked();
     void on_exportPushButton_clicked();
 
+protected:
+    void showEvent(QShowEvent* event) override;
+
 private:
     Ui::VisualizeOccurrencesDialog *ui;
 
@@ -78,9 +92,11 @@ private:
 
     QLocale locale;
     CurrencyInfo currInfo;
-    // last event limit date according to scenario (could not be in use). Limit set by Periodic
+
+    // Last event limit date according to scenario (could not be in use). Limit set by Periodic
     // Cds could override that value (if it is smaller)
     QDate maxDateScenarioFeGeneration;
+
     // Curve
     CustomQChartView *chartView;
     QChart* chart;
@@ -93,22 +109,10 @@ private:
     std::vector<double> searchVector;
     int indexLastPointSelected = -1;
 
+
     // *** Methods ***
 
-
     bool eventFilter(QObject *object, QEvent *event) override;
-
-    /**
-     * @brief Generate the financial events for that Csd (whether Periodic or Irregular). Return
-     * the no of saturations that occurred.
-     * @param scenarioInflation Inflation for the scenario (used only for Periodic).
-     * @param weakCsdPtr A QWeakPointer<Csd> reference to the Csd.
-     * @param saturationCount Saturation count that occurred during the generation.
-     * @param minMax Min/Max of the value generated.
-     * @return The generated Fe Stream.
-     */
-    FeStream generateFinancialEvents(Growth scenarioInflation, QWeakPointer<Csd> weakCsdPtr,
-        uint& saturationCount, FeMinMaxInfo& minMax);
 
     /**
      * @brief Using the generated FeStream, display the results in the PlainText Widget, with a header
@@ -116,10 +120,9 @@ private:
      * @param feStream The generated Fe Stream.
      * @param saturationCount Saturation count that occurred during the generation.
      * @param scenarioInflation Inflation for the scenario (used only for Periodic).
-     * @param weakCsdPtr A QWeakPointer<Csd> reference to the Csd.
      */
-    void updateTextTab(FeStream& feStream, uint saturationCount, Growth scenarioInflation,
-        QWeakPointer<Csd> weakCsdPtr);
+    void updateTextTab(QSharedPointer<FeStream> feStream, uint saturationCount,
+        Growth scenarioInflation);
 
     /**
      * @brief Using the generated FeStream, update the chart data with representation in proper
@@ -129,8 +132,8 @@ private:
      * @param scenarioInflation Inflation for the scenario (used only for Periodic).
      * @param minMax Min/Max of the value generated.
      */
-    void updateChartTab(FeStream& feStream, uint saturationCount, Growth scenarioInflation,
-        FeMinMaxInfo minMax);
+    void updateChartTab(QSharedPointer<FeStream> feStream, uint saturationCount,
+        Growth scenarioInflation,  FeMinMaxInfo minMax);
 
     void initChart();
     void reduceAxisFontSize();
@@ -142,6 +145,13 @@ private:
     void replaceChartSeries(QList<QPointF> data);
     void rescaleChart();
     void changeYaxisLabelFormat();
+
+    /**
+     * @brief Add HTML tags to make a string colored in HTML.
+     * @param t The string to color.
+     * @return The colored string.
+     */
+    QString colorizeStringWithHtml(QString t, QColor color);
 };
 
 #endif // VISUALIZEOCCURRENCESDIALOG_H

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -382,7 +382,8 @@ int Csd::convertTypeFromEnumToInt(CsdType type)
         return 1;
     } else{
         // should never happen
-        throw std::invalid_argument("Invalid CsdType");
+        throw std::invalid_argument(QString("%1: Invalid CsdType")
+            .arg(Q_FUNC_INFO).toStdString());
     }
 }
 

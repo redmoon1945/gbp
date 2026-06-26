@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -195,7 +195,8 @@ void ScenarioCsdTableModel::refresh(CurrencyInfo currInfo, QHash<QUuid, QSharedP
                     info.info = item->toStringForDisplay(currInfo,theLocale);
                     info.csdNameColor = item->getDecorationColor();
                     int ok;
-                    info.amount = CurrencyHelper::quint64ToDoubleString(item->getAmount(), currInfo,
+                    info.amount = CurrencyHelper::quint64ToDoubleString(
+                        static_cast<qint64>(item->getAmount()), currInfo,
                         theLocale, false, ok);;
                     if ( ok != 0 ){
                         // amount or noOfCurrencyDecimals is too big, should not happen
@@ -255,7 +256,8 @@ void ScenarioCsdTableModel::refresh(CurrencyInfo currInfo, QHash<QUuid, QSharedP
                     info.isActive = item->getActive();
                     info.info = item->toStringForDisplay(currInfo,theLocale);
                     int ok;
-                    info.amount = CurrencyHelper::quint64ToDoubleString(item->getAmount(), currInfo,
+                    info.amount = CurrencyHelper::quint64ToDoubleString(
+                        static_cast<qint64>(item->getAmount()), currInfo,
                         theLocale, false, ok);
                     info.csdNameColor = item->getDecorationColor();
                     if ( ok != 0 ){

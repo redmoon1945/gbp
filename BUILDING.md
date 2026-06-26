@@ -25,8 +25,8 @@ Download and run the **Qt online installer**. Try this link : https://www.qt.io/
 
 Install Qt in default directory ($HOME). The components to install are : 
 
-* Qt 6.10.1 and all the sub items, except Android and Web Assembly stuff
-* Qt Creator 18.x
+* Qt 6.10.3 and all the sub items, except Android and Web Assembly stuff
+* Qt Creator 19.x
 * CMake
 * Ninja
 
@@ -39,7 +39,7 @@ Test QtCreator by creating dummy widget app and verify that everything works.
 
 ### Step 5 : Rebuild gbp in Qt Creator
 
-In QtCreator, load the project (src/CmakeLists.txt). You will probably have to click "Configure" right after the load. Do a “rebuild” with the “Minimum Size Release” kit selected and make sure it is 100% successful. In Qt Creator, run and check that the application seems to work fine.
+In QtCreator, load the project (src/CmakeLists.txt). You will probably have to click "Configure" right after the load. Do a “rebuild” with the “Release” kit selected and make sure it is 100% successful. In Qt Creator, run and check that the application seems to work fine.
 
 ### Step 6 : Create the AppImage
 
@@ -62,7 +62,7 @@ Set the permissions to "execute" (e.g., sudo chmod a+x lin* )
 Create a directory where the gbp AppImage will be built (e.g. ~/gbp-app-image-build). In this guide, we will call this directory GBP_APP_IMAGE_BUILD_DIR. Put there the following : 
 
 - the 2 files downloaded previously.
-- From the QtCreator Build directory $HOME/data/dev/Qt/build/gbp/Desktop_Qt_6_10_1-MinSizeRel
+- From the QtCreator Build directory $HOME/data/dev/Qt/build/gbp/Desktop_Qt_6_10_3-Release
   - the compiled binary file "gbp" : this is the executable produced by QtCreator after a rebuilt
   - the "gbp_en.qm" and "gbp_fr.qm" translation files
 - From the "$HOME/data/dev/Qt/gbp/build-tools" directory : 

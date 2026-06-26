@@ -30,7 +30,7 @@ signals:
 
 public slots:
     // From client of ChooseTagsDialog: Prepare edition. Call this before show()
-    void slotPrepareContent(Tags tags, QSet<QUuid> preSelectedTags);
+    void slotPrepareContent(const Tags &tags, const QSet<QUuid> &preSelectedTags);
 
 private slots:
     void on_ChooseTagsDialog_rejected();
@@ -38,6 +38,9 @@ private slots:
     void on_applyPushButton_clicked();
     void on_selectAllPushButton_clicked();
     void on_unselectAllPushButton_clicked();
+
+protected:
+    void showEvent(QShowEvent* event) override;
 
 private:
     Ui::ChooseTagsDialog *ui;
@@ -69,7 +72,7 @@ private:
     Tags tags;  // copy of all tags for the scenario
 
     // Methods
-    void updateList(QSet<QUuid> preSelectedTags);
+    void updateList(const QSet<QUuid> &preSelectedTags);
 
 
 };

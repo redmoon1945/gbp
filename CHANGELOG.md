@@ -1,5 +1,126 @@
 # Change log for GBP
 
+## 1.7.0 to 1.8.0
+
+### New features : The big ones
+
+- **Analysis Dialog** has been significantly expanded with two new tabs:
+  - **Period — Heatmap** : visualizes incomes, expenses, or the income/expense delta as a color-coded grid at monthly or yearly granularity, with configurable colors, adjustable cell sizes, and rich tooltips.
+  - **Compare CSD** : overlays up to 10 CSDs on a single line chart for direct side-by-side comparison, with persistent per-CSD color assignment and optional event markers.
+  - The existing Period report and chart tabs have been consolidated (monthly and annual views merged into single tabs with a radio-button selector).
+- **Workspace support** : multiple isolated instances of the application can now run side-by-side using the `-workspace=NAME` command-line argument. Each workspace keeps its own settings and log files.
+- **Anonymize** feature (menu Scenario) : replaces sensitive scenario data with placeholder values, with optional amount randomization. Changes remain in-memory until explicitly saved.
+- **CSD breakdown** : both Periodic and Irregular CSD edit dialogs now offer a button to visualize the period-by-period totals for that CSD until the end of its validity period.
+- **Windows UI** : many improvements to the Windows version for the behavior of the UI, specially regarding layouts with misc fonts (including big ones).
+
+### New features : The details
+- Select currency Dialog
+  - This is used when a new scenario is to be created. The currency is directly selected by the user, instead of being inferred from a country selection.
+- In Analysis Dialog :
+  - Monthly and Annual **report** tabs have been merged in a single one, called "Period - list". More information has been added, with auto sizing for the column (user can manually override). Monthly or annual view can be selected with radio buttons.
+  - Monthly and Annual **chart** tabs have been merged in a single one, called "Period - chart". Monthly or annual view can be selected with radio buttons.
+  - In Period - list tab :
+    - Row numbers (vertical header) have been removed from the table.
+    - Amount columns (Income, Expenses, Delta, Cash balance) no longer use monospace font; this fixes a slight vertical alignment issue.
+  - In Period - chart tab :
+    - Hovering a bar now shows a tooltip with the series name, period, and formatted amount.
+    - Removed the "Selected bar" info label shown below the chart when a bar was clicked (superseded by the tooltip).
+    - Y axis now has 5 major divisions (reduced from 10) and no minor divisions, giving each label more vertical room and preventing label truncation at typical dialog heights.
+  - In Tags tab :
+    - Row numbers (vertical header) have been removed from the table.
+    - The Total amount column no longer uses monospace font; this fixes a slight vertical alignment issue.
+  - In Relative Weight tab :
+    - The CSD list box no longer uses monospace font; this fixes a slight vertical alignment issue.
+  - A new **Compare CSD** tab has been added.
+    - It displays a line chart overlaying the financial events of multiple CSDs over time, allowing direct visual comparison.
+    - A side list shows all CSDs active in the current date range, sorted alphabetically. Selecting entries (up to 10) adds them to the chart.
+    - Incomes or Expenses mode is selected via radio buttons; each mode maintains its own independent selection.
+    - Each selected CSD is drawn with a distinct color from the Okabe-Ito palette. Colors are assigned persistently per CSD so that adding or removing other CSDs does not change the color of an already-selected one. A colored square icon next to each list item reflects the assigned chart color.
+    - Lines use a step rendering: the value holds flat until the exact moment the next event occurs.
+    - An optional **Show points** checkbox overlays scatter markers at each individual event.
+    - Clicking a marker highlights it and displays its date and value below the chart; clicking it again deselects it.
+    - A **Fit** button rescales the chart to the current data and date range. An **Unselect all** button clears the selection for the active mode.
+  - A new Heatmap tab has been added, called "Period - heatmap".
+    - It displays financial data as a color-coded grid in two granularities, selectable via radio buttons:                                     
+      - Monthly : one row per year, one column per month (Jan–Dec), with year and abbreviated month-name headers.
+      - Yearly : years fill a fixed 10-column grid left-to-right, top-to-bottom; the year is written inside each cell and no headers are shown.    
+    - Three display modes are available:           
+      - Incomes : sequential scale — the smallest non-zero income shows a near-background tint of the income color; the highest income shows full  
+  saturation. The minimum color is derived automatically from the maximum color.                    
+      - Expenses : same sequential scale applied to expenses.
+      - Delta (income − expense) : diverging scale centered on pure black (breakeven). Positive periods blend toward the positive-side color;
+  negative periods blend toward the negative-side color. Each side is normalized independently so both extremes always reach full saturation.    
+    - An Exclude current month / year checkbox omits the in-progress period from both the grid and normalization. 
+    - Cell states:    
+      - Periods with no financial events are shown with a forward-diagonal hatch (/). 
+      - Periods outside the scenario range (or excluded) use a backward-diagonal hatch (\).
+      - In income or expense mode, a period that has events but zero activity for the active type is treated as no-events rather than colored,     
+  because its zero is uninformative rather than a meaningful breakeven. In delta mode, zero (income == expense) is always colored pure black.    
+    - Color configuration via the header:               
+      - In income or expense mode: one color picker sets the maximum (saturated) color; the minimum tint is derived automatically.                 
+      - In delta mode: two color pickers set the positive-extreme and negative-extreme colors independently. Default colors are green (positive) and red (negative).                              
+      - Each picker has a one-click reset to its default. 
+    - A legend at the bottom shows color swatches for the minimum value, maximum value, breakeven (delta mode only), no-events hatch, and          
+  out-of-period hatch, with formatted currency labels for min and max.                       
+    - Cell size can be adjusted between Normal, Big (1.5×, default), and Bigger (2×) via a combo box in the header; the table scrolls automatically
+   when cells exceed the available space.                                             - Hovering any cell shows a tooltip with the full income / expenses / delta / balance breakdown for that period.
+- In Edit Periodic Csd Dialog
+  - Add a button to visualize the "breakdown" for this CSD, that is the period-by-period totals until the end of the CSD validity period. Breakdown's period can be Month or Year.
+- In Edit Irregular Csd Dialog
+  - The Amount column no longer uses monospace font; this fixes a slight vertical alignment issue.
+  - Add a button to visualize the "breakdown" for this CSD, see "Edit Periodic Csd" Dialog.
+  - In the table, for the date column, use the "long format", as users mentioned ambiguity for some short format (e.g. US) 
+  - Outdated entries (date < tomorrow) are now shown with grayed strikedout font (instead of just grayed)  
+  - Remove the warning about outdated entries and Future values conversion, as it takes too much space in the Dialog.
+- In VisualizeOccurrence Dialog
+  - Add some colors to the text at the top, along with index markers 
+  - Remove the cumulative amount display, as comments indicates it was not useful
+- In Edit Scenario Dialog 
+  - The "New Periodic..." and "New Irregular..." buttons have been merged into a single one "Add". When click, a menu appears allowing to choose "Periodic" or "Irregular". The goal is to declutter the Dialog
+  - The Amount column no longer uses monospace font; this fixes a slight vertical alignment issue.
+- In MainWindow
+  - When viewing the Change Log, User Manual, or Quick Tutorial PDF, the cached copy in the temp directory is now validated by SHA-1 checksum against the embedded resource (instead of file size). This ensures an updated PDF is always extracted even if the new version happens to have the same size as the previous one.
+  - Change the way the example file is created and opened. When "Open example" menu item is selected, a temporary file is created in the OS temporary directory, OVERWRITING any existing file with the same name. There is no more unique ID attached to the file name.
+  - Change the Y=0 line to a dashed line, for better visibility
+  - Add an **Anonymize** feature (menu Tools) to replace sensitive scenario data with placeholder values. Amounts can optionally be randomized via an intensity slider. Changes are in-memory only until explicitly saved.
+  - Add a **Show gridlines** checkbox (checked by default) in the chart toolbar. When unchecked, X and Y axis grid lines are hidden on the Cash Balance chart.
+- In Options Dialog
+  - In the "Light mode colors" and "Dark mode colors" sections, add a **Gridlines color** row to set the color of the X and Y grid lines on the Cash Balance chart independently for each mode. Default is RGB(232, 232, 232) for light mode and RGB(60, 60, 60) for dark mode. The setting is persisted in the INI file under the keys `gridlines_color_light_mode` and `gridlines_color_dark_mode`.
+  - All color rows in the "Light mode colors" and "Dark mode colors" sections now have a **↺ reset button** that instantly reverts the color to its factory default, without closing the dialog.
+  - Color values displayed next to each color button are now zero-padded to 3 digits (e.g. `R:005 G:064 B:128`), making all color labels the same width for easier reading.
+- In About Dialog
+  - Add the current workspace
+  - Separate the "info" from "How it is"
+  - The "About" tab content now correctly uses the application font instead of a hardcoded font (Noto Sans 16pt).
+  - Config file path and log file path are now displayed using the native path separator (backslash on Windows, forward slash on Linux/macOS).
+- In CSD Breakdown Dialog
+  - Row numbers (vertical header) have been removed from both the monthly and yearly breakdown tables.
+  - The Amount column no longer uses monospace font; this fixes a slight vertical alignment issue.
+- General
+  - All platforms
+    - UI layout has been optimized furthermore to better support big application font (e.g. 24 point size) while still offering nice appearance.
+    - The application font selected applies to everything, including menu items and toolbars (thus bypassing KDE configuration for those using KDE under Linux). This has been done for consistency across all platforms.
+    - Workspace Support:
+      - New `-workspace=WORKSPACE` command-line argument to run multiple isolated instances of the application
+      - Each workspace uses separate settings file (`graphical-budget-planner_WORKSPACE.ini`)
+      - Each workspace generates separate log files (`YYYY-MM-DD__HH_MM_SS_WORKSPACE.txt`)
+      - Workspace identifier can be 1-20 alphanumeric characters (letters and digits only)
+      - Allows users to maintain different configurations for different use cases (e.g., testing, production, personal accounts)
+    - Workspace Management:
+      - New `-workspace_list` command-line argument to list workspace configurations
+      - Lists all workspace configuration files found in the config directory
+      - Displays workspace ID, file size, last modified date, and full path for each config
+      - New `-workspace_cleanup` command-line argument to remove all non-default workspace .ini files
+      - Helps users manage and clean up unused workspace configurations
+      - Prevents accumulation of orphaned configuration files
+
+
+### Known Issues
+
+- On Ubuntu Linux systems (tested on 22.04 and 24.04), secondary windows (e.g. popup dialogs) are tied by default to the Main Window and cannot be moved. To be able to move them (which is recommended as it adds flexibility), you can use the Gnome Tweaks application : go to Windows->Attach Modal Dialog and toggle to OFF. Another approach is to type the following command in a terminal : gsettings set org.gnome.mutter attach-modal-dialogs false
+- In extreme scenarios (meaning that do not correspond to expected use cases of GBP), where really extremely large data set is generated (e.g. generate many events per day, every day, for 100 years), there could be a noticeable lag between the moment you click on a point of the Cash Balance curve and the relevant info is displayed in the right panel. This depends heavily on the speed of your computer. The next 1.8 release will address the speed issue (expected end of 2026).
+
+
 ## 1.6.3 to 1.7.0
 
 ### New features : The big ones

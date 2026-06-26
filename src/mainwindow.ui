@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1391</width>
-    <height>700</height>
+    <width>1500</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -39,7 +39,7 @@
        <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="handleWidth">
-       <number>10</number>
+       <number>20</number>
       </property>
       <property name="childrenCollapsible">
        <bool>false</bool>
@@ -200,7 +200,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scroll the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;left&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span as the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>&lt;--</string>
+             <string>◀</string>
             </property>
            </widget>
           </item>
@@ -210,7 +210,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scroll the cash balance curve to the &lt;span style=&quot; font-weight:700;&quot;&gt;right&lt;/span&gt;, trying to keep &lt;span style=&quot; background-color:transparent;&quot;&gt;the same date span as the interval currently displayed. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>--&gt;</string>
+             <string>▶</string>
             </property>
            </widget>
           </item>
@@ -249,11 +249,6 @@
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QLabel" name="startAmountLabel">
-            <property name="font">
-             <font>
-              <bold>false</bold>
-             </font>
-            </property>
             <property name="text">
              <string>---</string>
             </property>
@@ -279,13 +274,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="baselineCurrencyLabel">
-            <property name="text">
-             <string>CAD</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>
@@ -293,22 +281,6 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>5</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Policy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
               <height>20</height>
              </size>
             </property>
@@ -326,7 +298,42 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt;, show data points on Cash Balance curve as big color-filled disks&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt;, don't show data points.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>Show points</string>
+             <string>Points</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Policy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="showGridlinesCheckBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt;, show X and Y grid lines on the chart.&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt;, hide grid lines.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Guidelines</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -366,7 +373,7 @@
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
         <property name="spacing">
-         <number>20</number>
+         <number>40</number>
         </property>
         <property name="sizeConstraint">
          <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
@@ -385,11 +392,6 @@
         </property>
         <item>
          <widget class="QGroupBox" name="CiGB">
-          <property name="font">
-           <font>
-            <bold>true</bold>
-           </font>
-          </property>
           <property name="title">
            <string>Selected point info</string>
           </property>
@@ -424,17 +426,12 @@
               <number>3</number>
              </property>
              <item row="0" column="0">
-              <widget class="QLabel" name="label_2">
+              <widget class="QLabel" name="ciDate">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <bold>false</bold>
-                </font>
                </property>
                <property name="text">
                 <string>Date :</string>
@@ -449,28 +446,18 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="font">
-                <font>
-                 <bold>false</bold>
-                </font>
-               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_5">
+              <widget class="QLabel" name="ciAmount">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <bold>false</bold>
-                </font>
                </property>
                <property name="text">
                 <string>Amount :</string>
@@ -485,28 +472,18 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="font">
-                <font>
-                 <bold>false</bold>
-                </font>
-               </property>
                <property name="text">
                 <string>TextLabel</string>
                </property>
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="label_4">
+              <widget class="QLabel" name="ciDelta">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <bold>false</bold>
-                </font>
                </property>
                <property name="text">
                 <string>Change :</string>
@@ -520,11 +497,6 @@
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <bold>false</bold>
-                </font>
                </property>
                <property name="text">
                 <string>TextLabel</string>
@@ -541,10 +513,8 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="font">
-              <font>
-               <bold>false</bold>
-              </font>
+             <property name="focusPolicy">
+              <enum>Qt::FocusPolicy::NoFocus</enum>
              </property>
              <property name="sizeAdjustPolicy">
               <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
@@ -565,11 +535,6 @@
         </item>
         <item>
          <widget class="QGroupBox" name="generalInfoGroupBox">
-          <property name="font">
-           <font>
-            <bold>true</bold>
-           </font>
-          </property>
           <property name="title">
            <string>Statistics</string>
           </property>
@@ -588,17 +553,12 @@
                 <number>3</number>
                </property>
                <item row="0" column="0">
-                <widget class="QLabel" name="label">
+                <widget class="QLabel" name="giNoDays">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <bold>false</bold>
-                  </font>
                  </property>
                  <property name="text">
                   <string>Eventful days :</string>
@@ -615,11 +575,6 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="font">
-                    <font>
-                     <bold>false</bold>
-                    </font>
-                   </property>
                    <property name="toolTip">
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In the set of financial events generated, how many days have at least one financial event.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
@@ -631,12 +586,7 @@
                 </layout>
                </item>
                <item row="1" column="0">
-                <widget class="QLabel" name="label_6">
-                 <property name="font">
-                  <font>
-                   <bold>false</bold>
-                  </font>
-                 </property>
+                <widget class="QLabel" name="giNoEvents">
                  <property name="text">
                   <string>No of events :</string>
                  </property>
@@ -651,11 +601,6 @@
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <bold>false</bold>
-                    </font>
                    </property>
                    <property name="toolTip">
                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How many financial events in total have been generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -679,11 +624,6 @@
         </item>
         <item>
          <widget class="QGroupBox" name="dateRangeGroupBox">
-          <property name="font">
-           <font>
-            <bold>true</bold>
-           </font>
-          </property>
           <property name="title">
            <string>Date range</string>
           </property>
@@ -699,24 +639,14 @@
                 <number>3</number>
                </property>
                <item row="0" column="0">
-                <widget class="QLabel" name="label_8">
-                 <property name="font">
-                  <font>
-                   <bold>false</bold>
-                  </font>
-                 </property>
+                <widget class="QLabel" name="dateRangeFrom">
                  <property name="text">
                   <string>From :</string>
                  </property>
                 </widget>
                </item>
                <item row="1" column="0">
-                <widget class="QLabel" name="label_7">
-                 <property name="font">
-                  <font>
-                   <bold>false</bold>
-                  </font>
-                 </property>
+                <widget class="QLabel" name="dateRangeTo">
                  <property name="text">
                   <string>To :</string>
                  </property>
@@ -729,11 +659,6 @@
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <bold>false</bold>
-                  </font>
                  </property>
                  <property name="text">
                   <string/>
@@ -748,23 +673,13 @@
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="font">
-                  <font>
-                   <bold>false</bold>
-                  </font>
-                 </property>
                  <property name="text">
                   <string/>
                  </property>
                 </widget>
                </item>
                <item row="2" column="0">
-                <widget class="QLabel" name="label_3">
-                 <property name="font">
-                  <font>
-                   <bold>false</bold>
-                  </font>
-                 </property>
+                <widget class="QLabel" name="deltaRange">
                  <property name="text">
                   <string>Delta :</string>
                  </property>
@@ -777,11 +692,6 @@
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <bold>false</bold>
-                  </font>
                  </property>
                  <property name="text">
                   <string/>
@@ -806,8 +716,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1391</width>
-     <height>31</height>
+     <width>1500</width>
+     <height>34</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -862,6 +772,7 @@
     <addaction name="actionOptions"/>
     <addaction name="actionAnalysis"/>
     <addaction name="actionPV_Calculator"/>
+    <addaction name="actionAnonymize"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -996,6 +907,14 @@
   <action name="actionReload">
    <property name="text">
     <string>Reload</string>
+   </property>
+  </action>
+  <action name="actionAnonymize">
+   <property name="text">
+    <string>Anonymize data...</string>
+   </property>
+   <property name="toolTip">
+    <string>Replace all identifying data in the current scenario with anonymous values</string>
    </property>
   </action>
  </widget>

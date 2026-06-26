@@ -18,7 +18,13 @@ set(PROJECT_SOURCES
     aboutdialog.cpp
     aboutdialog.h
     aboutdialog.ui
-    analysisdialog.cpp
+    analysisdialog_common.cpp
+    analysisdialog_rw.cpp
+    analysisdialog_period_chart.cpp
+    analysisdialog_period_list.cpp
+    analysisdialog_tags.cpp
+    analysisdialog_period_heatmap.cpp
+    analysisdialog_csd.cpp
     analysisdialog.h
     analysisdialog.ui
     choosetagsdialog.h
@@ -29,8 +35,13 @@ set(PROJECT_SOURCES
     constants.h
     csd.h
     csd.cpp
+    csdbreakdowndialog.h
+    csdbreakdowndialog.cpp
+    csdbreakdowndialog.ui
     currencyhelper.cpp
     currencyhelper.h
+    csvexporter.cpp
+    csvexporter.h
     customqchartview.cpp
     customqchartview.h
     datehelper.cpp
@@ -86,6 +97,9 @@ set(PROJECT_SOURCES
     loadirregulartextfiledialog.cpp
     loadirregulartextfiledialog.h
     loadirregulartextfiledialog.ui
+    loadvariablegrowthtextfiledialog.cpp
+    loadvariablegrowthtextfiledialog.h
+    loadvariablegrowthtextfiledialog.ui
     main.cpp
     mainwindow.cpp
     mainwindow.h
@@ -100,6 +114,9 @@ set(PROJECT_SOURCES
     managetagscsdinfo.cpp
     managetagstagsdefmodel.h
     managetagstagsdefmodel.cpp
+    anonymizedialog.h
+    anonymizedialog.cpp
+    anonymizedialog.ui
     optionsdialog.cpp
     optionsdialog.h
     optionsdialog.ui
@@ -118,15 +135,17 @@ set(PROJECT_SOURCES
     scenariopropertiesdialog.h
     scenariopropertiesdialog.cpp
     scenariopropertiesdialog.ui
-    selectcountrydialog.cpp
-    selectcountrydialog.h
-    selectcountrydialog.ui
+    selectcurrencydialog.cpp
+    selectcurrencydialog.h
+    selectcurrencydialog.ui
     tag.h
     tag.cpp
     tagcsdrelationships.h
     tagcsdrelationships.cpp
     tags.h
     tags.cpp
+    uiutil.h
+    uiutil.cpp
     util.cpp
     util.h
     visualizeoccurrencesdialog.h
@@ -159,6 +178,7 @@ qt6_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 qt6_add_executable(gbp MANUAL_FINALIZATION ${PROJECT_SOURCES} ${QM_FILES}
     gbp_resources.qrc
+
 )
 
 

@@ -1,2 +1,4 @@
 src/build
 
+# Claude Code files (use workspace-level .claude instead)
+.claude/

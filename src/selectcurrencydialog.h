@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,47 +16,50 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/#AGPL/>.
  */
 
-#ifndef SELECTCOUNTRYDIALOG_H
-#define SELECTCOUNTRYDIALOG_H
+#ifndef SELECTCURRENCYDIALOG_H
+#define SELECTCURRENCYDIALOG_H
 
 #include <QDialog>
 #include "currencyhelper.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui {class SelectCountryDialog;}
+namespace Ui {class SelectCurrencyDialog;}
 QT_END_NAMESPACE
 
 
-class SelectCountryDialog : public QDialog
+class SelectCurrencyDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit SelectCountryDialog(QLocale theLocale, QWidget *parent = nullptr);
-    ~SelectCountryDialog();
+    explicit SelectCurrencyDialog(QLocale theLocale, QWidget *parent = nullptr);
+    ~SelectCurrencyDialog();
 
 public slots:
-    // From client of SelectCountryDialog : prepare content before edition
+    // From client of SelectCurrencyDialog : prepare content before edition
     void slotPrepareContent();
 
 signals:
-    // For client of SelectCountryDialog : result of edition and edition completion notification
-    void signalSelectCountryResult(QString countryCode, CurrencyInfo currInfo);
+    // For client of SelectCurrencyDialog : result of edition and edition completion notification
+    void signalSelectCountryResult(CurrencyInfo currInfo);
     void signalSelectCountryCompleted();
 
 private slots:
     void on_selectPushButton_clicked();
     void on_cancelPushButton_clicked();
-    void on_countriesComboBox_activated(int index);
-    void on_SelectCountryDialog_rejected();
+    void on_currenciesComboBox_activated(int index);
+    void on_SelectCurrencyDialog_rejected();
+
+protected:
+    void showEvent(QShowEvent* event) override;
 
 private:
-    Ui::SelectCountryDialog *ui;
+    Ui::SelectCurrencyDialog *ui;
     QLocale locale;                 // this is the system locale
 
-    void selectCountryInComboBox(QString countryCode);
+    void selectCurrencyInComboBox(QString isoCode);
     void updateCurrencyLabels();
-    QString getCurrentlySelectedCountryCode();
+    QString getCurrentlySelectedIsoCode();
 };
 
-#endif // SELECTCOUNTRYDIALOG_H
+#endif // SELECTCURRENCYDIALOG_H

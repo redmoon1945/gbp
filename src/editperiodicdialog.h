@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,7 @@
 #include "currencyhelper.h"
 #include "editvariablegrowthdialog.h"
 #include "plaintexteditiondialog.h"
+#include "csdbreakdowndialog.h"
 #include "tags.h"
 #include "visualizeoccurrencesdialog.h"
 
@@ -56,9 +57,12 @@ signals:
     // show result : prepare Dialog before edition
     void signalShowResultPrepareContent(QString title, QString content, bool readOnly);
     // Visualize occurrences : prepare Dialog before edition
-    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, Growth adjustedInflation,
-        QDate maxDateScenarioFeGeneration, QWeakPointer<PeriodicCsd> pCsd);
-
+    void signalVisualizeOccurrencesPrepareContent(CurrencyInfo currInfo, QSharedPointer<FeStream>
+        feStream, uint noOfSaturations, Growth scenarioInflation, FeMinMaxInfo minMax,
+        QDate maxDateScenario);
+    // Csd Breakdown : prepare Dialog before edition
+    void signalCsdBreakdownPrepareContent(CurrencyInfo currInfo,  QSharedPointer<FeStream> feStream,
+        QDate maxDateScenario);
 
 public slots:
 
@@ -76,20 +80,26 @@ public slots:
      * @param availTags Set of all the tags defined in the scenario.
      */
     void slotPrepareContent(bool isNewCsd, bool isIncome, QWeakPointer<PeriodicCsd> pCsd,
-        CurrencyInfo newCurrInfo, Growth inflation, QDate theMaxDateFeGeneration,
-        QSet<QUuid> associatedTagIds, Tags availTags);
+        const CurrencyInfo &newCurrInfo, const Growth &inflation, QDate theMaxDateFeGeneration,
+        const QSet<QUuid> &associatedTagIds, const Tags &availTags);
 
     // Edit variable growth child Dialog : receive result and edition completion notification
     void slotEditVariableGrowthResult(Growth growthOut);
     void slotEditVariableGrowthCompleted();
+
     // PlainTextEdition child Dialog : receive result and edition completion notification
     void slotPlainTextEditionResult(QString result);
     void slotPlainTextEditionCompleted();
+
     // Show Result child Dialog : receive result and edition completion notification
     void slotShowResultResult(QString result);
     void slotShowResultCompleted();
+
     // Visualize occurrences child Dialog : receive completion notification
     void slotVisualizeOccurrencesCompleted();
+
+    // Csd Breakdown child Dialog : receive completion notification
+    void slotCsdBreakdownCompleted();
 
 
 private slots:
@@ -106,6 +116,19 @@ private slots:
     void on_editDescriptionPushButton_clicked();
     void on_fromDateEdit_userDateChanged(const QDate &date);
     void on_toDateEdit_userDateChanged(const QDate &date);
+    void on_breakdownPushButton_clicked();
+
+protected:
+    /**
+     * @brief Defers deselection of nameLineEdit until after the platform style has finished
+     * processing focus-in events.
+     * @details On many platforms (e.g. KDE Breeze), the style calls selectAll() inside
+     * focusInEvent when a QLineEdit gains focus, which fires during the show sequence.
+     * A direct deselect() in slotPrepareContent() is overridden by that call. Using
+     * QTimer::singleShot(0) posts the deselect to the end of the event queue, after all
+     * show-related events have completed.
+     */
+    void showEvent(QShowEvent* event) override;
 
 private:
     Ui::EditPeriodicDialog *ui;
@@ -127,6 +150,7 @@ private:
     EditVariableGrowthDialog* editVariableGrowthDlg;
     PlainTextEditionDialog* editDescriptionDialog;
     VisualizeOccurrencesDialog* visualizeoccurrencesDialog;
+    CsdBreakdownDialog* csdBreakdownDialog;
 
     /**
      * @struct BuildFromFormDataResult
@@ -135,7 +159,7 @@ private:
      */
     struct BuildFromFormDataResult{
         Util::ResultOfOperation result;
-        QSharedPointer<PeriodicCsd> pCsd;
+        QSharedPointer<PeriodicCsd> sharedPtrCsd;
         BuildFromFormDataResult();
         void init();
     };
@@ -146,7 +170,13 @@ private:
     // methods
     void prepareDataToCreateANewStreamDef(bool slotPrepare);
     void updateAuxCustomGrowthWidgetAccessibility();
+
+    /**
+     * @brief Use the data in the form to build a new Csd.
+     * @param result The result of the operation.
+     */
     void buildPeriodicCsdFromFormData(BuildFromFormDataResult &result);
+
     void updatePeriodCombobox(PeriodicCsd::PeriodType type);
     void setVisibilityComponentsGrowthType(GrowthType type);
     void updateGrowthTypeCombobox(GrowthType type);
@@ -159,6 +189,19 @@ private:
      * @brief Make the warning sign visible if Start date > scenario's End date
      */
     void setVisibilityStartDateWarningSign();
+
+    /**
+     * @brief Generate the financial events for that Csd with the current parameters
+     * of the form. Return the no of saturations that occurred.
+     * @param scenarioInflation Inflation for the scenario.
+     * @param weakCsdPtr A QWeakPointer<Csd> reference to the Csd.
+     * @param saturationCount Saturation count that occurred during the generation.
+     * @param minMax Min/Max of the value generated.
+     * @return The generated Fe Stream, wrapped with a QSharedPointer.
+     */
+    QSharedPointer<FeStream> generateFinancialEvents(const Growth &scenarioInflation,
+        QWeakPointer<Csd> weakCsdPtr, uint& saturationCount, FeMinMaxInfo& minMax);
+
 };
 
 #endif // EDITPERIODICDIALOG_H

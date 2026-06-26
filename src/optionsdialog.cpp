@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
  */
 
 #include <QColorDialog>
+#include <QTimer>
 #include <QPalette>
 #include <QFontDialog>
 #include <QMessageBox>
@@ -25,6 +26,7 @@
 #include "gbpcontroller.h"
 #include "gbplogger.h"
 #include "util.h"
+#include "uiutil.h"
 #include "gbpqmessage.h"
 
 
@@ -33,6 +35,9 @@ OptionsDialog::OptionsDialog(QWidget *parent)
     , ui(new Ui::OptionsDialog)
 {
     ui->setupUi(this);
+
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
 
     // "pack" the dialog to fit the font. This is required when there is no "expanding" widgets
     this->adjustSize();
@@ -102,7 +107,7 @@ void OptionsDialog::slotPrepareContent()
 
     // export text localization
     ui->exportTextAmountLocalizedCheckBox->setChecked(
-        GbpController::getInstance().getExportTextAmountLocalized());
+        GbpController::getInstance().getExportTextNumberLocalized());
     ui->exportTextDateLocalizedCheckBox->setChecked(
         GbpController::getInstance().getExportTextDateLocalized());
 
@@ -188,6 +193,14 @@ void OptionsDialog::slotPrepareContent()
     yZeroLineLightModeColor = GbpController::getInstance().getYZeroLineLightModeColor();
     setColorInfo(CI_YZERO_LINE_LT, yZeroLineLightModeColor);
 
+    // Gridlines color - dark mode
+    gridlinesDarkModeColor = GbpController::getInstance().getGridlinesDarkModeColor();
+    setColorInfo(CI_GRIDLINES_DT, gridlinesDarkModeColor);
+
+    // Gridlines color - light mode
+    gridlinesLightModeColor = GbpController::getInstance().getGridlinesLightModeColor();
+    setColorInfo(CI_GRIDLINES_LT, gridlinesLightModeColor);
+
     // X-Axis Date Format
     switch (GbpController::getInstance().getXAxisDateFormat()) {
         case 0:
@@ -219,8 +232,12 @@ void OptionsDialog::slotPrepareContent()
     expenseColor = GbpController::getInstance().getExpenseColor();
     setColorInfo(CI_EXPENSE_COLOR, expenseColor);
 
-    // Reset focus on default button "Save"
-    ui->applyPushButton->setFocus();
+    // Reset focus the first item to work on (we dont want "space" to active Close or Save
+    if ( ui->todaySystemRadioButton->isChecked()==true) {
+        ui->todaySystemRadioButton->setFocus();
+    } else {
+        ui->todaySpecificRadioButton->setFocus();
+    }
 }
 
 
@@ -236,7 +253,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     QDate newCustomTodayDate = ui->todayDateEdit->date();
     bool newUseSystemFont = ui->systemFontRadioButton->isChecked();
     bool newAllowDecorationColor = ui->allowDecorationColorCheckBox->isChecked();
-    bool newExportTextAmountLocalized = ui->exportTextAmountLocalizedCheckBox->isChecked();
+    bool newExportTextNumberLocalized = ui->exportTextAmountLocalizedCheckBox->isChecked();
     bool newExportTextDateLocalized = ui->exportTextDateLocalizedCheckBox->isChecked();
     bool newUsePv = ui->usePresentValueCheckBox->isChecked();
     double newDiscountrate = ui->pvDiscountRateDoubleSpinBox->value();
@@ -299,7 +316,9 @@ void OptionsDialog::on_applyPushButton_clicked()
             GbpController::getInstance().getDarkModeSelectedPointColor() ) ||
         ( lightModeSelectedPointColor !=
             GbpController::getInstance().getLightModeSelectedPointColor() ) ||
-        ( newChartPointSize != GbpController::getInstance().getChartPointSize() ) )
+        ( newChartPointSize != GbpController::getInstance().getChartPointSize() ) ||
+        ( gridlinesDarkModeColor != GbpController::getInstance().getGridlinesDarkModeColor() ) ||
+        ( gridlinesLightModeColor != GbpController::getInstance().getGridlinesLightModeColor() ) )
         {
         // Data and chart's scaling stay the same : just redraw charts with different
         // colors or background
@@ -347,8 +366,8 @@ void OptionsDialog::on_applyPushButton_clicked()
     // if custom font selected, a choice must have been made
     if ( newUseSystemFont==false) {
         if ( newCustomFontString.length() == 0 ){
-            QMessageBox::critical(nullptr,tr("Error"),
-                tr("You must choose a custom font if you don't use the default system font"));
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("You must choose a custom font if you don't use the default system font"), {tr("OK")}, 0, 0);
             LOG_DEBUG_INFO("Options Dialog : Aborted : Custom Font not selected");
             return;
         }
@@ -363,7 +382,7 @@ void OptionsDialog::on_applyPushButton_clicked()
         (GbpController::getInstance().getCustomApplicationFont() != newCustomFontString) ) ) {
 
         warnUserAppRestartRequired = true;
-        changesRequiringStart.append(tr("* Application font setting has changed."));
+        changesRequiringStart.append(tr("Application font setting has changed."));
         LOG_INFO("    * Font Setting have changed, restart required");
     }
 
@@ -374,7 +393,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     QString newCustomDateString = newCustomTodayDate.toString(Qt::DateFormat::ISODate);
     if ( GbpController::getInstance().getTodayUseSystemDate() != newUseSystemDateForToday ) {
         warnUserAppRestartRequired = true;
-        changesRequiringStart.append(tr("* Today's date settings have changed."));
+        changesRequiringStart.append(tr("Today's date settings have changed."));
         LOG_INFO(
             QString("    * Today's date settings have changed, restart required : new value is : "
             " Use System date = %1").arg(newUseSystemDateForToday) );
@@ -382,7 +401,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     } else if ( (newUseSystemDateForToday==false) &&
         (GbpController::getInstance().getTodayCustomDate() != newCustomTodayDate) ){
         warnUserAppRestartRequired = true;
-        changesRequiringStart.append(tr("* Today's replacement date have changed"));
+        changesRequiringStart.append(tr("Today's replacement date has changed."));
         LOG_INFO(
             QString("    * Today's custom date has been modified from %1 to %2, restart required")
             .arg(oldCustomDateString).arg(newCustomDateString));
@@ -392,7 +411,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     // if income color has changed, warn user the app has to be restarted
     if ( GbpController::getInstance().getIncomeColor() != incomeColor  ) {
         warnUserAppRestartRequired = true;
-        changesRequiringStart.append(tr("* Income color has changed."));
+        changesRequiringStart.append(tr("Income color has changed."));
         LOG_INFO( QString("    * Income color has changed to %1, restart required")
             .arg(incomeColor.name(QColor::HexRgb)));
     }
@@ -400,7 +419,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     // if expense color has changed, warn user the app has to be restarted
     if ( GbpController::getInstance().getExpenseColor() != expenseColor  ) {
         warnUserAppRestartRequired = true;
-        changesRequiringStart.append(tr("* Expense color has changed."));
+        changesRequiringStart.append(tr("Expense color has changed."));
         LOG_INFO( QString("    * Expense color has changed to %1, restart required")
             .arg(expenseColor.name(QColor::HexRgb)));
     }
@@ -408,14 +427,15 @@ void OptionsDialog::on_applyPushButton_clicked()
     // check tooltips show status
     if ( GbpController::getInstance().getShowTooltips() != newShowTooltips ) {
         warnUserAppRestartRequired = true;
-        changesRequiringStart.append(tr("* Show tooltips have changed."));
+        changesRequiringStart.append(tr("Show tooltips setting has changed."));
         LOG_INFO("   * Show tooltips have been modified, restart required");
     }
 
     if (warnUserAppRestartRequired == true) {
-        QMessageBox::warning(nullptr,tr("Warning"),
-            tr("Application must be restarted due to the following changes made :\n%1")
-            .arg(changesRequiringStart.join("\n")));
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::WARNING, tr("Warning"),
+            tr("Application must be restarted due to the following changes made :")
+            + "<ul><li>" + changesRequiringStart.join("</li><li>") + "</li></ul>",
+            {tr("OK")}, 0, 0);
     }
 
 
@@ -467,10 +487,10 @@ void OptionsDialog::on_applyPushButton_clicked()
         .arg((lightModeSelectedPointColor!=GbpController::getInstance()
             .getLightModeSelectedPointColor())?("(CHANGED)"):("")));
 
-    LOG_INFO( QString("    ExportTextAmountLocalized = %1 %2")
-        .arg(newExportTextAmountLocalized)
-        .arg((newExportTextAmountLocalized!=GbpController::getInstance().
-            getExportTextAmountLocalized())?("(CHANGED)"):("")));
+    LOG_INFO( QString("    ExportTextNumberLocalized = %1 %2")
+        .arg(newExportTextNumberLocalized)
+        .arg((newExportTextNumberLocalized!=GbpController::getInstance().
+            getExportTextNumberLocalized())?("(CHANGED)"):("")));
 
     LOG_INFO( QString("    ExportTextDateLocalized = %1 %2")
         .arg(newExportTextDateLocalized)
@@ -537,6 +557,16 @@ void OptionsDialog::on_applyPushButton_clicked()
         .arg((yZeroLineLightModeColor!=GbpController::getInstance().getYZeroLineLightModeColor())?
         ("(CHANGED)"):("")));
 
+    LOG_INFO( QString("    gridlinesDarkModeColor = %1 %2")
+        .arg(gridlinesDarkModeColor.name(QColor::HexRgb))
+        .arg((gridlinesDarkModeColor!=GbpController::getInstance().getGridlinesDarkModeColor())?
+            ("(CHANGED)"):("")));
+
+    LOG_INFO( QString("    gridlinesLightModeColor = %1 %2")
+        .arg(gridlinesLightModeColor.name(QColor::HexRgb))
+        .arg((gridlinesLightModeColor!=GbpController::getInstance().getGridlinesLightModeColor())?
+            ("(CHANGED)"):("")));
+
     LOG_INFO( QString("    XAxis Date Format = %1 %2")
         .arg(newXAxisDateFormat)
         .arg((newXAxisDateFormat!=GbpController::getInstance().getXAxisDateFormat())?
@@ -563,7 +593,7 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().setLightModeCurveColor(lightModeCurveColor);
     GbpController::getInstance().setLightModePointColor(lightModePointColor);
     GbpController::getInstance().setLightModeSelectedPointColor(lightModeSelectedPointColor);
-    GbpController::getInstance().setExportTextAmountLocalized(newExportTextAmountLocalized);
+    GbpController::getInstance().setExportTextNumberLocalized(newExportTextNumberLocalized);
     GbpController::getInstance().setExportTextDateLocalized(newExportTextDateLocalized);
     GbpController::getInstance().setPercentageMainChartScaling(newMainChartScaling);
     GbpController::getInstance().setUseDefaultSystemFont(newUseSystemFont);
@@ -577,6 +607,8 @@ void OptionsDialog::on_applyPushButton_clicked()
     GbpController::getInstance().setShowYzeroLine(newShowYzeroLine);
     GbpController::getInstance().setYZeroLineDarkModeColor(yZeroLineDarkModeColor);
     GbpController::getInstance().setYZeroLineLightModeColor(yZeroLineLightModeColor);
+    GbpController::getInstance().setGridlinesDarkModeColor(gridlinesDarkModeColor);
+    GbpController::getInstance().setGridlinesLightModeColor(gridlinesLightModeColor);
     GbpController::getInstance().setXAxisDateFormat(newXAxisDateFormat);
     GbpController::getInstance().setShowTooltips(newShowTooltips);
     GbpController::getInstance().setIncomeColor(incomeColor);
@@ -644,6 +676,14 @@ void OptionsDialog::setColorInfo(ColorItem item, QColor theColor)
         case CI_YZERO_LINE_LT:
             label = ui->lightModeYzeroLineColorLabel;
             pushButton = ui->lightModeYzeroLineColorPushButton;
+            break;
+        case CI_GRIDLINES_DT:
+            label = ui->darkModeGridlinesColorLabel;
+            pushButton = ui->darkModeGridlinesColorPushButton;
+            break;
+        case CI_GRIDLINES_LT:
+            label = ui->lightModeGridlinesColorLabel;
+            pushButton = ui->lightModeGridlinesColorPushButton;
             break;
         case CI_INCOME_COLOR:
             label = ui->incomeColorLabel;
@@ -918,6 +958,106 @@ void OptionsDialog::on_lightModeYzeroLineColorPushButton_clicked()
 }
 
 
+void OptionsDialog::on_darkModeGridlinesColorPushButton_clicked()
+{
+    QColor color = QColorDialog::getColor(gridlinesDarkModeColor, this, tr("Color chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        gridlinesDarkModeColor = color;
+        setColorInfo(CI_GRIDLINES_DT, gridlinesDarkModeColor);
+    }
+}
+
+
+void OptionsDialog::on_lightModeGridlinesColorPushButton_clicked()
+{
+    QColor color = QColorDialog::getColor(gridlinesLightModeColor, this, tr("Color chooser"));
+    if (color.isValid()==false) {
+        return;
+    } else {
+        gridlinesLightModeColor = color;
+        setColorInfo(CI_GRIDLINES_LT, gridlinesLightModeColor);
+    }
+}
+
+
+void OptionsDialog::on_lightModeCurveColorResetPushButton_clicked()
+{
+    lightModeCurveColor = GbpController::getInstance().getFactorySettings().lightModeCurveColor;
+    setColorInfo(CI_CURVE_LT, lightModeCurveColor);
+}
+
+
+void OptionsDialog::on_lightModePointColorResetPushButton_clicked()
+{
+    lightModePointColor = GbpController::getInstance().getFactorySettings().lightModePointColor;
+    setColorInfo(CI_POINT_LT, lightModePointColor);
+}
+
+
+void OptionsDialog::on_lightModeSelectedPointColorResetPushButton_clicked()
+{
+    lightModeSelectedPointColor =
+        GbpController::getInstance().getFactorySettings().lightModeSelectedPointColor;
+    setColorInfo(CI_SELECTED_POINT_LT, lightModeSelectedPointColor);
+}
+
+
+void OptionsDialog::on_lightModeYzeroLineColorResetPushButton_clicked()
+{
+    yZeroLineLightModeColor =
+        GbpController::getInstance().getFactorySettings().yZeroLineLightModeColor;
+    setColorInfo(CI_YZERO_LINE_LT, yZeroLineLightModeColor);
+}
+
+
+void OptionsDialog::on_lightModeGridlinesColorResetPushButton_clicked()
+{
+    gridlinesLightModeColor =
+        GbpController::getInstance().getFactorySettings().gridlinesLightModeColor;
+    setColorInfo(CI_GRIDLINES_LT, gridlinesLightModeColor);
+}
+
+
+void OptionsDialog::on_darkModeCurveColorResetPushButton_clicked()
+{
+    darkModeCurveColor = GbpController::getInstance().getFactorySettings().darkModeCurveColor;
+    setColorInfo(CI_CURVE_DT, darkModeCurveColor);
+}
+
+
+void OptionsDialog::on_darkModePointColorResetPushButton_clicked()
+{
+    darkModePointColor = GbpController::getInstance().getFactorySettings().darkModePointColor;
+    setColorInfo(CI_POINT_DT, darkModePointColor);
+}
+
+
+void OptionsDialog::on_darkModeSelectedPointColorResetPushButton_clicked()
+{
+    darkModeSelectedPointColor =
+        GbpController::getInstance().getFactorySettings().darkModeSelectedPointColor;
+    setColorInfo(CI_SELECTED_POINT_DT, darkModeSelectedPointColor);
+}
+
+
+void OptionsDialog::on_darkModeYzeroLineColorResetPushButton_clicked()
+{
+    yZeroLineDarkModeColor =
+        GbpController::getInstance().getFactorySettings().yZeroLineDarkModeColor;
+    setColorInfo(CI_YZERO_LINE_DT, yZeroLineDarkModeColor);
+}
+
+
+void OptionsDialog::on_darkModeGridlinesColorResetPushButton_clicked()
+{
+    gridlinesDarkModeColor =
+        GbpController::getInstance().getFactorySettings().gridlinesDarkModeColor;
+    setColorInfo(CI_GRIDLINES_DT, gridlinesDarkModeColor);
+}
+
+
 void OptionsDialog::on_incomeColorPushButton_clicked()
 {
     QColor color = QColorDialog::getColor(incomeColor, this, tr("Color chooser"));
@@ -960,8 +1100,8 @@ void OptionsDialog::on_resetPushButton_clicked()
 {
     // Ask confirmation before resetting all the settings
     int choice = GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::WARNING, tr("Warning"),
-        tr("All settings will be reset to their factory defaults, and this action cannot "
-        "be undone. Are you certain you wish to continue?"), {tr("No"),tr("Yes")},0,0);
+        tr("All settings will be reset to their factory defaults once the \"Save\" button "
+        "is pressed. Are you certain you wish to continue?"), {tr("No"),tr("Yes")},0,0);
     switch(choice){
         case -1:
             return;
@@ -971,7 +1111,7 @@ void OptionsDialog::on_resetPushButton_clicked()
             break;
     }
 
-    // Lets reset the settings, but all changes are NOT saved (user must press apply)
+    // Lets reset the settings, but all changes are NOT saved (user must press Save)
     GbpController::FactorySettings fs = GbpController::getInstance().getFactorySettings();
 
     ui->todaySystemRadioButton->setChecked(fs.todayUseSystemDate);
@@ -979,7 +1119,7 @@ void OptionsDialog::on_resetPushButton_clicked()
     newCustomFontString = fs.customApplicationFont; // ""
     setCustomFontlabel(newCustomFontString);
     ui->allowDecorationColorCheckBox->setChecked(fs.allowDecorationColor);
-    ui->exportTextAmountLocalizedCheckBox->setChecked(fs.exportTextAmountLocalized);
+    ui->exportTextAmountLocalizedCheckBox->setChecked(fs.exportTextNumberLocalized);
     ui->exportTextDateLocalizedCheckBox->setChecked(fs.exportTextDateLocalized);
     ui->usePresentValueCheckBox->setChecked(fs.usePresentValue);
     ui->tooltipsCheckBox->setChecked(fs.showTooltips);
@@ -993,15 +1133,15 @@ void OptionsDialog::on_resetPushButton_clicked()
     ui->wheelZoomInRadioButton->setChecked(fs.wheelRotatedAwayZoomIn);
     ui->showYzeroLineCheckBox->setChecked(fs.showYzeroLine);
     switch(fs.xAxisDateFormat){
-    case 0:
-        ui->xAxisDateLocaleRadioButton->setChecked(true);
-        break;
-    case 1:
-        ui->xAxisDateIsoRadioButton->setChecked(true);
-        break;
-    case 2:
-        ui->xAxisDateIsoTwoDigitsRadioButton->setChecked(true);
-        break;
+        case 0:
+            ui->xAxisDateLocaleRadioButton->setChecked(true);
+            break;
+        case 1:
+            ui->xAxisDateIsoRadioButton->setChecked(true);
+            break;
+        case 2:
+            ui->xAxisDateIsoTwoDigitsRadioButton->setChecked(true);
+            break;
     }
 
     switch(fs.chartTheming){
@@ -1032,5 +1172,15 @@ void OptionsDialog::on_resetPushButton_clicked()
     setColorInfo(CI_YZERO_LINE_LT, yZeroLineLightModeColor);
     yZeroLineDarkModeColor = fs.yZeroLineDarkModeColor;
     setColorInfo(CI_YZERO_LINE_DT, fs.yZeroLineDarkModeColor);
+}
+
+
+void OptionsDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("OptionsDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+    });
 }
 

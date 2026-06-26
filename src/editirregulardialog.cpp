@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
+ *  Copyright (C) 2024-2026 Claude Dumas <claudedumas63@protonmail.com>. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,15 +17,19 @@
  */
 
 #include "editirregulardialog.h"
+#include <QTimer>
+#include "csvexporter.h"
 #include "qcolordialog.h"
 #include "ui_editirregulardialog.h"
 #include "gbpcontroller.h"
 #include "gbplogger.h"
+#include "uiutil.h"
 #include <QMessageBox>
 #include <QFont>
 #include <QCoreApplication>
 #include <QFileDialog>
 #include <qforeach.h>
+#include "gbpqmessage.h"
 
 
 EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
@@ -35,29 +39,42 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
 {
     ui->setupUi(this);
 
+    /// Override fixed-pixel spacers from .ui with font-metric sizes (H: 20px=1×mA, V: 30px=1×mH).
+    UiUtil::scaleFixedSpacers(this);
+
+    QFont appFont = QApplication::font();
+
     // use smaller font for description list
-    QFont descFont = ui->descPlainTextEdit->font();
-    Util::changeFontSize(descFont, Util::FontResizeIntensity::WEAK, true);
+    QFont descFont = appFont;
+    Util::changeFontSize(descFont, Util::FontResizeIntensity::AVERAGE, true,
+        "EditIrregularDialog - description");
     ui->descPlainTextEdit->setFont(descFont);
 
     // force description widget to be small (cant do it in Qt Designer...)
     QFontMetrics fm = ui->descPlainTextEdit->fontMetrics();
     ui->descPlainTextEdit->setFixedHeight(fm.height()*(2*1.2)); // 2 lines
 
-    // use smaller font for the warning Label (for past events)
-    QFont warningLabelFont = ui->warningLabel->font();
-    Util::changeFontSize(warningLabelFont, Util::FontResizeIntensity::WEAK, true);
-    ui->warningLabel->setFont(warningLabelFont);
-
-    // use smaller font for the "future" Label
-    QFont futurLabelFont = ui->futurLabel->font();
-    Util::changeFontSize(futurLabelFont, Util::FontResizeIntensity::WEAK, true);
-    ui->futurLabel->setFont(futurLabelFont);
-
     // use smaller font for tag list
-    QFont tagFont = ui->tagsEdit->font();
-    Util::changeFontSize(tagFont, Util::FontResizeIntensity::AVERAGE, true);
+    QFont tagFont = appFont;
+    Util::changeFontSize(tagFont, Util::FontResizeIntensity::AVERAGE, true,
+        "EditIrregularDialog - tag list");
     ui->tagsEdit->setFont(tagFont);
+
+    // use smaller font for the "CRUD" buttons
+    QFont crudButtonFont = appFont;
+    Util::changeFontSize(crudButtonFont, Util::FontResizeIntensity::WEAK, true,
+        "EditIrregularDialog - CRUD buttons");
+    ui->addPushButton->setFont(crudButtonFont);
+    ui->deletePushButton->setFont(crudButtonFont);
+    ui->editPushButton->setFont(crudButtonFont);
+    ui->selectAllPushButton->setFont(crudButtonFont);
+    ui->unselectAllPushButton->setFont(crudButtonFont);
+
+    // Make full description view button smaller
+    QFont descFullViewFont = appFont;
+    Util::changeFontSize(descFullViewFont, Util::FontResizeIntensity::WEAK, true,
+        "EditIrregularDialog - desc full view button");
+    ui->fullViewPushButton->setFont(descFullViewFont);
 
     // make the tag list not too high (must be done after font setting)
     QFontMetrics fm2(ui->tagsEdit->font());
@@ -65,20 +82,35 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
 
     // set the model (no internal data for now)
     tableModel = new EditIrregularModel(aLocale);
+    ui->itemsTableView->setFont(appFont);
     ui->itemsTableView->setModel(tableModel);
 
-    // adjust table abd set fonts
+    // Model : Date font
+    QFont f = appFont;
+    tableModel->setDateTableFont(f);
+    f.setStrikeOut(true);
+    tableModel->setDateDisabledTableFont(f);
+
+    QFont amountFont = appFont;
+    tableModel->setAmountTableFont(amountFont);
+    amountFont.setStrikeOut(true);
+    tableModel->setAmountDisabledTableFont(amountFont);
+
+    // Model : Note font
+    f = appFont;
+    f.setItalic(true);
+    tableModel->setNoteTableFont(f);
+    f.setStrikeOut(true);
+    tableModel->setNoteDisabledTableFont(f);
+
     fm = ui->itemsTableView->fontMetrics();
-    ui->itemsTableView->setColumnWidth(0,fm.averageCharWidth()*15);  // date (based on trials)
-    ui->itemsTableView->setColumnWidth(1,fm.averageCharWidth()*25);  // amount (based on trials)
-    QFont defaultTableFont = ui->itemsTableView->font();
-    QFont mono = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    mono.setPointSize(defaultTableFont.pointSize());
-    QFont italic = defaultTableFont;
-    italic.setItalic(true);
-    tableModel->setDefaultTableFont(defaultTableFont);
-    tableModel->setMonoTableFont(mono);
-    tableModel->setItalicTableFont(italic);
+    ui->itemsTableView->horizontalHeader()->setFont(appFont);
+    ui->itemsTableView->horizontalHeader()->setMinimumHeight(fm.height() + 10);
+    ui->itemsTableView->setColumnWidth(0,fm.averageCharWidth()*30);  // date (long format)
+    CurrencyInfo usCur;
+    QFontMetrics fmAmount(tableModel->getAmountTableFont());
+    ui->itemsTableView->setColumnWidth(1,CurrencyHelper::currencyAmountMaxPixelWidth(usCur,
+        locale, fmAmount) + fmAmount.averageCharWidth()*2);  // longest amount + padding
 
     // force max len for name (not possible for Description)
     ui->nameLineEdit->setMaxLength(Csd::NAME_MAX_LEN);
@@ -90,12 +122,18 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     // Plain Text Edition Dialog
     editDescriptionDialog = new PlainTextEditionDialog(this);     // auto-destroyed by Qt
     editDescriptionDialog->setModal(true);
+
     // the import dialog
     importDlg = new LoadIrregularTextFileDialog(aLocale,this);        // auto-destroyed by Qt
     importDlg->setModal(true);
+
     // Visualize occurrences  Dialog
     visualizeOccurrencesDialog = new VisualizeOccurrencesDialog(locale,this);// auto-destroyed by Qt
     visualizeOccurrencesDialog->setModal(true);
+
+    // Csd Breakdown Dialog
+    csdBreakdownDialog = new CsdBreakdownDialog(locale,this);// auto-destroyed by Qt
+    csdBreakdownDialog->setModal(true);
 
     // connect emitters & receivers for Dialogs : Description Edition
     QObject::connect(this, &EditIrregularDialog::signalPlainTextDialogPrepareContent,
@@ -125,6 +163,13 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
         visualizeOccurrencesDialog, &VisualizeOccurrencesDialog::slotPrepareContent);
     QObject::connect(visualizeOccurrencesDialog, &VisualizeOccurrencesDialog::signalCompleted,
         this, &EditIrregularDialog::slotVisualizeOccurrencesCompleted);
+    // connect emitters & receivers for Dialogs : Csd Breakdown
+    QObject::connect(this, &EditIrregularDialog::signalCsdBreakdownPrepareContent,
+        csdBreakdownDialog, &CsdBreakdownDialog::slotPrepareContent);
+    QObject::connect(csdBreakdownDialog,
+        &CsdBreakdownDialog::signalCompleted, this,
+        &EditIrregularDialog::slotCsdBreakdownCompleted);
+
 }
 
 
@@ -136,11 +181,12 @@ EditIrregularDialog::~EditIrregularDialog()
 
 
 void EditIrregularDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
-    QWeakPointer<IrregularCsd> iCsd, CurrencyInfo newCurrInfo, QDate maxDateScenarioFeGeneration,
-    QSet<QUuid> associatedTagIds, Tags availTags)
+    QWeakPointer<IrregularCsd> iCsd, const CurrencyInfo &newCurrInfo,
+    QDate maxDateScenarioFeGeneration, const QSet<QUuid> &associatedTagIds,
+    const Tags &availTags)
 {
     // If we are editing a existing Csd, convert csd reference to strong pointer
-    QSharedPointer<IrregularCsd> irCsd;
+    QSharedPointer<const IrregularCsd> irCsd;
     if (isNewCsd==false) {
         irCsd = iCsd.toStrongRef();
         if (irCsd.isNull()) {
@@ -184,16 +230,6 @@ void EditIrregularDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
         ui->decorationColorPushButton->setVisible(true);
     }
     setDecorationColorInfo();
-
-    // Show the futur label only if "Convert to present values" is enabled in the Options Dialog.
-    // This way, we dont confuse the user if he does not know about this option (or dont care)
-    bool usePvConversion = GbpController::getInstance().getUsePresentValue();
-    double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
-    if ( (usePvConversion==true)&&(pvAnnualDiscountRate!=0) ){
-        ui->futurLabel->setVisible(true);
-    } else {
-        ui->futurLabel->setVisible(false);
-    }
 
     if(editingExistingCsd){
         // *** EXISTING ***
@@ -295,7 +331,7 @@ void EditIrregularDialog::slotEditElementCompleted()
 }
 
 
-void EditIrregularDialog::slotImportResult(QMap<QDate, IrregularCsd::AmountInfo> items)
+void EditIrregularDialog::slotImportResult(const QMap<QDate, IrregularCsd::AmountInfo> &items)
 {
     // update the model (the table view will be updated automatically)
     tableModel->setItems(items);
@@ -314,6 +350,11 @@ void EditIrregularDialog::slotVisualizeOccurrencesCompleted()
     LOG_DEBUG_INFO("Visualize occurences completed");
 }
 
+void EditIrregularDialog::slotCsdBreakdownCompleted()
+{
+    // Log the operation
+    LOG_INFO("\"Csd breakdown\" dialog completed");
+}
 
 void EditIrregularDialog::on_loadPushButton_clicked()
 {
@@ -332,33 +373,36 @@ void EditIrregularDialog::on_cancelPushButton_clicked()
 void EditIrregularDialog::on_applyPushButton_clicked()
 {
     if (editingExistingCsd) {
-        LOG_INFO( QString("Attempting to modify Irregular csd \"%1\" ...")
+        LOG_INFO( QString("Attempting to apply changes to an irregular csd \"%1\" ...")
             .arg(REDACT(ui->nameLineEdit->text())));
     } else {
-        LOG_INFO(QString("Attempting to create new Irregular csd \"%1\" ...")
+        LOG_INFO(QString("Creating a new Irregular csd \"%1\" ...")
             .arg(REDACT(ui->nameLineEdit->text())));
     }
 
-    QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
-    QSharedPointer<IrregularCsd> irCsd = QSharedPointer<IrregularCsd> (
-        new IrregularCsd(items, initialId, (ui->nameLineEdit->text().trimmed())
-        .left(Csd::NAME_MAX_LEN), ui->descPlainTextEdit->toPlainText()
-        .left(Csd::DESC_MAX_LEN),  ui->activeYesRadioButton->isChecked(), isIncome,
-        decorationColor));
+    // From the form data, build a temporary Periodic CSD (found in r.sharedPtrCsd) that
+    // will stay alive only for the duration of this method.
+    BuildFromFormDataResult r;
+    buildIrregularCsdFromFormData(r);
+    if (r.result.status==Util::ResultOfOperationStatus::ERROR){
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            r.result.userErrorMessage, {tr("OK")}, 0, 0);
+        return ;
+    }
 
-    emit signalEditIrregularCsdResult(ui->activeYesRadioButton->isChecked(), irCsd);
+    emit signalEditIrregularCsdResult(ui->activeYesRadioButton->isChecked(), r.sharedPtrCsd);
 
+    // if editing an existing Csd, then this is the end of it. For create,
+    // then stay right there to facilitate the rapid creation of multiple Csd
     if (editingExistingCsd) {
         hide();
         emit signalEditIrregularCsdCompleted();
-        LOG_INFO("    Modifications applied");
+        LOG_INFO("Modifications applied to the irregular csd");
     } else {
         cleanUpForNewCsd();
         ui->nameLineEdit->setFocus();
-        LOG_INFO("    New Irregular csd created");
+        LOG_INFO("New irregular csd created");
     }
-    LOG_INFO("End of edition");
-
 }
 
 
@@ -377,7 +421,8 @@ void EditIrregularDialog::on_editPushButton_clicked()
     QList<QDate> existingDates = items.keys();
     QList<int> selectedRows = getSelectedRows();
     if (selectedRows.size()!=1){
-        QMessageBox::critical(this,tr("Error"),tr("Select exactly one row"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select exactly one row"), {tr("OK")}, 0, 0);
         ui->itemsTableView->setFocus(); // fix strange behavior
         return;
     }
@@ -404,7 +449,8 @@ void EditIrregularDialog::on_deletePushButton_clicked()
     QList<QDate> existingDates = items.keys();
     QList<int> selectedRows = getSelectedRows();
     if (selectedRows.size()==0){
-        QMessageBox::critical(this,tr("Error"),tr("Select at least one row"));
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select at least one row"), {tr("OK")}, 0, 0);
         ui->itemsTableView->setFocus(); // fix strange behavior
         return;
     }
@@ -519,6 +565,63 @@ void EditIrregularDialog::updateTagListTextBox()
 }
 
 
+void EditIrregularDialog::buildIrregularCsdFromFormData(BuildFromFormDataResult &result)
+{
+    // Reset result to ERROR
+    result.init();
+
+    // Build a new IrregularCsd using data in the fields. Data should always be valid.
+    QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
+    try {
+        result.sharedPtrCsd = QSharedPointer<IrregularCsd>(
+            new IrregularCsd(items, initialId, ui->nameLineEdit->text(),
+                ui->descPlainTextEdit->toPlainText(),
+                ui->activeYesRadioButton->isChecked(), isIncome, decorationColor));
+    } catch(const std::exception& e){
+        // should never happen
+        result.result.userErrorMessage = QString(tr("An unexpected error has occurred."
+            " Details : %1")).arg(e.what());
+        result.result.logErrorMessage = QString("An unexpected error has occurred."
+            " Details : %1").arg(e.what());
+        return;
+    } catch (...) {
+        // should never happen
+        result.result.userErrorMessage = QString(tr("An unexpected error has occurred"));
+        result.result.logErrorMessage = QString("An unexpected error has occurred");
+        return;
+    }
+
+    result.result.status = Util::ResultOfOperationStatus::SUCCESS;
+    return;
+}
+
+
+QSharedPointer<FeStream> EditIrregularDialog::generateFinancialEvents(QWeakPointer<Csd> weakCsdPtr,
+    uint &saturationCount, FeMinMaxInfo &minMax)
+{
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+    DateRange fromto = DateRange(tomorrow, maxDateFeGeneration);
+    int maxNoOfdays = fromto.getNoOfDays();
+    QSharedPointer<FeStream> result = QSharedPointer<FeStream>::create(maxNoOfdays, weakCsdPtr,
+        tomorrow);
+
+    // info on PV conversion
+    bool usePvConversion = GbpController::getInstance().getUsePresentValue();
+    double pvAnnualDiscountRate = GbpController::getInstance().getPvDiscountRate();
+
+    // Generate financial events build for the maximum range set by scenario
+    QSharedPointer<IrregularCsd> iPtr = qSharedPointerDynamicCast<IrregularCsd>(weakCsdPtr);
+    if (iPtr != nullptr){
+        iPtr->generateEventStream(*result, tomorrow, fromto, maxDateFeGeneration,
+            (usePvConversion)?(pvAnnualDiscountRate):(0), tomorrow, saturationCount, minMax);
+    } else {
+        return result; // should never happen
+    }
+
+    return result;
+}
+
+
 void EditIrregularDialog::on_selectAllPushButton_clicked()
 {
     ui->itemsTableView->selectAll();
@@ -569,88 +672,143 @@ void EditIrregularDialog::on_decorationColorCheckBox_clicked()
 }
 
 
-
-
 void EditIrregularDialog::on_visualizeOccurrencesPushButton_clicked()
 {
-    // Build a new IrregularCsd using data in the fields
-    QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
-    QSharedPointer<IrregularCsd> irCsd = QSharedPointer<IrregularCsd>(
-        new IrregularCsd(items, initialId, ui->nameLineEdit->text(),
-        ui->descPlainTextEdit->toPlainText(),
-        ui->activeYesRadioButton->isChecked(), isIncome, decorationColor));
+    // From the form data, build a temporary Periodic CSD (found in r.sharedPtrCsd) that
+    // will stay alive only for the duration of this method.
+    BuildFromFormDataResult r;
+    buildIrregularCsdFromFormData(r);
+    if (r.result.status==Util::ResultOfOperationStatus::ERROR){
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            r.result.userErrorMessage, {tr("OK")}, 0, 0);
+        return ;
+    }
+
+    // Generate the FeStream for this Csd
+    uint saturationCount;
+    FeMinMaxInfo minMax;
+    QSharedPointer<FeStream> feStream = generateFinancialEvents( r.sharedPtrCsd.toWeakRef(),
+        saturationCount, minMax);
 
     // Log the operation
     LOG_INFO( QString("About to visualize occurrences for irregular item name = %1")
         .arg(REDACT(ui->nameLineEdit->text())));
 
-    emit signalVisualizeOccurrencesPrepareContent(currInfo, Growth(), maxDateFeGeneration,
-        irCsd.toWeakRef());
+    // Prepare display of Visualization. The slotPrepareContent must do all the calculation because
+    // both CSD and FeStream are own by this method on_visualizeOccurrencesPushButton_clicked
+    // and will disappear when it completes.
+    emit signalVisualizeOccurrencesPrepareContent(currInfo, feStream, saturationCount,
+        Growth(), minMax, maxDateFeGeneration);
     visualizeOccurrencesDialog->show();
 }
 
 
+void EditIrregularDialog::on_breakdownPushButton_clicked()
+{
+    // From the form data, build a temporary Periodic CSD (found in r.sharedPtrCsd) that
+    // will stay alive only for the duration of this method.
+    BuildFromFormDataResult r;
+    buildIrregularCsdFromFormData(r);
+    if (r.result.status==Util::ResultOfOperationStatus::ERROR){
+        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+            r.result.userErrorMessage, {tr("OK")}, 0, 0);
+        return ;
+    }
+
+    // Generate the FeStream for this Csd
+    uint saturationCount;
+    FeMinMaxInfo minMax;
+    QSharedPointer<FeStream> feStream = generateFinancialEvents( r.sharedPtrCsd.toWeakRef(),
+        saturationCount, minMax);
+
+    // Log the operation
+    LOG_INFO( QString("About to view Csd breakdown for irregular item name = %1")
+        .arg(REDACT(ui->nameLineEdit->text())));
+
+    // Prepare display of Breakdown view. The slotPrepareContent must do all the calculation
+    // because both CSD and FeStream are own by this method on_breakdownPushButton_clicked
+    // and will disappear when it completes.
+    emit signalCsdBreakdownPrepareContent(currInfo, feStream, maxDateFeGeneration);
+    csdBreakdownDialog->show();
+}
 
 void EditIrregularDialog::on_exportPushButton_clicked()
 {
-    // *** get a file name ***
-    QString defaultExtensionUsed = "CSV files (*.csv *.CSV)";
-    QString filter = tr("CSV files (*.csv *.CSV);;Text files (*.txt *.TXT);;All files (*)");
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Select a file"),
-        GbpController::getInstance().getLastDirExport(), filter, &defaultExtensionUsed);
-    if (fileName == ""){
-        return;
-    }
-    // *** fix the filename to add the proper suffix ***
-    QFileInfo fi(fileName);
-    if(fi.suffix()==""){    // user has not specified an extension
-        fileName.append(".csv");
-    }
-    GbpController::getInstance().setLastDirExport(fi.absolutePath());
-    LOG_INFO( QString("Attempting to export Irregular Csd \"%1\" Financial events to text "
-        "file \"%2\" ...").arg(REDACT(ui->nameLineEdit->text().trimmed())).arg(REDACT(fileName)));
 
-    QFile file(fileName);
-    if (false == file.open(QFile::WriteOnly | QFile::Truncate)){
-        QMessageBox::critical(nullptr,tr("Error"),tr("Cannot open the file for writing"));
-        LOG_ERROR("    Export failed : Cannot open the file for saving");
-        return;
-    }
+    // *** STEP 1 : Build the columns definitions ***
+    QList<CsvColumnDescriptor> columns;
+    columns.append({tr("Date"), CsvColumnType::date(CsvDateFormat::YearMonthDay,
+        GbpController::getInstance().getExportTextDateLocalized())});
+    columns.append({tr("Amount"), CsvColumnType::currency(
+        GbpController::getInstance().getExportTextNumberLocalized())});
+    columns.append({tr("Notes"), CsvColumnType::string()});
 
-    // *** export to the file ***
-    QString s;
-
-    // write header
-    s = QString("%1\t%2\t%3\n").arg(tr("Date"),tr("Amount"), tr("Notes"));
-    file.write(s.toUtf8());
-
-    // set date format
-    QString dateFormat = "yyyy-MM-dd";  // ISO
-    if (GbpController::getInstance().getExportTextDateLocalized()==true) {
-        dateFormat = locale.dateFormat(QLocale::ShortFormat);
-    }
-
-    // write data
+    // *** STEP 2 : Populate rows ***
+    QList<QList<QVariant>> data;
     QMap<QDate, IrregularCsd::AmountInfo> items = tableModel->getItems();
     QString amountString;
     for (auto it = items.cbegin(); it != items.cend(); ++it) {
         const QDate &date = it.key();
         const IrregularCsd::AmountInfo &info = it.value();
-        //
-        QString dateString = locale.toString(date, dateFormat );
-        if (GbpController::getInstance().getExportTextAmountLocalized()) {
-            // Localized
-            amountString = CurrencyHelper::formatAmount(info.amount, currInfo, locale, false);
-        } else {
-            // not localized
-            amountString = QString::number(info.amount,'f', currInfo.noOfDecimal);
+
+        int res;
+        double amount = CurrencyHelper::amountQint64ToDouble(info.amount,currInfo.noOfDecimal,res);
+        if(res==0){
+            data.append({date,amount,info.notes});
         }
-        s = QString("%1\t%2\t%3\n").arg(dateString,amountString, info.notes);
-        file.write(s.toUtf8());
     }
 
-    // Close file and exit
-    file.close();
-    LOG_INFO("    Export succeeded");
+    // *** STEP 3 : Call exportToCsv() and handle the result ***
+    CsvExportResult result = CsvExporter::exportToCsv(
+        "Irregular csd",  columns, data, locale, currInfo, '\t' );
+    switch (result.status) {
+        case CsvExportResult::Status::Success:
+            break;
+        case CsvExportResult::Status::Canceled:
+            return; // user closed the dialog — nothing to do
+        case CsvExportResult::Status::FileOpenError:
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Export process failed. Cannot open the "
+                "file for saving"), {tr("OK")}, 0, 0);
+            return;
+        case CsvExportResult::Status::WriteError:
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Export process failed. Write error."), {tr("OK")}, 0, 0);
+            return;
+        case CsvExportResult::Status::DataError:
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Export process failed. Data error."), {tr("OK")}, 0, 0);
+            return;
+    }
+
+}
+
+
+
+EditIrregularDialog::BuildFromFormDataResult::BuildFromFormDataResult()
+{
+    init();
+}
+
+
+void EditIrregularDialog::BuildFromFormDataResult::init()
+{
+    result.init();
+    sharedPtrCsd = QSharedPointer<IrregularCsd>(); // null
+}
+
+
+void EditIrregularDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+    // QTimer::singleShot(0) defers execution until after all show-related events have been
+    // processed, including the platform style's focusInEvent which calls selectAll() on the
+    // focused QLineEdit. Calling deselect() directly in slotPrepareContent() has no effect
+    // because that slot runs before the dialog is shown.
+    QTimer::singleShot(0, this, [this]() {
+        LOG_DEBUG_INFO(QString("EditIrregularDialog initial size : %1 x %2")
+            .arg(width()).arg(height()));
+        ui->nameLineEdit->deselect();
+    });
 }
 
