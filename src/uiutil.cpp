@@ -83,6 +83,38 @@ void UiUtil::resizeTableColumns(QTableWidget* tableWidget)
 }
 
 
+void UiUtil::resizeTableViewColumns(QTableView* tableView, const QList<int>& columns)
+{
+    QAbstractItemModel *model = tableView->model();
+    if (!model) {
+        return;
+    }
+
+    QFontMetrics fmTable(QApplication::font());
+    int minWidth = fmTable.horizontalAdvance(QString(4, '8'));
+    int extraPadding = fmTable.horizontalAdvance(QLatin1Char('8'));
+    QHeaderView *header = tableView->horizontalHeader();
+    int headerMargin = tableView->style()->pixelMetric(QStyle::PM_HeaderMargin, nullptr, header);
+    header->setMinimumSectionSize(fmTable.height() + 2 * headerMargin);
+
+    for (int col : columns) {
+        tableView->resizeColumnToContents(col);
+        int contentWidth = tableView->columnWidth(col) + extraPadding;
+        QString headerText = model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString();
+        int headerWidth = fmTable.horizontalAdvance(headerText) + 2 * headerMargin + extraPadding;
+        tableView->setColumnWidth(col, qMax(qMax(contentWidth, headerWidth), minWidth));
+    }
+}
+
+
+void UiUtil::widenDateEdit(QDateTimeEdit* dateEdit, int extraPaddingChars)
+{
+    QFontMetrics fm(dateEdit->fontMetrics());
+    int naturalWidth = dateEdit->sizeHint().width();
+    dateEdit->setMinimumWidth(naturalWidth + fm.averageCharWidth() * extraPaddingChars);
+}
+
+
 QFont UiUtil::screenMonoFont(const QString& context)
 {
     QFont mono = QFontDatabase::systemFont(QFontDatabase::FixedFont);

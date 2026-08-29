@@ -50,7 +50,7 @@ inline const QString APP_NAME = QString("graphical-budget-planner");
 /**
  * @brief Version of the application.
  */
-inline const QString APP_VERSION  = QString("1.8.0");
+inline const QString APP_VERSION  = QString("1.8.1");
 
 
 }

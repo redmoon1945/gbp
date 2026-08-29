@@ -299,9 +299,42 @@ static bool detectDarkTheme(const QString& desktop = "")
 
 
 /**
+ * @brief Count the log files belonging to one workspace.
+ * @details Log filenames follow "yyyy-MM-dd__hh_mm_ss.txt" for the default workspace, or
+ * "yyyy-MM-dd__hh_mm_ss_WORKSPACE.txt" for a named workspace (see GbpLogger). The exact
+ * length check avoids one workspace's name matching as a substring of another's.
+ * @param logFiles All *.txt files found in the log directory.
+ * @param workspaceName Workspace name, or an empty string for the default workspace.
+ * @return Number of log files belonging to that workspace.
+ */
+static int countLogFiles(const QFileInfoList &logFiles, const QString &workspaceName)
+{
+    const int timestampLength = 20; // "yyyy-MM-dd__hh_mm_ss"
+    int count = 0;
+
+    if (workspaceName.isEmpty()) {
+        for (const QFileInfo &logInfo : logFiles) {
+            if (logInfo.fileName().length() == timestampLength + 4) { // + ".txt"
+                count++;
+            }
+        }
+    } else {
+        QString suffix = "_" + workspaceName + ".txt";
+        for (const QFileInfo &logInfo : logFiles) {
+            QString name = logInfo.fileName();
+            if (name.endsWith(suffix) && name.length() == timestampLength + suffix.length()) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+/**
  * @brief List all workspaces found in the config directory.
  * @details Scans .ini files matching the application name pattern and extracts workspace names.
- * Shows last modified date for each workspace. The default workspace is always listed first.
+ * Shows how many log files belong to each workspace. The default workspace is always listed
+ * first.
  */
 static void listWorkspaces()
 {
@@ -316,9 +349,6 @@ static void listWorkspaces()
     // This is the same path as the one that will later be used by GbpController
     QString configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
     QString appNameStr = Constants::APP_NAME;
-
-    std::cout << Constants::APP_NAME.toStdString() << " - Workspaces\n";
-    std::cout << "====================================================================\n\n";
 
     QDir dir(configPath);
     if (!dir.exists()) {
@@ -335,24 +365,41 @@ static void listWorkspaces()
         std::cout << "  No workspaces found.\n";
         std::cout << "  (Workspaces are created on first application run)\n";
     } else {
+        // Locate the log directory the same way GbpLogger does, without creating it:
+        // AppDataLocation/logs normally, falling back to tempPath()/gbp.
+        QString logFolder = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+            + "/logs";
+        QDir logDir(logFolder);
+        if (!logDir.exists()) {
+            logDir.setPath(QDir::tempPath() + "/gbp");
+        }
+        QFileInfoList logFiles;
+        if (logDir.exists()) {
+            logFiles = logDir.entryInfoList({"*.txt"}, QDir::Files);
+        }
+
         std::cout << "Found " << files.size() << " workspace(s):\n\n";
 
         for (const QFileInfo &fileInfo : files) {
             QString fileName = fileInfo.fileName();
-            QString modified = fileInfo.lastModified().toString("yyyy-MM-dd hh:mm:ss");
 
             // Extract workspace name if present
             // Pattern: graphical-budget-planner_WORKSPACE.ini
             QString prefix = appNameStr + "_";
+            QString workspaceName;
+            QString displayName;
             if (fileName.startsWith(prefix) && fileName.endsWith(".ini")) {
                 int start = prefix.length();
                 int len = fileName.length() - start - 4;
-                std::cout << "  " << fileName.mid(start, len).toStdString()
-                          << "  (last modified: " << modified.toStdString() << ")\n";
+                workspaceName = fileName.mid(start, len);
+                displayName = workspaceName;
             } else {
-                std::cout << "  (default)"
-                          << "  (last modified: " << modified.toStdString() << ")\n";
+                displayName = "(default)";
             }
+
+            int logCount = countLogFiles(logFiles, workspaceName);
+            std::cout << "  " << displayName.toStdString()
+                      << "  (" << logCount << " log file(s))\n";
         }
 
         std::cout << "\nUse -workspace_cleanup to remove all non-default workspaces.\n\n";
@@ -362,10 +409,37 @@ static void listWorkspaces()
 }
 
 /**
- * @brief Remove all non-default workspace config and log files.
+ * @brief Extract the workspace name from a log file name.
+ * @details Log filenames follow "yyyy-MM-dd__hh_mm_ss.txt" for the default workspace, or
+ * "yyyy-MM-dd__hh_mm_ss_WORKSPACE.txt" for a named workspace (see GbpLogger).
+ * @param fileName The log file's base name.
+ * @return The workspace name, or an empty string if this is a default-workspace log (no
+ * suffix) or the name doesn't match the expected pattern. The default workspace's logs must
+ * never be reported as belonging to a named workspace, so any ambiguity resolves to empty.
+ */
+static QString workspaceNameFromLogFileName(const QString &fileName)
+{
+    const int timestampLength = 20; // "yyyy-MM-dd__hh_mm_ss"
+    if (!fileName.endsWith(".txt") || fileName.length() <= timestampLength + 4
+        || fileName.at(timestampLength) != QChar('_')) {
+        return QString();
+    }
+    int start = timestampLength + 1;
+    int len = fileName.length() - start - 4;
+    if (len <= 0) {
+        return QString();
+    }
+    return fileName.mid(start, len);
+}
+
+/**
+ * @brief Remove all non-default workspace config and log files, plus orphaned log files.
  * @details Deletes all .ini files except the default configuration file (without workspace
- * suffix), and deletes all associated log files for each removed workspace. Helps users clean
- * up unused workspaces.
+ * suffix), and deletes all associated log files for each removed workspace. Also deletes
+ * "orphaned" log files: logs whose workspace name has no matching .ini file at all (e.g. left
+ * behind by a workspace removed by hand before this tool existed). The default workspace's
+ * config and log files are never touched. Shows a preview of what will be deleted and always
+ * asks for confirmation before doing anything irreversible.
  */
 static void cleanupWorkspaces()
 {
@@ -380,10 +454,6 @@ static void cleanupWorkspaces()
     // This is the same path as the one that will later be used by GbpController
     QString configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
     QString appNameStr = Constants::APP_NAME;
-
-    std::cout << Constants::APP_NAME.toStdString() << " - Workspace Cleanup\n";
-    std::cout << "====================================================================\n";
-    std::cout << "Location: " << configPath.toStdString() << "\n\n";
 
     QDir dir(configPath);
     if (!dir.exists()) {
@@ -403,8 +473,93 @@ static void cleanupWorkspaces()
     }
 
     QString defaultConfigName = appNameStr + ".ini";
-    int deletedCount = 0;
-    int skippedCount = 0;
+
+    // Build the list of workspaces that would actually be deleted, without touching anything
+    // yet, so the user can be shown a preview before we do anything irreversible.
+    QString prefix = appNameStr + "_";
+    QStringList workspacesToDelete;
+    for (const QFileInfo &fileInfo : files) {
+        QString fileName = fileInfo.fileName();
+        if (fileName != defaultConfigName && fileName.startsWith(prefix)
+            && fileName.endsWith(".ini")) {
+            int start = prefix.length();
+            int len = fileName.length() - start - 4;
+            workspacesToDelete.append(fileName.mid(start, len));
+        }
+    }
+
+    // Also find orphaned log files: logs whose workspace name has no corresponding .ini
+    // file at all. The log directory is located the same way GbpLogger does, without
+    // creating it (this is a read-only preview at this point). The default workspace
+    // (no suffix) is never a candidate here: workspaceNameFromLogFileName() only returns
+    // a name for suffixed, non-default logs.
+    QString logFolder = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+        + "/logs";
+    QDir logDir(logFolder);
+    if (!logDir.exists()) {
+        logDir.setPath(QDir::tempPath() + "/gbp");
+    }
+    QStringList orphanedWorkspaces;
+    QFileInfoList logFiles;
+    if (logDir.exists()) {
+        logFiles = logDir.entryInfoList({"*.txt"}, QDir::Files);
+        for (const QFileInfo &logInfo : logFiles) {
+            QString ws = workspaceNameFromLogFileName(logInfo.fileName());
+            if (!ws.isEmpty() && !workspacesToDelete.contains(ws)
+                && !orphanedWorkspaces.contains(ws)) {
+                orphanedWorkspaces.append(ws);
+            }
+        }
+    }
+
+    if (workspacesToDelete.isEmpty() && orphanedWorkspaces.isEmpty()) {
+        std::cout << "  No non-default workspace configuration files found.\n";
+        std::cout << "  Nothing to clean up.\n";
+        exit(0);
+    }
+
+    if (!workspacesToDelete.isEmpty()) {
+        std::cout << "The following workspace(s) will be permanently deleted:\n\n";
+        for (const QString &workspaceName : workspacesToDelete) {
+            std::cout << "  " << workspaceName.toStdString() << "\n";
+        }
+        std::cout << "\n";
+    }
+
+    if (!orphanedWorkspaces.isEmpty()) {
+        std::cout << "The following workspace(s) have no configuration file, only leftover "
+                     "log files.\nTheir log files will also be permanently deleted:\n\n";
+        for (const QString &workspaceName : orphanedWorkspaces) {
+            std::cout << "  " << workspaceName.toStdString() << "\n";
+        }
+        std::cout << "\n";
+    }
+
+    std::cout << "The default workspace is never touched.\n";
+    std::cout << "This cannot be undone.\n\n";
+
+#ifdef _WIN32
+    // gbp is a GUI-subsystem app on Windows: launching it from cmd.exe/PowerShell does not
+    // make the shell wait for it, so the shell immediately starts reading its own next
+    // command from the same console gbp is attached to - racing gbp for the user's
+    // keystrokes at an interactive prompt (typing "yes" can end up being run as a command
+    // by the shell instead of answering this prompt). Proceed without asking for
+    // confirmation on Windows instead; the preview above is the safeguard here.
+    std::cout << "No interactive confirmation available on Windows - proceeding "
+                 "(see preview above).\n\n";
+#else
+    std::cout << "Type 'yes' to continue, anything else to cancel: ";
+    std::cout.flush();
+    std::string response;
+    std::getline(std::cin, response);
+    QString confirmation = QString::fromStdString(response).trimmed();
+    if (confirmation.compare("yes", Qt::CaseInsensitive) != 0) {
+        std::cout << "\nCancelled. No files were deleted.\n";
+        exit(0);
+    }
+    std::cout << "\n";
+#endif
+
     QStringList deletedWorkspaces;
 
     std::cout << "Scanning configuration files...\n\n";
@@ -415,7 +570,6 @@ static void cleanupWorkspaces()
         // Skip the default configuration file
         if (fileName == defaultConfigName) {
             std::cout << "  Keeping: " << fileName.toStdString() << " (default config)\n";
-            skippedCount++;
             continue;
         }
 
@@ -423,9 +577,7 @@ static void cleanupWorkspaces()
         QFile file(fileInfo.absoluteFilePath());
         if (file.remove()) {
             std::cout << "  Deleted: " << fileName.toStdString() << "\n";
-            deletedCount++;
             // Extract workspace name for log cleanup
-            QString prefix = appNameStr + "_";
             if (fileName.startsWith(prefix) && fileName.endsWith(".ini")) {
                 int start = prefix.length();
                 int len = fileName.length() - start - 4;
@@ -436,27 +588,41 @@ static void cleanupWorkspaces()
         }
     }
 
-    // Delete associated log files for removed workspaces
+    // Delete log files for removed workspaces, plus any orphaned logs found earlier (the
+    // default workspace is never included in either list). This reuses the log file
+    // listing already gathered above, deleting directly rather than going through
+    // GbpLogger::getInstance() - constructing that singleton here would create a new log
+    // file of its own as a side effect, which would be a confusing thing for a cleanup
+    // command to do.
     QStringList deletedLogs;
     QStringList failedLogs;
-    if (!deletedWorkspaces.isEmpty()) {
-        std::cout << "\nDeleting associated log files...\n";
-        GbpLogger::getInstance().removeWorkspaceLogs(deletedWorkspaces, deletedLogs, failedLogs);
-        for (const QString& n : failedLogs) {
-            std::cout << "  Failed to delete: " << n.toStdString() << "\n";
+    QStringList workspacesToPurgeLogsFor = deletedWorkspaces + orphanedWorkspaces;
+    if (!workspacesToPurgeLogsFor.isEmpty()) {
+        std::cout << "\nDeleting associated log files...\n\n";
+        for (const QString &ws : workspacesToPurgeLogsFor) {
+            int deletedForWorkspace = 0;
+            for (const QFileInfo &logInfo : logFiles) {
+                if (workspaceNameFromLogFileName(logInfo.fileName()) != ws) {
+                    continue;
+                }
+                if (QFile::remove(logInfo.absoluteFilePath())) {
+                    deletedLogs.append(logInfo.fileName());
+                    deletedForWorkspace++;
+                } else {
+                    failedLogs.append(logInfo.fileName());
+                    std::cout << "  Failed to delete: " << logInfo.fileName().toStdString()
+                              << "\n";
+                }
+            }
+            std::cout << "  " << ws.toStdString() << ": " << deletedForWorkspace
+                      << " log file(s) deleted\n";
         }
     }
 
-    std::cout << "\n====================================================================\n";
-    std::cout << "Cleanup complete:\n";
-    std::cout << "  Config files kept:    " << skippedCount << "\n";
-    std::cout << "  Config files deleted: " << deletedCount << "\n";
-    std::cout << "  Log files deleted:    " << deletedLogs.size() << "\n\n";
+    std::cout << "\n  Log files deleted: " << deletedLogs.size() << "\n\n";
 
     exit(0);
 }
-
-void showWelcomeScreen(bool french);
 
 /**
  * @brief Get the Windows look style from command-line arguments.
@@ -489,11 +655,13 @@ static void checkHelpArgument(int argc, char *argv[])
 {
 #ifdef _WIN32
     // GUI subsystem has no console. Attach to the parent (cmd/PowerShell) so that
-    // --help and workspace commands can print. Fails silently when launched without
-    // a console (e.g. double-click), leaving stdout unconnected as usual.
+    // --help and workspace commands can print, and so -workspace_cleanup can read the
+    // user's confirmation. Fails silently when launched without a console (e.g.
+    // double-click), leaving stdout/stdin unconnected as usual.
     if (AttachConsole(ATTACH_PARENT_PROCESS)) {
         freopen("CONOUT$", "w", stdout);
         freopen("CONOUT$", "w", stderr);
+        freopen("CONIN$", "r", stdin);
         std::cout << "\n";
     }
 #endif
@@ -529,9 +697,9 @@ static void checkHelpArgument(int argc, char *argv[])
             std::string appName = Constants::APP_NAME.toStdString();
             std::string appVer = Constants::APP_VERSION.toStdString();
             std::cout <<  appName << " v" << appVer << "\n";
-            std::cout << "USAGE:\n";
+            std::cout << "\nUSAGE:\n";
             std::cout << "  gbp [options]\n";
-            std::cout << "OPTIONS:\n";
+            std::cout << "\nOPTIONS:\n";
             std::cout << "  -h, --help\n";
             std::cout << "    Display help message and exit\n";
             std::cout << "\n  APPEARANCE OPTIONS:\n";
@@ -546,7 +714,8 @@ static void checkHelpArgument(int argc, char *argv[])
             std::cout << "  -xwayland\n";
             std::cout << "    Force XWayland instead of using native Wayland (Linux only)\n";
             std::cout << "  -noxwayland\n";
-            std::cout << "    Prevent switching to XWayland, use native Wayland only (Linux only)\n";
+            std::cout << "    Prevent switching to XWayland, use native Wayland only "
+                         "(Linux only)\n";
             std::cout << "\n  LOCALIZATION OPTIONS:\n";
             std::cout << "  -locale=LANG-TERRITORY\n";
             std::cout << "    Override system locale (e.g., -locale=en-US) (all platforms)\n";
@@ -566,12 +735,15 @@ static void checkHelpArgument(int argc, char *argv[])
             std::cout << "    Each workspace uses separate settings and logs (all platforms)\n";
             std::cout << "  -workspace_list\n";
             std::cout << "    List all workspace configuration files and exit\n";
-            std::cout << "    Shows location, size, and last modified date for each config\n";
+            std::cout << "    Shows the configuration directory location, workspace names,\n";
+            std::cout << "    and the number of log files for each\n";
             std::cout << "  -workspace_cleanup\n";
             std::cout << "    Remove all non-default workspace .ini files and their\n";
             std::cout << "    associated log files, then exit\n";
             std::cout << "    Only keeps the default configuration file\n";
-            std::cout << "    Use -workspace_list to preview before cleaning\n\n";
+            std::cout << "    Use -workspace_list to preview before cleaning\n";
+            std::cout << "    Shows the files to be deleted and asks for confirmation\n";
+            std::cout << "    (Linux/macOS only - proceeds without asking on Windows)\n\n";
 
             exit(0);
         }
@@ -816,6 +988,13 @@ int main(int argc, char *argv[])
     // Star the GBP Controller by loading settings
     GbpController::getInstance().loadSettings();
 
+    // Report the cache directory location, same as the config/log file locations reported
+    // above (see GbpController::loadSettings() and GbpLogger's constructor).
+    QString cacheDirString = QString("Cache directory : %1")
+        .arg(QDir::toNativeSeparators(
+            QStandardPaths::writableLocation(QStandardPaths::CacheLocation)));
+    qInfo().noquote() << cacheDirString;
+
     // Indicate if we have detected Dark Theme for the desktop
     GbpController::getInstance().setSystemDesktopDarkTheme(darkThemeDetected);
 
@@ -973,7 +1152,7 @@ int main(int argc, char *argv[])
     if (GbpController::getInstance().getNoSettingsFileAtStartup()==true) {
         // no settings file found : this must be the first time the app is run
         // display a welcome screen
-        showWelcomeScreen( (sysLocale.language()==QLocale::French) ? (true) : (false));
+        w.showWelcomeScreen();
     }
 
     w.show();
@@ -984,48 +1163,4 @@ int main(int argc, char *argv[])
 
 }
 
-void showWelcomeScreen(bool french)
-{
-    // first, copy the changelog included in the resource to a tmp directory
-    // Name of the file in temp dir is dependant on the version !
-    QString baseFileName = QString("/gbp_Welcome-%1-%2.pdf").arg((french)?("fr"):("en")).
-        arg(QCoreApplication::applicationVersion());
-    QString tempFileFullName = QDir::tempPath().append(baseFileName);
-    QFile tempFile(tempFileFullName);
-
-    // build resource name and check if it exists (it should)
-    QFile welcomeFile(QString(":/Doc/resources/Graphical Budget Planner - Welcome-%1.pdf").
-        arg((french)?("fr"):("en")));
-    if(welcomeFile.exists()==false){
-        LOG_ERROR(
-            QString("Viewing welcome : %1 does not exist in the resource file").arg(
-            welcomeFile.fileName()));
-        return;
-    }
-
-    //  check if the temp file exist. Copy only if non existent
-    bool success;
-    if (tempFile.exists()==true) {
-        LOG_INFO("Viewing welcome : File already exists in temp directory, not copied");
-    } else {
-        LOG_INFO(QString("Viewing welcome : Ready to copy change log in tmp directory : %1")
-            .arg(tempFileFullName));
-        success = welcomeFile.copy(tempFileFullName);
-        if (success==true) {
-            LOG_INFO(QString("Viewing welcome : Copy succeeded"));
-
-        } else {
-            LOG_ERROR(QString("Viewing welcome : Copy failed"));
-            return;
-        }
-    }
-
-    // then, use the system defaut application to read the file
-    success = QDesktopServices::openUrl(QUrl::fromLocalFile(tempFileFullName));
-    if (success==true) {
-        LOG_INFO(QString("Viewing welcome : PDF viewer launch succeeded"));
-    } else {
-        LOG_ERROR(QString("Viewing welcome : PDF viewer launch failed"));
-    }
-}
 

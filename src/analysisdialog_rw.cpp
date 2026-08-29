@@ -270,12 +270,12 @@ void AnalysisDialog::rwUpdateLegendWidgets(int rank, double amount, double perce
     if (rank==-1) {
         ui->rwRankLabel->setText("");
     } else {
-        ui->rwRankLabel->setText(QString::number(rank));
+        ui->rwRankLabel->setText(locale.toString(rank));
     }
 
     QString amountString = CurrencyHelper::formatAmount(amount, currInfo, locale, false);
     ui->rwAmountLabel->setText(amountString);
-    ui->rwPercentageLabel->setText(QString::number(percentage, 'f', 2));
+    ui->rwPercentageLabel->setText(locale.toString(percentage, 'f', 2));
     ui->rwPercentageSignLabel->setVisible(true);
 }
 

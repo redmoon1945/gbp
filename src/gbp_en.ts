@@ -25,13 +25,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="177"/>
+        <location filename="aboutdialog.ui" line="180"/>
         <source>Config file :</source>
         <oldsource>Config file : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="271"/>
+        <location filename="aboutdialog.ui" line="309"/>
         <source>This application (named graphical-budget-planner, a.k.a. GBP) and all its source code are licensed under the GNU Affero General Public License version 3 or later ( that is AGPL-3.0-or-later). It&apos;s Free Software. See https://www.gnu.org/licenses/#AGPL/  for the details of the licence.
 
 graphical-budget-planner is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY, ACCURACY, CORRECTNESS or FITNESS FOR A PARTICULAR PURPOSE.
@@ -40,13 +40,13 @@ graphical-budget-planner is distributed in the hope that it will be useful, but 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="296"/>
+        <location filename="aboutdialog.ui" line="334"/>
         <source>Source code of graphical-budget-planner can be found on Github at this URL :
 https://github.com/redmoon1945/gbp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="318"/>
+        <location filename="aboutdialog.ui" line="356"/>
         <source>Special thanks to :
 
 * Tobias Leupold : code to calculate difference between 2 dates
@@ -57,17 +57,17 @@ https://github.com/redmoon1945/gbp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="120"/>
+        <location filename="aboutdialog.ui" line="123"/>
         <source>Log file :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="260"/>
+        <location filename="aboutdialog.ui" line="298"/>
         <source>Licence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="191"/>
+        <location filename="aboutdialog.ui" line="205"/>
         <source>Locale used :</source>
         <translation type="unfinished"></translation>
     </message>
@@ -79,7 +79,7 @@ p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
-&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Noto Sans&apos;; font-size:14pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Graphical Budget Planner (GBP)&lt;/span&gt; is a free, open-source &amp;quot;desktop&amp;quot; application, designed to ease significantly the process of creating and maintaining a personal budget.&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;GBP allows you to:&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;
@@ -98,7 +98,7 @@ p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Noto Sans&apos;; font-size:16pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Graphical Budget Planner (GBP)&lt;/span&gt; is a free, open-source &amp;quot;desktop&amp;quot; application, designed to ease significantly the process of creating and maintaining a personal budget.&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;GBP allows you to:&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;
@@ -114,74 +114,79 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="152"/>
+        <location filename="aboutdialog.ui" line="155"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="209"/>
+        <location filename="aboutdialog.ui" line="223"/>
         <source>Workspace :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="227"/>
+        <location filename="aboutdialog.ui" line="241"/>
         <source>Log verbosity :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="241"/>
+        <location filename="aboutdialog.ui" line="255"/>
         <source>Log privacy :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="285"/>
+        <location filename="aboutdialog.ui" line="187"/>
+        <source>Cache :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="aboutdialog.ui" line="323"/>
         <source>Source code</source>
         <oldsource>Source Code</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="307"/>
+        <location filename="aboutdialog.ui" line="345"/>
         <source>Credits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="340"/>
+        <location filename="aboutdialog.ui" line="378"/>
         <source>Authors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="349"/>
+        <location filename="aboutdialog.ui" line="387"/>
         <source>Claude Dumas
 redmoon1945@protonmail.com</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="392"/>
+        <location filename="aboutdialog.ui" line="430"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="aboutdialog.cpp" line="42"/>
-        <source>Built on : %1 %2</source>
-        <translation></translation>
+        <location filename="aboutdialog.cpp" line="76"/>
+        <source>Built on : %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.cpp" line="78"/>
+        <location filename="aboutdialog.cpp" line="98"/>
         <source>Debug</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.cpp" line="78"/>
+        <location filename="aboutdialog.cpp" line="98"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.cpp" line="84"/>
+        <location filename="aboutdialog.cpp" line="104"/>
         <source>Allow private</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="aboutdialog.cpp" line="84"/>
+        <location filename="aboutdialog.cpp" line="104"/>
         <source>Public only</source>
         <translation type="unfinished"></translation>
     </message>
@@ -195,7 +200,7 @@ redmoon1945@protonmail.com</source>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="168"/>
-        <location filename="analysisdialog_common.cpp" line="825"/>
+        <location filename="analysisdialog_common.cpp" line="818"/>
         <source>Relative weight</source>
         <oldsource>Relative Weight</oldsource>
         <translation type="unfinished"></translation>
@@ -220,63 +225,63 @@ redmoon1945@protonmail.com</source>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="200"/>
-        <location filename="analysisdialog.ui" line="758"/>
-        <location filename="analysisdialog.ui" line="1545"/>
-        <location filename="analysisdialog.ui" line="1760"/>
+        <location filename="analysisdialog.ui" line="764"/>
+        <location filename="analysisdialog.ui" line="1551"/>
+        <location filename="analysisdialog.ui" line="1766"/>
         <location filename="analysisdialog_period_chart.cpp" line="141"/>
-        <location filename="analysisdialog_period_chart.cpp" line="343"/>
+        <location filename="analysisdialog_period_chart.cpp" line="353"/>
         <location filename="analysisdialog_period_list.cpp" line="254"/>
         <source>Income</source>
         <translation></translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="213"/>
-        <location filename="analysisdialog.ui" line="768"/>
+        <location filename="analysisdialog.ui" line="774"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the expenses.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="analysisdialog.ui" line="216"/>
-        <location filename="analysisdialog.ui" line="771"/>
-        <location filename="analysisdialog.ui" line="1075"/>
-        <location filename="analysisdialog.ui" line="1561"/>
-        <location filename="analysisdialog.ui" line="1776"/>
-        <location filename="analysisdialog_common.cpp" line="172"/>
+        <location filename="analysisdialog.ui" line="777"/>
+        <location filename="analysisdialog.ui" line="1081"/>
+        <location filename="analysisdialog.ui" line="1567"/>
+        <location filename="analysisdialog.ui" line="1782"/>
+        <location filename="analysisdialog_common.cpp" line="171"/>
         <location filename="analysisdialog_period_chart.cpp" line="142"/>
-        <location filename="analysisdialog_period_chart.cpp" line="344"/>
+        <location filename="analysisdialog_period_chart.cpp" line="354"/>
         <location filename="analysisdialog_period_list.cpp" line="258"/>
         <source>Expenses</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1513"/>
+        <location filename="analysisdialog.ui" line="1519"/>
         <source>Tags</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="781"/>
+        <location filename="analysisdialog.ui" line="787"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account the Cash Stream Definitions of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="797"/>
+        <location filename="analysisdialog.ui" line="803"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the differences between the Cash Stream Definition of type &amp;quot;Income&amp;quot; and &amp;quot;Expense&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display the deltas between incomes and expences.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="416"/>
+        <location filename="analysisdialog.ui" line="422"/>
         <source>Percentage :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="423"/>
+        <location filename="analysisdialog.ui" line="429"/>
         <source>Amount :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="485"/>
+        <location filename="analysisdialog.ui" line="491"/>
         <source>Rank :</source>
         <translation type="unfinished"></translation>
     </message>
@@ -319,400 +324,400 @@ redmoon1945@protonmail.com</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="439"/>
+        <location filename="analysisdialog.ui" line="445"/>
         <source>%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="549"/>
+        <location filename="analysisdialog.ui" line="555"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unselect everything in the Legend listbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="552"/>
+        <location filename="analysisdialog.ui" line="558"/>
         <source>Clear selection</source>
         <oldsource>Clear Selection</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="595"/>
+        <location filename="analysisdialog.ui" line="601"/>
         <source>Period - chart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="671"/>
+        <location filename="analysisdialog.ui" line="677"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of bars displayed at a time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="710"/>
+        <location filename="analysisdialog.ui" line="716"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pan to the previous set of bars.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="713"/>
+        <location filename="analysisdialog.ui" line="719"/>
         <source>◀</source>
         <oldsource>←</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="723"/>
+        <location filename="analysisdialog.ui" line="729"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pan to the next set of bars.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="726"/>
+        <location filename="analysisdialog.ui" line="732"/>
         <source>▶</source>
         <oldsource>→</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="755"/>
+        <location filename="analysisdialog.ui" line="761"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take into account only the Cash Stream Definitions of type &amp;quot;Income&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Display only the Cash Stream Definitions of type &amp;quot;Income&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="784"/>
+        <location filename="analysisdialog.ui" line="790"/>
         <source>Income and expenses</source>
         <oldsource>Incomes and Expenses</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1146"/>
+        <location filename="analysisdialog.ui" line="1152"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the last month (or year in yearly mode) of the projection is hidden and excluded from the colour scale&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the last completed month (or year in yearly mode) is hidden and excluded from the colour scale&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1149"/>
-        <location filename="analysisdialog_period_heatmap.cpp" line="498"/>
+        <location filename="analysisdialog.ui" line="1155"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="505"/>
         <source>Exclude last month</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1724"/>
+        <location filename="analysisdialog.ui" line="1730"/>
         <source>Compare CSD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1999"/>
+        <location filename="analysisdialog.ui" line="2005"/>
         <source>Selection →   </source>
         <oldsource>Selected point →  Date : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="641"/>
-        <location filename="analysisdialog.ui" line="935"/>
+        <location filename="analysisdialog.ui" line="647"/>
+        <location filename="analysisdialog.ui" line="941"/>
         <source>Annual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1014"/>
+        <location filename="analysisdialog.ui" line="1020"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show income, expenses or delta for each month, laid out in a year × month grid&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>Show income, expenses or delta for each month, laid out in a year × month grid</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="631"/>
-        <location filename="analysisdialog.ui" line="925"/>
-        <location filename="analysisdialog.ui" line="1017"/>
+        <location filename="analysisdialog.ui" line="637"/>
+        <location filename="analysisdialog.ui" line="931"/>
+        <location filename="analysisdialog.ui" line="1023"/>
         <source>Monthly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="896"/>
+        <location filename="analysisdialog.ui" line="902"/>
         <source>Period - list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="983"/>
+        <location filename="analysisdialog.ui" line="989"/>
         <source>Period - heatmap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1030"/>
+        <location filename="analysisdialog.ui" line="1036"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the annual total for each year as a colour-coded cell with the year written inside&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>Show the annual total for each year as a colour-coded cell with the year written inside</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1033"/>
+        <location filename="analysisdialog.ui" line="1039"/>
         <source>Yearly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1059"/>
+        <location filename="analysisdialog.ui" line="1065"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Colour each cell by its income amount: the higher the income, the more saturated the colour&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>Colour each cell by its income amount: the higher the income, the more saturated the colour</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1072"/>
+        <location filename="analysisdialog.ui" line="1078"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Colour each cell by its expense amount: the higher the expenses, the more saturated the colour&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>Colour each cell by its expense amount: the higher the expenses, the more saturated the colour</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1085"/>
+        <location filename="analysisdialog.ui" line="1091"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Colour each cell by its delta (income minus expenses): positive values use the Max colour, negative values use the Min colour&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>Colour each cell by its delta (income minus expenses): positive values use the Max colour, negative values use the Min colour</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1117"/>
+        <location filename="analysisdialog.ui" line="1123"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the current month (or year in yearly mode) is hidden and excluded from the colour scale, since its data is incomplete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>When checked, the current month (or year in yearly mode) is hidden and excluded from the colour scale, since its data is incomplete</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1173"/>
+        <location filename="analysisdialog.ui" line="1179"/>
         <source>Min color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1180"/>
+        <location filename="analysisdialog.ui" line="1186"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to choose the colour for the most negative delta values (only active in Delta mode)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>Click to choose the colour for the most negative delta values (only active in Delta mode)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1193"/>
+        <location filename="analysisdialog.ui" line="1199"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset Min color to default (red)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>Reset Min color to default (red)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1222"/>
+        <location filename="analysisdialog.ui" line="1228"/>
         <source>Max color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="432"/>
-        <location filename="analysisdialog.ui" line="463"/>
-        <location filename="analysisdialog.ui" line="494"/>
+        <location filename="analysisdialog.ui" line="438"/>
+        <location filename="analysisdialog.ui" line="469"/>
+        <location filename="analysisdialog.ui" line="500"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="884"/>
+        <location filename="analysisdialog.ui" line="890"/>
         <source>TextLabel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1542"/>
+        <location filename="analysisdialog.ui" line="1548"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For each tag selected, take into account only the Cash Stream Definitions of type &amp;quot;income&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1558"/>
+        <location filename="analysisdialog.ui" line="1564"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For each tag selected, take into account only the Cash Stream Definitions of type &amp;quot;expense&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1587"/>
+        <location filename="analysisdialog.ui" line="1593"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the tags for which the contribution will be compared&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1590"/>
+        <location filename="analysisdialog.ui" line="1596"/>
         <source>Select tags...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1616"/>
+        <location filename="analysisdialog.ui" line="1622"/>
         <source>0 selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1644"/>
+        <location filename="analysisdialog.ui" line="1650"/>
         <source>Total amount for that period : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1651"/>
+        <location filename="analysisdialog.ui" line="1657"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Total amount for that period, not taking into account any tag.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Total amount for that period, not taking into account any tag links.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1654"/>
+        <location filename="analysisdialog.ui" line="1660"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1062"/>
-        <location filename="analysisdialog_common.cpp" line="171"/>
+        <location filename="analysisdialog.ui" line="1068"/>
+        <location filename="analysisdialog_common.cpp" line="170"/>
         <source>Incomes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1196"/>
-        <location filename="analysisdialog.ui" line="1245"/>
+        <location filename="analysisdialog.ui" line="1202"/>
+        <location filename="analysisdialog.ui" line="1251"/>
         <source>↺</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1271"/>
+        <location filename="analysisdialog.ui" line="1277"/>
         <source>Cell size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1278"/>
+        <location filename="analysisdialog.ui" line="1284"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normal: default cell size — Big: 1.5× — Bigger: 2×&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1285"/>
+        <location filename="analysisdialog.ui" line="1291"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1290"/>
+        <location filename="analysisdialog.ui" line="1296"/>
         <source>Big</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1295"/>
+        <location filename="analysisdialog.ui" line="1301"/>
         <source>Bigger</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1120"/>
-        <location filename="analysisdialog_common.cpp" line="418"/>
-        <location filename="analysisdialog_period_heatmap.cpp" line="497"/>
+        <location filename="analysisdialog.ui" line="1126"/>
+        <location filename="analysisdialog_common.cpp" line="411"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="504"/>
         <source>Exclude current month</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="664"/>
+        <location filename="analysisdialog.ui" line="670"/>
         <source>Duration :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="687"/>
-        <location filename="analysisdialog_period_chart.cpp" line="604"/>
+        <location filename="analysisdialog.ui" line="693"/>
+        <location filename="analysisdialog_period_chart.cpp" line="614"/>
         <source> months</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1229"/>
+        <location filename="analysisdialog.ui" line="1235"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to choose the colour for the maximum end of the scale&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>Click to choose the colour for the maximum end of the scale</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1242"/>
+        <location filename="analysisdialog.ui" line="1248"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset Max color to default (green)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset Max color to default (green for Income and Delta, red for Expenses)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1428"/>
+        <location filename="analysisdialog.ui" line="1434"/>
         <source>Zero (breakeven)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1488"/>
+        <location filename="analysisdialog.ui" line="1494"/>
         <source>Outside period</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1757"/>
+        <location filename="analysisdialog.ui" line="1763"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show Cash Stream Definitions of type &amp;quot;income&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1773"/>
+        <location filename="analysisdialog.ui" line="1779"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show Cash Stream Definitions of type &amp;quot;expense&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1807"/>
+        <location filename="analysisdialog.ui" line="1813"/>
         <source>(max. of 10)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1897"/>
+        <location filename="analysisdialog.ui" line="1903"/>
         <source>Unselect all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1950"/>
+        <location filename="analysisdialog.ui" line="1956"/>
         <source>Fit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1976"/>
+        <location filename="analysisdialog.ui" line="1982"/>
         <source>Points</source>
         <oldsource>Show points</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="2045"/>
+        <location filename="analysisdialog.ui" line="2051"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="2080"/>
+        <location filename="analysisdialog.ui" line="2086"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export the table to a CSV formatted file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export the table in a CSV formatted file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="862"/>
-        <location filename="analysisdialog_common.cpp" line="873"/>
+        <location filename="analysisdialog_common.cpp" line="855"/>
+        <location filename="analysisdialog_common.cpp" line="866"/>
         <source>Export table...</source>
         <oldsource>Export table to CSV...</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="2093"/>
+        <location filename="analysisdialog.ui" line="2099"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export the chart to a PNG file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export the chart in a PNG file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="2096"/>
+        <location filename="analysisdialog.ui" line="2102"/>
         <source>Export chart...</source>
         <oldsource>Export chart as image file...</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="2119"/>
+        <location filename="analysisdialog.ui" line="2125"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="171"/>
+        <location filename="analysisdialog_common.cpp" line="170"/>
         <location filename="analysisdialog_period_list.cpp" line="53"/>
         <location filename="analysisdialog_period_list.cpp" line="248"/>
         <source>Month</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="172"/>
+        <location filename="analysisdialog_common.cpp" line="171"/>
         <source>Δ Incomes (%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="172"/>
+        <location filename="analysisdialog_common.cpp" line="171"/>
         <source>Δ Expenses (%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="173"/>
+        <location filename="analysisdialog_common.cpp" line="172"/>
         <source>Δ Deltas (%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="217"/>
+        <location filename="analysisdialog_common.cpp" line="216"/>
         <source>&lt;html&gt;Number of individual financial events contributing to this tag.&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;Number of individual financial events&lt;br&gt;contributing to this tag.&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1088"/>
+        <location filename="analysisdialog.ui" line="1094"/>
         <location filename="analysisdialog_period_list.cpp" line="262"/>
         <source>Delta</source>
         <translation></translation>
@@ -724,53 +729,53 @@ redmoon1945@protonmail.com</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="173"/>
+        <location filename="analysisdialog_common.cpp" line="172"/>
         <location filename="analysisdialog_period_list.cpp" line="266"/>
         <source>Cash balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="125"/>
+        <location filename="analysisdialog_common.cpp" line="124"/>
         <source>No of most significant items :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="800"/>
-        <location filename="analysisdialog_common.cpp" line="173"/>
+        <location filename="analysisdialog.ui" line="806"/>
+        <location filename="analysisdialog_common.cpp" line="172"/>
         <source>Deltas</source>
         <oldsource>Δ Delta (%)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="211"/>
+        <location filename="analysisdialog_common.cpp" line="210"/>
         <source>Tag&apos;s name</source>
         <oldsource>Tag&apos;s Name</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="211"/>
+        <location filename="analysisdialog_common.cpp" line="210"/>
         <source>Total amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_tags.cpp" line="100"/>
+        <location filename="analysisdialog_tags.cpp" line="102"/>
         <source>&quot;From&quot; date is invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_tags.cpp" line="104"/>
+        <location filename="analysisdialog_tags.cpp" line="106"/>
         <source>&quot;To&quot; date is invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="939"/>
-        <location filename="analysisdialog_tags.cpp" line="108"/>
+        <location filename="analysisdialog_common.cpp" line="932"/>
+        <location filename="analysisdialog_tags.cpp" line="110"/>
         <source>&quot;To&quot; date %1 cannot occur before &quot;From&quot; date %2</source>
         <oldsource>&quot;To&quot; Date %1 cannot occur before &quot;From&quot; Date %2</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_tags.cpp" line="113"/>
+        <location filename="analysisdialog_tags.cpp" line="115"/>
         <source>&quot;From&quot; date %1 cannot be smaller than &quot;tomorrow&quot; %2</source>
         <oldsource>&quot;From&quot; Date %1 cannot be smaller than &quot;tomorrow&quot; %2</oldsource>
         <translation type="unfinished"></translation>
@@ -792,13 +797,13 @@ redmoon1945@protonmail.com</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_chart.cpp" line="259"/>
-        <location filename="analysisdialog_period_chart.cpp" line="264"/>
+        <location filename="analysisdialog_period_chart.cpp" line="262"/>
+        <location filename="analysisdialog_period_chart.cpp" line="267"/>
         <source>Mean:%1  StdDeviation:%2  Sum:%3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_chart.cpp" line="616"/>
+        <location filename="analysisdialog_period_chart.cpp" line="626"/>
         <source> years</source>
         <translation type="unfinished"></translation>
     </message>
@@ -820,24 +825,24 @@ redmoon1945@protonmail.com</source>
     <message>
         <location filename="analysisdialog_period_list.cpp" line="312"/>
         <location filename="analysisdialog_rw.cpp" line="339"/>
-        <location filename="analysisdialog_tags.cpp" line="71"/>
+        <location filename="analysisdialog_tags.cpp" line="73"/>
         <source>Export process failed. Write error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="analysisdialog_period_list.cpp" line="316"/>
         <location filename="analysisdialog_rw.cpp" line="343"/>
-        <location filename="analysisdialog_tags.cpp" line="75"/>
+        <location filename="analysisdialog_tags.cpp" line="77"/>
         <source>Export process failed. Data error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="830"/>
+        <location filename="analysisdialog_common.cpp" line="823"/>
         <source>Monthly report chart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="832"/>
+        <location filename="analysisdialog_common.cpp" line="825"/>
         <source>Annual report chart</source>
         <translation type="unfinished"></translation>
     </message>
@@ -847,22 +852,22 @@ redmoon1945@protonmail.com</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="927"/>
+        <location filename="analysisdialog_common.cpp" line="920"/>
         <source>&quot;From&quot; date %1 is invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="933"/>
+        <location filename="analysisdialog_common.cpp" line="926"/>
         <source>&quot;To&quot; date %1 is invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="946"/>
+        <location filename="analysisdialog_common.cpp" line="939"/>
         <source>&quot;From&quot; date %1 cannot occur before &quot;tomorrow&quot; %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="953"/>
+        <location filename="analysisdialog_common.cpp" line="946"/>
         <source>&quot;To&quot; date %1 cannot occur before &quot;tomorrow&quot; %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -887,203 +892,203 @@ redmoon1945@protonmail.com</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_tags.cpp" line="32"/>
+        <location filename="analysisdialog_tags.cpp" line="34"/>
         <source>%1 selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_tags.cpp" line="40"/>
+        <location filename="analysisdialog_tags.cpp" line="42"/>
         <source>Tag name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_tags.cpp" line="41"/>
+        <location filename="analysisdialog_tags.cpp" line="43"/>
         <source>Total Amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_tags.cpp" line="43"/>
+        <location filename="analysisdialog_tags.cpp" line="45"/>
         <source>Weight (%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="2083"/>
-        <location filename="analysisdialog_common.cpp" line="851"/>
+        <location filename="analysisdialog.ui" line="2089"/>
+        <location filename="analysisdialog_common.cpp" line="844"/>
         <source>Export legend...</source>
         <oldsource>Export legend to CSV...</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="211"/>
+        <location filename="analysisdialog_common.cpp" line="210"/>
         <source>Weight (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="212"/>
-        <location filename="analysisdialog_tags.cpp" line="45"/>
+        <location filename="analysisdialog_common.cpp" line="211"/>
+        <location filename="analysisdialog_tags.cpp" line="47"/>
         <source>Count</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="214"/>
+        <location filename="analysisdialog_common.cpp" line="213"/>
         <source>&lt;html&gt;For this period of time, percentage of total amount for Csds associated with this tag, relative to the total amount for all Csds regardless of tags.&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;For this period of time, percentage of total amount&lt;br&gt;for Csds associated with this tag,&lt;br&gt;relative to the total amount for all Csds regardless of tags.&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="279"/>
+        <location filename="analysisdialog_common.cpp" line="272"/>
         <source>&lt;h2&gt;Analysis — Help&lt;/h2&gt;&lt;h3&gt;Global date range&lt;/h3&gt;&lt;p&gt;The &lt;b&gt;From&lt;/b&gt; and &lt;b&gt;To&lt;/b&gt; date controls at the top of the dialog define a shared analysis period. Press &lt;b&gt;Apply dates&lt;/b&gt; to refresh all tabs that use this range: &lt;i&gt;Relative Weight&lt;/i&gt;, &lt;i&gt;Period — Chart&lt;/i&gt;, &lt;i&gt;Tags&lt;/i&gt;, and &lt;i&gt;Compare CSD&lt;/i&gt;. The &lt;i&gt;Period — List&lt;/i&gt; and &lt;i&gt;Period — Heatmap&lt;/i&gt; tabs always show the full scenario range and are unaffected.&lt;/p&gt;&lt;h3&gt;Relative Weight&lt;/h3&gt;&lt;p&gt;Shows how much each active Cash Stream Definition (CSD) contributes to your total income or expenses as a pie chart.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Choose &lt;b&gt;Income&lt;/b&gt; or &lt;b&gt;Expenses&lt;/b&gt; mode with the radio buttons.&lt;/li&gt;&lt;li&gt;Only financial events falling within the global &lt;b&gt;From / To&lt;/b&gt; date range are counted. Press &lt;b&gt;Apply dates&lt;/b&gt; at the top to refresh.&lt;/li&gt;&lt;li&gt;Click a pie slice to select it: the rank, amount, and percentage of the corresponding CSD are highlighted in the legend below the chart.&lt;/li&gt;&lt;li&gt;The &lt;b&gt;N elements&lt;/b&gt; spinbox limits how many CSDs are shown; smaller CSDs are grouped into an &amp;ldquo;Others&amp;rdquo; slice.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export legend…&lt;/b&gt; to save the full ranked list (name, amount, percentage) as a CSV file.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Period — Chart&lt;/h3&gt;&lt;p&gt;Bar chart that aggregates financial data by month or by year, letting you spot trends and seasonal patterns over time.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Switch between &lt;b&gt;Monthly&lt;/b&gt; and &lt;b&gt;Annual&lt;/b&gt; granularity with the radio buttons at the top.&lt;/li&gt;&lt;li&gt;Choose what to display: &lt;b&gt;Income&lt;/b&gt;, &lt;b&gt;Expenses&lt;/b&gt;, &lt;b&gt;Income + Expenses&lt;/b&gt; (both bar sets side by side), or &lt;b&gt;Δ&lt;/b&gt; (income minus expenses — positive bars are surplus, negative bars are deficit).&lt;/li&gt;&lt;li&gt;The visible window is defined by the global &lt;b&gt;From / To&lt;/b&gt; date range. The day of the month is ignored: the window snaps to the first day of the &lt;i&gt;From&lt;/i&gt; month/year and the first day of the &lt;i&gt;To&lt;/i&gt; month/year.&lt;/li&gt;&lt;li&gt;Click a bar to see its exact value displayed below the chart.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export image…&lt;/b&gt; to save the chart as a PNG file.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Period — List&lt;/h3&gt;&lt;p&gt;Tabular summary of income, expenses, Δ, and running cash balance for every month or year covered by the scenario. The full scenario range is always shown; the global date range has no effect on this tab.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Switch between &lt;b&gt;Monthly&lt;/b&gt; and &lt;b&gt;Annual&lt;/b&gt; granularity.&lt;/li&gt;&lt;li&gt;Columns: period, income, income change %, expenses, expense change %, Δ (income &amp;minus; expenses), Δ change %, and end-of-period cash balance. Change percentages are relative to the previous period.&lt;/li&gt;&lt;li&gt;The cash balance column uses the &lt;b&gt;starting amount&lt;/b&gt; entered in the main window as its initial value.&lt;/li&gt;&lt;li&gt;Click any column header to sort ascending or descending.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export table…&lt;/b&gt; to save the full table as a CSV file.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Period — Heatmap&lt;/h3&gt;&lt;p&gt;Color-coded grid that encodes financial intensity, making it easy to identify the busiest or most profitable periods at a glance. The full scenario range is always shown; the global date range has no effect on this tab.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Two display granularities: &lt;b&gt;Monthly&lt;/b&gt; (years as rows, January–December as columns) and &lt;b&gt;Yearly&lt;/b&gt; (years arranged left-to-right in a fixed 10-column grid).&lt;/li&gt;&lt;li&gt;Three display modes: &lt;b&gt;Income&lt;/b&gt;, &lt;b&gt;Expenses&lt;/b&gt;, and &lt;b&gt;Δ&lt;/b&gt;.&lt;br&gt;Income/Expenses use a sequential palette: the lightest tint represents the smallest non-zero value, the fully saturated color represents the maximum.&lt;br&gt;Δ uses a diverging palette: a neutral center color for zero (breakeven), the &lt;i&gt;From&lt;/i&gt; color for the most negative period, and the &lt;i&gt;To&lt;/i&gt; color for the most positive period.&lt;/li&gt;&lt;li&gt;Special cell states:&lt;br&gt;Periods &lt;b&gt;outside the scenario range&lt;/b&gt; are shown with a &lt;b&gt;light gray&lt;/b&gt; background and no text.&lt;br&gt;Periods &lt;b&gt;within the scenario but with no financial events&lt;/b&gt; are shown with a &lt;b&gt;medium gray&lt;/b&gt; background and a centered &amp;bull;.&lt;br&gt;In Δ mode, a period where income exactly equals expenses is shown in the neutral center color (black by default).&lt;/li&gt;&lt;li&gt;Use the color-picker buttons to customize the extreme colors. The &lt;b&gt;From&lt;/b&gt; color (negative extreme, Δ mode only) and &lt;b&gt;To&lt;/b&gt; color (maximum) can each be reset to their defaults.&lt;/li&gt;&lt;li&gt;The &lt;b&gt;Cell size&lt;/b&gt; combo adjusts the grid density for readability.&lt;/li&gt;&lt;li&gt;Check &lt;b&gt;Exclude current month / year&lt;/b&gt; (label adapts to the active granularity) to omit the partially-elapsed current period from the color scale calculation.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Tags&lt;/h3&gt;&lt;p&gt;Breaks down total income or expenses by user-defined tags, showing how much each tag contributes to the overall total over a given period.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Choose &lt;b&gt;Income&lt;/b&gt; or &lt;b&gt;Expenses&lt;/b&gt; mode.&lt;/li&gt;&lt;li&gt;Only financial events falling within the global &lt;b&gt;From / To&lt;/b&gt; date range are counted. Press &lt;b&gt;Apply dates&lt;/b&gt; at the top to refresh.&lt;/li&gt;&lt;li&gt;Click &lt;b&gt;Select tags…&lt;/b&gt; to choose which tags to include in the analysis. The label shows how many tags are currently selected.&lt;/li&gt;&lt;li&gt;The table lists each tag with its total &lt;b&gt;amount&lt;/b&gt;, &lt;b&gt;weight&lt;/b&gt; (percentage of the period total), and &lt;b&gt;event count&lt;/b&gt; (number of individual financial events carrying that tag).&lt;/li&gt;&lt;li&gt;A CSD can contribute to a tag even if the tag is not its primary tag, as long as the tag relationship is defined.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export table…&lt;/b&gt; to save the results as a CSV file.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Compare CSD&lt;/h3&gt;&lt;p&gt;Plots the individual (non-cumulative) cashflow events of up to 10 Cash Stream Definitions side by side as step curves, making it easy to compare their timing and amounts.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Choose &lt;b&gt;Income&lt;/b&gt; or &lt;b&gt;Expenses&lt;/b&gt; mode. Only active CSDs of the selected type appear in the list.&lt;/li&gt;&lt;li&gt;Only financial events falling within the global &lt;b&gt;From / To&lt;/b&gt; date range are shown. Press &lt;b&gt;Apply dates&lt;/b&gt; at the top to refresh.&lt;/li&gt;&lt;li&gt;Check up to &lt;b&gt;10 CSDs&lt;/b&gt; from the list on the left. Each checked CSD is assigned a distinct color that it keeps for as long as it remains selected; a small colored square appears next to its name. Checking an eleventh CSD has no effect.&lt;/li&gt;&lt;li&gt;Press &lt;b&gt;Unselect all&lt;/b&gt; to clear all checkmarks and reset all color assignments at once.&lt;/li&gt;&lt;li&gt;The chart shows each event as a horizontal step: the curve holds its value until the next event occurs, making gaps and clusters immediately visible.&lt;/li&gt;&lt;li&gt;Whenever the selection or the Income/Expenses mode changes, the axes are automatically rescaled to fit the new data. Press &lt;b&gt;Fit&lt;/b&gt; at any time to force the same reset manually.&lt;/li&gt;&lt;li&gt;The chart supports &lt;b&gt;pan&lt;/b&gt; (click and drag) and &lt;b&gt;zoom&lt;/b&gt; (mouse wheel, Shift = horizontal only, Ctrl = vertical only).&lt;/li&gt;&lt;li&gt;Click a data point to highlight it and display its date and value below the chart. Click the same point again to deselect it.&lt;/li&gt;&lt;li&gt;Income/Expenses selection and individual checkmarks are preserved when you switch between the two modes; switching back to a mode restores its previous selection.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export image…&lt;/b&gt; to save the chart as a PNG file.&lt;/li&gt;&lt;/ul&gt;</source>
         <oldsource>&lt;h2&gt;Analysis — Help&lt;/h2&gt;&lt;h3&gt;Global date range&lt;/h3&gt;&lt;p&gt;The &lt;b&gt;From&lt;/b&gt; and &lt;b&gt;To&lt;/b&gt; date controls at the top of the dialog define a shared analysis period. Press &lt;b&gt;Apply dates&lt;/b&gt; to refresh all tabs that use this range: &lt;i&gt;Relative Weight&lt;/i&gt;, &lt;i&gt;Period — Chart&lt;/i&gt;, &lt;i&gt;Tags&lt;/i&gt;, and &lt;i&gt;Compare CSD&lt;/i&gt;. The &lt;i&gt;Period — List&lt;/i&gt; and &lt;i&gt;Period — Heatmap&lt;/i&gt; tabs always show the full scenario range and are unaffected.&lt;/p&gt;&lt;h3&gt;Relative Weight&lt;/h3&gt;&lt;p&gt;Shows how much each active Cash Stream Definition (CSD) contributes to your total income or expenses as a pie chart.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Choose &lt;b&gt;Income&lt;/b&gt; or &lt;b&gt;Expenses&lt;/b&gt; mode with the radio buttons.&lt;/li&gt;&lt;li&gt;Only financial events falling within the global &lt;b&gt;From / To&lt;/b&gt; date range are counted. Press &lt;b&gt;Apply dates&lt;/b&gt; at the top to refresh.&lt;/li&gt;&lt;li&gt;Click a pie slice to select it: the rank, amount, and percentage of the corresponding CSD are highlighted in the legend below the chart.&lt;/li&gt;&lt;li&gt;The &lt;b&gt;N elements&lt;/b&gt; spinbox limits how many CSDs are shown; smaller CSDs are grouped into an &amp;ldquo;Others&amp;rdquo; slice.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export legend…&lt;/b&gt; to save the full ranked list (name, amount, percentage) as a CSV file.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Period — Chart&lt;/h3&gt;&lt;p&gt;Bar chart that aggregates financial data by month or by year, letting you spot trends and seasonal patterns over time.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Switch between &lt;b&gt;Monthly&lt;/b&gt; and &lt;b&gt;Annual&lt;/b&gt; granularity with the radio buttons at the top.&lt;/li&gt;&lt;li&gt;Choose what to display: &lt;b&gt;Income&lt;/b&gt;, &lt;b&gt;Expenses&lt;/b&gt;, &lt;b&gt;Income + Expenses&lt;/b&gt; (both bar sets side by side), or &lt;b&gt;Delta&lt;/b&gt; (income minus expenses — positive bars are surplus, negative bars are deficit).&lt;/li&gt;&lt;li&gt;The visible window is defined by the global &lt;b&gt;From / To&lt;/b&gt; date range. The day of the month is ignored: the window snaps to the first day of the &lt;i&gt;From&lt;/i&gt; month/year and the first day of the &lt;i&gt;To&lt;/i&gt; month/year.&lt;/li&gt;&lt;li&gt;Click a bar to see its exact value displayed below the chart.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export image…&lt;/b&gt; to save the chart as a PNG file.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Period — List&lt;/h3&gt;&lt;p&gt;Tabular summary of income, expenses, delta, and running cash balance for every month or year covered by the scenario. The full scenario range is always shown; the global date range has no effect on this tab.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Switch between &lt;b&gt;Monthly&lt;/b&gt; and &lt;b&gt;Annual&lt;/b&gt; granularity.&lt;/li&gt;&lt;li&gt;Columns: period, income, income growth %, expenses, expense growth %, delta (income &amp;minus; expenses), delta growth %, and end-of-period cash balance. Growth percentages are relative to the previous period.&lt;/li&gt;&lt;li&gt;The cash balance column uses the &lt;b&gt;starting amount&lt;/b&gt; entered in the main window as its initial value.&lt;/li&gt;&lt;li&gt;Click any column header to sort ascending or descending.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export table…&lt;/b&gt; to save the full table as a CSV file.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Period — Heatmap&lt;/h3&gt;&lt;p&gt;Color-coded grid that encodes financial intensity, making it easy to identify the busiest or most profitable periods at a glance. The full scenario range is always shown; the global date range has no effect on this tab.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Two display granularities: &lt;b&gt;Monthly&lt;/b&gt; (years as rows, January–December as columns) and &lt;b&gt;Yearly&lt;/b&gt; (years arranged left-to-right in a fixed 10-column grid).&lt;/li&gt;&lt;li&gt;Three display modes: &lt;b&gt;Income&lt;/b&gt;, &lt;b&gt;Expenses&lt;/b&gt;, and &lt;b&gt;Delta&lt;/b&gt;.&lt;br&gt;Income/Expenses use a sequential palette: the lightest tint represents the smallest non-zero value, the fully saturated color represents the maximum.&lt;br&gt;Delta uses a diverging palette: a neutral center color for zero (breakeven), the &lt;i&gt;From&lt;/i&gt; color for the most negative period, and the &lt;i&gt;To&lt;/i&gt; color for the most positive period.&lt;/li&gt;&lt;li&gt;Special cell states:&lt;br&gt;Periods &lt;b&gt;outside the scenario range&lt;/b&gt; are shown with a &lt;b&gt;light gray&lt;/b&gt; background and no text.&lt;br&gt;Periods &lt;b&gt;within the scenario but with no financial events&lt;/b&gt; are shown with a &lt;b&gt;medium gray&lt;/b&gt; background and a centered &amp;bull;.&lt;br&gt;In Delta mode, a period where income exactly equals expenses is shown in the neutral center color (black by default).&lt;/li&gt;&lt;li&gt;Use the color-picker buttons to customize the extreme colors. The &lt;b&gt;From&lt;/b&gt; color (negative extreme, Delta mode only) and &lt;b&gt;To&lt;/b&gt; color (maximum) can each be reset to their defaults.&lt;/li&gt;&lt;li&gt;The &lt;b&gt;Cell size&lt;/b&gt; combo adjusts the grid density for readability.&lt;/li&gt;&lt;li&gt;Check &lt;b&gt;Exclude current month / year&lt;/b&gt; (label adapts to the active granularity) to omit the partially-elapsed current period from the color scale calculation.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Tags&lt;/h3&gt;&lt;p&gt;Breaks down total income or expenses by user-defined tags, showing how much each tag contributes to the overall total over a given period.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Choose &lt;b&gt;Income&lt;/b&gt; or &lt;b&gt;Expenses&lt;/b&gt; mode.&lt;/li&gt;&lt;li&gt;Only financial events falling within the global &lt;b&gt;From / To&lt;/b&gt; date range are counted. Press &lt;b&gt;Apply dates&lt;/b&gt; at the top to refresh.&lt;/li&gt;&lt;li&gt;Click &lt;b&gt;Select tags…&lt;/b&gt; to choose which tags to include in the analysis. The label shows how many tags are currently selected.&lt;/li&gt;&lt;li&gt;The table lists each tag with its total &lt;b&gt;amount&lt;/b&gt;, &lt;b&gt;weight&lt;/b&gt; (percentage of the period total), and &lt;b&gt;event count&lt;/b&gt; (number of individual financial events carrying that tag).&lt;/li&gt;&lt;li&gt;A CSD can contribute to a tag even if the tag is not its primary tag, as long as the tag relationship is defined.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export table…&lt;/b&gt; to save the results as a CSV file.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Compare CSD&lt;/h3&gt;&lt;p&gt;Plots the individual (non-cumulative) cashflow events of up to 10 Cash Stream Definitions side by side as step curves, making it easy to compare their timing and amounts.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Choose &lt;b&gt;Income&lt;/b&gt; or &lt;b&gt;Expenses&lt;/b&gt; mode. Only active CSDs of the selected type appear in the list.&lt;/li&gt;&lt;li&gt;Only financial events falling within the global &lt;b&gt;From / To&lt;/b&gt; date range are shown. Press &lt;b&gt;Apply dates&lt;/b&gt; at the top to refresh.&lt;/li&gt;&lt;li&gt;Check up to &lt;b&gt;10 CSDs&lt;/b&gt; from the list on the left. Each checked CSD is assigned a distinct color that it keeps for as long as it remains selected; a small colored square appears next to its name. Checking an eleventh CSD has no effect.&lt;/li&gt;&lt;li&gt;Press &lt;b&gt;Unselect all&lt;/b&gt; to clear all checkmarks and reset all color assignments at once.&lt;/li&gt;&lt;li&gt;The chart shows each event as a horizontal step: the curve holds its value until the next event occurs, making gaps and clusters immediately visible.&lt;/li&gt;&lt;li&gt;Whenever the selection or the Income/Expenses mode changes, the axes are automatically rescaled to fit the new data. Press &lt;b&gt;Fit&lt;/b&gt; at any time to force the same reset manually.&lt;/li&gt;&lt;li&gt;The chart supports &lt;b&gt;pan&lt;/b&gt; (click and drag) and &lt;b&gt;zoom&lt;/b&gt; (mouse wheel, Shift = horizontal only, Ctrl = vertical only).&lt;/li&gt;&lt;li&gt;Click a data point to highlight it and display its date and value below the chart. Click the same point again to deselect it.&lt;/li&gt;&lt;li&gt;Income/Expenses selection and individual checkmarks are preserved when you switch between the two modes; switching back to a mode restores its previous selection.&lt;/li&gt;&lt;li&gt;Use &lt;b&gt;Export image…&lt;/b&gt; to save the chart as a PNG file.&lt;/li&gt;&lt;/ul&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="622"/>
+        <location filename="analysisdialog_common.cpp" line="615"/>
         <source>PNG files (*.png *.PNG);;All files (*)</source>
         <oldsource>PNG files (*.png *.PNG)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="623"/>
+        <location filename="analysisdialog_common.cpp" line="616"/>
         <source>Select an image file</source>
         <oldsource>Select an Image File</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="637"/>
+        <location filename="analysisdialog_common.cpp" line="630"/>
         <source>Export failed. The creation of the image file did not succeed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="637"/>
-        <location filename="analysisdialog_common.cpp" line="927"/>
+        <location filename="analysisdialog_common.cpp" line="630"/>
+        <location filename="analysisdialog_common.cpp" line="920"/>
+        <location filename="analysisdialog_common.cpp" line="926"/>
         <location filename="analysisdialog_common.cpp" line="933"/>
         <location filename="analysisdialog_common.cpp" line="940"/>
         <location filename="analysisdialog_common.cpp" line="947"/>
-        <location filename="analysisdialog_common.cpp" line="954"/>
-        <location filename="analysisdialog_common.cpp" line="967"/>
+        <location filename="analysisdialog_common.cpp" line="960"/>
         <location filename="analysisdialog_period_list.cpp" line="308"/>
         <location filename="analysisdialog_period_list.cpp" line="312"/>
         <location filename="analysisdialog_period_list.cpp" line="316"/>
         <location filename="analysisdialog_rw.cpp" line="335"/>
         <location filename="analysisdialog_rw.cpp" line="339"/>
         <location filename="analysisdialog_rw.cpp" line="343"/>
-        <location filename="analysisdialog_tags.cpp" line="67"/>
-        <location filename="analysisdialog_tags.cpp" line="71"/>
-        <location filename="analysisdialog_tags.cpp" line="75"/>
-        <location filename="analysisdialog_tags.cpp" line="100"/>
-        <location filename="analysisdialog_tags.cpp" line="104"/>
-        <location filename="analysisdialog_tags.cpp" line="109"/>
-        <location filename="analysisdialog_tags.cpp" line="114"/>
+        <location filename="analysisdialog_tags.cpp" line="69"/>
+        <location filename="analysisdialog_tags.cpp" line="73"/>
+        <location filename="analysisdialog_tags.cpp" line="77"/>
+        <location filename="analysisdialog_tags.cpp" line="102"/>
+        <location filename="analysisdialog_tags.cpp" line="106"/>
+        <location filename="analysisdialog_tags.cpp" line="111"/>
+        <location filename="analysisdialog_tags.cpp" line="116"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="837"/>
+        <location filename="analysisdialog_common.cpp" line="830"/>
         <source>CSD comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="966"/>
+        <location filename="analysisdialog_common.cpp" line="959"/>
         <source>&quot;To&quot; date %1 cannot exceed the scenario end date %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_chart.cpp" line="338"/>
+        <location filename="analysisdialog_period_chart.cpp" line="348"/>
         <source>Yearly income and expenses</source>
         <oldsource>Yearly Incomes and Expenses</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_common.cpp" line="636"/>
-        <location filename="analysisdialog_common.cpp" line="926"/>
-        <location filename="analysisdialog_common.cpp" line="932"/>
+        <location filename="analysisdialog_common.cpp" line="629"/>
+        <location filename="analysisdialog_common.cpp" line="919"/>
+        <location filename="analysisdialog_common.cpp" line="925"/>
+        <location filename="analysisdialog_common.cpp" line="931"/>
         <location filename="analysisdialog_common.cpp" line="938"/>
         <location filename="analysisdialog_common.cpp" line="945"/>
-        <location filename="analysisdialog_common.cpp" line="952"/>
-        <location filename="analysisdialog_common.cpp" line="965"/>
+        <location filename="analysisdialog_common.cpp" line="958"/>
         <location filename="analysisdialog_period_list.cpp" line="306"/>
         <location filename="analysisdialog_period_list.cpp" line="311"/>
         <location filename="analysisdialog_period_list.cpp" line="315"/>
         <location filename="analysisdialog_rw.cpp" line="333"/>
         <location filename="analysisdialog_rw.cpp" line="338"/>
         <location filename="analysisdialog_rw.cpp" line="342"/>
-        <location filename="analysisdialog_tags.cpp" line="65"/>
-        <location filename="analysisdialog_tags.cpp" line="70"/>
-        <location filename="analysisdialog_tags.cpp" line="74"/>
-        <location filename="analysisdialog_tags.cpp" line="99"/>
-        <location filename="analysisdialog_tags.cpp" line="103"/>
-        <location filename="analysisdialog_tags.cpp" line="107"/>
-        <location filename="analysisdialog_tags.cpp" line="112"/>
+        <location filename="analysisdialog_tags.cpp" line="67"/>
+        <location filename="analysisdialog_tags.cpp" line="72"/>
+        <location filename="analysisdialog_tags.cpp" line="76"/>
+        <location filename="analysisdialog_tags.cpp" line="101"/>
+        <location filename="analysisdialog_tags.cpp" line="105"/>
+        <location filename="analysisdialog_tags.cpp" line="109"/>
+        <location filename="analysisdialog_tags.cpp" line="114"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="analysisdialog_period_list.cpp" line="307"/>
         <location filename="analysisdialog_rw.cpp" line="334"/>
-        <location filename="analysisdialog_tags.cpp" line="66"/>
+        <location filename="analysisdialog_tags.cpp" line="68"/>
         <source>Export process failed. Cannot open the file for saving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_chart.cpp" line="330"/>
+        <location filename="analysisdialog_period_chart.cpp" line="340"/>
         <source>Monthly income and expenses</source>
         <oldsource>Monthly Incomes and Expenses</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog.ui" line="1458"/>
-        <location filename="analysisdialog_period_heatmap.cpp" line="282"/>
-        <location filename="analysisdialog_period_heatmap.cpp" line="351"/>
+        <location filename="analysisdialog.ui" line="1464"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="289"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="358"/>
         <source>No events</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_heatmap.cpp" line="294"/>
-        <location filename="analysisdialog_period_heatmap.cpp" line="370"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="301"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="377"/>
         <source>Income:   </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_heatmap.cpp" line="296"/>
-        <location filename="analysisdialog_period_heatmap.cpp" line="372"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="303"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="379"/>
         <source>Expenses: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_heatmap.cpp" line="298"/>
-        <location filename="analysisdialog_period_heatmap.cpp" line="374"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="305"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="381"/>
         <source>Delta:    </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_heatmap.cpp" line="300"/>
-        <location filename="analysisdialog_period_heatmap.cpp" line="376"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="307"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="383"/>
         <source>Balance:  </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_heatmap.cpp" line="478"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="485"/>
         <source>Min: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_heatmap.cpp" line="480"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="487"/>
         <source>Max: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_heatmap.cpp" line="504"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="511"/>
         <source>Exclude current year</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_heatmap.cpp" line="505"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="512"/>
         <source>Exclude last year</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="analysisdialog_period_heatmap.cpp" line="582"/>
-        <location filename="analysisdialog_period_heatmap.cpp" line="603"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="589"/>
+        <location filename="analysisdialog_period_heatmap.cpp" line="610"/>
         <source>Color chooser</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1321,16 +1326,17 @@ The modified scenario stays in memory until you save it.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dateintervaldialog.ui" line="102"/>
+        <location filename="dateintervaldialog.ui" line="89"/>
         <source>To :</source>
         <oldsource>To : </oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="dateintervaldialog.ui" line="48"/>
-        <location filename="dateintervaldialog.ui" line="117"/>
+        <location filename="dateintervaldialog.ui" line="104"/>
         <source>yyyy-MMM-dd</source>
-        <translation></translation>
+        <oldsource>yyyy-MMMM-dd</oldsource>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="dateintervaldialog.ui" line="74"/>
@@ -1338,41 +1344,41 @@ The modified scenario stays in memory until you save it.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dateintervaldialog.ui" line="143"/>
+        <location filename="dateintervaldialog.ui" line="130"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For &amp;quot;to&amp;quot; date, change the month to &lt;span style=&quot; font-weight:700;&quot;&gt;December&lt;/span&gt; and day to &lt;span style=&quot; font-weight:700;&quot;&gt;31&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change the month to &lt;span style=&quot; font-weight:700;&quot;&gt;December&lt;/span&gt; and day to &lt;span style=&quot; font-weight:700;&quot;&gt;31&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dateintervaldialog.ui" line="146"/>
+        <location filename="dateintervaldialog.ui" line="133"/>
         <source>Set to EOY</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="dateintervaldialog.ui" line="204"/>
+        <location filename="dateintervaldialog.ui" line="178"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dateintervaldialog.ui" line="214"/>
+        <location filename="dateintervaldialog.ui" line="188"/>
         <source>Apply</source>
         <translation></translation>
     </message>
     <message>
         <location filename="dateintervaldialog.cpp" line="64"/>
-        <location filename="dateintervaldialog.cpp" line="83"/>
+        <location filename="dateintervaldialog.cpp" line="88"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="dateintervaldialog.cpp" line="65"/>
-        <location filename="dateintervaldialog.cpp" line="84"/>
+        <location filename="dateintervaldialog.cpp" line="89"/>
         <source>&quot;To&quot; date must occur after &quot;From&quot; date</source>
         <translation></translation>
     </message>
     <message>
         <location filename="dateintervaldialog.cpp" line="65"/>
-        <location filename="dateintervaldialog.cpp" line="84"/>
+        <location filename="dateintervaldialog.cpp" line="89"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1719,131 +1725,131 @@ The modified scenario stays in memory until you save it.</oldsource>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="556"/>
-        <location filename="editirregulardialog.cpp" line="247"/>
+        <location filename="editirregulardialog.cpp" line="254"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
         <location filename="editirregulardialog.ui" line="569"/>
-        <location filename="editirregulardialog.cpp" line="246"/>
+        <location filename="editirregulardialog.cpp" line="253"/>
         <source>Apply</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="242"/>
+        <location filename="editirregulardialog.cpp" line="249"/>
         <source>Editing irregular income</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="244"/>
+        <location filename="editirregulardialog.cpp" line="251"/>
         <source>Editing irregular expense</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="269"/>
+        <location filename="editirregulardialog.cpp" line="276"/>
         <source>Creating irregular income</source>
         <oldsource>Creating Irregular Income</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="271"/>
+        <location filename="editirregulardialog.cpp" line="278"/>
         <source>Creating irregular expense</source>
         <oldsource>Creating Irregular Expense</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="273"/>
+        <location filename="editirregulardialog.cpp" line="280"/>
         <source>Create</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="274"/>
+        <location filename="editirregulardialog.cpp" line="281"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="389"/>
-        <location filename="editirregulardialog.cpp" line="425"/>
-        <location filename="editirregulardialog.cpp" line="453"/>
-        <location filename="editirregulardialog.cpp" line="683"/>
-        <location filename="editirregulardialog.cpp" line="714"/>
-        <location filename="editirregulardialog.cpp" line="772"/>
-        <location filename="editirregulardialog.cpp" line="776"/>
-        <location filename="editirregulardialog.cpp" line="780"/>
+        <location filename="editirregulardialog.cpp" line="396"/>
+        <location filename="editirregulardialog.cpp" line="432"/>
+        <location filename="editirregulardialog.cpp" line="460"/>
+        <location filename="editirregulardialog.cpp" line="690"/>
+        <location filename="editirregulardialog.cpp" line="721"/>
+        <location filename="editirregulardialog.cpp" line="779"/>
+        <location filename="editirregulardialog.cpp" line="783"/>
+        <location filename="editirregulardialog.cpp" line="787"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="425"/>
+        <location filename="editirregulardialog.cpp" line="432"/>
         <source>Select exactly one row</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="771"/>
+        <location filename="editirregulardialog.cpp" line="778"/>
         <source>Export process failed. Cannot open the file for saving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="776"/>
+        <location filename="editirregulardialog.cpp" line="783"/>
         <source>Export process failed. Write error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="780"/>
+        <location filename="editirregulardialog.cpp" line="787"/>
         <source>Export process failed. Data error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="388"/>
-        <location filename="editirregulardialog.cpp" line="424"/>
-        <location filename="editirregulardialog.cpp" line="452"/>
-        <location filename="editirregulardialog.cpp" line="682"/>
-        <location filename="editirregulardialog.cpp" line="713"/>
-        <location filename="editirregulardialog.cpp" line="770"/>
-        <location filename="editirregulardialog.cpp" line="775"/>
-        <location filename="editirregulardialog.cpp" line="779"/>
+        <location filename="editirregulardialog.cpp" line="395"/>
+        <location filename="editirregulardialog.cpp" line="431"/>
+        <location filename="editirregulardialog.cpp" line="459"/>
+        <location filename="editirregulardialog.cpp" line="689"/>
+        <location filename="editirregulardialog.cpp" line="720"/>
+        <location filename="editirregulardialog.cpp" line="777"/>
+        <location filename="editirregulardialog.cpp" line="782"/>
+        <location filename="editirregulardialog.cpp" line="786"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="453"/>
+        <location filename="editirregulardialog.cpp" line="460"/>
         <source>Select at least one row</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="474"/>
+        <location filename="editirregulardialog.cpp" line="481"/>
         <source>Edit description</source>
         <oldsource>Edit Description</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="582"/>
+        <location filename="editirregulardialog.cpp" line="589"/>
         <source>An unexpected error has occurred. Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="589"/>
+        <location filename="editirregulardialog.cpp" line="596"/>
         <source>An unexpected error has occurred</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="642"/>
+        <location filename="editirregulardialog.cpp" line="649"/>
         <source>Color chooser</source>
         <oldsource>Color Chooser</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="740"/>
+        <location filename="editirregulardialog.cpp" line="747"/>
         <source>Date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="742"/>
+        <location filename="editirregulardialog.cpp" line="749"/>
         <source>Amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="744"/>
+        <location filename="editirregulardialog.cpp" line="751"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1877,7 +1883,7 @@ The modified scenario stays in memory until you save it.</oldsource>
     </message>
     <message>
         <location filename="editirregularelementdialog.ui" line="232"/>
-        <location filename="editirregularelementdialog.cpp" line="95"/>
+        <location filename="editirregularelementdialog.cpp" line="94"/>
         <source>Close</source>
         <translation></translation>
     </message>
@@ -1887,77 +1893,77 @@ The modified scenario stays in memory until you save it.</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="82"/>
-        <location filename="editirregularelementdialog.cpp" line="92"/>
+        <location filename="editirregularelementdialog.cpp" line="81"/>
+        <location filename="editirregularelementdialog.cpp" line="91"/>
         <source>Income</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="82"/>
-        <location filename="editirregularelementdialog.cpp" line="92"/>
+        <location filename="editirregularelementdialog.cpp" line="81"/>
+        <location filename="editirregularelementdialog.cpp" line="91"/>
         <source>Expense</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="85"/>
+        <location filename="editirregularelementdialog.cpp" line="84"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="94"/>
+        <location filename="editirregularelementdialog.cpp" line="93"/>
         <source>Create</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="120"/>
-        <location filename="editirregularelementdialog.cpp" line="126"/>
-        <location filename="editirregularelementdialog.cpp" line="131"/>
-        <location filename="editirregularelementdialog.cpp" line="143"/>
+        <location filename="editirregularelementdialog.cpp" line="119"/>
+        <location filename="editirregularelementdialog.cpp" line="125"/>
+        <location filename="editirregularelementdialog.cpp" line="130"/>
+        <location filename="editirregularelementdialog.cpp" line="142"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="81"/>
+        <location filename="editirregularelementdialog.cpp" line="80"/>
         <source>Editing an irregular item (%1)</source>
         <oldsource>Editing an irregular %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="84"/>
+        <location filename="editirregularelementdialog.cpp" line="83"/>
         <source>Apply changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="91"/>
+        <location filename="editirregularelementdialog.cpp" line="90"/>
         <source>Creating an irregular item (%1)</source>
         <oldsource>Creating an irregular %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="121"/>
+        <location filename="editirregularelementdialog.cpp" line="120"/>
         <source>Date entered is invalid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="121"/>
-        <location filename="editirregularelementdialog.cpp" line="127"/>
-        <location filename="editirregularelementdialog.cpp" line="134"/>
-        <location filename="editirregularelementdialog.cpp" line="144"/>
+        <location filename="editirregularelementdialog.cpp" line="120"/>
+        <location filename="editirregularelementdialog.cpp" line="126"/>
+        <location filename="editirregularelementdialog.cpp" line="133"/>
+        <location filename="editirregularelementdialog.cpp" line="143"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="127"/>
+        <location filename="editirregularelementdialog.cpp" line="126"/>
         <source>Amount cannot be smaller than 0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="132"/>
+        <location filename="editirregularelementdialog.cpp" line="131"/>
         <source>Amount is bigger than the maximum allowed of %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editirregularelementdialog.cpp" line="142"/>
+        <location filename="editirregularelementdialog.cpp" line="141"/>
         <source>This date has already an amount defined</source>
         <translation></translation>
     </message>
@@ -2273,13 +2279,13 @@ The modified scenario stays in memory until you save it.</oldsource>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="1105"/>
-        <location filename="editperiodicdialog.cpp" line="357"/>
+        <location filename="editperiodicdialog.cpp" line="352"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
         <location filename="editperiodicdialog.ui" line="1118"/>
-        <location filename="editperiodicdialog.cpp" line="266"/>
+        <location filename="editperiodicdialog.cpp" line="261"/>
         <source>Apply</source>
         <translation></translation>
     </message>
@@ -2301,113 +2307,113 @@ The modified scenario stays in memory until you save it.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="139"/>
+        <location filename="editperiodicdialog.cpp" line="134"/>
         <source>Growth</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="232"/>
+        <location filename="editperiodicdialog.cpp" line="227"/>
         <source>Defined by the scenario (%1)</source>
         <oldsource>Date defined by the scenario (%1)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="262"/>
+        <location filename="editperiodicdialog.cpp" line="257"/>
         <source>Editing periodic income</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="264"/>
+        <location filename="editperiodicdialog.cpp" line="259"/>
         <source>Editing periodic expense</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="267"/>
+        <location filename="editperiodicdialog.cpp" line="262"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="351"/>
+        <location filename="editperiodicdialog.cpp" line="346"/>
         <source>Creating periodic income</source>
         <oldsource>Creating Periodic Income</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="353"/>
+        <location filename="editperiodicdialog.cpp" line="348"/>
         <source>Creating periodic expense</source>
         <oldsource>Creating Periodic Expense</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="356"/>
+        <location filename="editperiodicdialog.cpp" line="351"/>
         <source>Create</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="430"/>
-        <location filename="editperiodicdialog.cpp" line="918"/>
-        <location filename="editperiodicdialog.cpp" line="1028"/>
+        <location filename="editperiodicdialog.cpp" line="425"/>
+        <location filename="editperiodicdialog.cpp" line="913"/>
+        <location filename="editperiodicdialog.cpp" line="1023"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="431"/>
-        <location filename="editperiodicdialog.cpp" line="919"/>
-        <location filename="editperiodicdialog.cpp" line="1029"/>
+        <location filename="editperiodicdialog.cpp" line="426"/>
+        <location filename="editperiodicdialog.cpp" line="914"/>
+        <location filename="editperiodicdialog.cpp" line="1024"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="507"/>
+        <location filename="editperiodicdialog.cpp" line="502"/>
         <source>Start date is invalid</source>
         <oldsource>Start Date is invalid</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="512"/>
+        <location filename="editperiodicdialog.cpp" line="507"/>
         <source>Start date must not occur before %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="532"/>
+        <location filename="editperiodicdialog.cpp" line="527"/>
         <source>End date is invalid</source>
         <oldsource>End Date is invalid</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="537"/>
+        <location filename="editperiodicdialog.cpp" line="532"/>
         <source>End date must not occur before the Start date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="542"/>
+        <location filename="editperiodicdialog.cpp" line="537"/>
         <source>End date must not occur before %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="568"/>
+        <location filename="editperiodicdialog.cpp" line="563"/>
         <source>The amount cannot be bigger than %1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="575"/>
+        <location filename="editperiodicdialog.cpp" line="570"/>
         <source>An error occurred while processing the amount : code=%1</source>
         <oldsource>An error occured while processing the amount : code=%1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="635"/>
+        <location filename="editperiodicdialog.cpp" line="630"/>
         <source>An unexpected error has occurred. Details : %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="989"/>
+        <location filename="editperiodicdialog.cpp" line="984"/>
         <source>Edit description</source>
         <oldsource>Edit Description</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="877"/>
+        <location filename="editperiodicdialog.cpp" line="872"/>
         <source>Color chooser</source>
         <oldsource>Color Chooser</oldsource>
         <translation type="unfinished"></translation>
@@ -2660,7 +2666,7 @@ The modified scenario stays in memory until you save it.</oldsource>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="349"/>
-        <location filename="editscenariodialog.cpp" line="859"/>
+        <location filename="editscenariodialog.cpp" line="867"/>
         <source>Cash stream definitions</source>
         <oldsource>Cash Stream Definitions</oldsource>
         <translation type="unfinished"></translation>
@@ -2754,30 +2760,30 @@ The modified scenario stays in memory until you save it.</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="213"/>
+        <location filename="editscenariodialog.cpp" line="221"/>
         <source>Inflation</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="205"/>
+        <location filename="editscenariodialog.cpp" line="213"/>
         <source>Apply changes</source>
         <oldsource>Apply Changes</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="363"/>
+        <location filename="editscenariodialog.cpp" line="371"/>
         <source>Edit current scenario</source>
         <oldsource>Edit Current Scenario</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="622"/>
+        <location filename="editscenariodialog.cpp" line="630"/>
         <source>Edit description</source>
         <oldsource>Edit Description</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="657"/>
+        <location filename="editscenariodialog.cpp" line="665"/>
         <source>An unexpected error has occurred while creating a scenario.
 
 Details : %1</source>
@@ -2787,110 +2793,110 @@ Details : %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="660"/>
-        <location filename="editscenariodialog.cpp" line="1021"/>
-        <location filename="editscenariodialog.cpp" line="1070"/>
-        <location filename="editscenariodialog.cpp" line="1111"/>
-        <location filename="editscenariodialog.cpp" line="1147"/>
-        <location filename="editscenariodialog.cpp" line="1169"/>
-        <location filename="editscenariodialog.cpp" line="1192"/>
+        <location filename="editscenariodialog.cpp" line="668"/>
+        <location filename="editscenariodialog.cpp" line="1029"/>
+        <location filename="editscenariodialog.cpp" line="1078"/>
+        <location filename="editscenariodialog.cpp" line="1119"/>
+        <location filename="editscenariodialog.cpp" line="1155"/>
+        <location filename="editscenariodialog.cpp" line="1177"/>
+        <location filename="editscenariodialog.cpp" line="1200"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="861"/>
+        <location filename="editscenariodialog.cpp" line="869"/>
         <source>Cash stream definitions (%1)</source>
         <oldsource>Cash Stream Definitions (%1)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1202"/>
+        <location filename="editscenariodialog.cpp" line="1210"/>
         <source>Question</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1330"/>
+        <location filename="editscenariodialog.cpp" line="1338"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1022"/>
+        <location filename="editscenariodialog.cpp" line="1030"/>
         <source>Select exactly one row</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="197"/>
+        <location filename="editscenariodialog.cpp" line="205"/>
         <source>All required</source>
         <oldsource>All required (AND)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="198"/>
+        <location filename="editscenariodialog.cpp" line="206"/>
         <source>At least one</source>
         <oldsource>At least one (OR)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="200"/>
+        <location filename="editscenariodialog.cpp" line="208"/>
         <source>None of those</source>
         <oldsource>None of those (NOT)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="661"/>
-        <location filename="editscenariodialog.cpp" line="1022"/>
-        <location filename="editscenariodialog.cpp" line="1071"/>
-        <location filename="editscenariodialog.cpp" line="1112"/>
-        <location filename="editscenariodialog.cpp" line="1148"/>
-        <location filename="editscenariodialog.cpp" line="1170"/>
-        <location filename="editscenariodialog.cpp" line="1193"/>
-        <location filename="editscenariodialog.cpp" line="1332"/>
+        <location filename="editscenariodialog.cpp" line="669"/>
+        <location filename="editscenariodialog.cpp" line="1030"/>
+        <location filename="editscenariodialog.cpp" line="1079"/>
+        <location filename="editscenariodialog.cpp" line="1120"/>
+        <location filename="editscenariodialog.cpp" line="1156"/>
+        <location filename="editscenariodialog.cpp" line="1178"/>
+        <location filename="editscenariodialog.cpp" line="1201"/>
+        <location filename="editscenariodialog.cpp" line="1340"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1071"/>
+        <location filename="editscenariodialog.cpp" line="1079"/>
         <source>Select at least 1 item</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1112"/>
-        <location filename="editscenariodialog.cpp" line="1148"/>
-        <location filename="editscenariodialog.cpp" line="1170"/>
-        <location filename="editscenariodialog.cpp" line="1193"/>
+        <location filename="editscenariodialog.cpp" line="1120"/>
+        <location filename="editscenariodialog.cpp" line="1156"/>
+        <location filename="editscenariodialog.cpp" line="1178"/>
+        <location filename="editscenariodialog.cpp" line="1201"/>
         <source>Select at least one item</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1203"/>
+        <location filename="editscenariodialog.cpp" line="1211"/>
         <source>Do you want to revert back to the default system color or choose a custom one ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1204"/>
+        <location filename="editscenariodialog.cpp" line="1212"/>
         <source>System&apos;s default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1204"/>
+        <location filename="editscenariodialog.cpp" line="1212"/>
         <source>Custom color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="editscenariodialog.ui" line="810"/>
-        <location filename="editscenariodialog.cpp" line="206"/>
-        <location filename="editscenariodialog.cpp" line="1204"/>
+        <location filename="editscenariodialog.cpp" line="214"/>
+        <location filename="editscenariodialog.cpp" line="1212"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1216"/>
+        <location filename="editscenariodialog.cpp" line="1224"/>
         <source>Color chooser</source>
         <oldsource>Color Chooser</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editscenariodialog.cpp" line="1331"/>
+        <location filename="editscenariodialog.cpp" line="1339"/>
         <source>There are no tag defined for this scenario, so you cannot use Tag-based filtering.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3067,35 +3073,35 @@ Details : %1</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="editvariablegrowthdialog.cpp" line="114"/>
+        <location filename="editvariablegrowthdialog.cpp" line="123"/>
         <source>%1 : Value is 0 before the oldest transition date is defined. It is always applied on a monthly basis, even if defined on an annual basis (for convenience purpose). Value stays the same until a new transition date + value is defined.</source>
         <oldsource>%1 : Value is 0 before the oldest transition date is defined. It is always applied on a monthly basis, even if the value is specified on an annual basis (for convenience purpose). Value stays the same until a new transition date + value is defined.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editvariablegrowthdialog.cpp" line="110"/>
+        <location filename="editvariablegrowthdialog.cpp" line="119"/>
         <source>Edit variable %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editvariablegrowthdialog.cpp" line="213"/>
+        <location filename="editvariablegrowthdialog.cpp" line="222"/>
         <source>Select exactly one row</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="editvariablegrowthdialog.cpp" line="212"/>
-        <location filename="editvariablegrowthdialog.cpp" line="231"/>
+        <location filename="editvariablegrowthdialog.cpp" line="221"/>
+        <location filename="editvariablegrowthdialog.cpp" line="240"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editvariablegrowthdialog.cpp" line="213"/>
-        <location filename="editvariablegrowthdialog.cpp" line="232"/>
+        <location filename="editvariablegrowthdialog.cpp" line="222"/>
+        <location filename="editvariablegrowthdialog.cpp" line="241"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="editvariablegrowthdialog.cpp" line="232"/>
+        <location filename="editvariablegrowthdialog.cpp" line="241"/>
         <source>Select at least one row</source>
         <translation></translation>
     </message>
@@ -3515,7 +3521,7 @@ If two lines share the same date, the last one wins. </source>
     <name>MainWindow</name>
     <message>
         <location filename="mainwindow.ui" line="20"/>
-        <location filename="mainwindow.cpp" line="2513"/>
+        <location filename="mainwindow.cpp" line="2591"/>
         <source>Graphical Budget Planner</source>
         <translation></translation>
     </message>
@@ -3947,53 +3953,53 @@ If two lines share the same date, the last one wins. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="92"/>
+        <location filename="mainwindow.cpp" line="94"/>
         <source>Start amount as of today %1 :</source>
         <oldsource>Start Amount for Today %1 :</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="613"/>
+        <location filename="mainwindow.cpp" line="616"/>
         <source>Current scenario has been modified, but changes have not been saved yet on disk. Do you want to save it before going forward ? If you answer &quot;No&quot;, &lt;b&gt;&lt;font color=&quot;#F44336&quot;&gt;the changes will be lost&lt;/font&gt;&lt;/b&gt;.</source>
         <oldsource>Current scenario has been modified, but changes have not been saved yet on disk. Do you want to save it before going forward ? If you answer &quot;No&quot;, &lt;b&gt;&lt;font color=&quot;#DC143C&quot;&gt;the changes will be lost&lt;/font&gt;&lt;/b&gt;.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="748"/>
+        <location filename="mainwindow.cpp" line="906"/>
         <source>Do you really want to quit the application ?</source>
         <oldsource>Do you really want to terminate the application ?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="878"/>
+        <location filename="mainwindow.cpp" line="1044"/>
         <source>No scenario loaded yet, so nothing to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="927"/>
+        <location filename="mainwindow.cpp" line="1093"/>
         <source>No scenario loaded yet, so nothing to save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2060"/>
+        <location filename="mainwindow.cpp" line="2227"/>
         <source>No scenario loaded yet, so nothing to export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1111"/>
-        <location filename="mainwindow.cpp" line="2371"/>
-        <location filename="mainwindow.cpp" line="2569"/>
+        <location filename="mainwindow.cpp" line="1277"/>
+        <location filename="mainwindow.cpp" line="2501"/>
+        <location filename="mainwindow.cpp" line="2647"/>
         <source>No scenario loaded yet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="910"/>
-        <location filename="mainwindow.cpp" line="941"/>
+        <location filename="mainwindow.cpp" line="1076"/>
+        <location filename="mainwindow.cpp" line="1107"/>
         <source>Scenario saved successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="985"/>
+        <location filename="mainwindow.cpp" line="1151"/>
         <source>An unexpected error has occurred.&lt;br&gt;&lt;br&gt;Details : %1</source>
         <oldsource>An unexpected error has occured.
 
@@ -4001,34 +4007,34 @@ Details : %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1027"/>
+        <location filename="mainwindow.cpp" line="1193"/>
         <source>Scenario opened successfully</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1029"/>
+        <location filename="mainwindow.cpp" line="1195"/>
         <source>Scenario opened successfully (converted from version 1 to 2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="690"/>
+        <location filename="mainwindow.cpp" line="848"/>
         <source>No scenario loaded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="802"/>
-        <location filename="mainwindow.cpp" line="886"/>
+        <location filename="mainwindow.cpp" line="960"/>
+        <location filename="mainwindow.cpp" line="1052"/>
         <source>GBP Files (*.json);;All files (*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="960"/>
+        <location filename="mainwindow.cpp" line="1126"/>
         <source>This file uses an older format, but cannot be upgraded to the current version. Check that you have write permission for the file. See the log file for details : 
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="965"/>
+        <location filename="mainwindow.cpp" line="1131"/>
         <source>This file cannot be loaded. Error code = &quot;%1&quot;. See the log file for details : 
 %2</source>
         <oldsource>This scenario file cannot be loaded.
@@ -4037,7 +4043,7 @@ Error code = %1. See the log file for details :
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1086"/>
+        <location filename="mainwindow.cpp" line="1252"/>
         <source>The current scenario could not be saved. Error code = &quot;%1&quot;. See the log file for details : 
 %2</source>
         <oldsource>The current scenario could not be saved. Error code = %1. See the log file for details : 
@@ -4045,236 +4051,363 @@ Error code = %1. See the log file for details :
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1438"/>
+        <location filename="mainwindow.cpp" line="1604"/>
         <source>A new scenario has been created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1816"/>
+        <location filename="mainwindow.cpp" line="1983"/>
         <source>Clear list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1987"/>
+        <location filename="mainwindow.cpp" line="2154"/>
         <source>Not enough days from tomorrow to EOY</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2080"/>
+        <location filename="mainwindow.cpp" line="2247"/>
         <source>Total daily expenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2082"/>
+        <location filename="mainwindow.cpp" line="2249"/>
         <source>Total delta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2084"/>
+        <location filename="mainwindow.cpp" line="2251"/>
         <source>Cumulative total</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2204"/>
-        <source>Cannot open the User Manual: the previous copy at %1 could not be removed (it may be locked by another process).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="2307"/>
-        <source>Cannot open the Quick Tutorial: the previous copy at %1 could not be removed (it may be locked by another process).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="2427"/>
-        <source>Cannot open the Change Log: the previous copy at %1 could not be removed (it may be locked by another process).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="2519"/>
+        <location filename="mainwindow.cpp" line="2597"/>
         <source>Not saved yet %1 GBP</source>
         <oldsource>Not saved yet - GBP</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2524"/>
+        <location filename="mainwindow.cpp" line="2602"/>
         <source>%1 %2 GBP</source>
         <oldsource>%1 - GBP</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1400"/>
+        <location filename="mainwindow.cpp" line="1566"/>
         <source>Current scenario has been modified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="612"/>
-        <location filename="mainwindow.cpp" line="634"/>
-        <location filename="mainwindow.cpp" line="747"/>
-        <location filename="mainwindow.cpp" line="877"/>
-        <location filename="mainwindow.cpp" line="926"/>
-        <location filename="mainwindow.cpp" line="1110"/>
-        <location filename="mainwindow.cpp" line="1560"/>
-        <location filename="mainwindow.cpp" line="2059"/>
+        <location filename="mainwindow.cpp" line="615"/>
+        <location filename="mainwindow.cpp" line="638"/>
+        <location filename="mainwindow.cpp" line="905"/>
+        <location filename="mainwindow.cpp" line="1043"/>
+        <location filename="mainwindow.cpp" line="1092"/>
+        <location filename="mainwindow.cpp" line="1276"/>
+        <location filename="mainwindow.cpp" line="1726"/>
+        <location filename="mainwindow.cpp" line="2226"/>
         <location filename="mainwindow.cpp" line="2370"/>
-        <location filename="mainwindow.cpp" line="2590"/>
-        <location filename="mainwindow.cpp" line="2600"/>
-        <location filename="mainwindow.cpp" line="2613"/>
+        <location filename="mainwindow.cpp" line="2425"/>
+        <location filename="mainwindow.cpp" line="2480"/>
+        <location filename="mainwindow.cpp" line="2500"/>
+        <location filename="mainwindow.cpp" line="2549"/>
+        <location filename="mainwindow.cpp" line="2668"/>
+        <location filename="mainwindow.cpp" line="2678"/>
+        <location filename="mainwindow.cpp" line="2691"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="615"/>
-        <location filename="mainwindow.cpp" line="637"/>
-        <location filename="mainwindow.cpp" line="748"/>
+        <location filename="mainwindow.cpp" line="619"/>
+        <location filename="mainwindow.cpp" line="642"/>
+        <location filename="mainwindow.cpp" line="906"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="615"/>
-        <location filename="mainwindow.cpp" line="637"/>
-        <location filename="mainwindow.cpp" line="748"/>
-        <location filename="mainwindow.cpp" line="2616"/>
+        <location filename="mainwindow.cpp" line="619"/>
+        <location filename="mainwindow.cpp" line="642"/>
+        <location filename="mainwindow.cpp" line="906"/>
+        <location filename="mainwindow.cpp" line="2694"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="615"/>
-        <location filename="mainwindow.cpp" line="637"/>
-        <location filename="mainwindow.cpp" line="2616"/>
+        <location filename="mainwindow.cpp" line="619"/>
+        <location filename="mainwindow.cpp" line="642"/>
+        <location filename="mainwindow.cpp" line="2694"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="635"/>
+        <location filename="mainwindow.cpp" line="639"/>
         <source>The new scenario has not been saved yet on disk. Do you want to  save it in a file before going forward ? If you answer &quot;No&quot;, &lt;b&gt;&lt;font color=&quot;#F44336&quot;&gt;the new scenario will be lost&lt;/font&gt;&lt;/b&gt;.</source>
         <oldsource>The new scenario has not been saved yet on disk. Do you want to  save it in a file before going forward ? If you answer &quot;No&quot;, &lt;b&gt;&lt;font color=&quot;#DC143C&quot;&gt;the new scenario will be lost&lt;/font&gt;&lt;/b&gt;.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="803"/>
+        <location filename="mainwindow.cpp" line="961"/>
         <source>Open an existing scenario</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="887"/>
+        <location filename="mainwindow.cpp" line="1053"/>
         <source>Choose a filename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="994"/>
+        <location filename="mainwindow.cpp" line="1160"/>
         <source>An unknown unexpected error has occurred.</source>
         <oldsource>An unknown unexpected error has occured.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1525"/>
+        <location filename="mainwindow.cpp" line="1691"/>
         <source>Options changes have been successfully saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1780"/>
+        <location filename="mainwindow.cpp" line="1946"/>
         <source>y</source>
         <translation>y</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1781"/>
+        <location filename="mainwindow.cpp" line="1947"/>
         <source>m</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1782"/>
+        <location filename="mainwindow.cpp" line="1948"/>
         <source>d</source>
         <translation>d</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2115"/>
+        <location filename="mainwindow.cpp" line="2282"/>
         <source>Export process failed. Cannot open the file for saving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2120"/>
+        <location filename="mainwindow.cpp" line="2287"/>
         <source>Export process failed. Write error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2124"/>
+        <location filename="mainwindow.cpp" line="2291"/>
         <source>Export process failed. Data error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1561"/>
+        <location filename="mainwindow.cpp" line="1727"/>
         <source>No scenario loaded yet, so nothing to anonymize.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1571"/>
+        <location filename="mainwindow.cpp" line="1737"/>
         <source>Name of the scenario</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1589"/>
+        <location filename="mainwindow.cpp" line="1755"/>
         <source>Periodic Income %1</source>
         <oldsource>Income %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1603"/>
+        <location filename="mainwindow.cpp" line="1769"/>
         <source>Irregular Income %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1628"/>
+        <location filename="mainwindow.cpp" line="1794"/>
         <source>Periodic Expense %1</source>
         <oldsource>Expense %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1642"/>
+        <location filename="mainwindow.cpp" line="1808"/>
         <source>Irregular Expense %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="1671"/>
+        <location filename="mainwindow.cpp" line="1837"/>
         <source>Tag %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2591"/>
+        <location filename="mainwindow.cpp" line="2347"/>
+        <source>The User Manual document (%1) could not be found. This is likely a packaging issue — please report it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2353"/>
+        <source>Cannot open the User Manual: the application&apos;s cache directory could not be created or accessed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2359"/>
+        <source>Cannot open the User Manual: a previous cached copy could not be removed (it may be locked by another process).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2365"/>
+        <source>Cannot open the User Manual: the document could not be copied to the application cache directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2371"/>
+        <source>The User Manual could not be fully prepared for viewing due to a file permission issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2378"/>
+        <source>The system&apos;s default PDF viewer failed to launch. You can try to open the User Manual manually from your system&apos;s temporary/cache folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2402"/>
+        <source>The Welcome document (%1) could not be found. This is likely a packaging issue — please report it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2408"/>
+        <source>Cannot open the Welcome document: the application&apos;s cache directory could not be created or accessed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2414"/>
+        <source>Cannot open the Welcome document: a previous cached copy could not be removed (it may be locked by another process).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2420"/>
+        <source>Cannot open the Welcome document: it could not be copied to the application cache directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2426"/>
+        <source>The Welcome document could not be fully prepared for viewing due to a file permission issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2433"/>
+        <source>The system&apos;s default PDF viewer failed to launch. You can try to open the Welcome document manually from your system&apos;s temporary/cache folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2457"/>
+        <source>The Quick Tutorial document (%1) could not be found. This is likely a packaging issue — please report it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2463"/>
+        <source>Cannot open the Quick Tutorial: the application&apos;s cache directory could not be created or accessed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2469"/>
+        <source>Cannot open the Quick Tutorial: a previous cached copy could not be removed (it may be locked by another process).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2475"/>
+        <source>Cannot open the Quick Tutorial: the document could not be copied to the application cache directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2481"/>
+        <source>The Quick Tutorial could not be fully prepared for viewing due to a file permission issue. Please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2488"/>
+        <source>The system&apos;s default PDF viewer failed to launch. You can try to open the Quick Tutorial manually from your system&apos;s temporary/cache folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2526"/>
+        <source>The Change Log document (%1) could not be found. This is likely a packaging issue — please report it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2532"/>
+        <source>Cannot open the Change Log: the application&apos;s cache directory could not be created or accessed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2538"/>
+        <source>Cannot open the Change Log: a previous cached copy could not be removed (it may be locked by another process).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2544"/>
+        <source>Cannot open the Change Log: the document could not be copied to the application cache directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2550"/>
+        <source>The Change Log could not be fully prepared for viewing due to a file permission issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2557"/>
+        <source>The system&apos;s default PDF viewer failed to launch. You can try to open the Change Log manually from your system&apos;s temporary/cache folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="2669"/>
         <source>The current scenario has not been saved to disk yet. Nothing to reload from.</source>
         <oldsource>The current scenario has not been saved to disk yet.
 Please save the scenario first using File → Save As.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="879"/>
-        <location filename="mainwindow.cpp" line="928"/>
-        <location filename="mainwindow.cpp" line="973"/>
-        <location filename="mainwindow.cpp" line="988"/>
-        <location filename="mainwindow.cpp" line="996"/>
-        <location filename="mainwindow.cpp" line="1090"/>
-        <location filename="mainwindow.cpp" line="1111"/>
-        <location filename="mainwindow.cpp" line="1561"/>
-        <location filename="mainwindow.cpp" line="1987"/>
-        <location filename="mainwindow.cpp" line="2022"/>
-        <location filename="mainwindow.cpp" line="2061"/>
-        <location filename="mainwindow.cpp" line="2116"/>
-        <location filename="mainwindow.cpp" line="2120"/>
-        <location filename="mainwindow.cpp" line="2124"/>
-        <location filename="mainwindow.cpp" line="2206"/>
-        <location filename="mainwindow.cpp" line="2256"/>
-        <location filename="mainwindow.cpp" line="2309"/>
+        <location filename="mainwindow.cpp" line="1045"/>
+        <location filename="mainwindow.cpp" line="1094"/>
+        <location filename="mainwindow.cpp" line="1139"/>
+        <location filename="mainwindow.cpp" line="1154"/>
+        <location filename="mainwindow.cpp" line="1162"/>
+        <location filename="mainwindow.cpp" line="1256"/>
+        <location filename="mainwindow.cpp" line="1277"/>
+        <location filename="mainwindow.cpp" line="1727"/>
+        <location filename="mainwindow.cpp" line="2154"/>
+        <location filename="mainwindow.cpp" line="2189"/>
+        <location filename="mainwindow.cpp" line="2228"/>
+        <location filename="mainwindow.cpp" line="2283"/>
+        <location filename="mainwindow.cpp" line="2287"/>
+        <location filename="mainwindow.cpp" line="2291"/>
+        <location filename="mainwindow.cpp" line="2348"/>
+        <location filename="mainwindow.cpp" line="2354"/>
         <location filename="mainwindow.cpp" line="2360"/>
-        <location filename="mainwindow.cpp" line="2371"/>
-        <location filename="mainwindow.cpp" line="2429"/>
-        <location filename="mainwindow.cpp" line="2480"/>
-        <location filename="mainwindow.cpp" line="2569"/>
-        <location filename="mainwindow.cpp" line="2592"/>
-        <location filename="mainwindow.cpp" line="2604"/>
+        <location filename="mainwindow.cpp" line="2366"/>
+        <location filename="mainwindow.cpp" line="2372"/>
+        <location filename="mainwindow.cpp" line="2380"/>
+        <location filename="mainwindow.cpp" line="2403"/>
+        <location filename="mainwindow.cpp" line="2409"/>
+        <location filename="mainwindow.cpp" line="2415"/>
+        <location filename="mainwindow.cpp" line="2421"/>
+        <location filename="mainwindow.cpp" line="2427"/>
+        <location filename="mainwindow.cpp" line="2435"/>
+        <location filename="mainwindow.cpp" line="2458"/>
+        <location filename="mainwindow.cpp" line="2464"/>
+        <location filename="mainwindow.cpp" line="2470"/>
+        <location filename="mainwindow.cpp" line="2476"/>
+        <location filename="mainwindow.cpp" line="2482"/>
+        <location filename="mainwindow.cpp" line="2490"/>
+        <location filename="mainwindow.cpp" line="2501"/>
+        <location filename="mainwindow.cpp" line="2527"/>
+        <location filename="mainwindow.cpp" line="2533"/>
+        <location filename="mainwindow.cpp" line="2539"/>
+        <location filename="mainwindow.cpp" line="2545"/>
+        <location filename="mainwindow.cpp" line="2551"/>
+        <location filename="mainwindow.cpp" line="2559"/>
+        <location filename="mainwindow.cpp" line="2647"/>
+        <location filename="mainwindow.cpp" line="2670"/>
+        <location filename="mainwindow.cpp" line="2682"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2601"/>
+        <location filename="mainwindow.cpp" line="2679"/>
         <source>The scenario file could not be found at the following location (it may have been moved or deleted) :
 %1</source>
         <oldsource>The scenario file could not be found at the following location:
@@ -4283,50 +4416,57 @@ The file may have been moved or deleted.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2614"/>
+        <location filename="mainwindow.cpp" line="2692"/>
         <source>The current scenario has been modified.&lt;br&gt;Do you want to discard these changes and reload the scenario from disk?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="973"/>
-        <location filename="mainwindow.cpp" line="987"/>
-        <location filename="mainwindow.cpp" line="995"/>
-        <location filename="mainwindow.cpp" line="1085"/>
-        <location filename="mainwindow.cpp" line="1986"/>
-        <location filename="mainwindow.cpp" line="2020"/>
-        <location filename="mainwindow.cpp" line="2114"/>
-        <location filename="mainwindow.cpp" line="2119"/>
-        <location filename="mainwindow.cpp" line="2123"/>
-        <location filename="mainwindow.cpp" line="2203"/>
-        <location filename="mainwindow.cpp" line="2253"/>
-        <location filename="mainwindow.cpp" line="2306"/>
-        <location filename="mainwindow.cpp" line="2357"/>
-        <location filename="mainwindow.cpp" line="2426"/>
-        <location filename="mainwindow.cpp" line="2477"/>
-        <location filename="mainwindow.cpp" line="2568"/>
+        <location filename="mainwindow.cpp" line="1139"/>
+        <location filename="mainwindow.cpp" line="1153"/>
+        <location filename="mainwindow.cpp" line="1161"/>
+        <location filename="mainwindow.cpp" line="1251"/>
+        <location filename="mainwindow.cpp" line="2153"/>
+        <location filename="mainwindow.cpp" line="2187"/>
+        <location filename="mainwindow.cpp" line="2281"/>
+        <location filename="mainwindow.cpp" line="2286"/>
+        <location filename="mainwindow.cpp" line="2290"/>
+        <location filename="mainwindow.cpp" line="2346"/>
+        <location filename="mainwindow.cpp" line="2352"/>
+        <location filename="mainwindow.cpp" line="2358"/>
+        <location filename="mainwindow.cpp" line="2364"/>
+        <location filename="mainwindow.cpp" line="2377"/>
+        <location filename="mainwindow.cpp" line="2401"/>
+        <location filename="mainwindow.cpp" line="2407"/>
+        <location filename="mainwindow.cpp" line="2413"/>
+        <location filename="mainwindow.cpp" line="2419"/>
+        <location filename="mainwindow.cpp" line="2432"/>
+        <location filename="mainwindow.cpp" line="2456"/>
+        <location filename="mainwindow.cpp" line="2462"/>
+        <location filename="mainwindow.cpp" line="2468"/>
+        <location filename="mainwindow.cpp" line="2474"/>
+        <location filename="mainwindow.cpp" line="2487"/>
+        <location filename="mainwindow.cpp" line="2525"/>
+        <location filename="mainwindow.cpp" line="2531"/>
+        <location filename="mainwindow.cpp" line="2537"/>
+        <location filename="mainwindow.cpp" line="2543"/>
+        <location filename="mainwindow.cpp" line="2556"/>
+        <location filename="mainwindow.cpp" line="2646"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2021"/>
+        <location filename="mainwindow.cpp" line="2188"/>
         <source>No scenario loaded yet : nothing to analyse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2076"/>
+        <location filename="mainwindow.cpp" line="2243"/>
         <source>Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="2078"/>
+        <location filename="mainwindow.cpp" line="2245"/>
         <source>Total daily income</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="2254"/>
-        <location filename="mainwindow.cpp" line="2358"/>
-        <location filename="mainwindow.cpp" line="2478"/>
-        <source>The system&apos;s default PDF viewer failed to launch. You can try to open the file manually at %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4519,7 +4659,7 @@ The file may have been moved or deleted.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="880"/>
+        <location filename="managetagsdialog.cpp" line="889"/>
         <source>Linked Tags</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4545,7 +4685,7 @@ The file may have been moved or deleted.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="233"/>
+        <location filename="managetagsdialog.cpp" line="242"/>
         <source>Tags defined</source>
         <oldsource>Tags Defined</oldsource>
         <translation type="unfinished"></translation>
@@ -4557,141 +4697,141 @@ The file may have been moved or deleted.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="306"/>
+        <location filename="managetagsdialog.cpp" line="315"/>
         <source>The maximum no of tags has been reached (%1).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="308"/>
-        <location filename="managetagsdialog.cpp" line="326"/>
-        <location filename="managetagsdialog.cpp" line="348"/>
-        <location filename="managetagsdialog.cpp" line="358"/>
-        <location filename="managetagsdialog.cpp" line="377"/>
+        <location filename="managetagsdialog.cpp" line="317"/>
+        <location filename="managetagsdialog.cpp" line="335"/>
+        <location filename="managetagsdialog.cpp" line="357"/>
+        <location filename="managetagsdialog.cpp" line="367"/>
         <location filename="managetagsdialog.cpp" line="386"/>
-        <location filename="managetagsdialog.cpp" line="466"/>
-        <location filename="managetagsdialog.cpp" line="646"/>
+        <location filename="managetagsdialog.cpp" line="395"/>
+        <location filename="managetagsdialog.cpp" line="475"/>
         <location filename="managetagsdialog.cpp" line="655"/>
-        <location filename="managetagsdialog.cpp" line="693"/>
-        <location filename="managetagsdialog.cpp" line="908"/>
-        <location filename="managetagsdialog.cpp" line="935"/>
+        <location filename="managetagsdialog.cpp" line="664"/>
+        <location filename="managetagsdialog.cpp" line="702"/>
+        <location filename="managetagsdialog.cpp" line="917"/>
         <location filename="managetagsdialog.cpp" line="944"/>
+        <location filename="managetagsdialog.cpp" line="953"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="347"/>
+        <location filename="managetagsdialog.cpp" line="356"/>
         <source>Exactly 1 tag must be selected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="357"/>
+        <location filename="managetagsdialog.cpp" line="366"/>
         <source>Unknown tag id : %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="325"/>
-        <location filename="managetagsdialog.cpp" line="376"/>
+        <location filename="managetagsdialog.cpp" line="334"/>
+        <location filename="managetagsdialog.cpp" line="385"/>
         <source>At least 1 tag must be selected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="384"/>
+        <location filename="managetagsdialog.cpp" line="393"/>
         <source>The maximum no of tags would be exceeded (%1).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="404"/>
+        <location filename="managetagsdialog.cpp" line="413"/>
         <source>Copy of </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="455"/>
+        <location filename="managetagsdialog.cpp" line="464"/>
         <source>Open an Existing Scenario</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="676"/>
+        <location filename="managetagsdialog.cpp" line="685"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="590"/>
+        <location filename="managetagsdialog.cpp" line="599"/>
         <source>Linked cash stream definitions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="461"/>
+        <location filename="managetagsdialog.cpp" line="470"/>
         <source>This scenario file cannot be loaded. Error code = %1. See the log file for details : 
 %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="309"/>
-        <location filename="managetagsdialog.cpp" line="327"/>
-        <location filename="managetagsdialog.cpp" line="349"/>
-        <location filename="managetagsdialog.cpp" line="359"/>
-        <location filename="managetagsdialog.cpp" line="378"/>
+        <location filename="managetagsdialog.cpp" line="318"/>
+        <location filename="managetagsdialog.cpp" line="336"/>
+        <location filename="managetagsdialog.cpp" line="358"/>
+        <location filename="managetagsdialog.cpp" line="368"/>
         <location filename="managetagsdialog.cpp" line="387"/>
-        <location filename="managetagsdialog.cpp" line="466"/>
-        <location filename="managetagsdialog.cpp" line="647"/>
+        <location filename="managetagsdialog.cpp" line="396"/>
+        <location filename="managetagsdialog.cpp" line="475"/>
         <location filename="managetagsdialog.cpp" line="656"/>
-        <location filename="managetagsdialog.cpp" line="677"/>
-        <location filename="managetagsdialog.cpp" line="694"/>
-        <location filename="managetagsdialog.cpp" line="909"/>
-        <location filename="managetagsdialog.cpp" line="936"/>
+        <location filename="managetagsdialog.cpp" line="665"/>
+        <location filename="managetagsdialog.cpp" line="686"/>
+        <location filename="managetagsdialog.cpp" line="703"/>
+        <location filename="managetagsdialog.cpp" line="918"/>
         <location filename="managetagsdialog.cpp" line="945"/>
-        <location filename="managetagsdialog.cpp" line="967"/>
+        <location filename="managetagsdialog.cpp" line="954"/>
+        <location filename="managetagsdialog.cpp" line="976"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="645"/>
+        <location filename="managetagsdialog.cpp" line="654"/>
         <source>A tag must be selected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="653"/>
+        <location filename="managetagsdialog.cpp" line="662"/>
         <source>No cash stream definition in the scenario. Cannot link to Tag</source>
         <oldsource>No Cash Stream Definition in the scenario. Cannot link to Tag</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="674"/>
+        <location filename="managetagsdialog.cpp" line="683"/>
         <source>No more cash stream definition to link. All the existing ones defined the scenario have already been linked to this tag.</source>
         <oldsource>No more Cash Stream Definition to link. All the existing ones defined the scenario have already been linked to this tag.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="692"/>
+        <location filename="managetagsdialog.cpp" line="701"/>
         <source>Select at least 1 cash stream definition.</source>
         <oldsource>Select at least 1 Cash Stream Definition.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="907"/>
+        <location filename="managetagsdialog.cpp" line="916"/>
         <source>Select at least 1 tag.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="934"/>
+        <location filename="managetagsdialog.cpp" line="943"/>
         <source>A cash stream definition must be selected.</source>
         <oldsource>A Cash Stream Definition must be selected.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="942"/>
+        <location filename="managetagsdialog.cpp" line="951"/>
         <source>No tag defined in the scenario. Cannot link to cash stream definition</source>
         <oldsource>No Tag defined in the scenario. Cannot link to Cash Stream Definition</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="964"/>
+        <location filename="managetagsdialog.cpp" line="973"/>
         <source>No more tags to link. All the existing ones defined the scenario have already been linked to this cash stream definition.</source>
         <oldsource>No more tags to link. All the existing ones defined the scenario have already been linked to this Cash Stream definition.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="managetagsdialog.cpp" line="966"/>
+        <location filename="managetagsdialog.cpp" line="975"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4897,6 +5037,7 @@ The file may have been moved or deleted.</oldsource>
     <message>
         <location filename="optionsdialog.ui" line="144"/>
         <source>yyyy-MMM-dd</source>
+        <oldsource>yyyy-MMMM-dd</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5431,77 +5572,77 @@ The file may have been moved or deleted.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="29"/>
+        <location filename="presentvaluecalculatordialog.ui" line="35"/>
         <source>Future value :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="63"/>
+        <location filename="presentvaluecalculatordialog.ui" line="69"/>
         <source>Discount rate :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="75"/>
+        <location filename="presentvaluecalculatordialog.ui" line="81"/>
         <source>%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="106"/>
+        <location filename="presentvaluecalculatordialog.ui" line="112"/>
         <source>Monthly rate :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="115"/>
+        <location filename="presentvaluecalculatordialog.ui" line="121"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The &lt;span style=&quot; font-weight:700;&quot;&gt;equivalent&lt;/span&gt; monthly discount rate, that will be &lt;span style=&quot; text-decoration: underline;&quot;&gt;compounded monthly &lt;/span&gt;to generate the annual discount rate above.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="118"/>
+        <location filename="presentvaluecalculatordialog.ui" line="124"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="140"/>
+        <location filename="presentvaluecalculatordialog.ui" line="146"/>
         <source>No of month :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="149"/>
+        <location filename="presentvaluecalculatordialog.ui" line="155"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;No of months between both values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="182"/>
+        <location filename="presentvaluecalculatordialog.ui" line="188"/>
         <source>Present value :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="238"/>
+        <location filename="presentvaluecalculatordialog.ui" line="244"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Convert the future value into a present value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="251"/>
+        <location filename="presentvaluecalculatordialog.ui" line="257"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Convert the present value into a future value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="254"/>
+        <location filename="presentvaluecalculatordialog.ui" line="260"/>
         <source>PV -&gt; FV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="241"/>
+        <location filename="presentvaluecalculatordialog.ui" line="247"/>
         <source>FV -&gt; PV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="72"/>
+        <location filename="presentvaluecalculatordialog.ui" line="78"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Final annual discount rate, fully &lt;span style=&quot; font-weight:700;&quot;&gt;compounded&lt;/span&gt;. Compounding is made on a monthly basis. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="presentvaluecalculatordialog.ui" line="277"/>
+        <location filename="presentvaluecalculatordialog.ui" line="283"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5580,14 +5721,14 @@ The file may have been moved or deleted.</oldsource>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenariocsdtablemodel.cpp" line="193"/>
-        <location filename="scenariocsdtablemodel.cpp" line="255"/>
+        <location filename="scenariocsdtablemodel.cpp" line="196"/>
+        <location filename="scenariocsdtablemodel.cpp" line="258"/>
         <source>Periodic</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="scenariocsdtablemodel.cpp" line="226"/>
-        <location filename="scenariocsdtablemodel.cpp" line="288"/>
+        <location filename="scenariocsdtablemodel.cpp" line="229"/>
+        <location filename="scenariocsdtablemodel.cpp" line="291"/>
         <source>Irregular</source>
         <translation></translation>
     </message>
@@ -5729,12 +5870,12 @@ The file may have been moved or deleted.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.cpp" line="106"/>
+        <location filename="scenariopropertiesdialog.cpp" line="111"/>
         <source>Constant annual inflation of %1 percent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="scenariopropertiesdialog.cpp" line="108"/>
+        <location filename="scenariopropertiesdialog.cpp" line="114"/>
         <source>Variable inflation</source>
         <oldsource>Variable Inflation</oldsource>
         <translation type="unfinished"></translation>
@@ -5856,7 +5997,7 @@ The file may have been moved or deleted.</oldsource>
     </message>
     <message>
         <location filename="visualizeoccurrencesdialog.ui" line="87"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="386"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="394"/>
         <source>Selected point :</source>
         <oldsource>Selected Point :</oldsource>
         <translation type="unfinished"></translation>
@@ -5867,28 +6008,28 @@ The file may have been moved or deleted.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="192"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="193"/>
         <source>Using variable inflation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="203"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="205"/>
         <source>Growth can be applied from %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="207"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="209"/>
         <source>Using custom variable growth.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="212"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="214"/>
         <source>No growth of any kind is applied.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="232"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="271"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="234"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="273"/>
         <source>Amount was too big %1 times and have been capped to %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5899,125 +6040,125 @@ The file may have been moved or deleted.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="186"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="187"/>
         <source>Inflation can be applied from %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="201"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="203"/>
         <source>Using custom constant annual growth of %1.</source>
         <oldsource>Using custom constant growth of %1.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="240"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="280"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="242"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="282"/>
         <source>No financial event will be generated before tomorrow %1 and past %2.</source>
         <oldsource>No event will be generated before tomorrow %1 and past %2.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="249"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="291"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="251"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="293"/>
         <source>income</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="249"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="291"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="251"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="293"/>
         <source>expense</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="289"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="291"/>
         <source>%1 %2 event(s) have been generated.</source>
         <oldsource>%1 %2 event(s) have been generated.&lt;br&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="222"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="261"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="224"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="263"/>
         <source>Converting Future Values to Present Values using an annual discount  rate of %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="247"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="249"/>
         <source>%1 event(s) of type &quot;%2&quot; have been generated.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="318"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="326"/>
         <source>Amount is bigger than the maximum allowed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="326"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="334"/>
         <source>Error during amount conversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="335"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="343"/>
         <source>%1 *** PAST -&gt; discarded ***</source>
         <oldsource>[%1] *** PAST -&gt; discarded ***</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="337"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="345"/>
         <source>%1 %2 : %3</source>
         <oldsource>%1 %2 : %3 (cummul=%4)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="394"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="402"/>
         <source>Financial events</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="660"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="668"/>
         <source>Cumulative</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="684"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="692"/>
         <source>Export process failed. Cannot open the file for saving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="685"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="689"/>
         <location filename="visualizeoccurrencesdialog.cpp" line="693"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="697"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="701"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="689"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="697"/>
         <source>Export process failed. Write error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="693"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="701"/>
         <source>Export process failed. Data error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="683"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="688"/>
-        <location filename="visualizeoccurrencesdialog.cpp" line="692"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="691"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="696"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="700"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="656"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="664"/>
         <source>Date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="658"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="666"/>
         <source>Amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="visualizeoccurrencesdialog.cpp" line="183"/>
+        <location filename="visualizeoccurrencesdialog.cpp" line="184"/>
         <source>Using constant adjusted annual inflation of %1.</source>
         <oldsource>Using constant adjusted annual inflation of %1 percent.</oldsource>
         <translation type="unfinished"></translation>

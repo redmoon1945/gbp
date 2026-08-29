@@ -38,6 +38,12 @@ void AnalysisDialog::periodHeatmapRedisplayTable()
     tw->horizontalHeader()->setVisible(true);
     tw->verticalHeader()->setVisible(true);
 
+    // A year is an identifier, not a quantity - it must never get a thousands separator
+    // (locale.toString(2026) would otherwise render e.g. "2,026" or, in Bengali, "২,০২৬").
+    // Used for every year displayed in this view, and to measure how wide a year can get.
+    QLocale yearLocale = locale;
+    yearLocale.setNumberOptions(QLocale::OmitGroupSeparator);
+
     bool yearlyMode = ui->periodHeatmapYearlyRadioButton->isChecked();
     const QMap<QDate,Bin>* const binsPtr = yearlyMode ? &binsYearly : &binsMonthly;
     const QMap<QDate,Bin>& bins = *binsPtr;
@@ -103,7 +109,7 @@ void AnalysisDialog::periodHeatmapRedisplayTable()
             tw->setHorizontalHeaderItem(m - 1, h);
         }
         for (int r = 0; r < noRows; ++r) {
-            auto* h = new QTableWidgetItem(QString::number(firstYear + r));
+            auto* h = new QTableWidgetItem(yearLocale.toString(firstYear + r));
             h->setTextAlignment(Qt::AlignCenter);
             tw->setVerticalHeaderItem(r, h);
         }
@@ -266,7 +272,7 @@ void AnalysisDialog::periodHeatmapRedisplayTable()
                 item->setBackground(oorBg);
             } else {
                 int year = displayYears[i];
-                item->setText(QString::number(year));
+                item->setText(yearLocale.toString(year));
                 item->setForeground(QColor(Qt::white));
                 QDate key(year, 1, 1);
                 if (!bins.contains(key)) {
@@ -279,7 +285,8 @@ void AnalysisDialog::periodHeatmapRedisplayTable()
                         item->setBackground(noeBg);
                         item->setText(QString(QChar(0x2022))); // • — overrides year
                         item->setForeground(noeFg);
-                        item->setToolTip(QString("%1\n%2").arg(year).arg(tr("No events")));
+                        item->setToolTip(QString("%1\n%2").arg(yearLocale.toString(year))
+                            .arg(tr("No events")));
                     } else {
                         double rawVal = byIncome  ? bin.income
                             : byExpense ? bin.expense : std::abs(bin.delta);
@@ -290,7 +297,7 @@ void AnalysisDialog::periodHeatmapRedisplayTable()
                         } else {
                             item->setBackground(cellColor(bin));
                         }
-                        QString tip = QString::number(year) +
+                        QString tip = yearLocale.toString(year) +
                             "\n" + tr("Income:   ") +
                             CurrencyHelper::formatAmount(bin.income, currInfo, locale, false) +
                             "\n" + tr("Expenses: ") +
@@ -347,7 +354,7 @@ void AnalysisDialog::periodHeatmapRedisplayTable()
                         item->setToolTip(
                             QString("%1 %2\n%3")
                                 .arg(locale.monthName(month, QLocale::LongFormat))
-                                .arg(year)
+                                .arg(yearLocale.toString(year))
                                 .arg(tr("No events")));
                     } else {
                         // State 3 : month has data — pick color based on active mode.
@@ -367,7 +374,7 @@ void AnalysisDialog::periodHeatmapRedisplayTable()
 
                         // Tooltip always shows the full breakdown regardless of the active mode.
                         QString tip = locale.monthName(month, QLocale::LongFormat) +
-                            QString(" %1\n").arg(year) + tr("Income:   ") +
+                            QString(" %1\n").arg(yearLocale.toString(year)) + tr("Income:   ") +
                             CurrencyHelper::formatAmount(bin.income, currInfo, locale, false) +
                             "\n" + tr("Expenses: ") +
                             CurrencyHelper::formatAmount(bin.expense, currInfo, locale, false) +
@@ -394,7 +401,7 @@ void AnalysisDialog::periodHeatmapRedisplayTable()
     if (yearlyMode) {
         // Square cells sized to the year text width; headers are hidden.
         QFontMetrics fm(scaledFont);
-        int cellSide = fm.horizontalAdvance("2099") + 20;
+        int cellSide = fm.horizontalAdvance(yearLocale.toString(9999)) + 20;
         tw->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
         tw->horizontalHeader()->setDefaultSectionSize(cellSide);
         tw->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
@@ -414,7 +421,7 @@ void AnalysisDialog::periodHeatmapRedisplayTable()
         tw->verticalHeader()->setFont(scaledFont);
         tw->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
         tw->verticalHeader()->setDefaultSectionSize(fm.height() + 6);
-        tw->verticalHeader()->setFixedWidth(fm.horizontalAdvance("2099") + 12);
+        tw->verticalHeader()->setFixedWidth(fm.horizontalAdvance(yearLocale.toString(9999)) + 12);
     }
 
     // --- Legend ---

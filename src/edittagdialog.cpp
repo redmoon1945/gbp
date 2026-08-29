@@ -236,9 +236,9 @@ void EditTagDialog::loadSuggestions()
     QString langCode = locale.languageToCode(locale.language()) ;
 
     // build resource name for incomes and expenses
-    QFile incomesFile(QString(":/Doc/resources/tag_suggestions_incomes_%1.txt").
+    QFile incomesFile(QString(":/Doc/resources/tag_suggestions_incomes-%1.txt").
         arg((langCode=="fr")?("fr"):("en")));
-    QFile expensesFile(QString(":/Doc/resources/tag_suggestions_expenses_%1.txt").
+    QFile expensesFile(QString(":/Doc/resources/tag_suggestions_expenses-%1.txt").
         arg((langCode=="fr")?("fr"):("en")));
     if(incomesFile.exists()==false){
         LOG_ERROR( QString("Load tag suggestions : %1 does not exist in the resource file")

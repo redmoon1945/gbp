@@ -45,9 +45,18 @@ EditVariableGrowthDialog::EditVariableGrowthDialog(QString newGrowthName, QLocal
     // set the model (no internal data for now)
     tableModel = new EditVariableGrowthModel(growthName, this->locale);
     ui->growthTableView->setModel(tableModel);
-    // force equal with of columns
     ui->growthTableView->setFont(QApplication::font());
-    ui->growthTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    // Columns previously all had an equal, stretched width regardless of content, which could
+    // leave the Transition date column too narrow for some locale's date format (or the
+    // annual/monthly columns too narrow for the growth name they display). Re-fit each column
+    // to its actual content every time the table's data changes instead - setGrowthData()
+    // always goes through beginResetModel()/endResetModel(), so this single connection
+    // covers every place the table gets (re)populated.
+    connect(tableModel, &QAbstractItemModel::modelReset, this, [this]() {
+        UiUtil::resizeTableViewColumns(ui->growthTableView, {0, 1, 2});
+    });
+    UiUtil::resizeTableViewColumns(ui->growthTableView, {0, 1, 2});
 
     QFont appFont = QApplication::font();
     ui->growthTableView->horizontalHeader()->setFont(appFont);

@@ -6,7 +6,7 @@
 #include "util.h"
 #include "uiutil.h"
 #include <qfileinfo.h>
-#
+#include <QDir>
 
 
 ScenarioPropertiesDialog::ScenarioPropertiesDialog(QLocale theLocale, QWidget *parent)
@@ -63,32 +63,32 @@ void ScenarioPropertiesDialog::slotPrepareContent()
         } else {
             QFileInfo fileInfo(fullName);
             QString fileName = fileInfo.fileName();
-            QString filePath = fileInfo.absolutePath();
+            QString filePath = QDir::toNativeSeparators(fileInfo.absolutePath());
             ui->filenamePlainTextEdit->setPlainText(fileName);
             ui->pathPlainTextEdit->setPlainText(filePath);
             QDateTime dt = fileInfo.birthTime();
             if (dt.isValid()){
-                QString s = locale.toString(dt, QLocale::FormatType::LongFormat);
+                QString s = locale.toString(dt, "yyyy-MMM-dd HH:mm:ss t");
                 ui->fileCreationDateLabel->setText(s);
             } else {
                 ui->fileCreationDateLabel->setText(tr("Info not available"));
             }
             dt = fileInfo.lastModified();
             if (dt.isValid()){
-                QString s = locale.toString(dt,QLocale::FormatType::LongFormat);
+                QString s = locale.toString(dt, "yyyy-MMM-dd HH:mm:ss t");
                 ui->fileModifDateLabel->setText(s);
             } else {
                 ui->fileModifDateLabel->setText(tr("Info not available"));
             }
         }
 
-        ui->noPeriodicIncomesLabel->setText(QString::number(
+        ui->noPeriodicIncomesLabel->setText(locale.toString(
             theScenario->getNoOfPeriodicIncomes(false)));
-        ui->noIrregularIncomesLabel->setText(QString::number(
+        ui->noIrregularIncomesLabel->setText(locale.toString(
             theScenario->getNoOfIrregularIncomes(false)));
-        ui->noPeriodicExpensesLabel->setText(QString::number(
+        ui->noPeriodicExpensesLabel->setText(locale.toString(
             theScenario->getNoOfPeriodicExpenses(false)));
-        ui->noIrregularExpensesLabel->setText(QString::number(
+        ui->noIrregularExpensesLabel->setText(locale.toString(
             theScenario->getNoOfIrregularExpenses(false)));
 
         bool found;
@@ -100,15 +100,22 @@ void ScenarioPropertiesDialog::slotPrepareContent()
             ui->currencyLabel->setText(tr("Unknown"));
         }
 
+        // label_15 (next to inflationLabel in the .ui) is a static "percent, annually" caption
+        // that doesn't translate naturally alongside a full sentence and can't adapt to the
+        // "Variable inflation" case at all - inflationLabel is a self-contained, fully
+        // translatable sentence on its own, so label_15 is always hidden.
+        ui->label_15->setVisible(false);
         if (theScenario->getInflation().getType()==Growth::Type::CONSTANT){
             qint64 intInf = theScenario->getInflation().getAnnualConstantGrowth();
             double inf = Growth::fromDecimalToDouble(intInf);
-            ui->inflationLabel->setText(tr("Constant annual inflation of %1 percent").arg(inf));
+            ui->inflationLabel->setText(tr("Constant annual inflation of %1 percent").arg(
+                Util::formatDouble(inf, locale, Util::DoubleFormatMode::Standard, {})));
         } else{
             ui->inflationLabel->setText(tr("Variable inflation"));
         }
 
-        ui->feGenerationDurationLabel->setText(QString::number(theScenario->getFeGenerationDuration()));
+        ui->feGenerationDurationLabel->setText(
+            locale.toString(theScenario->getFeGenerationDuration()));
 
     }
 

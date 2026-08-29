@@ -47,6 +47,13 @@ class ScenarioCsdTableModel : public QAbstractTableModel
 
 public:
 
+    /// @brief Max length of a CSD name as displayed in this table's Name column; longer
+    /// names are elided with "...". This is a display-only limit, independent of the name's
+    /// actual stored length (see Csd::NAME_MAX_LEN) - it exists purely to keep the table from
+    /// growing excessively wide for a long CSD name. The full name remains available (e.g. by
+    /// opening the CSD for editing); this only affects what is shown in the table cell.
+    static constexpr int DISPLAYED_NAME_MAX_LEN = 50;
+
     explicit ScenarioCsdTableModel(QLocale aLocale, QFont activeTableFont, QFont inactiveTableFont,
         QFont amountActiveTableFont, QFont amountInactiveTableFont, QFont infoActiveTableFont,
         QFont infoInactiveTableFont, bool allowColoredCsdNames, QObject *parent = nullptr);

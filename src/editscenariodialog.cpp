@@ -110,11 +110,19 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale) :
         GbpController::getInstance().getAllowDecorationColor());
     ui->itemsTableView->setModel(itemTableModel);
 
+    // Type/Name/Amount all show locale- and content-dependent text (translated type labels,
+    // free-form CSD names, locale-formatted amounts) that a fixed averageCharWidth() guess
+    // can under-size on some platform/font/locale combinations (see the Irregular dialog's
+    // Date column for a concrete case of this). Re-fit all three to their actual content
+    // every time the table's data changes, rather than guessing once at startup -
+    // refresh() always goes through beginResetModel()/endResetModel(), so this single
+    // connection covers every place the table gets (re)populated.
+    connect(itemTableModel, &QAbstractItemModel::modelReset, this, [this]() {
+        UiUtil::resizeTableViewColumns(ui->itemsTableView, {0, 1, 2});
+    });
     // it appears this must be done AFTER setting the model (don't know why...)
     QFontMetrics fm2 = ui->itemsTableView->fontMetrics();
-    ui->itemsTableView->setColumnWidth(0,fm2.averageCharWidth()*12);    // type
-    ui->itemsTableView->setColumnWidth(1,fm2.averageCharWidth()*40);    // name
-    ui->itemsTableView->setColumnWidth(2,fm2.averageCharWidth()*18);    // amount
+    UiUtil::resizeTableViewColumns(ui->itemsTableView, {0, 1, 2});  // type, name, amount
     // Horizontal header: minimum height derived from font so text is never clipped on Windows.
     ui->itemsTableView->horizontalHeader()->setFont(appFont);
     ui->itemsTableView->horizontalHeader()->setMinimumHeight(fm2.height() + 10);
@@ -858,7 +866,7 @@ void EditScenarioDialog::updateNoItemsLabel()
     if (noItems==0){
         s = QString(tr("Cash stream definitions"));
     } else {
-        s = QString(tr("Cash stream definitions (%1)").arg(noItems));
+        s = QString(tr("Cash stream definitions (%1)").arg(displayLocale.toString(noItems)));
     }
     ui->groupBox->setTitle(s);
     //ui->noItemsLabel->setText(s);

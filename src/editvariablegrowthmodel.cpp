@@ -74,7 +74,7 @@ QVariant EditVariableGrowthModel::data(const QModelIndex &index, int role) const
         if ( row <= (listKeys.size()-1) ){
             QDate key = listKeys.at(row);
             if (col==0){
-                return theLocale.toString(key, QLocale::ShortFormat);
+                return theLocale.toString(key, "yyyy-MMM-dd");
             } else if (col==1){
                 double d = Growth::fromDecimalToDouble(factors.value(key));
                 int noDec = Growth::NO_OF_DECIMALS;

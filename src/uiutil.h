@@ -21,6 +21,8 @@
 
 #include <QWidget>
 #include <QTableWidget>
+#include <QTableView>
+#include <QDateTimeEdit>
 
 /**
  * @brief UI-only utility functions that depend on Qt widget/layout headers.
@@ -91,6 +93,54 @@ public:
      * @param tableWidget The table whose columns and header are to be resized. Must not be null.
      */
     static void resizeTableColumns(QTableWidget* tableWidget);
+
+    /**
+     * @brief Resize selected columns of a @c QTableView (a model/view table, as opposed to
+     *        the item-based @c QTableWidget) to fit both cell content and header label.
+     *
+     * @details Uses the same algorithm and rationale as @c resizeTableColumns() - see its
+     * documentation for the full explanation of why each measurement is taken the way it is
+     * (in particular, the Windows-specific pitfalls around header/section fonts). The only
+     * differences are:
+     * - The header label text comes from the model's @c headerData(), since a @c QTableView
+     *   has no @c QTableWidgetItem of its own to ask.
+     * - Only the columns listed in @p columns are touched. Unlike @c resizeTableColumns(),
+     *   which resizes every column, a @c QTableView's other columns may already have their
+     *   own content-aware sizing (e.g. a currency amount column sized from its longest
+     *   possible formatted value) or may be meant to stretch and fill remaining space -
+     *   forcing every column to shrink-to-content would undo that.
+     *
+     * Call this again whenever the view's model content changes (e.g. rows added/removed/
+     * reloaded), since - like @c resizeTableColumns() - it only reflects whatever is in the
+     * view at the moment it runs; it is not automatically kept up to date afterwards.
+     *
+     * @param tableView The view whose columns are to be resized. Must not be null, and must
+     * have a model set.
+     * @param columns Indices of the columns to resize; any other column is left untouched.
+     */
+    static void resizeTableViewColumns(QTableView* tableView, const QList<int>& columns);
+
+    /**
+     * @brief Widen a @c QDateEdit/@c QDateTimeEdit a bit beyond its natural size, without
+     * risking it becoming too narrow to show its own content.
+     *
+     * @details Sets the widget's minimum width to:
+     * @code
+     *   dateEdit->sizeHint().width() + extraPaddingChars × averageCharWidth
+     * @endcode
+     * @c sizeHint() is Qt's own size calculation for this widget - it already accounts for
+     * the widget's @c displayFormat(), current locale, and current font, so (unlike a plain
+     * @c QTableView column, which has no idea what content is coming) there is nothing to
+     * guess here: the base width is always correct for whatever this widget will actually
+     * display. @p extraPaddingChars is added purely for a roomier look on top of that correct
+     * base, so even a generous or imprecise padding value can only ever make the widget a
+     * little more or less spacious - never too narrow to render its own date.
+     *
+     * @param dateEdit The widget to widen. Must not be null.
+     * @param extraPaddingChars Extra width to add on top of @c sizeHint(), expressed as a
+     * multiple of the widget's average character width. Default is 4.
+     */
+    static void widenDateEdit(QDateTimeEdit* dateEdit, int extraPaddingChars = 4);
 
     /**
      * @brief Returns the system monospace font sized to match @c QApplication::font().

@@ -1,6 +1,51 @@
 # Change log for GBP
 
-## 1.7.0 to 1.8.0
+## 1.8.0 to 1.8.1 (28-aug-2026)
+
+### New features : The big ones
+
+- **Installation simplified** : On Linux, GBP no longer requires a separate installation of the FUSE 2 library (`libfuse2`) as a prerequisite. 
+- **Full French translation for bundled documentation** : the User Manual and Quick Tutorial are now available in French, in addition to English which is the default.
+- **Dynamic column sizing** : table columns in several dialogs (Edit Irregular Financial Stream Definition, Edit Scenario, Manage Tags, Edit Variable Growth, Analysis — Tags tab) now resize themselves to fit their actual content, instead of relying on a fixed estimate made once at startup. This fixes long content getting truncated with an ellipsis on some platform/locale combinations — most visibly a German long-format date on Windows, where the fixed estimate didn't leave enough room for the font actually used there.
+- **Better support for international locales** : numbers and dates across the app are now more consistently rendered in the application's actual locale — including locales with their own numbering system (e.g. Bengali or Arabic digits), where several places had been silently falling back to plain Western digits or picking up formatting that doesn't belong on an identifier (like a thousands separator on a year).
+- In **Custom Date Interval dialog :**
+  - **Custom date interval (chart) remembers your last selection** : the "Custom" chart range dialog no longer resets its "From"/"To" dates to the chart's current view every time it is opened ; your previous selection is kept instead, and only adjusted if it falls outside what the loaded scenario can actually calculate.
+
+### New features : The details
+
+- Documentation
+  - The User Manual and Quick Tutorial PDFs are now provided in both English and French. The appropriate language version is selected automatically based on the application's current locale, consistent with the existing behavior for the Welcome screen.
+- In About Dialog
+  - The "Info" tab now also displays the location of the application's cache directory, alongside the existing config file and log file paths.
+- In Custom Date Interval dialog
+  - The "From" and "To" date fields now keep the values you last entered instead of resetting to the chart's current view each time the dialog is opened.
+  - Both fields are bounded to the range the loaded scenario can generate financial events for (tomorrow through its max calculation date). If a previously entered value no longer fits that range (e.g. after changing "Options -> Scenario years"), it is automatically adjusted to the nearest allowed date.
+- In command-line workspace options
+  - `-workspace_cleanup` now shows a preview of what will be deleted and, on Linux and macOS, asks for confirmation before deleting anything ; it previously deleted immediately with no way to preview or cancel. On Windows, it proceeds automatically after the preview instead of prompting.
+  - `-workspace_cleanup` also detects and removes orphaned log files. The default workspace's configuration and logs are never touched.
+  - `-workspace_list` now shows the number of log files belonging to each workspace.
+- In Edit Scenario dialog
+  - In the CSD list, a CSD name longer than 50 characters is now truncated with an ellipsis, to keep the table from growing excessively wide. The full name is unaffected everywhere else (e.g. when editing the CSD).
+- For consistency, dates shown across the app (date fields, labels, messages, and some tables) now use the same shorter `yyyy-MMM-dd` format (e.g. `2028-Dec-28`) instead of a mix of locale-short and full-month-name formats.
+
+### Fixes
+
+- The application no longer depends on `libfuse2` at runtime, removing the need to manually install it on Ubuntu 22.04, 24.04, 26.04.
+- Fixed a potential multi-user issue on the same Linux machine. Cached copies of the bundled PDF documents (Change Log, Quick Tutorial, User Manual, Welcome) were previously stored in the shared system temporary directory (`/tmp`). Because of the sticky bit set on `/tmp`, only the OS user who originally created a cached copy was permitted to delete or replace it — so if a different user account on the same machine tried to view a document after its content changed, the operation could fail with a permission error. Cached copies are now stored in a per-user application cache directory instead, so each user account keeps its own independent copy and is no longer affected by files created by other users.
+- Fixed the same potential multi-user issue for the "Open Example" menu action (Scenario menu). The bundled example budget scenario was previously copied to the shared system temporary directory before being opened; it is now copied to the same per-user application cache directory as the bundled PDF documents.
+- For Windows, some file paths were not rendered correctly : the Scenario Properties dialog's "Path" field and the "Open recent" menu (Scenario menu) displayed forward slashes (`/`) instead of the native Windows backslash (`\`) separator. Paths are now shown using the OS-appropriate separator.
+- The same forward-slash issue affected the console messages printed at startup (log file, configuration file, and cache directory locations) ; they are now shown using the OS-appropriate separator as well.
+- Some tables could truncate long content with an ellipsis instead of showing it in full. This was most visible in the Edit Irregular Financial Stream Definition dialog's Date column under some locales (e.g. German) on Windows, where the locale's long-format date (including the full weekday and month name) did not fit the column's fixed width estimate. Column widths in that table, as well as in the Edit Scenario CSD list, Manage Tags dialog, Edit Variable Growth dialog, and the Analysis dialog's Tags tab, are now computed from their actual content instead of a fixed estimate, and are recalculated automatically whenever the table's data changes.
+- In the Edit Variable Growth dialog, the last column (monthly growth) was also forced to stretch and fill all remaining space regardless of its content ; it now sizes to its content like the other columns.
+- Several date fields used a fixed-width guess for sizing instead of their actual width ; Edit Periodic's From/To date fields also silently ignored their configured display format. Both are fixed.
+- Some numbers (percentages, counts, a few amounts) were shown using plain Western digits regardless of locale, instead of the locale's own numbering system (e.g. Bengali or Arabic digits) like the rest of the app. Affected spots : Analysis dialog's Relative Weight rank/percentage and Tags table, the Period Heatmap's year labels and tooltips, Scenario Properties' event counts and duration, the Present Value Calculator's monthly rate, an import error message, and the occurrence list's event index.
+- A few more localization gaps in the same vein : the Period Heatmap's row headers could end up too narrow because their width was measured against Western digits instead of the locale's own ; years and the occurrence list's event index could pick up a stray thousands separator (e.g. "2,026") since they're identifiers, not quantities ; and the inflation/growth percentages shown when visualizing occurrences and in Scenario Properties now follow the same locale-aware formatting as amounts elsewhere in the app.
+
+### Known Issues
+
+- On most Linux distribution running Gnome (tested on Ubuntu 22.04, 24.04 and 26.04), modal dialog windows are tied by default to the Main Window and cannot be moved. To be able to move them (which is recommended as it adds flexibility), you can use the Gnome Tweaks application : go to Windows->Attach Modal Dialog and toggle to OFF. Another approach is to type the following command in a terminal : gsettings set org.gnome.mutter attach-modal-dialogs false. Note that this is a per-user setting, so it must be applied separately for each OS user account that runs GBP, and you may need to log out and back in (or at least restart GBP) for it to take effect.
+
+## 1.7.0 to 1.8.0 (26-jun-2026)
 
 ### New features : The big ones
 
@@ -14,6 +59,7 @@
 - **Windows UI** : many improvements to the Windows version for the behavior of the UI, specially regarding layouts with misc fonts (including big ones).
 
 ### New features : The details
+
 - Select currency Dialog
   - This is used when a new scenario is to be created. The currency is directly selected by the user, instead of being inferred from a country selection.
 - In Analysis Dialog :
@@ -46,24 +92,24 @@
       - Yearly : years fill a fixed 10-column grid left-to-right, top-to-bottom; the year is written inside each cell and no headers are shown.    
     - Three display modes are available:           
       - Incomes : sequential scale — the smallest non-zero income shows a near-background tint of the income color; the highest income shows full  
-  saturation. The minimum color is derived automatically from the maximum color.                    
+        saturation. The minimum color is derived automatically from the maximum color.                    
       - Expenses : same sequential scale applied to expenses.
       - Delta (income − expense) : diverging scale centered on pure black (breakeven). Positive periods blend toward the positive-side color;
-  negative periods blend toward the negative-side color. Each side is normalized independently so both extremes always reach full saturation.    
+        negative periods blend toward the negative-side color. Each side is normalized independently so both extremes always reach full saturation.    
     - An Exclude current month / year checkbox omits the in-progress period from both the grid and normalization. 
     - Cell states:    
       - Periods with no financial events are shown with a forward-diagonal hatch (/). 
       - Periods outside the scenario range (or excluded) use a backward-diagonal hatch (\).
       - In income or expense mode, a period that has events but zero activity for the active type is treated as no-events rather than colored,     
-  because its zero is uninformative rather than a meaningful breakeven. In delta mode, zero (income == expense) is always colored pure black.    
+        because its zero is uninformative rather than a meaningful breakeven. In delta mode, zero (income == expense) is always colored pure black.    
     - Color configuration via the header:               
       - In income or expense mode: one color picker sets the maximum (saturated) color; the minimum tint is derived automatically.                 
       - In delta mode: two color pickers set the positive-extreme and negative-extreme colors independently. Default colors are green (positive) and red (negative).                              
       - Each picker has a one-click reset to its default. 
     - A legend at the bottom shows color swatches for the minimum value, maximum value, breakeven (delta mode only), no-events hatch, and          
-  out-of-period hatch, with formatted currency labels for min and max.                       
+      out-of-period hatch, with formatted currency labels for min and max.                       
     - Cell size can be adjusted between Normal, Big (1.5×, default), and Bigger (2×) via a combo box in the header; the table scrolls automatically
-   when cells exceed the available space.                                             - Hovering any cell shows a tooltip with the full income / expenses / delta / balance breakdown for that period.
+      when cells exceed the available space.                                             - Hovering any cell shows a tooltip with the full income / expenses / delta / balance breakdown for that period.
 - In Edit Periodic Csd Dialog
   - Add a button to visualize the "breakdown" for this CSD, that is the period-by-period totals until the end of the CSD validity period. Breakdown's period can be Month or Year.
 - In Edit Irregular Csd Dialog
@@ -114,14 +160,12 @@
       - Helps users manage and clean up unused workspace configurations
       - Prevents accumulation of orphaned configuration files
 
-
 ### Known Issues
 
-- On Ubuntu Linux systems (tested on 22.04 and 24.04), secondary windows (e.g. popup dialogs) are tied by default to the Main Window and cannot be moved. To be able to move them (which is recommended as it adds flexibility), you can use the Gnome Tweaks application : go to Windows->Attach Modal Dialog and toggle to OFF. Another approach is to type the following command in a terminal : gsettings set org.gnome.mutter attach-modal-dialogs false
+- On Ubuntu Gnome Linux (tested on 22.04, 24.04 and 26.04), secondary windows (e.g. popup dialogs) are tied by default to the Main Window and cannot be moved. To be able to move them (which is recommended as it adds flexibility), you can use the Gnome Tweaks application : go to Windows->Attach Modal Dialog and toggle to OFF. Another approach is to type the following command in a terminal : gsettings set org.gnome.mutter attach-modal-dialogs false
 - In extreme scenarios (meaning that do not correspond to expected use cases of GBP), where really extremely large data set is generated (e.g. generate many events per day, every day, for 100 years), there could be a noticeable lag between the moment you click on a point of the Cash Balance curve and the relevant info is displayed in the right panel. This depends heavily on the speed of your computer. The next 1.8 release will address the speed issue (expected end of 2026).
 
-
-## 1.6.3 to 1.7.0
+## 1.6.3 to 1.7.0 (02-dec-2025)
 
 ### New features : The big ones
 
@@ -199,7 +243,6 @@
   - -logverbosity=DEBUG : Set verbose debug logging (all platforms)
   - -logverbosity=NORMAL : Set normal logging verbosity, default (all platforms)
 
-
 ### Fixes
 
 - Theming : For Linux Gnome/Cinnamon (e.g. Ubuntu 24 / 26, Fedora 43 Gnome, Linux Mint, etc), GBP can now detect and apply some elements of the system theming, like dark/light mode. However, it still cannot detect and adapt to the _accent color_ chosen in the system configuration. For KDE system however (e.g. Tuxedo OS, Fedora 43 KDE, OpenSuse, etc), all configuration settings related to theming are respected. 
@@ -215,8 +258,7 @@
 - On Ubuntu Linux systems (tested on 22.04 and 24.04), secondary windows (e.g. popup dialogs) are tied by default to the Main Window and cannot be moved. To be able to move them (which is recommended as it adds flexibility), you can use the Gnome Tweaks application : go to Windows->Attach Modal Dialog and toggle to OFF. Another approach is to type the following command in a terminal : gsettings set org.gnome.mutter attach-modal-dialogs false
 - In extreme scenarios (meaning that do not correspond to expected use cases of GBP), where really extremely large data set is generated (e.g. generate many events per day, every day, for 100 years), there could be a noticeable lag between the moment you click on a point of the Cash Balance curve and the relevant info is displayed in the right panel. This depends heavily on the speed of your computer. The next 1.8 release will address the speed issue (expected end of 2026).
 
-
-## 1.6.2 to 1.6.3
+## 1.6.2 to 1.6.3 (29-mar-2025)
 
 ### New features
 

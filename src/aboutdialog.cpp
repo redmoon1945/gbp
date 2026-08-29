@@ -25,6 +25,10 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDir>
+#include <QDate>
+#include <QTime>
+#include <QDateTime>
+#include <qstandardpaths.h>
 
 AboutDialog::AboutDialog(QWidget *parent)
     : QDialog(parent)
@@ -39,12 +43,14 @@ AboutDialog::AboutDialog(QWidget *parent)
 
     ui->appLabel->setText(QCoreApplication::applicationName() + "  " +
         QCoreApplication::applicationVersion());
-    QString builtOn = QString(tr("Built on : %1 %2")).arg(__DATE__).arg(__TIME__);
-    ui->buildOnLabel->setText(builtOn);
+    // "Built on" label is set in slotAboutDialogPrepareContent(), once the locale is known -
+    // __DATE__/__TIME__ are fixed-format, always-English compile-time strings and need to be
+    // parsed before they can be shown in the application's locale.
 
     QFontMetrics fm(ui->configFilePlainTextEdit->font());
-    ui->configFilePlainTextEdit->setFixedHeight(fm.height()*3); // 2 lines min
-    ui->logFilePlainTextEdit->setFixedHeight(fm.height()*3); // 2 lines min
+    ui->configFilePlainTextEdit->setFixedHeight(fm.height()*3);
+    ui->logFilePlainTextEdit->setFixedHeight(fm.height()*3);
+    ui->cachePlainTextEdit->setFixedHeight(fm.height()*3);
 
     // set first tab as current
     ui->tabWidget->setCurrentIndex(0);
@@ -59,11 +65,25 @@ AboutDialog::~AboutDialog()
 
 void AboutDialog::slotAboutDialogPrepareContent(const QLocale &theLocale)
 {
+    // Built on : __DATE__/__TIME__ are fixed-format, always-English compile-time strings
+    // (e.g. "Aug 28 2026", "14:32:07") - parse them back into real QDate/QTime so they can be
+    // shown using the application's locale, consistent with the rest of the app. For a
+    // single-digit day, __DATE__ pads with a space instead of a zero (e.g. "Aug  8 2026",
+    // two spaces) - simplified() collapses that back to one space so it matches the format.
+    QDate buildDate = QDate::fromString(QString(__DATE__).simplified(), "MMM d yyyy");
+    QTime buildTime = QTime::fromString(QString(__TIME__), "hh:mm:ss");
+    QDateTime buildDateTime(buildDate, buildTime);
+    QString builtOn = tr("Built on : %1")
+        .arg(theLocale.toString(buildDateTime, "yyyy-MMM-dd HH:mm:ss"));
+    ui->buildOnLabel->setText(builtOn);
+
     ui->configFilePlainTextEdit->setPlainText(
         QDir::toNativeSeparators(GbpController::getInstance().getSettingsFullFileName()));
     ui->logFilePlainTextEdit->setPlainText(
         QDir::toNativeSeparators(GbpLogger::getInstance().getLogFullFileName()));
     ui->workspaceLineEdit->setText(GbpController::getInstance().getWorkspace());
+    ui->cachePlainTextEdit->setText(
+        QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)));
 
     // Locale
     QString locString = QString("%1 (%2 %3)").

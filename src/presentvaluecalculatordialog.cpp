@@ -112,7 +112,7 @@ double PresentValueCalculatorDialog::convertMonthlyRateStringToValue(const QStri
 QString PresentValueCalculatorDialog::makeStringFromMonthlyRate(double value)
 {
     QString s = QString("%1 %2")
-        .arg(QString::number(value, 'f', 8))
+        .arg(locale.toString(value, 'f', 8))
         .arg("%");
     return s;
 }

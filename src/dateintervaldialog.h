@@ -34,7 +34,16 @@ public:
     ~DateIntervalDialog();
 
 public slots:
-    // From client of DateIntervalDialog : Prepare Dialog before edition
+
+    /**
+     * @brief From client of DateIntervalDialog : to be called just before showing the Dialog.
+     * @param from Minimum date allowed for both date edits.
+     * @param to Maximum date allowed for both date edits.
+     * @details "from"/"to" only bound the allowed [min,max] range for the "From"/"To" date
+     * edits, they are not values to display. The previously selected values are preserved
+     * across invocations of this Dialog, and only adjusted (clamped) if they no longer fit
+     * within that range.
+     */
     void slotPrepareContent(QDate from, QDate to);
 
 signals:

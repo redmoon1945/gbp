@@ -1,0 +1,21 @@
+Habitation	Location, hypothèque, taxes foncières, maintenance, rénovations, réparations
+Services publics	Eau, gaz, électricité, ordures, recyclage
+Téléphone/Internet 	Cable, fibre, services en continu, souscription, télécom
+Alimentation	Épicerie, resto, livraison, items ménagers, items à emporter
+Transport publics	Train, bus, métro, taxi, Uber, avion
+Assurance	Santé, vie, habitation, auto, accident et infirmité, soins long terme
+Dette	Prêt étudiant, carte de crédit, prêt personnel, hypothèque
+Divertissement	Souscriptions, services en continu, cinéma, resto, converts, dance, évènements sociaux, passe-temps
+Voyages	Hotel, avion, bateau, location d'auto 
+Cadeaux	Anniversaires, charité, Noel, évènements spéciaux
+Dons	Charité, Église, levée de fond, financement participatif, parti politique
+Soins enfants	Gardiennage, voyage scolaire, repas scolaire, uniforme scolaire
+Animaux	Alimentation, vétérinaire, jouet, traitement
+Soins médicaux	Docteur, dentiste, prescription, lunette, optométriste, gym, frais soins privés
+Soins personnels	Coupe de cheveux, ongles, varices, soin de beauté, thérapie
+Mise en forme
+Taxes et impôts	Taxes sur biens, impôt sur salaire, impôt sur gain en capital, impôt sur dividende, taxes foncières
+Vêtements
+Education	Frais scolaires, livres, fournitures, cours en ligne
+Meubles
+Vacances

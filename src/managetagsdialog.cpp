@@ -69,9 +69,18 @@ ManageTagsDialog::ManageTagsDialog(QLocale aLocale,QWidget *parent)
     ui->csdsViewCsdsListWidget->setFont(appFont);
     ui->csdsViewTagsListWidget->setFont(appFont);
 
+    // Name is free-form, locale-independent text, but a fixed averageCharWidth() guess can
+    // still under-size it on some platform/font combinations (see the Irregular dialog's
+    // Date column for a concrete case of this general pattern). Re-fit it to its actual
+    // content every time the table's data changes, rather than guessing once at startup -
+    // setModelData() always goes through beginResetModel()/endResetModel(), so this single
+    // connection covers every place the table gets (re)populated.
+    connect(itemTableModel, &QAbstractItemModel::modelReset, this, [this]() {
+        UiUtil::resizeTableViewColumns(ui->tagsDefTableView, {0});
+    });
     // it appears this must be done AFTER setting the model (don't know why...)
     QFontMetrics fm2 = ui->tagsDefTableView->fontMetrics();
-    ui->tagsDefTableView->setColumnWidth(0,fm2.averageCharWidth()*50);    // name
+    UiUtil::resizeTableViewColumns(ui->tagsDefTableView, {0});  // name
     ui->tagsDefTableView->horizontalHeader()->setFont(appFont);
     ui->tagsDefTableView->horizontalHeader()->setMinimumHeight(fm2.height() + 10);
 
@@ -232,7 +241,7 @@ void ManageTagsDialog::tagsDef_UpdateTagListLabel()
 {
     QString s = tr("Tags defined");
     if (tags.size()!=0) {
-        s = QString("%1 (%2)").arg(s).arg(tags.size());
+        s = QString("%1 (%2)").arg(s).arg(locale.toString(tags.size()));
     }
     ui->tagsDefListTitleLabel->setText(s);
 }
@@ -589,7 +598,7 @@ void ManageTagsDialog::tagsView_UpdateCsdListLabel()
 {
     QString s = tr("Linked cash stream definitions");
     if (ui->tagsViewCsdListWidget->count()!=0) {
-        s = QString("%1 (%2)").arg(s).arg(ui->tagsViewCsdListWidget->count());
+        s = QString("%1 (%2)").arg(s).arg(locale.toString(ui->tagsViewCsdListWidget->count()));
     }
     ui->tagsViewCsdListLabel->setText(s);
 }
@@ -879,7 +888,7 @@ void ManageTagsDialog::csdsView_UpdateTagListLabel()
 {
     QString s = tr("Linked Tags");
     if (ui->csdsViewTagsListWidget->count()!=0) {
-        s = QString("%1 (%2)").arg(s).arg(ui->csdsViewTagsListWidget->count());
+        s = QString("%1 (%2)").arg(s).arg(locale.toString(ui->csdsViewTagsListWidget->count()));
     }
     ui->csdsViewTagsListLabel->setText(s);
 

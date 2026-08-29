@@ -25,6 +25,7 @@
 #include <QPalette>
 #include <QPen>
 #include <QColor>
+#include <QDir>
 #include "gbpcontroller.h"
 #include "gbplogger.h"
 #include "currencyhelper.h"
@@ -40,6 +41,7 @@
 #include "irregularcsd.h"
 #include <QRandomGenerator>
 #include <QCryptographicHash>
+#include <QStandardPaths>
 
 
 MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
@@ -90,7 +92,7 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
 
     // display todays's date in bottom startAmountLabel
     ui->startAmountLabel->setText(tr("Start amount as of today %1 :").arg(
-        locale.toString(GbpController::getInstance().getToday(),QLocale::FormatType::ShortFormat)));
+        locale.toString(GbpController::getInstance().getToday(),"yyyy-MMM-dd")));
 
     // set scaling factor from settings
     chartScalingFactor = 1 + (GbpController::getInstance().getPercentageMainChartScaling())/100.0;
@@ -196,7 +198,8 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
         &SelectCurrencyDialog::slotPrepareContent);
     QObject::connect(selectCurrencyDialog, &SelectCurrencyDialog::signalSelectCountryResult, this,
         &MainWindow::slotSelectCountryResult );
-    QObject::connect(selectCurrencyDialog, &SelectCurrencyDialog::signalSelectCountryCompleted, this,
+    QObject::connect(selectCurrencyDialog,
+        &SelectCurrencyDialog::signalSelectCountryCompleted, this,
         &MainWindow::slotSelectCountryCompleted );
     // connect MainWindow and options dialog
     QObject::connect(this, &MainWindow::signalOptionsPrepareContent, optionsDlg,
@@ -411,7 +414,7 @@ void MainWindow::fillDailyInfoSection(const QDate& date, double amount,
         return; // if no scenario loaded (should not happen)
     }
 
-    ui->ciDateLabel->setText(locale.toString(date, locale.dateFormat(QLocale::ShortFormat)));
+    ui->ciDateLabel->setText(locale.toString(date, "yyyy-MMM-dd"));
     QColor negAmountColor = GbpController::getInstance().getExpenseColor();
     QColor posAmountColor = GbpController::getInstance().getIncomeColor();
 
@@ -612,7 +615,8 @@ bool MainWindow::aboutToSwitchScenario()
         choice = GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::WARNING, tr("Warning"),
             tr("Current scenario has been modified, but changes have not been saved "
             "yet on disk. Do you want to save it before going forward ? If you answer \"No\", "
-            "<b><font color=\"#F44336\">the changes will be lost</font></b>."), {tr("Cancel"),tr("No"),tr("Yes")},0,0);
+            "<b><font color=\"#F44336\">the changes will be lost</font></b>."),
+            {tr("Cancel"),tr("No"),tr("Yes")},0,0);
         if(choice==-1){
             // ESC pressed
             return false;
@@ -633,8 +637,9 @@ bool MainWindow::aboutToSwitchScenario()
         // be created.
         choice = GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::WARNING, tr("Warning"),
             tr("The new scenario has not been saved yet on disk. Do you want to "
-            " save it in a file before going forward ? If you answer \"No\", <b><font color=\"#F44336\">the "
-            "new scenario will be lost</font></b>."), {tr("Cancel"),tr("No"),tr("Yes")},0,0);
+            " save it in a file before going forward ? If you answer \"No\", "
+            "<b><font color=\"#F44336\">the new scenario will be lost</font></b>."),
+            {tr("Cancel"),tr("No"),tr("Yes")},0,0);
         if(choice==-1){
             // ESC pressed
             return false;
@@ -671,6 +676,159 @@ bool MainWindow::aboutToSwitchScenario()
     }
 
     return true;
+}
+
+
+void MainWindow::viewResourceFile(const QString resourceFullFileName,
+    ViewResourceFileResult& result)
+{
+    bool carryOn = true;
+    bool copyRequired = true;
+
+    // Set destination file name in temp directory. The resource file will be copied there under
+    // a different name, that includes the gbp version !
+    // Name of the resource file (without path) always obeys to a strict convention.
+    // Spaces are replaced with "_": a raw space in a file:// URI is left unescaped by
+    // QUrl::toString() and can be mishandled by the OS's URI dispatch, causing the system
+    // viewer to fail to open an otherwise valid file (e.g. "could not read file ...").
+    QString baseNameDest = "gbp_";
+    baseNameDest.append(QCoreApplication::applicationVersion());
+    baseNameDest.append("_");
+    baseNameDest.append(QFileInfo(resourceFullFileName).fileName().replace(' ', '_'));
+    // Use a per-user, per-app cache directory rather than the shared system temp dir, so that
+    // different OS user accounts on the same machine never collide over the same cached file.
+    QString cacheDir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+    if (cacheDir.isEmpty() || !QDir().mkpath(cacheDir)) {
+        LOG_ERROR(QString("->Cannot create/resolve cache directory (path: '%1')").arg(cacheDir));
+        result.code = ViewResourceFileErrorCode::VRF_CACHE_DIR_UNAVAILABLE;
+        result.data = "";
+        carryOn = false;
+    }
+    QString tempFileFullName = QDir(cacheDir).filePath(baseNameDest);
+    QFile tempFile(tempFileFullName);
+
+    LOG_INFO(QString("Preparing to view %1").arg(QFileInfo(resourceFullFileName).fileName()));
+    LOG_DEBUG_INFO(QString("->Resource file is %1").arg(resourceFullFileName));
+    LOG_DEBUG_INFO(QString("->Destination file will be %1").arg(tempFileFullName));
+
+    // build name of the resource file and check if it exists (it must)
+    QFile resFile(resourceFullFileName);
+    if(carryOn == true && resFile.exists()==false){
+        LOG_ERROR(QString("->Resource file %1 does not exist").arg(resourceFullFileName));
+        result.code = ViewResourceFileErrorCode::VRF_RES_FILE_DOES_NOT_EXIST;
+        result.data = resourceFullFileName;
+        carryOn = false;
+    }
+
+    if(carryOn == true){
+        // Check if the temp file exists and has identical content to the resource file. If it is
+        // the case, no copy will occur. Hash comparison catches same-version PDF updates
+        // during development (size alone would miss them).
+        auto fileHash = [](QFile &f) -> QByteArray {
+            if (!f.open(QIODevice::ReadOnly)){
+                return {};
+            }
+            QByteArray h = QCryptographicHash::hash(f.readAll(), QCryptographicHash::Sha1);
+            f.close();
+            return h;
+        };
+        bool tempFileAlreadyExist = tempFile.exists();
+        if(tempFileAlreadyExist==true){
+            LOG_DEBUG_INFO("->File with same name already exists in temp directory");
+
+            // check if content are identical
+            bool hashesDiffer = (fileHash(tempFile) != fileHash(resFile));
+
+            if( hashesDiffer==false ){
+                LOG_DEBUG_INFO("->File in temp directory has the same content, no copy required");
+                copyRequired = false;
+            } else {
+                LOG_DEBUG_INFO("->File in temp directory has NOT the same content, copy required");
+
+                LOG_DEBUG_INFO("->Removing existing temp file");
+                if ( tempFile.remove()==false ){
+                    // deletion has failed
+                    LOG_ERROR(QString("->Cannot remove temp file (may be locked by another"
+                        " process)"));
+                    result.code = ViewResourceFileErrorCode::VRF_TEMP_FILE_DELETION_ERROR;
+                    result.data = "";
+                    carryOn = false;
+                } else {
+                    // deletion has succeeded
+                    LOG_DEBUG_INFO("->Temp file deleted successfully");
+                }
+            }
+        } else {
+            LOG_DEBUG_INFO("-> File with same name does NOT already exists in temp directory");
+        }
+
+    }
+
+    if(carryOn == true){
+        // copy if required
+        if(copyRequired==true){
+            if ( resFile.copy(tempFileFullName) == false ){
+                // copy has failed.
+                bool tempDirWritable = QFileInfo(cacheDir).isWritable();
+                LOG_ERROR(QString("->Copy failed : %1 (error code : %2) (temp dir writable : %3)")
+                              .arg(resFile.errorString())
+                              .arg(resFile.error())
+                              .arg(tempDirWritable ? "yes" : "no"));
+                result.code = ViewResourceFileErrorCode::VRF_RES_FILE_COPY_ERROR;
+                result.data = "";
+                carryOn = false;
+            } else {
+                // copy has succeeded.
+                // Qt resource files carry a read-only attribute that QFile::copy() preserves on
+                // Windows. Clear it immediately while we own the file, so we can delete or replace
+                // it on the next launch without hitting "access denied".
+                QFile::Permissions rw =
+                    QFile::ReadOwner  | QFile::WriteOwner |
+                    QFile::ReadUser   | QFile::WriteUser  |
+                    QFile::ReadGroup  | QFile::ReadOther;
+                if (QFile::setPermissions(tempFileFullName, rw)) {
+                    LOG_DEBUG_INFO("->Read-only attribute cleared on temp file");
+                } else {
+                    LOG_ERROR(QString("->Failed to clear read-only attribute on temp file %1 "
+                        "— manual deletion may require admin rights on next update")
+                            .arg(tempFileFullName));
+                    result.code = ViewResourceFileErrorCode::VRF_FAIL_CLEARING_RO_ATTRIBUTE;
+                    result.data = "";
+                    carryOn = false;
+                }
+            }
+        }
+    }
+
+    QUrl theUrl;
+    if(carryOn == true){
+        // Get URL to view the file
+        theUrl = QUrl::fromLocalFile(tempFileFullName);
+        if(theUrl.isValid()==false){
+            // Should never happen
+            LOG_ERROR( QString("->Cannot obtain Url from local file %1")
+                .arg(tempFileFullName));
+            result.code = ViewResourceFileErrorCode::VRF_ERROR_OBTAINING_URL;
+            result.data = "";
+            carryOn = false;
+        }
+    }
+
+    if(carryOn == true){
+        // View the file
+        bool success = QDesktopServices::openUrl(theUrl);
+        if (success==true) {
+            LOG_INFO("->System viewer launch succeeded");
+            result.code = ViewResourceFileErrorCode::VRF_SUCCESS;
+        } else {
+            LOG_ERROR( QString("->System viewer launch failed"));
+            result.code = ViewResourceFileErrorCode::VRF_ERROR_LAUNCHING_VIEWER;
+            result.data = "";
+            carryOn = false;
+        }
+    }
+
+    LOG_INFO(QString("View operation completed"));
 }
 
 
@@ -822,11 +980,19 @@ void MainWindow::on_actionOpen_Example_triggered()
         return;
     }
 
-    // first, copy the json file included in the resource to a tmp directory
+    // first, copy the json file included in the resource to the per-user, per-app cache
+    // directory (rather than the shared system temp dir, so that different OS user accounts
+    // on the same machine never collide over the same copy -- see viewResourceFile()).
     // Any existing copy will be overwritten without warning.
-    QString baseFileName = QString("/gbp_Budget_Example.json");
-    QString tempFile = QDir::tempPath().append(baseFileName);
-    LOG_INFO( QString("Opening budget example : Ready to copy in tmp directory : %1")
+    QString cacheDir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+    if (cacheDir.isEmpty() || !QDir().mkpath(cacheDir)) {
+        LOG_ERROR(QString("Opening budget example : Cannot create/resolve cache directory "
+            "(path: '%1')").arg(cacheDir));
+        return;
+    }
+    QString baseFileName = QString("gbp_Budget_Example.json");
+    QString tempFile = QDir(cacheDir).filePath(baseFileName);
+    LOG_INFO( QString("Opening budget example : Ready to copy in cache directory : %1")
         .arg(tempFile));
     QFile scenarioFile(":/Samples/resources/budget-example.json");
     if (scenarioFile.exists() == false ){
@@ -1772,16 +1938,17 @@ void MainWindow::handleXaxisRangeChange(QDateTime dtFrom, QDateTime dtTo)
     QDate to = dtTo.date();
     Util::DateDifference delta = Util::dateDifference(from, to);
 
-    QString s = locale.toString(from, locale.dateFormat(QLocale::ShortFormat));
+    QString s = locale.toString(from, "yyyy-MMM-dd");
     ui->dateRangeFromLabel->setText(s);
-    s = locale.toString(to, locale.dateFormat(QLocale::ShortFormat));
+    s = locale.toString(to, "yyyy-MMM-dd");
     ui->dateRangeToLabel->setText(s);
 
     QString deltaStringYear = tr("y",this->metaObject()->className());
     QString deltaStringMonth= tr("m",this->metaObject()->className());
     QString deltaStringDay= tr("d",this->metaObject()->className());
-    QString deltaString = QString("%1%2 %3%4 %5%6").arg(delta.years).arg(deltaStringYear)
-        .arg(delta.months).arg(deltaStringMonth).arg(delta.days).arg(deltaStringDay);
+    QString deltaString = QString("%1%2 %3%4 %5%6").arg(locale.toString(delta.years))
+        .arg(deltaStringYear).arg(locale.toString(delta.months)).arg(deltaStringMonth)
+        .arg(locale.toString(delta.days)).arg(deltaStringDay);
     ui->deltaRangeXLabel->setText(deltaString);
 }
 
@@ -1834,7 +2001,7 @@ void MainWindow::recentFilesMenuUpdate(){
 
     for (auto i = 0u; i < itEnd; ++i) {
         QString strippedName = Util::elideText(QFileInfo(rfList.at(i)).fileName()+
-            " ["+QFileInfo(rfList.at(i)).filePath()+"]",100,true);
+            " ["+QDir::toNativeSeparators(QFileInfo(rfList.at(i)).filePath())+"]",100,true);
         recentFileActionList.at(i)->setText(strippedName);  // what is displyed in the menu item
         recentFileActionList.at(i)->setData(rfList.at(i));  // the actual full length path+filename
         recentFileActionList.at(i)->setVisible(true);
@@ -2145,12 +2312,16 @@ void MainWindow::on_baselineDoubleSpinBox_editingFinished()
 
 void MainWindow::on_customToolButton_clicked()
 {
-    if (!(GbpController::getInstance().isScenarioLoaded())){
-        return;
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if(scenario==nullptr){
+        return; // if no scenario loaded
     }
-    // overscaling will be apply again...Too complicated to remove it (0,1,2,N points)
-    QDate from = axisX->min().date();
-    QDate to = axisX->max().date();
+
+    // "from"/"to" bound the DateIntervalDialog's date edits to the full range the scenario can
+    // actually generate financial events for : tomorrow through the scenario's max calculation
+    // date -- not the chart's currently zoomed-in view.
+    QDate from = GbpController::getInstance().getTomorrow();
+    QDate to = from.addYears(scenario->getFeGenerationDuration()).addDays(-1);
 
     emit signalDateIntervalPrepareContent(from,to);
     dateIntervalDlg->show();
@@ -2159,206 +2330,165 @@ void MainWindow::on_customToolButton_clicked()
 
 void MainWindow::on_actionUser_Manual_triggered()
 {
-    // first, copy the user manual included in the resource to a tmp directory
-    // Name of the file in temp dir is dependant on the version !
-    QString baseFileName = QString("/gbp_User_Manual-%1.pdf").arg(
-        QCoreApplication::applicationVersion());
-    QString tempFileFullName = QDir::tempPath().append(baseFileName);
-    QFile tempFile(tempFileFullName);
+    bool french = (locale.language() == QLocale::French);
+    QString resourcePath = QString(":/Doc/resources/user_manual-%1.pdf")
+        .arg(french ? "fr" : "en");
 
-    LOG_INFO(QString("Viewing user manual : Attempting to open file %1")
-        .arg(tempFileFullName));
+    ViewResourceFileResult result;
+    viewResourceFile(resourcePath, result);
 
-    // build resource name and check if it exists (it should)
-    QFile userManualFile(QString(":/Doc/resources/Graphical Budget Planner - User Manual.pdf"));
-    if(userManualFile.exists()==false){
-        LOG_ERROR(
-            QString("Viewing user manual : User manual %1 does not exist in the resource file")
-            .arg(userManualFile.fileName()));
-        return;
+    switch (result.code) {
+        case ViewResourceFileErrorCode::VRF_SUCCESS:
+            // Viewer launched successfully, nothing to tell the user.
+            break;
+
+        case ViewResourceFileErrorCode::VRF_RES_FILE_DOES_NOT_EXIST:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("The User Manual document (%1) could not be found. This is likely a "
+                "packaging issue — please report it.").arg(result.data), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_CACHE_DIR_UNAVAILABLE:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Cannot open the User Manual: the application's cache directory could "
+                "not be created or accessed."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_TEMP_FILE_DELETION_ERROR:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Cannot open the User Manual: a previous cached copy could not be "
+                "removed (it may be locked by another process)."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_RES_FILE_COPY_ERROR:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Cannot open the User Manual: the document could not be copied to the "
+                "application cache directory."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_FAIL_CLEARING_RO_ATTRIBUTE:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::WARNING, tr("Warning"),
+                tr("The User Manual could not be fully prepared for viewing due to a file "
+                "permission issue."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_ERROR_OBTAINING_URL:
+        case ViewResourceFileErrorCode::VRF_ERROR_LAUNCHING_VIEWER:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("The system's default PDF viewer failed to launch. You can try to open "
+                "the User Manual manually from your system's temporary/cache folder."),
+                {tr("OK")}, 0, 0);
+            break;
     }
+}
 
-    // Check if the temp file exists and has identical content to the resource.
-    // Hash comparison catches same-version PDF updates during development
-    // (size alone would miss them).
-    auto fileHash = [](QFile &f) -> QByteArray {
-        if (!f.open(QIODevice::ReadOnly)) return {};
-        QByteArray h = QCryptographicHash::hash(f.readAll(), QCryptographicHash::Sha1);
-        f.close();
-        return h;
-    };
-    bool needsCopy = !tempFile.exists() || fileHash(tempFile) != fileHash(userManualFile);
-    bool success;
-    if (!needsCopy) {
-        LOG_DEBUG_INFO("Viewing user manual : File already exists in temp directory with same "
-            "content, not copied");
-    } else {
-        if (tempFile.exists()) {
-            LOG_DEBUG_INFO("Viewing user manual : Content differs, removing stale temp file");
-            if (!tempFile.remove()) {
-                LOG_ERROR(QString("Viewing user manual : Cannot remove stale temp file %1 : %2 "
-                    "(file may be locked by another process)")
-                    .arg(tempFileFullName)
-                    .arg(tempFile.errorString()));
-                GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-                    tr("Cannot open the User Manual: the previous copy at %1 could not be "
-                    "removed (it may be locked by another process).").arg(tempFileFullName),
-                    {tr("OK")}, 0, 0);
-                return;
-            }
-        }
-        LOG_DEBUG_INFO(QString("Viewing user manual : Ready to copy user manual in tmp "
-            "directory : %1").arg(tempFileFullName));
-        success = userManualFile.copy(tempFileFullName);
-        if (success==true) {
-            LOG_DEBUG_INFO("Viewing user manual : Copy succeeded");
-            // Qt resource files carry a read-only attribute that QFile::copy() preserves on
-            // Windows. Clear it immediately while we own the file, so we can delete or replace
-            // it on the next launch without hitting "access denied".
-            QFile::Permissions rw =
-                QFile::ReadOwner  | QFile::WriteOwner |
-                QFile::ReadUser   | QFile::WriteUser  |
-                QFile::ReadGroup  | QFile::ReadOther;
-            if (QFile::setPermissions(tempFileFullName, rw)) {
-                LOG_DEBUG_INFO("Viewing user manual : Read-only attribute cleared on temp file");
-            } else {
-                LOG_WARNING(QString("Viewing user manual : Failed to clear read-only attribute "
-                    "on temp file %1 — manual deletion may require admin rights on next update")
-                    .arg(tempFileFullName));
-            }
-        } else {
-            bool tempDirWritable = QFileInfo(QDir::tempPath()).isWritable();
-            LOG_ERROR(QString("Viewing user manual : Copy failed : %1 (error code : %2) "
-                "(temp dir writable : %3)")
-                .arg(userManualFile.errorString())
-                .arg(userManualFile.error())
-                .arg(tempDirWritable ? "yes" : "no"));
-            return;
-        }
-    }
 
-    // then, use the system defaut application to read the file
-    QUrl theUrl = QUrl::fromLocalFile(tempFileFullName);
-    if(theUrl.isValid()==false){
-        // Should never happen
-        LOG_ERROR( QString("Viewing user manual : Cannot obtain Url from local file %1")
-            .arg(tempFileFullName));
-        return;
-    }
-    success = QDesktopServices::openUrl(theUrl);
-    if (success==true) {
-        LOG_INFO(QString("Viewing user manual : PDF viewer launch succeeded"));
-    } else {
-        LOG_ERROR("Viewing user manual : PDF viewer launch failed");
-        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-            tr("The system's default"
-            " PDF viewer failed to launch. You can try to open the file manually at %1")
-            .arg(tempFileFullName), {tr("OK")}, 0, 0);
-        return;
-    }
+void MainWindow::showWelcomeScreen()
+{
+    bool french = (locale.language() == QLocale::French);
+    QString resourcePath = QString(":/Doc/resources/welcome-%1.pdf")
+        .arg(french ? "fr" : "en");
 
+    ViewResourceFileResult result;
+    viewResourceFile(resourcePath, result);
+
+    switch (result.code) {
+        case ViewResourceFileErrorCode::VRF_SUCCESS:
+            // Viewer launched successfully, nothing to tell the user.
+            break;
+
+        case ViewResourceFileErrorCode::VRF_RES_FILE_DOES_NOT_EXIST:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("The Welcome document (%1) could not be found. This is likely a "
+                "packaging issue — please report it.").arg(result.data), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_CACHE_DIR_UNAVAILABLE:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Cannot open the Welcome document: the application's cache directory "
+                "could not be created or accessed."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_TEMP_FILE_DELETION_ERROR:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Cannot open the Welcome document: a previous cached copy could not be "
+                "removed (it may be locked by another process)."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_RES_FILE_COPY_ERROR:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Cannot open the Welcome document: it could not be copied to the "
+                "application cache directory."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_FAIL_CLEARING_RO_ATTRIBUTE:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::WARNING, tr("Warning"),
+                tr("The Welcome document could not be fully prepared for viewing due to a "
+                "file permission issue."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_ERROR_OBTAINING_URL:
+        case ViewResourceFileErrorCode::VRF_ERROR_LAUNCHING_VIEWER:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("The system's default PDF viewer failed to launch. You can try to open "
+                "the Welcome document manually from your system's temporary/cache folder."),
+                {tr("OK")}, 0, 0);
+            break;
+    }
 }
 
 
 void MainWindow::on_actionQuick_Tutorial_triggered()
 {
-    // first, copy the quick tutorial included in the resource to a tmp directory
-    // Name of the file in temp dir is dependant on the version !
-    QString baseFileName = QString("/gbp_Quick-Tutorial-%1.pdf").arg(
-        QCoreApplication::applicationVersion());
-    QString tempFileFullName = QDir::tempPath().append(baseFileName);
-    QFile tempFile(tempFileFullName);
+    bool french = (locale.language() == QLocale::French);
+    QString resourcePath = QString(":/Doc/resources/quick_tutorial-%1.pdf")
+        .arg(french ? "fr" : "en");
 
-    LOG_INFO(QString("Viewing quick tutorial : Attempting to open file %1")
-        .arg(tempFileFullName));
+    ViewResourceFileResult result;
+    viewResourceFile(resourcePath, result);
 
-    // build resource name and check if it exists (it should)
-    QFile quickTutorialFile(
-        QString(":/Doc/resources/Graphical Budget Planner - Quick Tutorial.pdf"));
-    if(quickTutorialFile.exists()==false){
-        LOG_ERROR( QString("Viewing quick tutorial : Quick tutorial %1 does not exist in the "
-            "resource file").arg(quickTutorialFile.fileName()));
-        return;
-    }
+    switch (result.code) {
+    case ViewResourceFileErrorCode::VRF_SUCCESS:
+        // Viewer launched successfully, nothing to tell the user.
+        break;
 
-    // Check if the temp file exists and has identical content to the resource.
-    // Hash comparison catches same-version PDF updates during development
-    // (size alone would miss them).
-    auto fileHash = [](QFile &f) -> QByteArray {
-        if (!f.open(QIODevice::ReadOnly)) return {};
-        QByteArray h = QCryptographicHash::hash(f.readAll(), QCryptographicHash::Sha1);
-        f.close();
-        return h;
-    };
-    bool needsCopy = !tempFile.exists() || fileHash(tempFile) != fileHash(quickTutorialFile);
-    bool success;
-    if (!needsCopy) {
-        LOG_DEBUG_INFO("Viewing quick tutorial : File already exists in temp directory with same "
-            "content, not copied");
-    } else {
-        if (tempFile.exists()) {
-            LOG_DEBUG_INFO("Viewing quick tutorial : Content differs, removing stale temp file");
-            if (!tempFile.remove()) {
-                LOG_ERROR(QString("Viewing quick tutorial : Cannot remove stale temp file %1 : %2 "
-                    "(file may be locked by another process)")
-                    .arg(tempFileFullName)
-                    .arg(tempFile.errorString()));
-                GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-                    tr("Cannot open the Quick Tutorial: the previous copy at %1 could not be "
-                    "removed (it may be locked by another process).").arg(tempFileFullName),
-                    {tr("OK")}, 0, 0);
-                return;
-            }
-        }
-        LOG_DEBUG_INFO(QString("Viewing quick tutorial : Ready to copy quick tutorial in tmp "
-            "directory : %1").arg(tempFileFullName));
-        success = quickTutorialFile.copy(tempFileFullName);
-        if (success==true) {
-            LOG_DEBUG_INFO("Viewing quick tutorial : Copy succeeded");
-            // Qt resource files carry a read-only attribute that QFile::copy() preserves on
-            // Windows. Clear it immediately while we own the file, so we can delete or replace
-            // it on the next launch without hitting "access denied".
-            QFile::Permissions rw =
-                QFile::ReadOwner  | QFile::WriteOwner |
-                QFile::ReadUser   | QFile::WriteUser  |
-                QFile::ReadGroup  | QFile::ReadOther;
-            if (QFile::setPermissions(tempFileFullName, rw)) {
-                LOG_DEBUG_INFO(
-                    "Viewing quick tutorial : Read-only attribute cleared on temp file");
-            } else {
-                LOG_WARNING(QString("Viewing quick tutorial : Failed to clear read-only attribute "
-                    "on temp file %1 — manual deletion may require admin rights on next update")
-                    .arg(tempFileFullName));
-            }
-        } else {
-            bool tempDirWritable = QFileInfo(QDir::tempPath()).isWritable();
-            LOG_ERROR(QString("Viewing quick tutorial : Copy failed : %1 (error code : %2) "
-                "(temp dir writable : %3)")
-                .arg(quickTutorialFile.errorString())
-                .arg(quickTutorialFile.error())
-                .arg(tempDirWritable ? "yes" : "no"));
-            return;
-        }
-    }
+    case ViewResourceFileErrorCode::VRF_RES_FILE_DOES_NOT_EXIST:
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("The Quick Tutorial document (%1) could not be found. This is likely a "
+            "packaging issue — please report it.").arg(result.data), {tr("OK")}, 0, 0);
+        break;
 
-    // then, use the system defaut application to read the file
-    QUrl theUrl = QUrl::fromLocalFile(tempFileFullName);
-    if(theUrl.isValid()==false){
-        // Should never happen
-        LOG_ERROR(QString("Viewing quick tutorial : Cannot obtain Url from local file %1")
-            .arg(tempFileFullName));
-        return;
-    }
-    success = QDesktopServices::openUrl(theUrl);
-    if (success==true) {
-        LOG_INFO("Viewing quick tutorial : PDF viewer launch succeeded");
-    } else {
-        LOG_ERROR("Viewing quick tutorial : PDF viewer launch failed");
-        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-            tr("The system's default"
-            " PDF viewer failed to launch. You can try to open the file manually at %1")
-            .arg(tempFileFullName), {tr("OK")}, 0, 0);
-        return;
+    case ViewResourceFileErrorCode::VRF_CACHE_DIR_UNAVAILABLE:
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Cannot open the Quick Tutorial: the application's cache directory could "
+            "not be created or accessed."), {tr("OK")}, 0, 0);
+        break;
+
+    case ViewResourceFileErrorCode::VRF_TEMP_FILE_DELETION_ERROR:
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Cannot open the Quick Tutorial: a previous cached copy could not be "
+            "removed (it may be locked by another process)."), {tr("OK")}, 0, 0);
+        break;
+
+    case ViewResourceFileErrorCode::VRF_RES_FILE_COPY_ERROR:
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Cannot open the Quick Tutorial: the document could not be copied to the "
+            "application cache directory."), {tr("OK")}, 0, 0);
+        break;
+
+    case ViewResourceFileErrorCode::VRF_FAIL_CLEARING_RO_ATTRIBUTE:
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::WARNING, tr("Warning"),
+            tr("The Quick Tutorial could not be fully prepared for viewing due to a file "
+            "permission issue. Please try again."), {tr("OK")}, 0, 0);
+        break;
+
+    case ViewResourceFileErrorCode::VRF_ERROR_OBTAINING_URL:
+    case ViewResourceFileErrorCode::VRF_ERROR_LAUNCHING_VIEWER:
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("The system's default PDF viewer failed to launch. You can try to open "
+            "the Quick Tutorial manually from your system's temporary/cache folder."),
+            {tr("OK")}, 0, 0);
+        break;
     }
 }
 
@@ -2382,105 +2512,53 @@ void MainWindow::on_actionProperties_triggered()
 // Visualize the Change Log file
 void MainWindow::on_actionChange_Log_triggered()
 {
-    // first, copy the changelog included in the resource to a tmp directory
-    // Name of the file in temp dir is dependant on the version !
-    QString baseFileName = QString("/gbp_CHANGELOG-%1.pdf").arg(QCoreApplication::applicationVersion());
-    QString tempFileFullName = QDir::tempPath().append(baseFileName);
-    QFile tempFile(tempFileFullName);
+    ViewResourceFileResult result;
+    // Always in english
+    viewResourceFile(":/Doc/resources/changelog-en.pdf", result);
 
-    LOG_INFO(QString("Viewing change log : Attempting to open file %1")
-        .arg(tempFileFullName));
+    switch (result.code) {
+        case ViewResourceFileErrorCode::VRF_SUCCESS:
+            // Viewer launched successfully, nothing to tell the user.
+            break;
 
-    // build resource name and check if it exists (it should)
-    QFile changelogFile(QString(":/Doc/resources/Graphical Budget Planner - CHANGELOG.pdf"));
-    if(changelogFile.exists()==false){
-        LOG_ERROR(QString("Viewing change log : %1 does not exist in the resource file")
-            .arg(changelogFile.fileName()));
-        return;
+        case ViewResourceFileErrorCode::VRF_RES_FILE_DOES_NOT_EXIST:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("The Change Log document (%1) could not be found. This is likely a "
+                "packaging issue — please report it.").arg(result.data), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_CACHE_DIR_UNAVAILABLE:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Cannot open the Change Log: the application's cache directory could "
+                "not be created or accessed."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_TEMP_FILE_DELETION_ERROR:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Cannot open the Change Log: a previous cached copy could not be removed "
+                "(it may be locked by another process)."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_RES_FILE_COPY_ERROR:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Cannot open the Change Log: the document could not be copied to the "
+                "application cache directory."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_FAIL_CLEARING_RO_ATTRIBUTE:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::WARNING, tr("Warning"),
+                tr("The Change Log could not be fully prepared for viewing due to a file "
+                "permission issue."), {tr("OK")}, 0, 0);
+            break;
+
+        case ViewResourceFileErrorCode::VRF_ERROR_OBTAINING_URL:
+        case ViewResourceFileErrorCode::VRF_ERROR_LAUNCHING_VIEWER:
+            GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("The system's default PDF viewer failed to launch. You can try to open "
+                "the Change Log manually from your system's temporary/cache folder."),
+                {tr("OK")}, 0, 0);
+            break;
     }
-
-    // Check if the temp file exists and has identical content to the resource.
-    // Hash comparison catches same-version PDF updates during development
-    // (size alone would miss them).
-    auto fileHash = [](QFile &f) -> QByteArray {
-        if (!f.open(QIODevice::ReadOnly)){
-            return {};
-        }
-        QByteArray h = QCryptographicHash::hash(f.readAll(), QCryptographicHash::Sha1);
-        f.close();
-        return h;
-    };
-    bool needsCopy = (!tempFile.exists()) || (fileHash(tempFile) != fileHash(changelogFile));
-    bool success;
-    if (!needsCopy) {
-        LOG_DEBUG_INFO("Viewing change log : File already exists in temp directory with same "
-            "content, not copied");
-    } else {
-        if (tempFile.exists()) {
-            LOG_DEBUG_INFO("Viewing change log : Content differs, removing stale temp file");
-            if (!tempFile.remove()) {
-                LOG_ERROR(QString("Viewing change log : Cannot remove stale temp file %1 : %2 "
-                    "(file may be locked by another process)")
-                    .arg(tempFileFullName)
-                    .arg(tempFile.errorString()));
-                GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-                    tr("Cannot open the Change Log: the previous copy at %1 could not be "
-                    "removed (it may be locked by another process).").arg(tempFileFullName),
-                    {tr("OK")}, 0, 0);
-                return;
-            }
-        }
-        LOG_DEBUG_INFO(
-            QString("Viewing change log : Ready to copy Change Log in tmp directory : %1")
-            .arg(tempFileFullName));
-        success = changelogFile.copy(tempFileFullName);
-        if (success==true) {
-            LOG_DEBUG_INFO("Viewing change log : Copy succeeded");
-            // Qt resource files carry a read-only attribute that QFile::copy() preserves on
-            // Windows. Clear it immediately while we own the file, so we can delete or replace
-            // it on the next launch without hitting "access denied".
-            QFile::Permissions rw =
-                QFile::ReadOwner  | QFile::WriteOwner |
-                QFile::ReadUser   | QFile::WriteUser  |
-                QFile::ReadGroup  | QFile::ReadOther;
-            if (QFile::setPermissions(tempFileFullName, rw)) {
-                LOG_DEBUG_INFO("Viewing change log : Read-only attribute cleared on temp file");
-            } else {
-                LOG_WARNING(QString("Viewing change log : Failed to clear read-only attribute "
-                    "on temp file %1 — manual deletion may require admin rights on next update")
-                    .arg(tempFileFullName));
-            }
-        } else {
-            bool tempDirWritable = QFileInfo(QDir::tempPath()).isWritable();
-            LOG_ERROR(QString("Viewing change log : Copy failed : %1 (error code : %2) "
-                "(temp dir writable : %3)")
-                .arg(changelogFile.errorString())
-                .arg(changelogFile.error())
-                .arg(tempDirWritable ? "yes" : "no"));
-            return;
-        }
-    }
-
-    // then, use the system defaut application to read the file
-    QUrl theUrl = QUrl::fromLocalFile(tempFileFullName);
-    if(theUrl.isValid()==false){
-        // Should never happen
-        LOG_ERROR( QString("Viewing change log : Cannot obtain Url from local file %1")
-            .arg(tempFileFullName));
-        return;
-    }
-    success = QDesktopServices::openUrl(theUrl);
-    if (success==true) {
-        LOG_INFO("Viewing change log : PDF viewer launch succeeded");
-    } else {
-        LOG_ERROR("Viewing change log : PDF viewer launch failed");
-        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-            tr("The system's default"
-            " PDF viewer failed to launch. You can try to open the file manually at %1")
-            .arg(tempFileFullName), {tr("OK")}, 0, 0);
-        return;
-}
-
 }
 
 void MainWindow::changeYaxisLabelFormat(){

@@ -117,7 +117,7 @@ void VisualizeOccurrencesDialog::mypoint_clicked(const QPointF pt)
     // display
     QDate date = dt.date();
     QString s = tr("Selected point :  Date=%1  Amount=%2").
-        arg(locale.toString(date, locale.dateFormat(QLocale::ShortFormat)) ,
+        arg(locale.toString(date, "yyyy-MMM-dd") ,
         locale.toString(pt.y(),'f',currInfo.noOfDecimal));
     ui->selectedPointLabel->setText(s);
 
@@ -178,14 +178,15 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
             adjustedInflation.changeByFactor(psd->getInflationAdjustmentFactor(),capped);
 
             if (Growth::Type::CONSTANT == scenarioInflation.getType()) {
-                QString infString = QString("%1%").arg(static_cast<double>(
-                    Growth::fromDecimalToDouble(adjustedInflation.getAnnualConstantGrowth())));
+                QString infString = QString("%1%").arg(Util::formatDouble(static_cast<double>(
+                    Growth::fromDecimalToDouble(adjustedInflation.getAnnualConstantGrowth())),
+                    locale, Util::DoubleFormatMode::Standard, {}));
                 resultStringList.append( tr("Using constant adjusted annual inflation"
                     " of %1.").arg(colorizeStringWithHtml(infString,
                     Util::getOptimizedBlue()))) ;
                 resultStringList.append( tr("Inflation can be applied from %1.").
                     arg( colorizeStringWithHtml(
-                            locale.toString(nextEventDate, locale.dateFormat(QLocale::ShortFormat))
+                            locale.toString(nextEventDate, "yyyy-MMM-dd")
                             , Util::getOptimizedBlue())
                     ));
             } else if (Growth::Type::VARIABLE == scenarioInflation.getType()) {
@@ -196,13 +197,14 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
         } else if (psd->getGrowthStrategy()==PeriodicCsd::GrowthStrategy::CUSTOM) {
             if (psd->getGrowth().getType()==Growth::Type::CONSTANT) {
                 QString growthString = QString("%1%")
-                    .arg(static_cast<double>(Growth::fromDecimalToDouble(
-                        psd->getGrowth().getAnnualConstantGrowth())));
+                    .arg(Util::formatDouble(static_cast<double>(Growth::fromDecimalToDouble(
+                        psd->getGrowth().getAnnualConstantGrowth())),
+                        locale, Util::DoubleFormatMode::Standard, {}));
                 resultStringList.append( tr("Using custom constant annual growth of %1.")
                     .arg(colorizeStringWithHtml(growthString,Util::getOptimizedBlue())));
                 resultStringList.append( tr("Growth can be applied from %1")
                         .arg(colorizeStringWithHtml(locale.toString(nextEventDate,
-                        locale.dateFormat(QLocale::ShortFormat)),Util::getOptimizedBlue()))   );
+                        "yyyy-MMM-dd"),Util::getOptimizedBlue()))   );
             } else if (psd->getGrowth().getType()==Growth::Type::VARIABLE){
                 resultStringList.append(tr("Using custom variable growth."));
             } else {
@@ -234,9 +236,9 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
                 .arg( colorizeStringWithHtml(maxSatStr,Util::getOptimizedBlue()) )
                 );
         }
-        QString tomStr = locale.toString(tomorrow, locale.dateFormat(QLocale::ShortFormat));
+        QString tomStr = locale.toString(tomorrow, "yyyy-MMM-dd");
         QString toStr = locale.toString(psd->getRealEndDate(maxDateScenarioFeGeneration),
-            locale.dateFormat(QLocale::ShortFormat));
+            "yyyy-MMM-dd");
         resultStringList.append(tr("No financial event will be generated before "
             "tomorrow %1 and past %2.")
             .arg(colorizeStringWithHtml(tomStr, Util::getOptimizedBlue()))
@@ -274,9 +276,9 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
             );
         }
 
-        QString tomStr = locale.toString(tomorrow, locale.dateFormat(QLocale::ShortFormat));
+        QString tomStr = locale.toString(tomorrow, "yyyy-MMM-dd");
         QString toStr = locale.toString(maxDateScenarioFeGeneration,
-            locale.dateFormat(QLocale::ShortFormat));
+            "yyyy-MMM-dd");
         resultStringList.append(tr("No financial event will be generated before "
             "tomorrow %1 and past %2.")
             .arg(colorizeStringWithHtml(tomStr, Util::getOptimizedBlue()))
@@ -297,6 +299,11 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
     double cummul = 0;
     uint size = feStream->size();
     uint eventIndex = 0;
+    // The event index is an identifier, not a quantity - it must never get a thousands
+    // separator (locale.toString(1234) would otherwise render e.g. "1,234", which would also
+    // break the intended fixed 5-character zero-padded width below).
+    QLocale indexLocale = locale;
+    indexLocale.setNumberOptions(QLocale::OmitGroupSeparator);
     for (int var = 0; var < size; var++) {
         if (feStream->contains(var)==false) {
             continue;
@@ -305,7 +312,8 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
         // Build the index string
         eventIndex++;
         QString indexStr = colorizeStringWithHtml(
-            QString("[%1]").arg( QString::number(eventIndex).rightJustified(5, '0') ) ,
+            QString("[%1]").arg( indexLocale.toString(eventIndex).rightJustified(5,
+                indexLocale.zeroDigit().at(0)) ) ,
             Util::getOptimizedPurple());
 
         qint64 amount = feStream->get(var);

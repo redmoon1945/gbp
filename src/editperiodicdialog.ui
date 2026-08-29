@@ -391,7 +391,7 @@
              <date>
               <year>1999</year>
               <month>10</month>
-              <day>17</day>
+              <day>16</day>
              </date>
             </property>
             <property name="displayFormat">
@@ -533,7 +533,7 @@
              <date>
               <year>1999</year>
               <month>10</month>
-              <day>19</day>
+              <day>18</day>
              </date>
             </property>
             <property name="displayFormat">
@@ -1134,7 +1134,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

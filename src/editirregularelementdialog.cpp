@@ -41,8 +41,7 @@ EditIrregularElementDialog::EditIrregularElementDialog(const QLocale &aLocale, Q
     ui->notesLineEdit->setMaxLength(IrregularCsd::AmountInfo::NOTES_MAX_LEN);
 
     // widen Date Widget
-    QFontMetrics fm = ui->dateEdit->fontMetrics();
-    ui->dateEdit->setMinimumWidth(fm.averageCharWidth()*20);
+    UiUtil::widenDateEdit(ui->dateEdit);
 
     QFont appFont = QApplication::font();
 

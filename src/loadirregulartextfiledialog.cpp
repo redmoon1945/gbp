@@ -160,7 +160,7 @@ void LoadIrregularTextFileDialog::on_importPushButton_clicked()
                             currInfo.noOfDecimal) ) {
                         double maxAllowed =  CurrencyHelper::maxValueAllowedForAmountInDouble(
                             currInfo.noOfDecimal);
-                        QString maxAllowedString = QString::number(maxAllowed, 'f',
+                        QString maxAllowedString = theLocale.toString(maxAllowed, 'f',
                             currInfo.noOfDecimal);
                         userErrorMessage = tr("Amount \"%1\" is bigger than the maximum allowed of %2"
                             " at line %3.").arg(tokens[1]).arg(maxAllowedString).arg(lineNo);

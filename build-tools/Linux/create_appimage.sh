@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define Qt version once
-QT_VERSION=6.10.1
+QT_VERSION=6.10.3
 QT_PATH=$HOME/Qt/$QT_VERSION/gcc_64
 
 # Clean up
@@ -10,6 +10,8 @@ rm -rf AppDir
 # Set environment variables
 export LD_LIBRARY_PATH=$QT_PATH/lib
 export PATH=$QT_PATH/bin:$PATH
+export LDAI_RUNTIME_FILE=$(pwd)/runtime-x86_64
+
 
 echo "Qt Version: $QT_VERSION"
 echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"

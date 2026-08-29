@@ -68,8 +68,13 @@ void DateIntervalDialog::slotPrepareContent(QDate from, QDate to)
     if( (from.isValid()==false) || (to.isValid()==false) ){
         return;
     }
-    ui->fromDateEdit->setDate(from);
-    ui->toDateEdit->setDate(to);
+
+    // "from"/"to" define the allowed [min,max] range for both date edits, not the values to
+    // display. The previously selected values are preserved across invocations of this dialog ;
+    // QDateEdit automatically clamps its current value into the new range if it no longer fits,
+    // so no additional clamping logic is needed here.
+    ui->fromDateEdit->setDateRange(from, to);
+    ui->toDateEdit->setDateRange(from, to);
 
     ui->fromDateEdit->setFocus();
 }

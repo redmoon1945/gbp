@@ -20,6 +20,12 @@
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <layout class="QFormLayout" name="formLayout">
+         <property name="horizontalSpacing">
+          <number>30</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>10</number>
+         </property>
          <property name="labelAlignment">
           <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>

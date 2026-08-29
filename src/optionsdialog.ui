@@ -2250,10 +2250,10 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_4"/>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

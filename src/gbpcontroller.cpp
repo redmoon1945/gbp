@@ -162,12 +162,13 @@ GbpController::GbpController()
         throw std::logic_error(errorString.toStdString());
     }
 
+    QString nativeSettingsFullFileName = QDir::toNativeSeparators(settingsFullFileName);
     QString configFileString;
     if (noSettingsFileAtStartup) {
         configFileString = QString("New configuration file will be created with default "
-            "values at %1").arg(settingsFullFileName);
+            "values at %1").arg(nativeSettingsFullFileName);
     } else {
-        configFileString = QString("Configuration file : %1").arg(settingsFullFileName);
+        configFileString = QString("Configuration file : %1").arg(nativeSettingsFullFileName);
     }
     qInfo().noquote() << configFileString;
 }

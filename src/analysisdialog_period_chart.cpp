@@ -218,14 +218,13 @@ void AnalysisDialog::periodChartRedisplayChart(PeriodType type)
         QObject::connect(series, &QAbstractBarSeries::hovered, series,
             [=](bool status, int index, QBarSet *set) {
                 if (!status) { QToolTip::hideText(); return; }
-                QStringList cats = chartMonthlyReportAxisX->categories();
-                bool ok;
-                QStringList catParts = cats.at(index).split("-");
-                int month = catParts.at(0).toInt(&ok);
-                if (!ok) return;
+                // Recompute the period date directly from the bar index instead of parsing
+                // the axis category text back, since that text is now purely locale-formatted
+                // (see periodChartBuildCategoryName()) and no longer a parseable "M-yy" key.
+                QDate periodDate = startDate.addMonths(index);
                 QString period = QString("%1 %2")
-                    .arg(locale.monthName(month, QLocale::FormatType::ShortFormat))
-                    .arg(catParts.at(1));
+                    .arg(locale.monthName(periodDate.month(), QLocale::FormatType::ShortFormat))
+                    .arg(locale.toString(periodDate.year()%100));
                 QString text = QString("%1\n%2\n%3").arg(set->label()).arg(period)
                     .arg(CurrencyHelper::formatAmount(set->at(index), currInfo, locale, true));
                 QToolTip::showText(QCursor::pos(), text);
@@ -234,8 +233,12 @@ void AnalysisDialog::periodChartRedisplayChart(PeriodType type)
         QObject::connect(series, &QAbstractBarSeries::hovered, series,
             [=](bool status, int index, QBarSet *set) {
                 if (!status) { QToolTip::hideText(); return; }
-                QStringList cats = chartYearlyReportAxisX->categories();
-                QString text = QString("%1\n%2\n%3").arg(set->label()).arg(cats.at(index))
+                int year = startDate.addYears(index).year();
+                // A year is an identifier, not a quantity - no thousands separator.
+                QLocale noGroupLocale = locale;
+                noGroupLocale.setNumberOptions(QLocale::OmitGroupSeparator);
+                QString text = QString("%1\n%2\n%3").arg(set->label())
+                    .arg(noGroupLocale.toString(year))
                     .arg(CurrencyHelper::formatAmount(set->at(index), currInfo, locale, true));
                 QToolTip::showText(QCursor::pos(), text);
             });
@@ -289,13 +292,20 @@ void AnalysisDialog::periodChartRedisplayChart(PeriodType type)
  */
 QString AnalysisDialog::periodChartBuildCategoryName(PeriodType type, QDate date) const
 {
+    // Month/year numbers here are identifiers (calendar positions), not quantities - no
+    // thousands separator (irrelevant at 1-2 digits, but kept consistent with the rest of
+    // the app). This string is only ever displayed on the axis - callers that need the
+    // underlying date back (e.g. hover tooltips) recompute it directly instead of parsing
+    // this text, so it is safe for it to be purely locale-formatted here.
+    QLocale noGroupLocale = locale;
+    noGroupLocale.setNumberOptions(QLocale::OmitGroupSeparator);
     if (type == PeriodType::MONTHLY) {
         int smallYear = date.year()%100;
-        QString s = QString("%1-%2").arg(date.month()).arg(smallYear);
+        QString s = QString("%1-%2").arg(noGroupLocale.toString(date.month()))
+            .arg(noGroupLocale.toString(smallYear));
         return s;
     } else {
-        QString s = QString("%1").arg(date.year());
-        return s;
+        return noGroupLocale.toString(date.year());
     }
 }
 

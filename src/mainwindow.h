@@ -67,6 +67,13 @@ public:
     MainWindow(QLocale systemLocale, QWidget *parent = nullptr);
     ~MainWindow();
 
+    /**
+     * @brief Displays the first-run welcome screen (English or French, based on `locale`).
+     * @details Called once from main(), right after construction, when no settings file was
+     * found at startup. Delegates to viewResourceFile().
+     */
+    void showWelcomeScreen();
+
 signals:
     // For Edit Scenario : prepare content before edition
     void signalEditScenarioPrepareContent(CurrencyInfo currInfo);
@@ -200,6 +207,31 @@ private:
         QDateTime to;   // used only when mode = X_RESCALE_CUSTOM=1
     };
 
+    /**
+     * @brief Outcome codes for MainWindow::viewResourceFile().
+     */
+    enum class ViewResourceFileErrorCode {
+        VRF_SUCCESS,                    ///< File was cached (or already up to date) and opened OK.
+        VRF_RES_FILE_DOES_NOT_EXIST,    ///< The requested resource file does not exist.
+        VRF_CACHE_DIR_UNAVAILABLE,      ///< The per-user cache directory could not be resolved or
+                                        ///< created.
+        VRF_TEMP_FILE_DELETION_ERROR,   ///< Stale cached copy could not be deleted (e.g. locked by
+                                        ///< another process).
+        VRF_RES_FILE_COPY_ERROR,        ///< Resource file could not be copied to the cache dir.
+        VRF_FAIL_CLEARING_RO_ATTRIBUTE, ///< Read-only attribute could not be cleared on the cached
+                                        ///< copy.
+        VRF_ERROR_OBTAINING_URL,        ///< Could not build a valid QUrl from the cached file's
+                                        ///< local path.
+        VRF_ERROR_LAUNCHING_VIEWER      ///< OS declined or failed to launch a viewer for the file.
+    };
+
+    /**
+     * @brief Result of a MainWindow::viewResourceFile() call.
+     */
+    struct ViewResourceFileResult{
+        ViewResourceFileErrorCode code = ViewResourceFileErrorCode::VRF_SUCCESS; ///< Outcome code.
+        QString data; ///< Optional extra context (e.g. offending file name), empty if unused.
+    };
 
     // *** Children Dialogs pointers ***
 
@@ -375,6 +407,38 @@ private:
      */
     bool aboutToSwitchScenario();
 
+    /**
+     * @brief Displays a bundled Qt resource file (e.g. a PDF) using the OS default viewer.
+     *
+     * @details A resource file (":/...") lives inside the compiled binary and cannot be handed
+     * directly to an external application. This method therefore:
+     *   1. Checks that the resource file exists.
+     *   2. Copies it to a per-user, per-app cache directory
+     *      (QStandardPaths::CacheLocation), under a destination name that embeds the current
+     *      application version (e.g. "gbp_1.8.0_gbp_changelog - en.pdf"), so a version upgrade
+     *      never reuses a stale cached copy.
+     *   3. If a cached copy with that name already exists, compares its SHA-1 hash against the
+     *      resource file's content and skips the copy when they match (avoids redundant writes
+     *      on repeated views; also catches resource content changes made during development
+     *      without a version bump).
+     *   4. Clears the read-only attribute on the cached copy (Qt resource files are read-only,
+     *      and QFile::copy() preserves that bit on Windows), so it can be deleted/replaced on a
+     *      later call without an "access denied" error.
+     *   5. Opens the cached file via QDesktopServices::openUrl(), which launches whatever
+     *      application the OS associates with the file's extension.
+     *
+     * Resource file naming convention (input parameter): all lowercase, words separated by "_",
+     * always ending with a language suffix (e.g. "- en"), with a mandatory file extension.
+     *
+     * @param resourceFullFileName Full path of the resource file to view
+     *        (e.g. ":/Doc/resources/gbp_changelog - en.pdf"). Must already exist in the
+     *        application's resources.
+     * @param result [out] Outcome of the operation. On success, result.code is set to
+     *        ViewResourceFileErrorCode::VRF_SUCCESS. On failure, result.code identifies which
+     *        step failed (see ViewResourceFileErrorCode) and result.data optionally carries
+     *        extra context (e.g. the offending file name).
+     */
+    void viewResourceFile(const QString resourceFullFileName, ViewResourceFileResult &result);
 
     void changeYaxisLabelFormat();
     void setWindowTopTitle();

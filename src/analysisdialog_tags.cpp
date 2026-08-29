@@ -22,6 +22,7 @@
 #include "gbpcontroller.h"
 #include "gbplogger.h"
 #include "util.h"
+#include "uiutil.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include "gbpqmessage.h"
@@ -29,7 +30,8 @@
 
 void AnalysisDialog::tagsUpdateNoTagsSelected()
 {
-    ui->tags_noTagsSelectedLabel->setText(tr("%1 selected").arg(selectedTags.size()));
+    ui->tags_noTagsSelectedLabel->setText(
+        tr("%1 selected").arg(locale.toString(selectedTags.size())));
 }
 
 
@@ -134,8 +136,8 @@ void AnalysisDialog::tagsRedisplayTable()
         // Use key and value (read-only)
         QString s1 = data.name;
         QString s2 = CurrencyHelper::formatAmount(abs(data.amount),currInfo,locale,false);
-        QString s3 = QString::number(data.weight*100, 'f', 3);
-        QString s4 = QString::number(data.count);
+        QString s3 = locale.toString(data.weight*100, 'f', 3);
+        QString s4 = locale.toString(data.count);
         QTableWidgetItem* wi1 = new QTableWidgetItem(s1);
         QTableWidgetItem* wi2 = new NumericTableWidgetItem(s2);
         wi2->setData(Qt::UserRole, data.amount);
@@ -167,6 +169,10 @@ void AnalysisDialog::tagsRedisplayTable()
 
     // re-enable sorting
     ui->tagsTableWidget->setSortingEnabled(true);
+
+    // Fit each column to its actual content (tag name, formatted amount, weight, count are all
+    // locale/content dependent), rather than a fixed width guess made once at startup.
+    UiUtil::resizeTableColumns(ui->tagsTableWidget);
 }
 
 

@@ -156,18 +156,6 @@ public:
      */
     QString getLogFolder() const;
 
-    /**
-     * @brief Remove log files for specified workspaces.
-     * @details Deletes all log files whose names match the workspace suffix pattern for each
-     * given workspace. Log filenames follow the format yyyy-MM-dd__hh_mm_ss_WORKSPACE.txt
-     * (25 + workspace length characters).
-     * @param workspaces List of workspace names to remove logs for. If empty, nothing is deleted.
-     * @param deleted Populated with filenames that were successfully deleted.
-     * @param failed Populated with filenames that could not be deleted.
-     */
-    void removeWorkspaceLogs( const QStringList& workspaces, QStringList& deleted,
-        QStringList& failed);
-
     // Getters
     QString getLogFullFileName() const;
     LogPrivacy getLogPrivacy() const;

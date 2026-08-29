@@ -1,0 +1,33 @@
+Converting an MD file into a PDF file on Linux, with the style we want for gbp.
+
+1) create a conversion directory
+
+2) put the MD file in it
+
+3) enter this directory
+
+4) create a file named pdf-style.css and with the following content
+  @page {
+      size: letter;
+      margin: 0.5in;
+      @bottom-center {
+          content: "Page " counter(page) " of " counter(pages);
+          font-size: 10pt;
+          color: #555;
+      }
+
+  }
+  body {
+      max-width: none;
+      margin: 0;
+      font-family: sans-serif;
+  }
+
+5) make sure the following apps are installed : pandoc and weasyprint
+sudo apt install pandoc
+sudo apt install weasyprint
+
+6) if the MD file is named for example CHANGELOG.md, run this :
+pandoc CHANGELOG.md -o changelog-en.pdf --metadata pagetitle="GBP Change Log" --pdf-engine=weasyprint --css=pdf-style.css
+
+7) The resulting PDF file is created in this directory (changelog-en.pdf)

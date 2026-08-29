@@ -101,14 +101,9 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     QFontMetrics fm2(ui->tagsEdit->font());
     ui->tagsEdit->setFixedHeight(fm2.height()*(2 * 1.4)); // 2 lines
 
-    // make DateWidgets widget wide enough
-    QFontMetrics fm3 = ui->fromDateEdit->fontMetrics();
-    ui->fromDateEdit->setMinimumWidth(fm3.averageCharWidth()*20);
-    ui->toDateEdit->setMinimumWidth(fm3.averageCharWidth()*20);
-
-    // Set Date widgets to display date in Locale short format
-    ui->fromDateEdit->setDisplayFormat(locale.dateFormat(QLocale::ShortFormat));
-    ui->toDateEdit->setDisplayFormat(locale.dateFormat(QLocale::ShortFormat));
+    // Date widgets display format is set in the .ui file (displayFormat property), not here.
+    UiUtil::widenDateEdit(ui->fromDateEdit);
+    UiUtil::widenDateEdit(ui->toDateEdit);
 
     // set "from" / "to" date default
     ui->toScenarioRadioButton->setChecked(true);
@@ -230,7 +225,7 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
 
     // set name of Label for end date for Scenario case
     ui->toScenarioRadioButton->setText(tr("Defined by the scenario (%1)").
-        arg(locale.toString(maxDateFeGeneration,locale.dateFormat(QLocale::ShortFormat))));
+        arg(locale.toString(maxDateFeGeneration,"yyyy-MMM-dd")));
 
     // Name colorization
     if (isNewCsd) {
@@ -510,7 +505,7 @@ void EditPeriodicDialog::buildPeriodicCsdFromFormData(BuildFromFormDataResult &r
     }
     if( from < PeriodicCsd::MIN_START_DATE){
         result.result.userErrorMessage = tr("Start date must not occur before %1")
-            .arg(locale.toString(PeriodicCsd::MIN_START_DATE, QLocale::LongFormat));
+            .arg(locale.toString(PeriodicCsd::MIN_START_DATE, "yyyy-MMM-dd"));
         result.result.logErrorMessage = "Start date is invalid";
         return;
     }
@@ -540,7 +535,7 @@ void EditPeriodicDialog::buildPeriodicCsdFromFormData(BuildFromFormDataResult &r
         }
         if( to < PeriodicCsd::MIN_START_DATE.addDays(1)){
             result.result.userErrorMessage = tr("End date must not occur before %1")
-            .arg(locale.toString(PeriodicCsd::MIN_START_DATE.addDays(1), QLocale::LongFormat));
+            .arg(locale.toString(PeriodicCsd::MIN_START_DATE.addDays(1), "yyyy-MMM-dd"));
             result.result.logErrorMessage = "End date is invalid";
             return;
         }

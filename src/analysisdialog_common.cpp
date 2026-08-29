@@ -117,9 +117,8 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     globalPreviousToDate = tomorrow.addYears(5).addDays(-1);
 
     // Widen global date widgets
-    QFontMetrics fm = ui->globalFromDateEdit->fontMetrics();
-    ui->globalFromDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
-    ui->globalToDateEdit->setMinimumWidth(fm.averageCharWidth()*20);
+    UiUtil::widenDateEdit(ui->globalFromDateEdit);
+    UiUtil::widenDateEdit(ui->globalToDateEdit);
 
     // misc init
     ui->noElementsLabel->setText(tr("No of most significant items :"));
@@ -143,7 +142,7 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     int numChars = CurrencyHelper::maxCharForMaxAmountInDouble(
         CurrencyHelper::maxValueAllowedForNoOfDecimalsForCurrency());
     QFontMetrics fmAmount(appFont);
-    int widthAmount = fm.horizontalAdvance(QString(numChars*1.5, '8'));
+    int widthAmount = fmAmount.horizontalAdvance(QString(numChars*1.5, '8'));
     ui->rwAmountLabel->setMinimumWidth(widthAmount);
 
 
@@ -230,17 +229,11 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     ui->tagsExpensesRadioButton->setStyleSheet(Util::getStyleSheetStringForColor(
         GbpController::getInstance().getExpenseColor()));
 
-    // resize column of tag table
-    //ui->tagsTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // Column widths are fitted to actual content in tagsRedisplayTable() (via
+    // UiUtil::resizeTableColumns()) once the table has real rows to measure - not here, where
+    // the table is still empty. Only the parts that don't depend on content are set up here.
     QHeaderView *header = ui->tagsTableWidget->horizontalHeader();
-    header->setSectionResizeMode(0, QHeaderView::Stretch); // Column 0: stretch
     QFontMetrics fm2 = ui->tagsTableWidget->fontMetrics();
-    header->setSectionResizeMode(1, QHeaderView::Fixed);
-    ui->tagsTableWidget->setColumnWidth(1, fm2.averageCharWidth()*20);
-    header->setSectionResizeMode(2, QHeaderView::Fixed);
-    ui->tagsTableWidget->setColumnWidth(2, fm2.averageCharWidth()*20);
-    header->setSectionResizeMode(3, QHeaderView::Fixed);
-    ui->tagsTableWidget->setColumnWidth(3, fm2.averageCharWidth()*12);
     // Horizontal header: minimum height derived from font so text is never clipped on Windows.
     header->setFont(appFont);
     header->setMinimumHeight(fm2.height() + 10);

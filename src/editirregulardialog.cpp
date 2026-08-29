@@ -85,6 +85,17 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     ui->itemsTableView->setFont(appFont);
     ui->itemsTableView->setModel(tableModel);
 
+    // The Date column shows a locale-dependent long-format date (e.g. weekday + full month
+    // name), which can render wider than expected on some platform/font/locale combinations
+    // (observed cut off on Windows with German). Re-fit both it and the Amount column to
+    // their actual content every time the table's data changes, rather than relying on a
+    // width guess made once at startup - setItems() always goes through
+    // beginResetModel()/endResetModel(), so this single connection covers every place the
+    // table gets (re)populated.
+    connect(tableModel, &QAbstractItemModel::modelReset, this, [this]() {
+        UiUtil::resizeTableViewColumns(ui->itemsTableView, {0, 1});
+    });
+
     // Model : Date font
     QFont f = appFont;
     tableModel->setDateTableFont(f);
@@ -106,11 +117,7 @@ EditIrregularDialog::EditIrregularDialog(QLocale aLocale, QWidget *parent)
     fm = ui->itemsTableView->fontMetrics();
     ui->itemsTableView->horizontalHeader()->setFont(appFont);
     ui->itemsTableView->horizontalHeader()->setMinimumHeight(fm.height() + 10);
-    ui->itemsTableView->setColumnWidth(0,fm.averageCharWidth()*30);  // date (long format)
-    CurrencyInfo usCur;
-    QFontMetrics fmAmount(tableModel->getAmountTableFont());
-    ui->itemsTableView->setColumnWidth(1,CurrencyHelper::currencyAmountMaxPixelWidth(usCur,
-        locale, fmAmount) + fmAmount.averageCharWidth()*2);  // longest amount + padding
+    UiUtil::resizeTableViewColumns(ui->itemsTableView, {0, 1});  // date (long format), amount
 
     // force max len for name (not possible for Description)
     ui->nameLineEdit->setMaxLength(Csd::NAME_MAX_LEN);

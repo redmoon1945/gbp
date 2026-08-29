@@ -53,7 +53,7 @@
          </date>
         </property>
         <property name="displayFormat">
-         <string notr="true">yyyy-MMMM-dd</string>
+         <string notr="true">yyyy-MMM-dd</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -106,7 +106,7 @@
          </date>
         </property>
         <property name="displayFormat">
-         <string notr="true">yyyy-MMMM-dd</string>
+         <string notr="true">yyyy-MMM-dd</string>
         </property>
         <property name="calendarPopup">
          <bool>true</bool>
@@ -161,7 +161,7 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>5</number>
+      <number>6</number>
      </property>
      <widget class="QWidget" name="relativeWeightTab">
       <attribute name="title">
@@ -409,6 +409,12 @@
               <layout class="QFormLayout" name="formLayout">
                <property name="labelAlignment">
                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+               </property>
+               <property name="horizontalSpacing">
+                <number>30</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>10</number>
                </property>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_13">
@@ -2133,11 +2139,11 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_5"/>
   <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_4"/>
   <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

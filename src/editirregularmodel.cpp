@@ -88,8 +88,8 @@ QVariant EditIrregularModel::data(const QModelIndex &index, int role) const
         QList<QDate> listKeys = items.keys();
         if ( row <= (listKeys.size()-1) ){
             QDate key = listKeys.at(row);
-            if (col==0){    // *** date, long format ***
-                return theLocale.toString(key,QLocale::FormatType::LongFormat);
+            if (col==0){    // *** date ***
+                return theLocale.toString(key, "yyyy-MMM-dd");
             } else if (col==1){ //*** Amount ***
                 IrregularCsd::AmountInfo ai = items.value(key);
                 int result;

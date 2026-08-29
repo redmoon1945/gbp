@@ -534,7 +534,7 @@ void AnalysisDialog::csdPointClicked(QScatterSeries* series, const QPointF& pt)
     const QDate date = QDateTime::fromMSecsSinceEpoch(
         static_cast<qint64>(storedPt.x())).date();
     ui->csdSelectedPointDateLabel->setText(
-        locale.toString(date, locale.dateFormat(QLocale::ShortFormat)));
+        locale.toString(date, "yyyy-MMM-dd"));
     ui->csdSelectedPointValueLabel->setText(
         locale.toString(storedPt.y(), 'f', currInfo.noOfDecimal));
 }

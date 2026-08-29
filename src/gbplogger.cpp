@@ -133,11 +133,12 @@ GbpLogger::GbpLogger()
     if (!success) {
         loggingEnabled = false;
         QString errorString = QString("Logging is disabled (cannot create a log file in %1)")
-                                  .arg(logFolder);
+                                  .arg(QDir::toNativeSeparators(logFolder));
         qWarning().noquote() << errorString;
     } else {
         loggingEnabled = true;
-        QString successString = QString("Log file created : %1").arg(logFullFileName);
+        QString successString = QString("Log file created : %1")
+            .arg(QDir::toNativeSeparators(logFullFileName));
         qInfo().noquote() << successString;
     }
 
@@ -225,47 +226,6 @@ QString GbpLogger::redact(const QString& privateData, const QString& redactedTex
 QString GbpLogger::getLogFolder() const
 {
     return logFolder;
-}
-
-void GbpLogger::removeWorkspaceLogs( const QStringList& workspaces, QStringList& deleted,
-    QStringList& failed)
-{
-    deleted.clear();
-    failed.clear();
-
-    if (workspaces.isEmpty() || logFolder.isEmpty()) {
-        return;
-    }
-
-    QDir logDir(logFolder);
-    if (!logDir.exists()) {
-        return;
-    }
-
-    // Log filename format:
-    //   yyyy-MM-dd__hh_mm_ss_WORKSPACE.txt
-    // The date+time prefix is always exactly 20 chars
-    QFileInfoList logFiles = logDir.entryInfoList(
-        {"*.txt"}, QDir::Files);
-
-    for (const QString& ws : workspaces) {
-        QString suffix = "_" + ws + ".txt";
-        for (const QFileInfo& logInfo : logFiles) {
-            QString name = logInfo.fileName();
-            if (!name.endsWith(suffix)
-                || name.length()
-                    != 20 + suffix.length()) {
-                continue;
-            }
-            QString path =
-                logInfo.absoluteFilePath();
-            if (QFile::remove(path)) {
-                deleted.append(name);
-            } else {
-                failed.append(name);
-            }
-        }
-    }
 }
 
 void GbpLogger::cleanUpLogs(const QDate& today)

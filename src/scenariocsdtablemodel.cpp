@@ -89,6 +89,9 @@ QVariant ScenarioCsdTableModel::data(const QModelIndex &index, int role) const
             if (col==0){            // *** type ***
                 return info.type;
             } else if (col==1){     // *** name ***
+                if (info.name.length() > DISPLAYED_NAME_MAX_LEN) {
+                    return info.name.left(DISPLAYED_NAME_MAX_LEN) + QStringLiteral("…");
+                }
                 return info.name;
             } else if (col==2){     // *** Amount ***
                 return info.amount;

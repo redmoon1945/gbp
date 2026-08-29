@@ -1,15 +1,17 @@
 <RCC>
     <qresource prefix="/Images"/>
     <qresource prefix="/Doc">
-        <file>resources/Graphical Budget Planner - User Manual.pdf</file>
-        <file>resources/Graphical Budget Planner - Quick Tutorial.pdf</file>
-        <file>resources/Graphical Budget Planner - CHANGELOG.pdf</file>
-        <file>resources/Graphical Budget Planner - Welcome-en.pdf</file>
-        <file>resources/Graphical Budget Planner - Welcome-fr.pdf</file>
-        <file>resources/tag_suggestions_expenses_en.txt</file>
-        <file>resources/tag_suggestions_incomes_en.txt</file>
-        <file>resources/tag_suggestions_incomes_fr.txt</file>
-        <file>resources/tag_suggestions_expenses_fr.txt</file>
+        <file>resources/changelog-en.pdf</file>
+        <file>resources/quick_tutorial-en.pdf</file>
+        <file>resources/quick_tutorial-fr.pdf</file>
+        <file>resources/tag_suggestions_expenses-en.txt</file>
+        <file>resources/tag_suggestions_expenses-fr.txt</file>
+        <file>resources/tag_suggestions_incomes-en.txt</file>
+        <file>resources/tag_suggestions_incomes-fr.txt</file>
+        <file>resources/user_manual-en.pdf</file>
+        <file>resources/user_manual-fr.pdf</file>
+        <file>resources/welcome-en.pdf</file>
+        <file>resources/welcome-fr.pdf</file>
     </qresource>
     <qresource prefix="/Samples">
         <file>resources/budget-example.json</file>

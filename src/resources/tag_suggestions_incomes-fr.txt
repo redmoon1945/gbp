@@ -1,0 +1,11 @@
+Épargnes	Versements dans compte d'épargne, Versements dans fonds d'urgence, Versements dans fonds de retraite
+Salaires	Revenus d'emplois
+Investissements	Dividendes, revenus d'intérêt, gains en capital
+Primes
+Revenus de travailleur autonome
+Revenus de location	Appartements, condos, maisons, édifices à logements
+Pensions de retraite	Tout revenu relié à la retraite
+Aides gouvernementales	Tout revenu reçu de programmes gouvernementaux
+Revenus complémentaires	Revenus obtenus à partir d'emplois à temps partiel
+Héritages
+Cadeaux

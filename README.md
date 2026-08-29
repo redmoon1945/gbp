@@ -2,16 +2,19 @@
 
 ## What's new ?
 
-Version **1.8.0** is out (July 2026) ! This is a big release, with many new features and several improvements. Here are the main changes compared to 1.7.0 :
+Version **1.8.1** is out (29 August 2026) ! This is a **bug-fix release**, with addition of a French user manual and quick tutorial, making gbp French support complete (English is the default language and will always be). Here are the main changes compared to 1.8.0 (see CHANGELOG for details) :
 
- - **Analysis Dialog** has been significantly expanded with two new tabs:
-   - **Period — Heatmap** : visualizes incomes, expenses, or the income/expense delta as a color-coded grid at monthly or yearly granularity, with configurable colors, adjustable cell sizes, and rich tooltips.
-   - **Compare CSD** : overlays up to 10 CSDs on a single line chart for direct side-by-side comparison, with persistent per-CSD color assignment and optional event markers.
-   - The existing Period report and chart tabs have been consolidated (monthly and annual views merged into single tabs with a radio-button selector).
-- **Workspace support** : multiple isolated instances of the application can now run side-by-side using the `-workspace=NAME` command-line argument. Each workspace keeps its own settings and log files.
-- **Anonymize** feature (menu Scenario) : replaces sensitive scenario data with placeholder values, with optional amount randomization. Changes remain in-memory until explicitly saved.
-- **CSD breakdown** : both Periodic and Irregular CSD edit dialogs now offer a button to visualize the period-by-period totals for that CSD until the end of its validity period.
-- **Windows UI** : many improvements to the Windows version for the behavior of the UI, specially regarding layouts with misc fonts (including big ones).
+- **Installation simplified** : On Linux, GBP no longer requires a separate installation of the FUSE 2 library (`libfuse2`) as a prerequisite.
+
+- **Full French translation for bundled documentation** : the User Manual and Quick Tutorial are now available in French, in addition to English which is the default.
+
+- **Dynamic column sizing** : table columns in several dialogs (Edit Irregular Financial Stream Definition, Edit Scenario, Manage Tags, Edit Variable Growth, Analysis — Tags tab) now resize themselves to fit their actual content, instead of relying on a fixed estimate made once at startup. This fixes long content getting truncated with an ellipsis on some platform/locale combinations — most visibly a German long-format date on Windows, where the fixed estimate didn't leave enough room for the font actually used there.
+
+- **Better support for international locales** : numbers and dates across the app are now more consistently rendered in the application's actual locale — including locales with their own numbering system (e.g. Bengali or Arabic digits), where several places had been silently falling back to plain Western digits or picking up formatting that doesn't belong on an identifier (like a thousands separator on a year).
+
+- In **Custom Date Interval dialog :**
+  
+  - **Custom date interval (chart) remembers your last selection** : the "Custom" chart range dialog no longer resets its "From"/"To" dates to the chart's current view every time it is opened ; your previous selection is kept instead, and only adjusted if it falls outside what the loaded scenario can actually calculate.
 
 ## Screenshots
 
@@ -43,15 +46,38 @@ Analysis - Heatmap
 
 ### On Linux
 
-GBP is distributed as an “AppImage” on Linux platform, which is a single-file executable packaging format allowing a program to run on many Linux distributions. There is nothing else to install. After downloading the most recent AppImage application from https://github.com/redmoon1945/gbp/releases, user has to enable “executable” permission on the file and it is ready to be launched. 
+GBP is distributed as an “AppImage” on Linux platform, which is a single-file executable packaging format allowing a program to run on many Linux distributions. There is nothing else to install in most cases. After downloading the most recent AppImage application from https://github.com/redmoon1945/gbp/releases, user has to enable “executable” permission on the file and it is ready to be launched. 
 
-On Ubuntu (tested on v 22.04, 24.04), additional steps must be performed. In order to run an AppImage, some packages are missing from the default distribution. Ubuntu needs the FUSE library to run AppImage like GBP. Otherwise, when launched, you will get the following error : 
+###### **Lunduke Computer Operating System (LCOS) case**
 
-`dlopen(): error loading libfuse.so.2`
+As of sept 2026, LCOS 0.2 is still an alpha version, intended for testing only, it will probably greatly evolve in the coming months. You have to install FUSE 3 to execute an AppImage file like gbp. 
 
-AppImages require FUSE to run. To solve this, do : 
+`sudo apt install fuse3`
 
-`sudo apt install libfuse2`
+gbp works well, even if there are several minor "warning messages" written to the console, all related to what is or is not implemented at this stage in LCOS.
+
+###### NixOS case
+
+NixOS does not use the traditional Linux filesystem layout (no `/lib64`, no FHS-style directories) that AppImages expect, so the GBP AppImage will **not** launch directly, even after setting the executable permission. Running it as-is typically fails with an error such as `cannot execute binary file`.
+
+To run the GBP AppImage on NixOS, you have two options :
+
+* **One-off / try it out** : run it through `appimage-run`, without installing anything permanently :
+  
+  `nix-shell -p appimage-run --run "appimage-run ./gbp-x.y.z.AppImage"`
+
+* **Permanent fix (recommended)** : enable AppImage support system-wide by adding this to your `configuration.nix`, then running `sudo nixos-rebuild switch` :
+  
+  ```nix
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+  ```
+  
+  Once enabled, AppImages (including GBP's) can be launched directly, e.g. `./gbp-x.y.z.AppImage`, or by double-clicking them in a file manager, just like on any other distribution.
+
+Note that GBP's configuration and log files are stored under the standard XDG user directories (`~/.config` and `~/.local/share`), so they behave normally on NixOS regardless of how the AppImage is launched.
 
 ### On Windows®
 
@@ -61,16 +87,17 @@ Download the ".zip" file binary from the repository mentioned above and unzip it
 
 GBP is intended to be run first and foremost on the Linux Operating System. But since it is built using the Qt cross platform toolkit, a version of GBP for the Windows® Operating System is also provided and fully tested. A version for MAC could be easily produced if requested.
 
-GBP does not use a lot of RAM (the absolute worst case ever seen is 300 MB for an extremely demanding testing scenario) and necessitate roughly 50 MB of disk space (not taken into account the scenario files that you will create and GBP log files, which are all pretty small anyways).
+GBP does not use a lot of RAM (typically between 25 and 250 MB, depending on the scenario) and necessitate roughly 50 MB of disk space (not taken into account the scenario files that you will create and GBP log files, which are all pretty small anyways).
 
-As of July 2026, GBP has been extensively tested on the following platforms : 
+As of september 2026, GBP has been extensively tested on the following platforms : 
 
-* Kubuntu 26.04 LTS, KDE 6.6.4, Wayland, Kernel 7.0.0-22
-* Linux Mint Debian Edition 7, Cinnamon 6.4.13, X11, Kernel 6.12.94
-* Windows® 11 Home Edition
+* **Kubuntu 26.04 LTS**, KDE 6.6.4, Wayland, Kernel 7.0.0-22
+* **Linux Mint** Debian Edition 7, Cinnamon 6.4.13, X11, Kernel 6.12.94
+* **Windows® 11** Home Edition
 
 It has also been tested, but not as extensively, on the following platforms :
 
+* LCOS 0.2, XFCE 4.20, Libre X11, Kernel 6.12.101
 * MX linux 25, XFCE 4.20.1, X11, Kernel 6.16.12
 * Fedora 43, KDE Plasma 6.6.5, Wayland, Kernel 7.0.11-100
 * OpenMandriva Lx 5.0, X11, KDE Plasma 5.27.9, kernel 6.6.2
