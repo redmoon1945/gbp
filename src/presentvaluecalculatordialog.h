@@ -35,7 +35,16 @@ private:
     QLocale locale;
 
     // Methods
-    double convertMonthlyRateStringToValue(const QString s);
+    /**
+     * @brief Gets the monthly discount rate to use for the PV <-> FV conversions.
+     * @details Always computed from the annual discount rate spin box value. It must NOT be
+     * read back from the monthly rate label : the label text is formatted with the user's
+     * locale (e.g. "0,40741238 %" in French) and rounded to 8 decimals, so parsing it fails
+     * for locales using a decimal comma or their own digits, which used to silently give a
+     * rate of 0 (FV = PV).
+     * @return The monthly discount rate, in percentage (e.g. 0.407412378 for 5% annually).
+     */
+    double getMonthlyDiscountRate() const;
     QString makeStringFromMonthlyRate(double value);
 };
 

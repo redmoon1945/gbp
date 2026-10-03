@@ -56,11 +56,9 @@ void PresentValueCalculatorDialog::on_PresentValueCalculatorDialog_rejected()
 void PresentValueCalculatorDialog::on_pvToFvPushButton_clicked()
 {
     double pv = ui->pvDoubleSpinBox->value();
-    QString monthlyDiscountRateString = ui->monthlyDiscountRateLabel->text();
     int noPeriod = ui->noOfMonthSpinBox->value();
 
-    bool ok;
-    double monthlyDiscountRate = convertMonthlyRateStringToValue(monthlyDiscountRateString);
+    double monthlyDiscountRate = getMonthlyDiscountRate();
     long double fv = Util::futureValue(pv, monthlyDiscountRate, noPeriod);
     ui->fvDoubleSpinBox->setValue(fv);
 }
@@ -69,11 +67,9 @@ void PresentValueCalculatorDialog::on_pvToFvPushButton_clicked()
 void PresentValueCalculatorDialog::on_fvToPvPushButton_clicked()
 {
     double fv = ui->fvDoubleSpinBox->value();
-    QString monthlyDiscountRateString = ui->monthlyDiscountRateLabel->text();
     int noPeriod = ui->noOfMonthSpinBox->value();
 
-    bool ok;
-    double monthlyDiscountRate = convertMonthlyRateStringToValue(monthlyDiscountRateString);
+    double monthlyDiscountRate = getMonthlyDiscountRate();
     long double pv = Util::presentValue(fv, monthlyDiscountRate, noPeriod);
     ui->pvDoubleSpinBox->setValue(pv);
 }
@@ -87,25 +83,12 @@ void PresentValueCalculatorDialog::on_annualDiscountRateDoubleSpinBox_valueChang
 }
 
 
-double PresentValueCalculatorDialog::convertMonthlyRateStringToValue(const QString s)
+double PresentValueCalculatorDialog::getMonthlyDiscountRate() const
 {
-    QString s2 = s;
-    if (s2.size()<3) {
-        // should not happen
-        return 0;
-    }
-
-    // remove the last 2 char (" %")
-    s2.chop(2);
-
-    // convert
-    bool ok;
-    double monthlyDiscountRate = s2.toDouble(&ok);
-    if (ok==false) {
-        return 0; // should never happen
-    }
-
-    return monthlyDiscountRate;
+    // Always computed from the annual rate spin box, never parsed back from the label text
+    // (the label is locale-formatted and is for display only).
+    return static_cast<double>(
+        Util::annualToMonthlyGrowth(ui->annualDiscountRateDoubleSpinBox->value()));
 }
 
 

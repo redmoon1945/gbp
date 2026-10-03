@@ -208,7 +208,7 @@ public:
     Type getType() const;
     /**
      * @brief Return no of days in the interval, including start and end date. 0 if
-     * this object id of type is NOT "BOUND.". This field is NOT serialized in JSon object.
+     * this object is NOT of type BOUNDED. This field is NOT serialized in JSon object.
      */
     uint getNoOfDays() const;
 

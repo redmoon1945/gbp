@@ -448,12 +448,23 @@ void EditPeriodicDialog::on_applyPushButton_clicked()
 }
 
 // Set form's widgets contents for creation of a new Stream Def
-// If slotPrepare == true, some more field are initialized
+// If slotPrepare == true (dialog is opened), all fields are initialized. Otherwise (a Stream Def
+// has just been created and the dialog stays open), only the fields identifying the Stream Def
+// are reset : the others are kept to facilitate the rapid creation of similar Stream Defs.
 void EditPeriodicDialog::prepareDataToCreateANewStreamDef(bool slotPrepare)
 {
     initialId = QUuid::createUuid();
     ui->nameLineEdit->setText("");
     ui->descPlainTextEdit->setPlainText("");
+
+    // tags
+    ui->tagsEdit->clear();
+    tagIdSet.clear();   // new fsd will have no association with tags when created
+
+    if (slotPrepare==false) {
+        return;
+    }
+
     ui->amountDoubleSpinBox->setValue(0);
 
     // set from date
@@ -467,16 +478,10 @@ void EditPeriodicDialog::prepareDataToCreateANewStreamDef(bool slotPrepare)
     ui->gapSpinBox->setValue(1);
     ui->periodMultiplierSpinBox->setValue(1);
 
-    // inflation adjustment factor
+    // growth : follow scenario's inflation (factor 1) by default
     ui->growthTypeScenaroInflationDoubleSpinBox->setValue(1);
-
-    // growth is constant & 0 by default if slotPrepare = true
-    // Otherwise, dot touch it.
-    if (slotPrepare==true) {
-        ui->growthTypeScenaroInflationDoubleSpinBox->setValue(1);
-        ui->growthTypeCustomConstantDoubleSpinBox->setValue(0);
-        updateGrowthTypeCombobox(GrowthType::SCENARIO);
-    }
+    ui->growthTypeCustomConstantDoubleSpinBox->setValue(0);
+    updateGrowthTypeCombobox(GrowthType::SCENARIO);
 
     // but initialize an empty Variable Growth if ever user decide to switch to that type
     tempVariableGrowth = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>());
@@ -484,10 +489,6 @@ void EditPeriodicDialog::prepareDataToCreateANewStreamDef(bool slotPrepare)
     // decoration color
     ui->decorationColorCheckBox->setChecked(false);
     on_decorationColorCheckBox_clicked();
-
-    // tags
-    ui->tagsEdit->clear();
-    tagIdSet.clear();   // new fsd will have no association with tags when created
 }
 
 

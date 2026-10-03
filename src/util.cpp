@@ -143,14 +143,20 @@ qint64 Util::extractQint64FromDoubleWithNoFractionalPart(double amount, int &res
 }
 
 
-// Convert into a quint16 a double that contains no fractional part
-// Result :
-// 0 : success
-// -1 : fail, double has a fractional part and so does not contain an int
-// -2 : fail : double is bigger than maxValue
+// Convert into a quint16 a double that contains no fractional part. See util.h for result codes.
 quint16 Util::extractQuint16FromDoubleWithNoFracPart(double amount, quint16 maxValue, int &result)
 {
-    if ( amount > maxValue ){
+    // NaN : comparisons with NaN are always false, so it would pass all the checks below
+    if ( std::isnan(amount) ){
+        result = -4;
+        return 0;
+    }
+    // casting a negative double to an unsigned integer is undefined behavior
+    if ( amount < 0 ){
+        result = -3;
+        return 0;
+    }
+    if ( amount > maxValue ){                     // also rejects +infinity
         result = -2;
         return 0;
     }

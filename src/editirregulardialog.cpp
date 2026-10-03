@@ -268,7 +268,7 @@ void EditIrregularDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
         // *** CREATING ***
 
         // clean up the window
-        cleanUpForNewCsd();
+        cleanUpForNewCsd(true);
 
         initialId = QUuid::createUuid();
         // set some UI elements
@@ -397,7 +397,7 @@ void EditIrregularDialog::on_applyPushButton_clicked()
         return ;
     }
 
-    emit signalEditIrregularCsdResult(ui->activeYesRadioButton->isChecked(), r.sharedPtrCsd);
+    emit signalEditIrregularCsdResult(isIncome, r.sharedPtrCsd);
 
     // if editing an existing Csd, then this is the end of it. For create,
     // then stay right there to facilitate the rapid creation of multiple Csd
@@ -406,7 +406,7 @@ void EditIrregularDialog::on_applyPushButton_clicked()
         emit signalEditIrregularCsdCompleted();
         LOG_INFO("Modifications applied to the irregular csd");
     } else {
-        cleanUpForNewCsd();
+        cleanUpForNewCsd(false);
         ui->nameLineEdit->setFocus();
         LOG_INFO("New irregular csd created");
     }
@@ -502,20 +502,29 @@ QList<int> EditIrregularDialog::getSelectedRows()
 }
 
 
-void EditIrregularDialog::cleanUpForNewCsd(){
+// Set form's widgets contents for creation of a new Stream Def
+// If slotPrepare == true (dialog is opened), all fields are initialized. Otherwise (a Stream Def
+// has just been created and the dialog stays open), "active" and decoration color are kept to
+// facilitate the rapid creation of similar Stream Defs.
+void EditIrregularDialog::cleanUpForNewCsd(bool slotPrepare){
     ui->nameLineEdit->setText("");
     ui->descPlainTextEdit->setPlainText("");
-    ui->activeYesRadioButton->setChecked(true);
     initialId = QUuid::createUuid();
     tableModel->setItems(QMap<QDate, IrregularCsd::AmountInfo>());// erase data
-
-    // decoration color
-    ui->decorationColorCheckBox->setChecked(false);
-    on_decorationColorCheckBox_clicked();
 
     // tags
     ui->tagsEdit->clear();
     tagIdSet.clear();   // new fsd will have no association with tags when created
+
+    if (slotPrepare==false) {
+        return;
+    }
+
+    ui->activeYesRadioButton->setChecked(true);
+
+    // decoration color
+    ui->decorationColorCheckBox->setChecked(false);
+    on_decorationColorCheckBox_clicked();
 }
 
 

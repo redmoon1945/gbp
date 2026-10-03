@@ -63,21 +63,22 @@ Create a directory where the gbp AppImage will be built (e.g. ~/gbp-app-image-bu
 
 - the 3 files downloaded previously (`linuxdeploy-x86_64.AppImage`, `linuxdeploy-plugin-qt-x86_64.AppImage`, `runtime-x86_64`)
 - From the QtCreator Build directory $HOME/data/dev/Qt/build/gbp/Desktop_Qt_6_10_3-Release
-  - the compiled binary file "gbp" : this is the executable produced by QtCreator after a rebuild
+  - the compiled binary file "graphical-budget-planner" : this is the executable produced by QtCreator after a rebuild
   - the "gbp_en.qm" and "gbp_fr.qm" translation files
 - From the "$HOME/data/dev/Qt/gbp/build-tools" directory :
+  - the app icon "graphical-budget-planner.png"
+- From the "$HOME/data/dev/Qt/gbp/build-tools/Linux" directory :
   - the file "create_appimage.sh"
-  - the app icon "gbp.png"
-  - the app Desktop shortcut "gbp.desktop"
+  - the app Desktop shortcut "graphical-budget-planner.desktop"
 
 #### C)
 
-Open a terminal and change current directory to GBP_APP_IMAGE_BUILD_DIR. Run the following shell script :
-`./create_appimage.sh`
+Open a terminal and change current directory to GBP_APP_IMAGE_BUILD_DIR. Run the following shell script, passing the gbp version as argument (e.g. 1.8.2) :
+`./create_appimage.sh 1.8.2`
 
 The script points `linuxdeploy`/`linuxdeploy-plugin-appimage` at the `runtime-x86_64` file in the current directory via the `LDAI_RUNTIME_FILE` environment variable, bundles the Qt libraries/plugins, and produces the final AppImage.
 
-**The resulting executable "graphical-budget-planner-x86_64.AppImage" is now in the directory GBP_APP_IMAGE_BUILD_DIR** . Rename as you wish. Set permission to “execute”. This is your gbp executable file for Linux.
+**The resulting executable "gbp-1.8.2-x86_64.AppImage" (named after the version passed to the script) is now in the directory GBP_APP_IMAGE_BUILD_DIR** . Set permission to “execute”. This is your gbp executable file for Linux.
 
 ### Appendix : the AppImage runtime and FUSE, in detail
 
@@ -169,6 +170,6 @@ Pick a recent release and grab the `runtime-x86_64` asset (there are also `runti
 4. **Universal fallback**, works regardless of FUSE setup on any AppImage: extract and run directly, bypassing FUSE mounting entirely:
    
    ```
-   ./gbp-x86_64.AppImage --appimage-extract
+   ./gbp-1.8.2-x86_64.AppImage --appimage-extract
    ./squashfs-root/AppRun
    ```

@@ -45,7 +45,7 @@
   * conversion to double value. For example, if the qint64 holds 12345, with a no of decimals = 3,
   * it means the value stores represents exactly 12.345 %. With no of decimals = 5, the value
   * represents 0.12345%.
-  * Swoth is never applied to the first financial event from Start Date.
+  * Growth is never applied to the first financial event from Start Date.
   *
   * There are 2 options available to define a growth pattern :
   * -> CONSTANT GROWTH :
@@ -53,8 +53,8 @@
   *        with a annual growth value of 5%, applied to an amount of 1000 starting to exist on
   *        1 jan 2000, we have :
   *            1 jan 2000 : 1000 (growth does not apply on the first month of existence)
-  *            1 feb 2000 : 1004.74 (1 month of monthly growth of 0.40741238%,
-  *                         CFG is now 1.0040741238)
+  *            1 feb 2000 : 1004.07 (1 month of monthly growth of 0.40741238%,
+  *                         CGF is now 1.0040741238)
   *            1 jan 2001 : 1050 (CGF is now = 1.05)
   *            1 jan 2002 : 1102.50 (CGF is now = 1.05 * 1.05 =  1.1025)
   * -> VARIABLE GROWTH :
@@ -65,16 +65,20 @@
   *        have the following pairs defined :  (1 jan 2000, 10%) , (1 jan 2002, -10%).
   *        Here are the values of an amount of 1000 that starts existing on 1 jan 1998 and is
   *        submitted to this growth pattern:
-  *            1 jan 1999 : 1000 (growth = 0%, CFG = 1)
-  *            1 jan 2000 : 1100 (new growth value=10%, CGF is now = 1 + 10% = 1.1)
-  *            1 jan 2001 : 1210 (growth value still at 10%, CFG is now = 1.1 + 10% = 1.21)
-  *            1 jan 2002 : 1089 (new growth value=-10%, CFG is now = 1.21 - 10% = 1.089)
-  *            1 jan 2003 : 980.10 (growth still at -10%, CFG is now = 1.089 - 10% = 0.9801)
+  *            1 jan 1999 : 1000    (no growth defined yet : CGF = 1)
+  *            1 jan 2000 : 1007.97 (10% now in force, 1 month applied : CGF = 1.1^(1/12))
+  *            1 jan 2001 : 1108.77 (13 months of 10% : CGF = 1.1^(13/12))
+  *            1 jan 2002 : 1199.42 (24 months of 10%, then 1 month of -10% :
+  *                         CGF = 1.21 * 0.9^(1/12))
+  *            1 jan 2003 : 1079.48 (24 months of 10%, 13 months of -10% :
+  *                         CGF = 1.21 * 0.9^(13/12))
+  *        Note : a new growth value is applied monthly from the month it is defined, so its
+  *        full annual effect is reached 12 months later, not on its start date.
   *        If the amount of 1000 starts existing on 1 jan 2003, then we have
   *            1 jan 2003 : 1000 (no growth applied on the first month of existence))
   *            1 jan 2004 : 900 (growth is -10% as lastly defined in 1 jan 2002,
-  *                         CFG is now at 1 - 10% =  0.9)
-  *            1 jan 2005 : 810 (growth is -10% as lastly defined in 1 jan 2002, CFG is now
+  *                         CGF is now at 1 - 10% =  0.9)
+  *            1 jan 2005 : 810 (growth is -10% as lastly defined in 1 jan 2002, CGF is now
   *                         at 0.9 - 10% = 0.81)
   *
   * **Key Concepts:**
@@ -223,7 +227,10 @@ public:
      * @param appStrategy Strategy defining how growth is applied.
      * @param pvDiscountRate Annual discount rate for present value calculation (percentage, >= 0).
      * @param pvCalculationReferenceDate Present value reference date.
-     * @param ok Result of the operation, including success and error details.
+     * @param ok Result of the operation, including success and error details. success is
+     * false if an argument is invalid, or if a calculated amount is not a finite number (NaN or
+     * infinite, which should never happen since growth values are validated). In both cases,
+     * the returned list is empty.
      * @return List of adjusted amounts (>=0), with matching indexes with occurrenceDates.
      */
     QList<quint64> adjustForGrowth(quint64 amount, const QList<QDate> &occurrenceDates,
@@ -244,12 +251,19 @@ public:
      */
     static Growth fromJson(const QJsonObject& jsonObject, Util::ResultOfOperation &result);
 
-        /**
+    /**
      * @brief Multiplies all growth values by a factor.
-     * @details Resulting growth value(s) are capped to the max allowed (MAX_GROWTH_DECIMAL) and
-     * if this happens at least once, capped is set to true.
+     * @details Resulting growth value(s) are capped to the allowed range
+     * [MIN_GROWTH_DECIMAL, MAX_GROWTH_DECIMAL], i.e. [-100%, 10000%], and if this happens at
+     * least once, capped is set to true.
+     * Capping to the min is required because a negative growth multiplied by a factor > 1 can
+     * go below -100% (e.g. -10% x 15 = -150%). Such a value has no meaning (an amount cannot
+     * lose more than 100% of its value) and would make the monthly growth calculation produce
+     * NaN (root of a negative number). With a growth of -100%, an amount becomes 0 from the
+     * month following its first occurrence.
      * @param factor Multiplier for growth values (must be >= 0).
-     * @param capped Set to true if any growth value was capped to MAX_GROWTH_DECIMAL.
+     * @param capped Set to true if any growth value was capped to MIN_GROWTH_DECIMAL or
+     * MAX_GROWTH_DECIMAL, false otherwise.
      * @throws std::domain_error If factor is negative or type is unknown.
      */
     void changeByFactor(double factor, bool& capped);

@@ -2,19 +2,21 @@
 
 ## What's new ?
 
-Version **1.8.1** is out (29 August 2026) ! This is a **bug-fix release**, with addition of a French user manual and quick tutorial, making gbp French support complete (English is the default language and will always be). Here are the main changes compared to 1.8.0 (see CHANGELOG for details) :
+Version **1.8.2** is out (05-oct-2026) ! This is a **bug-fix release** that corrects calculation errors in some edge cases. Updating is recommended. Here are the main changes compared to 1.8.1 (see CHANGELOG for details) :
 
-- **Installation simplified** : On Linux, GBP no longer requires a separate installation of the FUSE 2 library (`libfuse2`) as a prerequisite.
+- **Faster creation of several financial streams** : after "Create", the periodic financial stream dialog now keeps the start date, amount, period and growth for the next stream, and clears only the name and description. The irregular financial stream dialog keeps the "Active" choice and the color.
 
-- **Full French translation for bundled documentation** : the User Manual and Quick Tutorial are now available in French, in addition to English which is the default.
+- **Payment dates fixed** : monthly and yearly payments starting on the 29th, 30th, 31st or on Feb 29 no longer drift to an earlier day, and "end of month" payments repeating every 2 months or more no longer skip their first payment.
 
-- **Dynamic column sizing** : table columns in several dialogs (Edit Irregular Financial Stream Definition, Edit Scenario, Manage Tags, Edit Variable Growth, Analysis — Tags tab) now resize themselves to fit their actual content, instead of relying on a fixed estimate made once at startup. This fixes long content getting truncated with an ellipsis on some platform/locale combinations — most visibly a German long-format date on Windows, where the fixed estimate didn't leave enough room for the font actually used there.
+- **Present Value Calculator fixed** : the discount rate is now taken into account in all languages (it was ignored e.g. in French).
 
-- **Better support for international locales** : numbers and dates across the app are now more consistently rendered in the application's actual locale — including locales with their own numbering system (e.g. Bengali or Arabic digits), where several places had been silently falling back to plain Western digits or picking up formatting that doesn't belong on an identifier (like a thousands separator on a year).
+- **Other calculation fixes** : no more crash with a negative inflation combined with a large adjustment factor, no more "nan" percentages in Analysis (Relative Weight), and invalid values in imported or loaded files are now refused.
 
-- In **Custom Date Interval dialog :**
-  
-  - **Custom date interval (chart) remembers your last selection** : the "Custom" chart range dialog no longer resets its "From"/"To" dates to the chart's current view every time it is opened ; your previous selection is kept instead, and only adjusted if it falls outside what the loaded scenario can actually calculate.
+- **Monospace font option in the description editor** : a new "Use monospace font" checkbox helps align tables and numbers in descriptions.
+
+- **Linux AppImage** : now named `gbp-<version>-x86_64.AppImage`, and the files inside are named after the application (`graphical-budget-planner`), fixing a user-reported naming warning.
+
+- **French translation completed** : the last few texts still shown in English are now translated.
 
 ## Screenshots
 
@@ -48,14 +50,6 @@ Analysis - Heatmap
 
 GBP is distributed as an “AppImage” on Linux platform, which is a single-file executable packaging format allowing a program to run on many Linux distributions. There is nothing else to install in most cases. After downloading the most recent AppImage application from https://github.com/redmoon1945/gbp/releases, user has to enable “executable” permission on the file and it is ready to be launched. 
 
-###### **Lunduke Computer Operating System (LCOS) case**
-
-As of sept 2026, LCOS 0.2 is still an alpha version, intended for testing only, it will probably greatly evolve in the coming months. You have to install FUSE 3 to execute an AppImage file like gbp. 
-
-`sudo apt install fuse3`
-
-gbp works well, even if there are several minor "warning messages" written to the console, all related to what is or is not implemented at this stage in LCOS.
-
 ###### NixOS case
 
 NixOS does not use the traditional Linux filesystem layout (no `/lib64`, no FHS-style directories) that AppImages expect, so the GBP AppImage will **not** launch directly, even after setting the executable permission. Running it as-is typically fails with an error such as `cannot execute binary file`.
@@ -64,7 +58,7 @@ To run the GBP AppImage on NixOS, you have two options :
 
 * **One-off / try it out** : run it through `appimage-run`, without installing anything permanently :
   
-  `nix-shell -p appimage-run --run "appimage-run ./gbp-x.y.z.AppImage"`
+  `nix-shell -p appimage-run --run "appimage-run ./gbp-x.y.z-x86_64.AppImage"`
 
 * **Permanent fix (recommended)** : enable AppImage support system-wide by adding this to your `configuration.nix`, then running `sudo nixos-rebuild switch` :
   
@@ -75,7 +69,7 @@ To run the GBP AppImage on NixOS, you have two options :
   };
   ```
   
-  Once enabled, AppImages (including GBP's) can be launched directly, e.g. `./gbp-x.y.z.AppImage`, or by double-clicking them in a file manager, just like on any other distribution.
+  Once enabled, AppImages (including GBP's) can be launched directly, e.g. `./gbp-x.y.z-x86_64.AppImage`, or by double-clicking them in a file manager, just like on any other distribution.
 
 Note that GBP's configuration and log files are stored under the standard XDG user directories (`~/.config` and `~/.local/share`), so they behave normally on NixOS regardless of how the AppImage is launched.
 
@@ -89,18 +83,18 @@ GBP is intended to be run first and foremost on the Linux Operating System. But 
 
 GBP does not use a lot of RAM (typically between 25 and 250 MB, depending on the scenario) and necessitate roughly 50 MB of disk space (not taken into account the scenario files that you will create and GBP log files, which are all pretty small anyways).
 
-As of september 2026, GBP has been extensively tested on the following platforms : 
+As of october 2026, GBP has been extensively tested on the following platforms : 
 
-* **Kubuntu 26.04 LTS**, KDE 6.6.4, Wayland, Kernel 7.0.0-22
-* **Linux Mint** Debian Edition 7, Cinnamon 6.4.13, X11, Kernel 6.12.94
+* **Kubuntu 26.04.01 LTS**, KDE 6.6.6, Wayland, Kernel 7.0.0-34
+* **Linux Mint** Debian Edition 7, Cinnamon 6.6.9 (X11), Kernel 6.12.111
 * **Windows® 11** Home Edition
 
 It has also been tested, but not as extensively, on the following platforms :
 
-* LCOS 0.2, XFCE 4.20, Libre X11, Kernel 6.12.101
-* MX linux 25, XFCE 4.20.1, X11, Kernel 6.16.12
-* Fedora 43, KDE Plasma 6.6.5, Wayland, Kernel 7.0.11-100
-* OpenMandriva Lx 5.0, X11, KDE Plasma 5.27.9, kernel 6.6.2
+* LCOS 0.7.1, XFCE 4.20, Libre X11, Kernel 7.2.6-lunduke
+* OpenMandriva 6.0, LXQt 2.2.0, kernel 6.16.2
+* MX linux 25.3, XFCE 4.20.1, X11, Kernel 7.2.8
+* Fedora 44, KDE Plasma 6.7.5, Wayland, Kernel 7.2.8
 * Ubuntu 24.04.04 LTS, Gnome 46, Kernel 6.7.0-35
 * Ubuntu 22.04.5 LTS, Gnome 42.9, X11, Kernel 6.8.0-52
 * Ubuntu 22.04.5 LTS, Gnome 42.9, Wayland, Kernel 6.8.0-52

@@ -1,5 +1,25 @@
 # Change log for GBP
 
+## 1.8.1 to 1.8.2 (05-oct-2026)
+
+### New features : The big ones
+
+- **Faster creation of several financial streams** : after clicking "Create" in the periodic financial stream dialog, which stays open to create another one, only the name and the description are now cleared. The start date, amount, period, growth and other settings are kept, instead of being reset (the start date was reset to tomorrow). In the irregular financial stream dialog, the "Active" choice and the color are now kept too (the list of events is still cleared).
+
+### Fixes
+
+- **First end-of-month payment no longer skipped** : an "end of month" financial stream repeating every 2 months or more, with a start date not at the end of a month, had its first payment(s) skipped (e.g. every 3 months from Jan 15 : Mar 31, Jun 30... instead of Jan 31, Apr 30...). The first payment is now at the end of the start month.
+- **Monthly and yearly payment dates no longer drift** : a monthly financial stream starting on the 29th, 30th or 31st stayed on an earlier day after a shorter month (e.g. Jan 31, Feb 28, Mar 28... instead of Mar 31), and a yearly one starting on Feb 29 stayed on Feb 28 in later leap years. The original day is now kept.
+- **Present Value Calculator ignored the discount rate** in locales using a decimal comma (e.g. French) or their own digits (e.g. Bengali) : the future value was always equal to the present value. The rate is now always taken into account.
+- **No crash with negative inflation and a large adjustment factor** : a financial stream using the scenario inflation, when that inflation is negative and multiplied by an adjustment factor bringing it below -100% (e.g. -10% x 15 = -150%), produced invalid amounts and could crash GBP. The adjusted inflation is now limited to -100%.
+- **Analysis, Relative Weight** : percentages showed "nan" when all amounts in the period were 0. They now show 0.
+- **Growth validation messages** : out-of-range growth error messages now show the value and its limit correctly (they could previously become huge and exhaust memory).
+- **Invalid values rejected** : "nan" in imported files or in the settings, and a scenario duration of 0 or less in a scenario file, are now refused instead of giving wrong results or a crash.
+- **Monospace font option in the description editor** : the text editor used for descriptions (scenarios, financial streams, tags) has a new "Use monospace font" checkbox to help align tables and numbers. The choice is kept for the rest of the session, but is not saved in the gbp's options.
+- **Linux AppImage** : the file is now named `gbp-<version>-x86_64.AppImage` (e.g. `gbp-1.8.2-x86_64.AppImage`), and the executable inside is now named `graphical-budget-planner`. The desktop file and icon inside are renamed to match (`graphical-budget-planner.desktop`, `graphical-budget-planner.png`), fixing a user-reported warning that the file names did not match the application name in the desktop file.
+- **French translation completed** : a few texts still shown in English are now translated (the "Cache" and "Built on" labels in the About dialog, and the error messages shown when the User Manual, Welcome document, Quick Tutorial or Change Log cannot be opened because the application's cache directory is unavailable).
+- **Smaller documentation images** : the images of the User Manual (English and French) have been compressed to reduce the size of the executable, at the cost of slightly less sharp images.
+
 ## 1.8.0 to 1.8.1 (28-aug-2026)
 
 ### New features : The big ones

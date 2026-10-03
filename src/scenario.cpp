@@ -385,6 +385,21 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
                 .arg(d);
             return result;
         }
+        if ( ok==-3 ){
+            result.logErrorMessage = QString("FeGenerationDuration: Value %1 is negative")
+                .arg(d);
+            return result;
+        }
+        if ( ok==-4 ){
+            result.logErrorMessage = QString("FeGenerationDuration: Value is not a number");
+            return result;
+        }
+        // a duration of 0 would give a scenario without any day to generate events for
+        if ( feGenDuration < Constants::MIN_DURATION_FE_GENERATION ){
+            result.logErrorMessage = QString("FeGenerationDuration: Value %1 is too small")
+                .arg(d);
+            return result;
+        }
     }
 
     // currency code (GBP 1.8+: CurrencyCode field; GBP 1.7 and below: derive from CountryCode)

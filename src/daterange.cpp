@@ -440,6 +440,11 @@ QDate DateRange::getEnd() const
 
 uint DateRange::getNoOfDays() const
 {
+    // EMPTY and INFINITE ranges keep dummy start/end dates (compatibility with 1.6.3), so
+    // noOfDays is meaningless for them : return 0 as documented
+    if (type != Type::BOUNDED) {
+        return 0;
+    }
     return noOfDays;
 }
 

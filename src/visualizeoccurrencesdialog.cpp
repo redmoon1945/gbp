@@ -167,8 +167,8 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
 
         // Periodic
 
-        // Get next event data from start
-        QDate nextEventDate = psd->getNextEventDate(psd->getStartDate());
+        // Get the second event date (growth is never applied on the first event)
+        QDate nextEventDate = psd->getNthEventDate(psd->getFirstEventDate(), 1);
 
         // Special additionnal header for Periodic
         if (psd->getGrowthStrategy()==PeriodicCsd::GrowthStrategy::INFLATION){

@@ -99,6 +99,9 @@ public:
 
     /**
      * @brief Copy Constructor.
+     * @details Copies all data : the daily data, the counters (no of days, no of elements used,
+     * no of Fe) and the list of contributing Csds. The copy is equal (operator==) to the
+     * original and rejects, like the original, a stream from a Csd that already contributed.
      * @param o The CombinedFeStreams object to copy.
      */
     CombinedFeStreams(const CombinedFeStreams& o);

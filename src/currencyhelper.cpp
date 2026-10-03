@@ -117,6 +117,13 @@ qint64 CurrencyHelper::amountDoubleToQint64(double amount, quint8 noOfDecimal, i
         return 0;
     }
 
+    // NaN and infinite values cannot be converted (comparisons with NaN are always false, so
+    // NaN would pass the max check below)
+    if (!std::isfinite(amount)){
+        result = -3;
+        return 0;
+    }
+
     // check if amount is above the max allowed.
     if (fabs(amount)>maxValueAllowedForAmountInDouble(noOfDecimal)){
         result = -1;

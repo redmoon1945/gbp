@@ -185,6 +185,7 @@ qt6_add_executable(gbp MANUAL_FINALIZATION ${PROJECT_SOURCES} ${QM_FILES}
 target_link_libraries(gbp PRIVATE Qt6::Widgets Qt6::Charts)
 
 set_target_properties(gbp PROPERTIES
+    OUTPUT_NAME graphical-budget-planner
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}

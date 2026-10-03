@@ -124,7 +124,8 @@ public:
      * @param amount The double to be converted to qint64.
      * @param noOfDecimal No of decimal for the currency.
      * @param result 0 if success, -1 if absolute value of amount is bigger than the maximum
-     * allowed, -2 if noOfDecimal is too big.
+     * allowed, -2 if noOfDecimal is too big, -3 if amount is not a finite number (NaN or
+     * infinite).
      * @return The qint64 produced.
      */
     static qint64 amountDoubleToQint64(double amount, quint8 noOfDecimal, int &result) ;

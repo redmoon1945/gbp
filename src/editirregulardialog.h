@@ -189,7 +189,7 @@ private:
     // *** PRIVATE METHODS ***
 
     QList<int> getSelectedRows();
-    void cleanUpForNewCsd();
+    void cleanUpForNewCsd(bool slotPrepare);
     void setDecorationColorInfo();
     QString convertTagIDSetToString();
     void updateTagListTextBox();

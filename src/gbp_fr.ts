@@ -59,7 +59,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Export freely&lt;/span&gt;: your data is not locked in : scenarios are stored as portable JSON files; analysis results are exportable to CSV.&lt;/li&gt;&lt;/ul&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;GBP is all about &lt;span style=&quot; font-weight:700;&quot;&gt;CASH BALANCE FORECASTING&lt;/span&gt; : it focuses on &lt;span style=&quot; font-weight:700;&quot;&gt;FUTURE&lt;/span&gt; expected incomes and expenses, starting from today. It is &lt;span style=&quot; font-style:italic;&quot;&gt;not&lt;/span&gt; the right tool for tracking how your money was spent in the past.&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;GBP is free software licensed under the &lt;span style=&quot; font-weight:700;&quot;&gt;GNU Affero General Public License v3&lt;/span&gt; (AGPL-3.0-or-later).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
@@ -102,7 +102,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <message>
         <location filename="aboutdialog.ui" line="187"/>
         <source>Cache :</source>
-        <translation type="unfinished"></translation>
+        <translation>Cache :</translation>
     </message>
     <message>
         <location filename="aboutdialog.ui" line="309"/>
@@ -470,7 +470,7 @@ Credits :
     <message>
         <location filename="aboutdialog.cpp" line="76"/>
         <source>Built on : %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Construit le : %1</translation>
     </message>
     <message>
         <location filename="aboutdialog.cpp" line="98"/>
@@ -1179,7 +1179,7 @@ Credits :
         <translation>Nom d&apos;étiquette</translation>
     </message>
     <message>
-        <location filename="analysisdialog_rw.cpp" line="307"/>
+        <location filename="analysisdialog_rw.cpp" line="310"/>
         <source>Amount</source>
         <translation>Montant</translation>
     </message>
@@ -1194,9 +1194,9 @@ Credits :
         <location filename="analysisdialog_period_list.cpp" line="306"/>
         <location filename="analysisdialog_period_list.cpp" line="311"/>
         <location filename="analysisdialog_period_list.cpp" line="315"/>
-        <location filename="analysisdialog_rw.cpp" line="333"/>
-        <location filename="analysisdialog_rw.cpp" line="338"/>
-        <location filename="analysisdialog_rw.cpp" line="342"/>
+        <location filename="analysisdialog_rw.cpp" line="336"/>
+        <location filename="analysisdialog_rw.cpp" line="341"/>
+        <location filename="analysisdialog_rw.cpp" line="345"/>
         <location filename="analysisdialog_tags.cpp" line="67"/>
         <location filename="analysisdialog_tags.cpp" line="72"/>
         <location filename="analysisdialog_tags.cpp" line="76"/>
@@ -1325,9 +1325,9 @@ dépenses (%)</translation>
         <location filename="analysisdialog_period_list.cpp" line="308"/>
         <location filename="analysisdialog_period_list.cpp" line="312"/>
         <location filename="analysisdialog_period_list.cpp" line="316"/>
-        <location filename="analysisdialog_rw.cpp" line="335"/>
-        <location filename="analysisdialog_rw.cpp" line="339"/>
-        <location filename="analysisdialog_rw.cpp" line="343"/>
+        <location filename="analysisdialog_rw.cpp" line="338"/>
+        <location filename="analysisdialog_rw.cpp" line="342"/>
+        <location filename="analysisdialog_rw.cpp" line="346"/>
         <location filename="analysisdialog_tags.cpp" line="69"/>
         <location filename="analysisdialog_tags.cpp" line="73"/>
         <location filename="analysisdialog_tags.cpp" line="77"/>
@@ -1399,8 +1399,8 @@ approx. des
         <translation>La date &quot;de&quot; (%1) ne peut pas survenir avant &quot;demain&quot; (%2)</translation>
     </message>
     <message>
-        <location filename="analysisdialog_rw.cpp" line="191"/>
-        <location filename="analysisdialog_rw.cpp" line="192"/>
+        <location filename="analysisdialog_rw.cpp" line="194"/>
+        <location filename="analysisdialog_rw.cpp" line="195"/>
         <source>Others</source>
         <translation>Autres</translation>
     </message>
@@ -1427,14 +1427,14 @@ approx. des
     </message>
     <message>
         <location filename="analysisdialog_period_list.cpp" line="312"/>
-        <location filename="analysisdialog_rw.cpp" line="339"/>
+        <location filename="analysisdialog_rw.cpp" line="342"/>
         <location filename="analysisdialog_tags.cpp" line="73"/>
         <source>Export process failed. Write error.</source>
         <translation>Échec de l&apos;exportation. Erreur d&apos;écriture.</translation>
     </message>
     <message>
         <location filename="analysisdialog_period_list.cpp" line="316"/>
-        <location filename="analysisdialog_rw.cpp" line="343"/>
+        <location filename="analysisdialog_rw.cpp" line="346"/>
         <location filename="analysisdialog_tags.cpp" line="77"/>
         <source>Export process failed. Data error.</source>
         <translation>Échec de l&apos;exportation. Erreur de données.</translation>
@@ -1466,7 +1466,7 @@ approx. des
         <translation>Graphique rapport annuel</translation>
     </message>
     <message>
-        <location filename="analysisdialog_rw.cpp" line="326"/>
+        <location filename="analysisdialog_rw.cpp" line="329"/>
         <source>Relative Weight Legend</source>
         <translation>Légende des poids relatifs</translation>
     </message>
@@ -1497,7 +1497,7 @@ approx. des
     </message>
     <message>
         <location filename="analysisdialog_period_list.cpp" line="307"/>
-        <location filename="analysisdialog_rw.cpp" line="334"/>
+        <location filename="analysisdialog_rw.cpp" line="337"/>
         <location filename="analysisdialog_tags.cpp" line="68"/>
         <source>Export process failed. Cannot open the file for saving</source>
         <translation>L&apos;exportation a échouée. Impossible d&apos;ouvrir le fichier en mode écriture</translation>
@@ -1528,17 +1528,17 @@ approx. des
         <translation>L&apos;exportation a échoué : le fichier image n&apos;a pas pu être créé</translation>
     </message>
     <message>
-        <location filename="analysisdialog_rw.cpp" line="302"/>
+        <location filename="analysisdialog_rw.cpp" line="305"/>
         <source>Rank</source>
         <translation>Rang</translation>
     </message>
     <message>
-        <location filename="analysisdialog_rw.cpp" line="304"/>
+        <location filename="analysisdialog_rw.cpp" line="307"/>
         <source>Percentage</source>
         <translation>Pourcentage</translation>
     </message>
     <message>
-        <location filename="analysisdialog_rw.cpp" line="306"/>
+        <location filename="analysisdialog_rw.cpp" line="309"/>
         <source>Csd name</source>
         <translation>Nom du flux monétaire</translation>
     </message>
@@ -2163,7 +2163,7 @@ At 100%: each amount can range from 0% to 200% of its original value (fully rand
         <location filename="dateintervaldialog.ui" line="104"/>
         <source>yyyy-MMM-dd</source>
         <oldsource>yyyy-MMMM-dd</oldsource>
-        <translation type="unfinished">yyyy-MMM-dd</translation>
+        <translation>yyyy-MMM-dd</translation>
     </message>
     <message>
         <location filename="dateintervaldialog.ui" line="74"/>
@@ -2818,36 +2818,36 @@ Détails : %1</translation>
         <location filename="editirregulardialog.cpp" line="396"/>
         <location filename="editirregulardialog.cpp" line="432"/>
         <location filename="editirregulardialog.cpp" line="460"/>
-        <location filename="editirregulardialog.cpp" line="690"/>
-        <location filename="editirregulardialog.cpp" line="721"/>
-        <location filename="editirregulardialog.cpp" line="779"/>
-        <location filename="editirregulardialog.cpp" line="783"/>
-        <location filename="editirregulardialog.cpp" line="787"/>
+        <location filename="editirregulardialog.cpp" line="699"/>
+        <location filename="editirregulardialog.cpp" line="730"/>
+        <location filename="editirregulardialog.cpp" line="788"/>
+        <location filename="editirregulardialog.cpp" line="792"/>
+        <location filename="editirregulardialog.cpp" line="796"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="589"/>
+        <location filename="editirregulardialog.cpp" line="598"/>
         <source>An unexpected error has occurred. Details : %1</source>
         <translation>Une erreur est survenue. Détails : %1</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="596"/>
+        <location filename="editirregulardialog.cpp" line="605"/>
         <source>An unexpected error has occurred</source>
         <translation>Une erreur est survenue</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="778"/>
+        <location filename="editirregulardialog.cpp" line="787"/>
         <source>Export process failed. Cannot open the file for saving</source>
         <translation>L&apos;exportation a échoué. Impossible d&apos;ouvrir le fichier en mode écriture</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="783"/>
+        <location filename="editirregulardialog.cpp" line="792"/>
         <source>Export process failed. Write error.</source>
         <translation>Échec de l&apos;exportation. Erreur d&apos;écriture.</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="787"/>
+        <location filename="editirregulardialog.cpp" line="796"/>
         <source>Export process failed. Data error.</source>
         <translation>Échec de l&apos;exportation. Erreur de données.</translation>
     </message>
@@ -2865,17 +2865,17 @@ Détails : %1</translation>
         <translation type="vanished">Impossible d&apos;ouvrir le fichier en mode écriture</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="747"/>
+        <location filename="editirregulardialog.cpp" line="756"/>
         <source>Date</source>
         <translation>Date</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="749"/>
+        <location filename="editirregulardialog.cpp" line="758"/>
         <source>Amount</source>
         <translation>Montant</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="751"/>
+        <location filename="editirregulardialog.cpp" line="760"/>
         <source>Notes</source>
         <translation>Notes</translation>
     </message>
@@ -2893,11 +2893,11 @@ Détails : %1</translation>
         <location filename="editirregulardialog.cpp" line="395"/>
         <location filename="editirregulardialog.cpp" line="431"/>
         <location filename="editirregulardialog.cpp" line="459"/>
-        <location filename="editirregulardialog.cpp" line="689"/>
-        <location filename="editirregulardialog.cpp" line="720"/>
-        <location filename="editirregulardialog.cpp" line="777"/>
-        <location filename="editirregulardialog.cpp" line="782"/>
+        <location filename="editirregulardialog.cpp" line="698"/>
+        <location filename="editirregulardialog.cpp" line="729"/>
         <location filename="editirregulardialog.cpp" line="786"/>
+        <location filename="editirregulardialog.cpp" line="791"/>
+        <location filename="editirregulardialog.cpp" line="795"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
@@ -2913,7 +2913,7 @@ Détails : %1</translation>
         <translation>Éditer la description</translation>
     </message>
     <message>
-        <location filename="editirregulardialog.cpp" line="649"/>
+        <location filename="editirregulardialog.cpp" line="658"/>
         <source>Color chooser</source>
         <oldsource>Color Chooser</oldsource>
         <translation>Sélection de couleur</translation>
@@ -3643,25 +3643,25 @@ Détails : %1</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.cpp" line="425"/>
-        <location filename="editperiodicdialog.cpp" line="913"/>
-        <location filename="editperiodicdialog.cpp" line="1023"/>
+        <location filename="editperiodicdialog.cpp" line="914"/>
+        <location filename="editperiodicdialog.cpp" line="1024"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
         <location filename="editperiodicdialog.cpp" line="426"/>
-        <location filename="editperiodicdialog.cpp" line="914"/>
-        <location filename="editperiodicdialog.cpp" line="1024"/>
+        <location filename="editperiodicdialog.cpp" line="915"/>
+        <location filename="editperiodicdialog.cpp" line="1025"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="537"/>
+        <location filename="editperiodicdialog.cpp" line="538"/>
         <source>End date must not occur before %1</source>
         <translation>La date de fin ne doit pas survenir avant %1</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="630"/>
+        <location filename="editperiodicdialog.cpp" line="631"/>
         <source>An unexpected error has occurred. Details : %1</source>
         <translation>Une erreur est survenue. Détails : %1</translation>
     </message>
@@ -3671,13 +3671,13 @@ Détails : %1</translation>
         <translation type="vanished">Donnée invalide</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="502"/>
+        <location filename="editperiodicdialog.cpp" line="503"/>
         <source>Start date is invalid</source>
         <oldsource>Start Date is invalid</oldsource>
         <translation>La date de début est invalide</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="507"/>
+        <location filename="editperiodicdialog.cpp" line="508"/>
         <source>Start date must not occur before %1</source>
         <translation>La date de début ne doit pas survenir avant %1</translation>
     </message>
@@ -3686,13 +3686,13 @@ Détails : %1</translation>
         <translation type="vanished">La date de fin telle que définie au niveau du scénario ne peut être antérieure à la date de début</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="527"/>
+        <location filename="editperiodicdialog.cpp" line="528"/>
         <source>End date is invalid</source>
         <oldsource>End Date is invalid</oldsource>
         <translation>La date de fin est invalide</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="532"/>
+        <location filename="editperiodicdialog.cpp" line="533"/>
         <source>End date must not occur before the Start date</source>
         <translation>La date de fin ne peut pas être antérieure à la date de début</translation>
     </message>
@@ -3701,12 +3701,12 @@ Détails : %1</translation>
         <translation type="vanished">Pour l&apos;intervalle de validité, la date &quot;À&quot; ne doit pas survenir avant la date &quot;De&quot;</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="563"/>
+        <location filename="editperiodicdialog.cpp" line="564"/>
         <source>The amount cannot be bigger than %1</source>
         <translation>Le montant ne doit pas être supérieur à %1</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="570"/>
+        <location filename="editperiodicdialog.cpp" line="571"/>
         <source>An error occurred while processing the amount : code=%1</source>
         <oldsource>An error occured while processing the amount : code=%1</oldsource>
         <translation>Erreur lors du traitement du montant : code = %1</translation>
@@ -3723,7 +3723,7 @@ Details : %1</oldsource>
 Détails : %1</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="984"/>
+        <location filename="editperiodicdialog.cpp" line="985"/>
         <source>Edit description</source>
         <oldsource>Edit Description</oldsource>
         <translation>Édition de la description</translation>
@@ -3796,7 +3796,7 @@ Détails : %1</translation>
         <translation type="vanished">Résultats</translation>
     </message>
     <message>
-        <location filename="editperiodicdialog.cpp" line="872"/>
+        <location filename="editperiodicdialog.cpp" line="873"/>
         <source>Color chooser</source>
         <oldsource>Color Chooser</oldsource>
         <translation>Sélection de couleur</translation>
@@ -5004,7 +5004,7 @@ Détails : %1</translation>
         <translation type="vanished">L&apos;étiquette &quot;Type&quot; a une valeur %1 qui est inconnue</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="424"/>
+        <location filename="growth.cpp" line="432"/>
         <source>%1 : OccurrenceDates are not sorted properly</source>
         <translation>%1 : Les dates d&apos;occurrence ne sont pas triées</translation>
     </message>
@@ -5013,27 +5013,32 @@ Détails : %1</translation>
         <translation type="vanished">%1 : OccurrenceDates couvre une période de temps trop grande</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="432"/>
+        <location filename="growth.cpp" line="440"/>
         <source>%1 : AppStrategy.noOfMonth is invalid</source>
         <translation>%1 : AppStrategy.noOfMonth est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="437"/>
+        <location filename="growth.cpp" line="445"/>
         <source>%1 : Amount is too big </source>
         <translation>%1 : Le montant est trop grand </translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="442"/>
+        <location filename="growth.cpp" line="450"/>
         <source>%1 : Present Value annual discount rate smaller than 0</source>
         <translation>%1 : Le taux de réduction annuel est plus petit que zéro</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="449"/>
+        <location filename="growth.cpp" line="457"/>
         <source>%1 : PV Present Date is invalid</source>
         <translation>%1 : La date &quot;présent&quot; pour la valeur actuelle est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="705"/>
+        <location filename="growth.cpp" line="513"/>
+        <source>%1 : Growth calculation produced an invalid value</source>
+        <translation>%1 : le calcul de croissance a produit une valeur invalide</translation>
+    </message>
+    <message>
+        <location filename="growth.cpp" line="726"/>
         <source>%1 : Too many entries for variable growth</source>
         <translation>%1 : Trop d&apos;entrée pour variable growth</translation>
     </message>
@@ -5054,26 +5059,26 @@ Détails : %1</translation>
         <translation type="vanished">La valeur du montant est inférieure à 0</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="655"/>
-        <location filename="growth.cpp" line="713"/>
+        <location filename="growth.cpp" line="673"/>
+        <location filename="growth.cpp" line="734"/>
         <source>Date %1 is invalid</source>
         <translation>La date %1 est invalide</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="660"/>
-        <location filename="growth.cpp" line="718"/>
+        <location filename="growth.cpp" line="678"/>
+        <location filename="growth.cpp" line="739"/>
         <source>Date %1 is invalid because Day is not set to 1</source>
         <translation>La date %1 est invalide, pcq le jour n&apos;est pas égale à 1</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="670"/>
-        <location filename="growth.cpp" line="728"/>
+        <location filename="growth.cpp" line="690"/>
+        <location filename="growth.cpp" line="753"/>
         <source>Growth %1 is smaller than the minimum allowed of %2</source>
         <translation>La valeur de la croissance %1 est inférieure au minimum permis de %2</translation>
     </message>
     <message>
-        <location filename="growth.cpp" line="677"/>
-        <location filename="growth.cpp" line="735"/>
+        <location filename="growth.cpp" line="697"/>
+        <location filename="growth.cpp" line="760"/>
         <source>Growth %1 is bigger than the maximum allowed of %2</source>
         <translation>La valeur de la croissance %1 est supérieure au maximum permis de %2</translation>
     </message>
@@ -5081,17 +5086,17 @@ Détails : %1</translation>
 <context>
     <name>IrregularCsd</name>
     <message>
-        <location filename="irregularcsd.cpp" line="167"/>
+        <location filename="irregularcsd.cpp" line="178"/>
         <source>No event defined</source>
         <translation>Aucun évènement défini</translation>
     </message>
     <message>
-        <location filename="irregularcsd.cpp" line="180"/>
+        <location filename="irregularcsd.cpp" line="191"/>
         <source>%1 on %2 and %3 more...</source>
         <translation>%1 au %2 et %3 en plus...</translation>
     </message>
     <message>
-        <location filename="irregularcsd.cpp" line="182"/>
+        <location filename="irregularcsd.cpp" line="193"/>
         <source>%1 on %2</source>
         <translation>%1 au %2</translation>
     </message>
@@ -5120,7 +5125,7 @@ Détails : %1</translation>
         <translation type="vanished">IrregularCsd - l&apos;entité &quot;Map&quot; est invalide -&gt; %1</translation>
     </message>
     <message>
-        <location filename="irregularcsd.cpp" line="293"/>
+        <location filename="irregularcsd.cpp" line="304"/>
         <source>Copy of</source>
         <translation>Copie de</translation>
     </message>
@@ -5137,12 +5142,12 @@ Détails : %1</translation>
         <translation type="vanished">IrregularCsd - La clé %1 n&apos;est pas une date ISO valide ou est invalide</translation>
     </message>
     <message>
-        <location filename="irregularcsd.cpp" line="340"/>
+        <location filename="irregularcsd.cpp" line="351"/>
         <source>A date is invalid</source>
         <translation>Une date est invalide</translation>
     </message>
     <message>
-        <location filename="irregularcsd.cpp" line="348"/>
+        <location filename="irregularcsd.cpp" line="359"/>
         <source>Amount %1 for date %2 is too big</source>
         <translation>Le montant %1 associé à la date %2 est trop grand</translation>
     </message>
@@ -5480,68 +5485,68 @@ Si deux lignes partagent la même date, la dernière l&apos;emporte. </translati
         <translation>Importer</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="52"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="53"/>
         <source>Importing variable %1</source>
         <translation>Importer %1 variable</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="89"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="197"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="90"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="200"/>
         <source>File %1 does not exist</source>
         <translation>Le fichier %1 n&apos;existe pas</translation>
-    </message>
-    <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="91"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="100"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="123"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="135"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="148"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="163"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="181"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="196"/>
-        <source>Error</source>
-        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="loadvariablegrowthtextfiledialog.cpp" line="92"/>
         <location filename="loadvariablegrowthtextfiledialog.cpp" line="101"/>
         <location filename="loadvariablegrowthtextfiledialog.cpp" line="124"/>
         <location filename="loadvariablegrowthtextfiledialog.cpp" line="136"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="149"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="164"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="173"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="182"/>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="197"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="151"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="166"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="184"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="199"/>
+        <source>Error</source>
+        <translation>Erreur</translation>
+    </message>
+    <message>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="93"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="102"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="125"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="137"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="152"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="167"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="176"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="185"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="200"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="98"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="99"/>
         <source>Cannot open file %1 in read-only mode</source>
         <translation>Impossible d&apos;ouvrir le fichier %1 en mode lecture</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="119"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="120"/>
         <source>Bad format for line no %1 (expected 2 TAB-separated tokens, got %2).</source>
         <translation>Format incorrect à la ligne n° %1 (2 champs séparés par une tabulation attendus, %2 obtenus).</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="131"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="132"/>
         <source>Date &quot;%1&quot; is invalid at line no %2.</source>
         <translation>La date &quot;%1&quot; est invalide à la ligne no %2.</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="144"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="147"/>
         <source>%1 value &quot;%2&quot; is not a valid number at line no %3.</source>
         <translation>La valeur %1 « %2 » n&apos;est pas un nombre valide à la ligne %3.</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="154"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="157"/>
         <source>%1 value &quot;%2&quot; is out of the allowed range [%3, %4] at line no %5.</source>
         <translation>La valeur %1 « %2 » est hors de la plage autorisée [%3, %4] à la ligne %5.</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="190"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="193"/>
         <source>Select a CSV file</source>
         <translation>Choisir un fichier CSV</translation>
     </message>
@@ -5554,17 +5559,17 @@ Si deux lignes partagent la même date, la dernière l&apos;emporte. </translati
         <translation type="vanished">La valeur de croissance « %1 » est hors de la plage autorisée [%2, %3] à la ligne n° %4.</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="172"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="175"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="173"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="176"/>
         <source>Import succeeded, %1 entries have been imported.</source>
         <translation>%1 entrées ont été importées.</translation>
     </message>
     <message>
-        <location filename="loadvariablegrowthtextfiledialog.cpp" line="179"/>
+        <location filename="loadvariablegrowthtextfiledialog.cpp" line="182"/>
         <source>An unexpected error has occurred.&lt;br&gt;&lt;br&gt;Details : %1</source>
         <translation>Une erreur inattendue s&apos;est produite.&lt;br&gt;&lt;br&gt;Détails : %1</translation>
     </message>
@@ -5898,7 +5903,7 @@ Si deux lignes partagent la même date, la dernière l&apos;emporte. </translati
     <message>
         <location filename="mainwindow.ui" line="800"/>
         <source>Ctrl+N</source>
-        <translation></translation>
+        <translation>Ctrl+N</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="805"/>
@@ -6443,7 +6448,7 @@ Error code = %1. See the log file for details :
     <message>
         <location filename="mainwindow.cpp" line="2353"/>
         <source>Cannot open the User Manual: the application&apos;s cache directory could not be created or accessed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le Manuel utilisateur : le répertoire de cache de l&apos;application n&apos;a pas pu être créé ou n&apos;est pas accessible.</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="2359"/>
@@ -6473,7 +6478,7 @@ Error code = %1. See the log file for details :
     <message>
         <location filename="mainwindow.cpp" line="2408"/>
         <source>Cannot open the Welcome document: the application&apos;s cache directory could not be created or accessed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le document de Bienvenue : le répertoire de cache de l&apos;application n&apos;a pas pu être créé ou n&apos;est pas accessible.</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="2414"/>
@@ -6503,7 +6508,7 @@ Error code = %1. See the log file for details :
     <message>
         <location filename="mainwindow.cpp" line="2463"/>
         <source>Cannot open the Quick Tutorial: the application&apos;s cache directory could not be created or accessed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le Tutoriel rapide : le répertoire de cache de l&apos;application n&apos;a pas pu être créé ou n&apos;est pas accessible.</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="2469"/>
@@ -6533,7 +6538,7 @@ Error code = %1. See the log file for details :
     <message>
         <location filename="mainwindow.cpp" line="2532"/>
         <source>Cannot open the Change Log: the application&apos;s cache directory could not be created or accessed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le journal des modifications : le répertoire de cache de l&apos;application n&apos;a pas pu être créé ou n&apos;est pas accessible.</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="2538"/>
@@ -7365,7 +7370,7 @@ The file may have been moved or deleted.</oldsource>
         <location filename="optionsdialog.ui" line="144"/>
         <source>yyyy-MMM-dd</source>
         <oldsource>yyyy-MMMM-dd</oldsource>
-        <translation type="unfinished">yyyy-MMM-dd</translation>
+        <translation>yyyy-MMM-dd</translation>
     </message>
     <message>
         <location filename="optionsdialog.ui" line="280"/>
@@ -8086,102 +8091,102 @@ The file may have been moved or deleted.</oldsource>
         <translation type="vanished">PeriodicCsd - La valeur de Growth Strategy %1 est invalide</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="910"/>
+        <location filename="periodiccsd.cpp" line="917"/>
         <source>Day</source>
         <translation>Jour</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="912"/>
+        <location filename="periodiccsd.cpp" line="919"/>
         <source>Week</source>
         <translation>Semaine</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="914"/>
+        <location filename="periodiccsd.cpp" line="921"/>
         <source>Month</source>
         <translation>Mois</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="916"/>
+        <location filename="periodiccsd.cpp" line="923"/>
         <source>End-of-Month</source>
         <translation>Fin-de-mois</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="918"/>
+        <location filename="periodiccsd.cpp" line="925"/>
         <source>Year</source>
         <translation>Année</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="922"/>
+        <location filename="periodiccsd.cpp" line="929"/>
         <source>day</source>
         <translation>jour</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="924"/>
+        <location filename="periodiccsd.cpp" line="931"/>
         <source>week</source>
         <translation>semaine</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="926"/>
+        <location filename="periodiccsd.cpp" line="933"/>
         <source>month</source>
         <translation>mois</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="928"/>
+        <location filename="periodiccsd.cpp" line="935"/>
         <source>end-of-month</source>
         <translation>fin-de-mois</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="930"/>
+        <location filename="periodiccsd.cpp" line="937"/>
         <source>year</source>
         <translation>année</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="937"/>
+        <location filename="periodiccsd.cpp" line="944"/>
         <source>Days</source>
         <translation>Jours</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="939"/>
+        <location filename="periodiccsd.cpp" line="946"/>
         <source>Weeks</source>
         <translation>Semaines</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="941"/>
+        <location filename="periodiccsd.cpp" line="948"/>
         <source>Months</source>
         <translation>Mois</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="943"/>
+        <location filename="periodiccsd.cpp" line="950"/>
         <source>Ends-of-Month</source>
         <translation>Fins-de-mois</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="945"/>
+        <location filename="periodiccsd.cpp" line="952"/>
         <source>Years</source>
         <translation>Années</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="949"/>
+        <location filename="periodiccsd.cpp" line="956"/>
         <source>days</source>
         <translation>jours</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="951"/>
+        <location filename="periodiccsd.cpp" line="958"/>
         <source>weeks</source>
         <translation>semaines</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="953"/>
+        <location filename="periodiccsd.cpp" line="960"/>
         <source>months</source>
         <translation>mois</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="955"/>
+        <location filename="periodiccsd.cpp" line="962"/>
         <source>ends-of-month</source>
         <translation>fins-de-mois</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="957"/>
+        <location filename="periodiccsd.cpp" line="964"/>
         <source>years</source>
         <translation>années</translation>
     </message>
@@ -8222,14 +8227,14 @@ The file may have been moved or deleted.</oldsource>
         <translation type="vanished">EndDate - La valeur %1 n&apos;est pas une date ISO valide ou est invalide</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="831"/>
+        <location filename="periodiccsd.cpp" line="838"/>
         <source>Scenario defined</source>
         <oldsource>Scenario Defined</oldsource>
         <translation>Défini par le scénario</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="832"/>
-        <location filename="periodiccsd.cpp" line="835"/>
+        <location filename="periodiccsd.cpp" line="839"/>
+        <location filename="periodiccsd.cpp" line="842"/>
         <source>Every %1 %2 in [%3,%4]</source>
         <translation>Tous les %1 %2 dans [%3,%4]</translation>
     </message>
@@ -8282,7 +8287,7 @@ The file may have been moved or deleted.</oldsource>
         <translation type="vanished">PeriodicCsd - La valeur de InflationAdjustmentFactor %1 est soit plus petite que 0 ou trop grande</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="768"/>
+        <location filename="periodiccsd.cpp" line="775"/>
         <source>Copy of</source>
         <translation>Copie de</translation>
     </message>
@@ -8291,18 +8296,18 @@ The file may have been moved or deleted.</oldsource>
         <translation type="vanished">Chaque %1 %2 dans %3</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="842"/>
+        <location filename="periodiccsd.cpp" line="849"/>
         <source>Growth: None</source>
         <translation>Croissance: Aucune</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="845"/>
+        <location filename="periodiccsd.cpp" line="852"/>
         <source>Growth: %1x Inflation</source>
         <oldsource>Growth: Inflation</oldsource>
         <translation>Croissance: %1x Inflation</translation>
     </message>
     <message>
-        <location filename="periodiccsd.cpp" line="848"/>
+        <location filename="periodiccsd.cpp" line="855"/>
         <source>Growth: Custom</source>
         <translation>Croissance: Spécifique</translation>
     </message>
@@ -8315,15 +8320,26 @@ The file may have been moved or deleted.</oldsource>
         <translation>Éditeur de texte</translation>
     </message>
     <message>
-        <location filename="plaintexteditiondialog.ui" line="38"/>
+        <location filename="plaintexteditiondialog.ui" line="25"/>
+        <source>Use monospace font</source>
+        <translation>Police à espacement fixe</translation>
+    </message>
+    <message>
+        <location filename="plaintexteditiondialog.ui" line="48"/>
+        <location filename="plaintexteditiondialog.cpp" line="71"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="plaintexteditiondialog.ui" line="48"/>
+        <location filename="plaintexteditiondialog.ui" line="58"/>
         <source>Apply changes</source>
         <oldsource>Apply Changes</oldsource>
         <translation>Appliquer</translation>
+    </message>
+    <message>
+        <location filename="plaintexteditiondialog.cpp" line="67"/>
+        <source>Close</source>
+        <translation>Fermer</translation>
     </message>
 </context>
 <context>
@@ -8703,7 +8719,7 @@ Détails: Code d&apos;erreur = %1, offset = %2, message d&apos;erreur = %3</tran
         <translation type="vanished">Les relations d&apos;étiquettes sont invalides</translation>
     </message>
     <message>
-        <location filename="scenario.cpp" line="1088"/>
+        <location filename="scenario.cpp" line="1103"/>
         <source>No name</source>
         <translation>Sans nom</translation>
     </message>
@@ -9268,33 +9284,33 @@ Détails: Code d&apos;erreur = %1, offset = %2, message d&apos;erreur = %3</tran
         <translation type="vanished">années</translation>
     </message>
     <message>
-        <location filename="util.cpp" line="426"/>
+        <location filename="util.cpp" line="432"/>
         <source>R:%1 G:%2 B:%3</source>
         <oldsource>Red:%1  Green:%2  Blue:%3</oldsource>
         <translation>R:%1  V:%2  B:%3</translation>
     </message>
     <message>
-        <location filename="util.cpp" line="862"/>
+        <location filename="util.cpp" line="868"/>
         <source>Weak</source>
         <translation>Faible</translation>
     </message>
     <message>
-        <location filename="util.cpp" line="865"/>
+        <location filename="util.cpp" line="871"/>
         <source>Average</source>
         <translation>Moyen</translation>
     </message>
     <message>
-        <location filename="util.cpp" line="868"/>
+        <location filename="util.cpp" line="874"/>
         <source>Aggressive</source>
         <translation>Aggressif</translation>
     </message>
     <message>
-        <location filename="util.cpp" line="871"/>
+        <location filename="util.cpp" line="877"/>
         <source>Extreme</source>
         <translation>Extrême</translation>
     </message>
     <message>
-        <location filename="util.cpp" line="874"/>
+        <location filename="util.cpp" line="880"/>
         <source>Unknow</source>
         <translation>Inconnu</translation>
     </message>

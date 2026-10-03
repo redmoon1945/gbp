@@ -23,6 +23,7 @@
 #include <QString>
 #include <QStandardPaths>
 #include <QApplication>
+#include <cmath>
 
 
 
@@ -586,7 +587,8 @@ void GbpController::loadSettings()
         v = settingsPtr->value("pv_discount_rate");
         bool ok;
         double aDouble = v.toDouble(&ok);
-        if ( (!ok) || (aDouble<0) || (aDouble>100) )  {
+        // NaN passes the range checks below (comparisons with NaN are always false)
+        if ( (!ok) || !std::isfinite(aDouble) || (aDouble<0) || (aDouble>100) )  {
             // settings is invalid, revert back to default
             pvDiscountRate = factorySettings.pvDiscountRate;
         } else {

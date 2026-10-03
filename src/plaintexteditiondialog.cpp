@@ -18,8 +18,12 @@
 
 #include "plaintexteditiondialog.h"
 #include "gbplogger.h"
+#include "uiutil.h"
+#include <QApplication>
 #include <QTimer>
 #include "ui_plaintexteditiondialog.h"
+
+bool PlainTextEditionDialog::useMonoFont = false;
 
 PlainTextEditionDialog::PlainTextEditionDialog(QWidget *parent)
     : QDialog(parent)
@@ -27,6 +31,23 @@ PlainTextEditionDialog::PlainTextEditionDialog(QWidget *parent)
 {
     ui->setupUi(this);
     readOnly = false;
+}
+
+
+void PlainTextEditionDialog::applyFont()
+{
+    if (useMonoFont) {
+        ui->plainTextEdit->setFont(UiUtil::screenMonoFont("PlainTextEditionDialog"));
+    } else {
+        ui->plainTextEdit->setFont(QApplication::font());
+    }
+}
+
+
+void PlainTextEditionDialog::on_MonoFontCheckBox_toggled(bool checked)
+{
+    useMonoFont = checked;
+    applyFont();
 }
 
 PlainTextEditionDialog::~PlainTextEditionDialog()
@@ -43,12 +64,19 @@ void PlainTextEditionDialog::slotPrepareContent(QString title, QString content, 
     if (readOnly){
         ui->plainTextEdit->setReadOnly(true);
         ui->applyChangesPushButton->setVisible(false);
-        ui->cancelPushButton->setText("Close");
+        ui->cancelPushButton->setText(tr("Close"));
     } else{
         ui->plainTextEdit->setReadOnly(false);
         ui->applyChangesPushButton->setVisible(true);
-        ui->cancelPushButton->setText("Cancel");
+        ui->cancelPushButton->setText(tr("Cancel"));
     }
+
+    // Sync with the session-wide choice (another instance may have changed it)
+    {
+        const QSignalBlocker blocker(ui->MonoFontCheckBox);
+        ui->MonoFontCheckBox->setChecked(useMonoFont);
+    }
+    applyFont();
 
     ui->plainTextEdit->setFocus();
 

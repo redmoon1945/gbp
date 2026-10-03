@@ -60,6 +60,28 @@ public:
     static bool isEndOfMonth(QDate date);
 
 private:
+    /**
+     * @brief Gets the N-th end-of-month strictly after (or before) a given date.
+     * @details Ends-of-month are counted starting from the given date, excluding the date itself:
+     *   - multiplier > 0 : returns the multiplier-th end-of-month strictly AFTER date.
+     *     -> If date is already an end-of-month, it does not count : the 1st one is the end of
+     *        the next month. E.g. Jan 31 x1 = Feb 28, Jan 31 x3 = Apr 30.
+     *     -> If date is mid-month, the end of its own month is still ahead and counts as the
+     *        1st one. E.g. Jan 15 x1 = Jan 31, Jan 15 x3 = Mar 31 (and NOT Apr 30).
+     *   - multiplier < 0 : returns the |multiplier|-th end-of-month strictly BEFORE date.
+     *     E.g. Jul 15 x-1 = Jun 30, Jul 31 x-1 = Jun 30, Jul 15 x-7 = Dec 31 of previous year.
+     *
+     * The result is always the last day of a month, so there is no day-of-month drift : the
+     * result can safely be used as the input of a next call.
+     *
+     * **Note for financial event generation** : this method answers "where is the N-th
+     * end-of-month from here ?", not "where is the first event of a series ?".
+     * @param date The reference date. Must be valid.
+     * @param multiplier Number of ends-of-month to move forward (positive) or backward
+     * (negative). Must not be 0.
+     * @return The last day of the target month.
+     * @throws std::invalid_argument If date is invalid or multiplier is 0.
+     */
     static QDate getNextDateEndOfMonth(const QDate &date, int multiplier);
 };
 

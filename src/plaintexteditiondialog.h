@@ -46,6 +46,7 @@ private slots:
     void on_applyChangesPushButton_clicked();
     void on_cancelPushButton_clicked();
     void on_PlainTextEditionDialog_rejected();
+    void on_MonoFontCheckBox_toggled(bool checked);
 
 protected:
     void showEvent(QShowEvent* event) override;
@@ -53,6 +54,11 @@ protected:
 private:
     Ui::PlainTextEditionDialog *ui;
     bool readOnly;
+
+    // Mono font choice, shared by all instances for the app session (off at launch)
+    static bool useMonoFont;
+
+    void applyFont();
 };
 
 #endif // PLAINTEXTEDITIONDIALOG_H

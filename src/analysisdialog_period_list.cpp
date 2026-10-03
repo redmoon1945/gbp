@@ -75,7 +75,7 @@ void AnalysisDialog::periodListRedisplayTableData(PeriodType rTypr)
             date = date.addMonths(1);
         }
     } else{
-        for (int var = 0; var < noOfMonths; ++var) {
+        for (int var = 0; var < noOfYears; ++var) {
             dateList.append(QDate(date.year(),1,1));
             date = date.addYears(1);
         }

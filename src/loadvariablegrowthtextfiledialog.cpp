@@ -28,6 +28,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTimer>
+#include <cmath>
 #include "gbpqmessage.h"
 
 
@@ -140,7 +141,9 @@ void LoadVariableGrowthTextFileDialog::on_importPushButton_clicked()
 
             bool ok;
             double growth = tokens[1].toDouble(&ok);
-            if (!ok) {
+            // NaN is accepted by toDouble() and passes the range check below (comparisons with
+            // NaN are always false) : reject it here as not a valid number
+            if (!ok || !std::isfinite(growth)) {
                 userErrorMessage = tr("%1 value \"%2\" is not a valid number at line no %3.")
                     .arg(growthName).arg(tokens[1]).arg(lineNo);
                 logErrorMessage  = QString("%1 value \"%2\" is not a valid number "

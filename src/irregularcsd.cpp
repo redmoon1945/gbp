@@ -107,7 +107,7 @@ void IrregularCsd::generateEventStream(FeStream& feStream, QDate tomorrow,
     long double monthlyDiscountRate = Util::annualToMonthlyGrowth(pvAnnualDiscountRate);
 
     // iterate once in the set to generate Fes and convert values to present values. Values
-    // can occur before tomorrow, equal or after.
+    // occur from tomorrow, before or after the PV date.
     minMaxInfo.yMin =std::numeric_limits<qint64>::max();
     minMaxInfo.yMax = std::numeric_limits<qint64>::min();
     QList<QDate> zeKeys = amountSet.keys();
@@ -115,7 +115,10 @@ void IrregularCsd::generateEventStream(FeStream& feStream, QDate tomorrow,
     foreach (const QDate date, zeKeys) {
         // still in the validity range of this stream def ?
         // Still in the fromto range ? Still under the max allowed ?
-        if ( fromto.includeDate(date) && (date<=maxDateScenarioFeGeneration) ){
+        // Events before tomorrow are in the past : they cannot be stored in the stream (which
+        // starts tomorrow) and are ignored, like in PeriodicCsd
+        if ( (date >= tomorrow) && fromto.includeDate(date) &&
+            (date<=maxDateScenarioFeGeneration) ){
             quint64 temp = amountSet.value(date).amount;
 
             // *** convert to present value (applied on a monthly basis) ***
@@ -124,8 +127,16 @@ void IrregularCsd::generateEventStream(FeStream& feStream, QDate tomorrow,
             // calculate FV to PV factor
             long double factor = Util::toPvConversionFactor(monthlyDiscountRate,pvPeriods);
             // calculate the PV (in integer). Never a negative value.
-            quint64 pv = static_cast<quint64>(std::round((static_cast<long double>(temp)
-                * factor)));
+            long double t = std::round(static_cast<long double>(temp) * factor);
+            // A past event converted to present value is compounded and can go above the max
+            // allowed : cap it and count it as a saturation, like in Growth::adjustForGrowth()
+            const long double maxAmount = static_cast<long double>(
+                CurrencyHelper::maxValueAllowedForAmount());
+            if (t > maxAmount) {
+                t = maxAmount;
+                saturationCount++;
+            }
+            quint64 pv = static_cast<quint64>(t);
             // *********************************
 
             // build Fe and insert in the result list

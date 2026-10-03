@@ -131,7 +131,10 @@ void AnalysisDialog::rwUpdateChart()
     foreach(QUuid id, bins.keys()){
         double d = bins.value(id);
         // rank will be set later after the sort
-        LegendItemInfo p = {.rank=0, .amount = d, .percentage= (100*d/grandTotal), .id = id};
+        // grandTotal can be 0 when all amounts in the period are 0 (e.g. Csd with amount 0, or
+        // -100% growth) : percentage is then meaningless and set to 0 instead of NaN (0/0)
+        double percentage = (grandTotal > 0) ? (100*d/grandTotal) : 0;
+        LegendItemInfo p = {.rank=0, .amount = d, .percentage = percentage, .id = id};
         tempList.append(p);
     }
     std::sort(tempList.begin(), tempList.end(), [](const LegendItemInfo& p1, const LegendItemInfo& p2) {
