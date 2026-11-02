@@ -55,7 +55,8 @@ void AnalysisDialog::periodListRedisplayTableData(PeriodType rTypr)
     // determine how many rows in the table. We display all month/years between
     // tomorrow and max date as established by the scenario
     QDate tomorrow = GbpController::getInstance().getTomorrow();
-    QDate maxDate = tomorrow.addYears(scenario->getFeGenerationDuration()).addDays(-1);
+    QDate maxDate = Scenario::getMaxDateFeGeneration(GbpController::getInstance().getToday(),
+        scenario->getFeGenerationDuration());
     int noRows;
     int noOfMonths = 1 + (12*maxDate.year()+maxDate.month()) -
         (12*tomorrow.year()+tomorrow.month());
@@ -75,7 +76,7 @@ void AnalysisDialog::periodListRedisplayTableData(PeriodType rTypr)
             date = date.addMonths(1);
         }
     } else{
-        for (int var = 0; var < noOfMonths; ++var) {
+        for (int var = 0; var < noOfYears; ++var) {
             dateList.append(QDate(date.year(),1,1));
             date = date.addYears(1);
         }

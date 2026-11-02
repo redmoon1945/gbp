@@ -50,7 +50,15 @@ inline const QString APP_NAME = QString("graphical-budget-planner");
 /**
  * @brief Version of the application.
  */
-inline const QString APP_VERSION  = QString("1.8.1");
+inline const QString APP_VERSION  = QString("1.9.0");
+
+/**
+ * @brief Web address of a PDF document in the "doc" directory of the GitHub repository (branch
+ * "master"), shown by the "Online manuals version" (see GBP_EMBEDDED_MANUALS in
+ * CMakeLists.txt). %1 is the file name (e.g. "user_manual-en.pdf").
+ */
+inline const QString ONLINE_DOC_URL =
+    QString("https://github.com/redmoon1945/gbp/raw/master/doc/%1");
 
 
 }

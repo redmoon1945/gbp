@@ -398,7 +398,7 @@ void CsdBreakdownDialog::exportTextMonthlyYearlyReport(ReportType rType)
     }
     columns.append({tr("Amount"), CsvColumnType::currency(
         GbpController::getInstance().getExportTextNumberLocalized())});
-    columns.append({tr("Change (%)"), CsvColumnType::currency(
+    columns.append({tr("Change (%)"), CsvColumnType::numberFull(
         GbpController::getInstance().getExportTextNumberLocalized())});
 
     // *** STEP 2 : Populate rows ***

@@ -203,8 +203,9 @@ void PeriodicCsd::generateEventStream(FeStream& feStream, QDate tomorrow, DateRa
     }
     if (period==PeriodType::END_OF_MONTHLY) {
         if (false==DateHelper::isEndOfMonth(startDate)){
-            // First event must be at end-of-month
-            QDate nextStart = getNextEventDate(startDate);
+            // First event must be at end-of-month : the end of start date's month, whatever
+            // the period multiplier is (do not use getNextEventDate() here).
+            QDate nextStart = getFirstEventDate();
             // Are we past "real end date" ?
             if (nextStart > realEndDate) {
                 // so there could be no event : return
@@ -227,8 +228,13 @@ void PeriodicCsd::generateEventStream(FeStream& feStream, QDate tomorrow, DateRa
     //    to calculate Growth from the very beginning. Start date can occur BEFORE tomorrow,
     //    but not smaller than MIN_START_DATE. Events before fromto.start or before
     //    tomorrow will be REMOVED in the last stage.
+    //    Each occurrence is computed from the anchor (first occurrence), never from the previous
+    //    occurrence, so that a day-of-month clamped in a short month (e.g. 31 -> 28) is restored
+    //    in the following months. See getNthEventDate().
     QList<QDate> occurrenceDates;
-    QDate aDate = realValidityRange.getStart();
+    const QDate anchor = realValidityRange.getStart();
+    QDate aDate = anchor;
+    quint32 n = 0;
     while(true){
         if (!realValidityRange.includeDate(aDate) ){ // check if still in the validity range
             break;
@@ -237,7 +243,8 @@ void PeriodicCsd::generateEventStream(FeStream& feStream, QDate tomorrow, DateRa
             break;
         }
         occurrenceDates.append(aDate);
-        aDate = getNextEventDate(aDate);             // advance to the next event
+        n++;
+        aDate = getNthEventDate(anchor, n);          // advance to the next event
     }
 
     // ** Step 2 : Correct for growth (custom or inflation) ***
@@ -1017,6 +1024,61 @@ QDate PeriodicCsd::getNextEventDate(QDate date) const
             throw std::invalid_argument("PeriodicCsd type does not exist");
     }
     return nextDate; // dummy
+}
+
+
+QDate PeriodicCsd::getFirstEventDate() const
+{
+    if ( (period==PeriodType::END_OF_MONTHLY) && (false==DateHelper::isEndOfMonth(startDate)) ) {
+        return QDate(startDate.year(), startDate.month(), startDate.daysInMonth());
+    }
+    return startDate;
+}
+
+
+QDate PeriodicCsd::getNthEventDate(QDate anchor, quint32 n) const
+{
+    if (!anchor.isValid()) {
+        throw std::invalid_argument(QString("%1: anchor is an invalid date")
+            .arg(Q_FUNC_INFO).toStdString());
+    }
+
+    // n * periodMultiplier : quint32 * quint16 always fits in qint64
+    const qint64 steps = static_cast<qint64>(n) * this->periodMultiplier;
+
+    // addMonths() and addYears() take an int : make sure steps can be narrowed safely
+    if ( (this->period==PeriodType::MONTHLY) || (this->period==PeriodType::END_OF_MONTHLY) ||
+        (this->period==PeriodType::YEARLY) ) {
+        if (steps > std::numeric_limits<int>::max()) {
+            throw std::out_of_range(QString("%1: n * periodMultiplier is too big")
+                .arg(Q_FUNC_INFO).toStdString());
+        }
+    }
+
+    switch (this->period) {
+        case PeriodType::DAILY:
+            return anchor.addDays(steps);
+        case PeriodType::WEEKLY:
+            return anchor.addDays(7 * steps);
+        case PeriodType::MONTHLY:
+            // addMonths() clamps to the last day of a shorter month, but since we always
+            // start from the anchor, the original day-of-month is restored afterwards.
+            return anchor.addMonths(static_cast<int>(steps));
+        case PeriodType::END_OF_MONTHLY: {
+            if (!DateHelper::isEndOfMonth(anchor)) {
+                throw std::invalid_argument(QString("%1: anchor must be an end-of-month date")
+                    .arg(Q_FUNC_INFO).toStdString());
+            }
+            QDate d = anchor.addMonths(static_cast<int>(steps));
+            return QDate(d.year(), d.month(), d.daysInMonth());
+        }
+        case PeriodType::YEARLY:
+            // Same as monthly : a Feb 29 anchor gives Feb 28 in non-leap years and Feb 29
+            // again in leap years.
+            return anchor.addYears(static_cast<int>(steps));
+        default:
+            throw std::invalid_argument("PeriodicCsd type does not exist");
+    }
 }
 
 

@@ -22,14 +22,14 @@
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0,0">
    <item>
     <layout class="QFormLayout" name="formLayout_3">
+     <property name="labelAlignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+     </property>
      <property name="horizontalSpacing">
       <number>30</number>
      </property>
      <property name="verticalSpacing">
       <number>10</number>
-     </property>
-     <property name="labelAlignment">
-      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
@@ -707,7 +707,7 @@
           <item>
            <widget class="QPushButton" name="setColorPushButton">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a color and use it to colorize the name of each Cash Stream Definition selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Copy (Ctrl+Shift+C), paste (Ctrl+Shift+V), edit or reset the color of the name of each Cash Stream Definition selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>Color...</string>
@@ -800,6 +800,26 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="modifiedWarningLabel">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The scenario has been modified in this window. Click &amp;quot;Apply changes&amp;quot; to apply them to the current scenario, or &amp;quot;Cancel&amp;quot; to discard them.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string notr="true">!</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closePushButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stop edition and close the window.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="cancelPushButton">

@@ -26,9 +26,11 @@
 #include "selectcurrencydialog.h"
 #include "optionsdialog.h"
 #include "aboutdialog.h"
+#include "shortcutsdialog.h"
 #include "analysisdialog.h"
 #include "dateintervaldialog.h"
 #include <QMainWindow>
+#include <optional>
 #include <QFileDialog>
 #include <QLocale>
 #include <QChart>
@@ -70,7 +72,8 @@ public:
     /**
      * @brief Displays the first-run welcome screen (English or French, based on `locale`).
      * @details Called once from main(), right after construction, when no settings file was
-     * found at startup. Delegates to viewResourceFile().
+     * found at startup. Delegates to viewResourceFile() : a PDF, in both the "Embedded manuals
+     * version" and the "Online manuals version" (see gbp_welcome.qrc).
      */
     void showWelcomeScreen();
 
@@ -132,6 +135,15 @@ public slots:
 
     // to catch scale change in an axis in main chart
     void handleXaxisRangeChange(QDateTime dtFrom, QDateTime dtTo);
+    /**
+     * @brief Rebuild the markers of the Cash Balance curve, for the visible X range only. No
+     * marker is created if "Points" is unchecked, or if there would be more than the maximum
+     * number of points (chart_max_points setting) of them (the checkbox is then grayed out and a
+     * message is shown). The selected point is selected again if it is visible. If the markers
+     * are hidden, the Daily Info panel is cleared (the selected point is kept) : it is filled
+     * again when the markers are shown again.
+     */
+    void rebuildChartMarkers();
     void handleYaxisRangeChange(qreal min, qreal max);
 
 protected:
@@ -177,6 +189,7 @@ private slots:
     void on_actionUser_Manual_triggered();
     void on_actionQuick_Tutorial_triggered();
     void on_actionChange_Log_triggered();
+    void on_actionShortcuts_triggered();
     void on_actionPV_Calculator_triggered();
     void on_actionReload_triggered();
     void on_actionAnonymize_triggered();
@@ -240,6 +253,7 @@ private:
     SelectCurrencyDialog* selectCurrencyDialog;
     OptionsDialog* optionsDlg;
     AboutDialog* aboutDlg;
+    ShortcutsDialog* shortcutsDlg;
     AnalysisDialog* analysisDlg;
     DateIntervalDialog* dateIntervalDlg;
     ScenarioPropertiesDialog* scenarioPropertiesDlg;
@@ -259,7 +273,18 @@ private:
     CustomQChartView *chartView;
     QChart *chart ;
     QLineSeries *shadowSeries;          // shadow the points just to trace line between them
-    QScatterSeries* scatterSeries;      // contains only the real points
+    QScatterSeries* scatterSeries;      // markers of the real points visible in the chart
+    /**
+     * @brief All the real points of the Cash Balance curve (one per day with financial events),
+     * sorted by date. scatterSeries only holds the visible ones, as markers (see
+     * rebuildChartMarkers()).
+     */
+    QList<QPointF> chartAllPoints;
+    QTimer* chartMarkersTimer = nullptr; // rebuilds the markers during/after a zoom or a pan
+    std::optional<QPointF> chartSelectedPoint; // point selected by the user, if any
+    // true when the Daily Info panel has been cleared because the markers are hidden, while a
+    // point is still selected (the panel is filled again when the markers are shown again)
+    bool dailyInfoHidden = false;
     QLineSeries *zeroYvalueLineSeries;  // line at y value = 0
     QDateTimeAxis *axisX;
     QValueAxis *axisY;
@@ -267,7 +292,7 @@ private:
     QDateTime fullToDateX;          // max date of calculation for the current scenario
     uint xAxisFontSize;
     uint yAxisFontSize;
-    int indexLastPointSelected = -1;
+    int indexLastPointSelected = -1;    // index of the selected point in scatterSeries, or -1
     /**
      * @brief The final stream of financial events generated for the scenario. This is
      * what is displayed in the Cash Balance curve an Analysis module. MainWindow object
@@ -374,6 +399,12 @@ private:
     void emptyDailyInfoSection();
 
     /**
+     * @brief Fill the "Daily Info" section for a point of the Cash Balance curve.
+     * @param pt The point (X = date in ms since epoch, Y = cash balance).
+     */
+    void showDailyInfo(QPointF pt);
+
+    /**
      * @brief Refresh the content of the "General Info" section.
      * @details A scenario must have been loaded.
      */
@@ -440,8 +471,44 @@ private:
      */
     void viewResourceFile(const QString resourceFullFileName, ViewResourceFileResult &result);
 
+    /**
+     * @brief Shows the address of a PDF document in the GitHub repository (see
+     * Constants::ONLINE_DOC_URL), with a button to copy it to the clipboard. Used
+     * by the "Online manuals version". GBP never accesses the Internet : the user downloads the
+     * document himself.
+     *
+     * @param fileName Name of the PDF file in the "doc" directory (e.g. "user_manual-en.pdf").
+     * @param docName Translated name of the document (title and text of the message).
+     */
+    void showOnlineDocumentAddress(const QString &fileName, const QString &docName);
+
     void changeYaxisLabelFormat();
     void setWindowTopTitle();
     void adjustMenuItemLength();
+
+    /**
+     * @brief Take a new reference copy of the current scenario (savedScenario) and remove the
+     * "*" from the window title.
+     * @details Must be called each time the current scenario is replaced (loaded, created) or
+     * successfully saved. The copy is deep : Csds are copied too, because some changes are made
+     * in place on the Csds of the current scenario (Apply without data regeneration in
+     * EditScenarioDialog, Anonymize). Clears savedScenario if there is no current scenario.
+     */
+    void resetSavedScenario();
+
+    /**
+     * @brief Compare the current scenario with savedScenario and show/hide the "*" in the window
+     * title accordingly.
+     * @details Must be called after anything that modifies the current scenario without saving
+     * it (Edit Scenario's Apply, Anonymize).
+     */
+    void updateScenarioModified();
+
+    /**
+     * @brief Deep copy of the current scenario as it was when last loaded, created or saved.
+     * Reference used to show "*" in the window title when the current scenario differs from it.
+     * Never modified : replaced by resetSavedScenario() (the previous copy is then freed).
+     */
+    QSharedPointer<Scenario> savedScenario;
 };
 #endif // MAINWINDOW_H

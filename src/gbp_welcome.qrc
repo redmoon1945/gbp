@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/Doc">
+        <file>resources/welcome-en.pdf</file>
+        <file>resources/welcome-fr.pdf</file>
+    </qresource>
+</RCC>

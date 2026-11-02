@@ -29,6 +29,7 @@
 #include "gbpcontroller.h"
 #include "uiutil.h"
 #include "gbpqmessage.h"
+#include "csvexporter.h"
 
 
 EditVariableGrowthDialog::EditVariableGrowthDialog(QString newGrowthName, QLocale locale,
@@ -57,6 +58,17 @@ EditVariableGrowthDialog::EditVariableGrowthDialog(QString newGrowthName, QLocal
         UiUtil::resizeTableViewColumns(ui->growthTableView, {0, 1, 2});
     });
     UiUtil::resizeTableViewColumns(ui->growthTableView, {0, 1, 2});
+
+    // Change detection : the table is always updated with setGrowthData() (add, edit, delete,
+    // import), which resets the model
+    QObject::connect(tableModel, &QAbstractItemModel::modelReset,
+        this, &EditVariableGrowthDialog::updateContentChanged);
+
+    // Indicator of changes not applied yet : orange warning sign, explained by its tooltip
+    // (same as in EditScenarioDialog). Shown/hidden by contentHasChanged().
+    ui->modifiedWarningLabel->setText("\u26A0");
+    ui->modifiedWarningLabel->setStyleSheet("color: #FF9800;");
+    ui->modifiedWarningLabel->setVisible(false);
 
     QFont appFont = QApplication::font();
     ui->growthTableView->horizontalHeader()->setFont(appFont);
@@ -116,9 +128,11 @@ EditVariableGrowthDialog::~EditVariableGrowthDialog()
 // To be called before displaying the EditComplexGrowthDialog window, to setup content
 void EditVariableGrowthDialog::slotPrepareContent(const Growth newGrowth)
 {
+    // [*] : replaced by "*" when there are changes not applied yet (see setWindowModified() in
+    // contentHasChanged())
     QString tmp = Util::wordCapitalize(true,QString(tr("Edit variable %1"))
         .arg(tableModel->getGrowthName()));
-    this->setWindowTitle(tmp);
+    this->setWindowTitle(tmp + "[*]");
 
     ui->noteLabel->setText(QString(tr("%1 : Value is 0 before the oldest transition date is "
         "defined. It is always applied on a monthly basis, even if defined on an annual basis "
@@ -126,7 +140,11 @@ void EditVariableGrowthDialog::slotPrepareContent(const Growth newGrowth)
         "defined.")).arg(tableModel->getGrowthName()));
     tableModel->setGrowthName(tableModel->getGrowthName());
     // update model (the view will be automatically updated)
+    fillingForm = true;
+    originalGrowth = newGrowth;
     tableModel->setGrowthData(newGrowth);
+    fillingForm = false;
+    contentHasChanged(false);   // only "Close" at first
 
     ui->growthTableView->setFocus();
 }
@@ -187,6 +205,54 @@ void EditVariableGrowthDialog::on_importPushButton_clicked()
 }
 
 
+void EditVariableGrowthDialog::on_exportPushButton_clicked()
+{
+    bool numberLocalized = GbpController::getInstance().getExportTextNumberLocalized();
+
+    // *** STEP 1 : Build the columns definitions ***
+    QList<CsvColumnDescriptor> columns;
+    columns.append({tr("Transition date"), CsvColumnType::date(CsvDateFormat::YearMonthDay,
+        GbpController::getInstance().getExportTextDateLocalized())});
+    columns.append({tr("%1 (annual %)").arg(growthName),
+        CsvColumnType::number(Growth::NO_OF_DECIMALS, numberLocalized)});
+    columns.append({tr("%1 (monthly %)").arg(growthName),
+        CsvColumnType::numberFull(numberLocalized)});
+
+    // *** STEP 2 : Populate rows ***
+    QList<QList<QVariant>> data;
+    QMap<QDate,qint64> factors = tableModel->getGrowthData().getAnnualVariableGrowth();
+    for (auto it = factors.cbegin(); it != factors.cend(); ++it) {
+        double annual = Growth::fromDecimalToDouble(it.value());
+        double monthly = Util::annualToMonthlyGrowth(annual);
+        data.append({it.key(), annual, monthly});
+    }
+
+    // *** STEP 3 : Call exportToCsv() and handle the result ***
+    // Currency info is not used, since there is no currency column
+    CsvExportResult result = CsvExporter::exportToCsv(
+        "Variable growth", columns, data, locale, CurrencyInfo(), '\t');
+    switch (result.status) {
+        case CsvExportResult::Status::Success:
+            break;
+        case CsvExportResult::Status::Canceled:
+            return; // user closed the dialog — nothing to do
+        case CsvExportResult::Status::FileOpenError:
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Export process failed. Cannot open the "
+                "file for saving"), {tr("OK")}, 0, 0);
+            return;
+        case CsvExportResult::Status::WriteError:
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Export process failed. Write error."), {tr("OK")}, 0, 0);
+            return;
+        case CsvExportResult::Status::DataError:
+            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
+                tr("Export process failed. Data error."), {tr("OK")}, 0, 0);
+            return;
+    }
+}
+
+
 void EditVariableGrowthDialog::on_applyPushButton_clicked()
 {
     Growth g = tableModel->getGrowthData();
@@ -196,10 +262,17 @@ void EditVariableGrowthDialog::on_applyPushButton_clicked()
 }
 
 
-void EditVariableGrowthDialog::on_cancelPushButton_clicked()
+void EditVariableGrowthDialog::on_closePushButton_clicked()
 {
     hide();
     emit signalEditVariableGrowthCompleted();
+}
+
+
+// Changes not applied : discard them and close
+void EditVariableGrowthDialog::on_cancelPushButton_clicked()
+{
+    on_closePushButton_clicked();
 }
 
 
@@ -274,7 +347,7 @@ void EditVariableGrowthDialog::on_growthTableView_doubleClicked(const QModelInde
 // dialog has been closed ("x" button) manually by user
 void EditVariableGrowthDialog::on_EditVariableGrowthDialog_rejected()
 {
-    on_cancelPushButton_clicked();
+    on_closePushButton_clicked();
 }
 
 
@@ -300,3 +373,39 @@ void EditVariableGrowthDialog::showEvent(QShowEvent* event)
     });
 }
 
+
+void EditVariableGrowthDialog::contentHasChanged(bool v)
+{
+    // override the value, don't care if it is the same as the cost is negligible
+    contentChanged.set(v);
+
+    // Visual indicators : warning sign next to the buttons, "*" in the window title
+    ui->modifiedWarningLabel->setVisible(hasContentChanged());
+    setWindowModified(hasContentChanged());
+
+    // Update buttons to reflect the new situation
+    if (hasContentChanged()==true) {
+        ui->closePushButton->setVisible(false);
+        ui->cancelPushButton->setVisible(true);
+        ui->applyPushButton->setVisible(true);
+    } else {
+        ui->closePushButton->setVisible(true);
+        ui->cancelPushButton->setVisible(false);
+        ui->applyPushButton->setVisible(false);
+    }
+}
+
+
+bool EditVariableGrowthDialog::hasContentChanged() const
+{
+    return contentChanged.get();
+}
+
+
+void EditVariableGrowthDialog::updateContentChanged()
+{
+    if (fillingForm) {
+        return;     // table being filled : nothing to check
+    }
+    contentHasChanged( !(tableModel->getGrowthData() == originalGrowth) );
+}

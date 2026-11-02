@@ -19,6 +19,7 @@
 #include "loadvariablegrowthtextfiledialog.h"
 #include "gbpcontroller.h"
 #include "gbplogger.h"
+#include "csvimporter.h"
 #include "growth.h"
 #include "ui_loadvariablegrowthtextfiledialog.h"
 #include "util.h"
@@ -44,7 +45,36 @@ LoadVariableGrowthTextFileDialog::LoadVariableGrowthTextFileDialog(
     QFont font = appFont;
     Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true,
         "LoadVariableGrowthTextFileDialog - instructions");
-    ui->instructionsPlainTextEdit->setFont(font);
+    ui->instructionsTextEdit->setFont(font);
+    ui->instructionsTextEdit->setHtml(tr(
+        "<h3>Importing entries</h3>"
+        "<p>Loads a list of entries from a file. <b>The current entries are deleted.</b> This is "
+        "useful when the values are computed by an external model and entering them manually "
+        "would be tedious.</p>"
+
+        "<h3>File format</h3>"
+        "<ul>"
+        "<li>Unicode text file (UTF-8, UTF-16 or UTF-32).</li>"
+        "<li>One entry per line, with no empty lines.</li>"
+        "<li>The first line can be a header : it is ignored if at least one of its fields is "
+        "not valid, and the final message then shows it.</li>"
+        "<li>[TAB] is the TAB character (0x09).</li>"
+        "<li>If two lines share the same date, the last one wins.</li>"
+        "</ul>"
+        "<p>Format of a line : <code>&lt;date&gt;[TAB]&lt;growth&gt;</code><br>"
+        "Example : <code>2025-01-01[TAB]8.9234</code></p>"
+
+        "<h3>Fields</h3>"
+        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"4\">"
+        "<tr><th>Field</th><th>Format</th></tr>"
+        "<tr><td><b>Date</b></td><td>Transition date, the first day the new value applies. "
+        "ISO 8601 (YYYY-MM-DD), e.g. 2025-01-01</td></tr>"
+        "<tr><td><b>Growth</b></td><td>Annual growth (or inflation) rate in percentage, with "
+        "&quot;.&quot; as the decimal separator : 8.9234 means 8.9234%. From -100 to 10000, up "
+        "to 5 decimal places stored.</td></tr>"
+        "<tr><td><b>Third field</b></td><td><i>Optional.</i> The monthly value written by the "
+        "CSV export. It must be a number, and it is not used.</td></tr>"
+        "</table>"));
 
     growthName = newGrowthName.isEmpty()
         ? newGrowthName
@@ -77,110 +107,63 @@ void LoadVariableGrowthTextFileDialog::on_cancelPushButton_clicked()
 
 void LoadVariableGrowthTextFileDialog::on_importPushButton_clicked()
 {
-    QString userErrorMessage, logErrorMessage, line;
     QString fileName = ui->fileNameLineEdit->text();
-    int lineNo = 0;
 
     LOG_INFO(QString("Attempting to import a text file containing variable %1 entries : "
         "file name=\"%2\"").arg(growthName).arg(REDACT(fileName)));
 
-    QFile file(fileName);
-    if (!file.exists()) {
-        userErrorMessage = QString(tr("File %1 does not exist")).arg(fileName);
-        logErrorMessage  = QString("File %1 does not exist").arg(fileName);
+    // Show an error to the user and log it
+    auto importFailed = [](const QString &userErrorMessage, const QString &logErrorMessage) {
         GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
             userErrorMessage, {tr("OK")}, 0, 0);
         LOG_ERROR(QString("Import failed : %1").arg(logErrorMessage));
-        return;
-    }
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        userErrorMessage = tr("Cannot open file %1 in read-only mode").arg(fileName);
-        logErrorMessage  = QString("Cannot open file %1 in read-only mode").arg(REDACT(fileName));
-        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-            userErrorMessage, {tr("OK")}, 0, 0);
-        LOG_ERROR(QString("Import failed : %1").arg(logErrorMessage));
-        return;
-    }
+    };
 
     try {
-        QTextStream stream(&file);
-        stream.setAutoDetectUnicode(true);
+        // read and check the lines. The monthly value, written by the CSV export, is not used
+        // since it is derived from the annual value.
+        QString capitalizedName = growthName.isEmpty()
+            ? growthName
+            : growthName[0].toUpper() + growthName.mid(1);
+        CsvImportResult result = CsvImporter::importFile(fileName, {
+            {tr("Date"), CsvImportColumn::Type::Date},
+            {capitalizedName, CsvImportColumn::Type::Number},
+            {tr("Monthly %1").arg(growthName), CsvImportColumn::Type::Number, true}
+        });
+        if (!result.success) {
+            importFailed(result.userErrorMessage, result.logErrorMessage);
+            return;
+        }
+
+        // check the meaning of the values
         QMap<QDate,qint64> data;
-
-        while (!stream.atEnd()) {
-            line = stream.readLine();
-            lineNo++;
-            if (line.isNull()) continue;
-
-            QString lineTrimmed = line.trimmed();
-            QStringList tokens = lineTrimmed.split('\t');
-            if (tokens.length() != 2) {
-                userErrorMessage = tr("Bad format for line no %1 (expected 2 TAB-separated "
-                    "tokens, got %2).").arg(lineNo).arg(tokens.size());
-                logErrorMessage  = QString("Bad format for line no %1 (expected 2 tokens, "
-                    "got %2).").arg(lineNo).arg(tokens.size());
-                GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-                    userErrorMessage, {tr("OK")}, 0, 0);
-                LOG_ERROR(QString("Import failed : %1").arg(logErrorMessage));
-                return;
-            }
-
-            QDate date = QDate::fromString(tokens[0], Qt::ISODate);
-            if (!date.isValid()) {
-                userErrorMessage = tr("Date \"%1\" is invalid at line no %2.")
-                    .arg(tokens[0]).arg(lineNo);
-                logErrorMessage  = QString("Date \"%1\" is invalid at line no %2.")
-                    .arg(tokens[0]).arg(lineNo);
-                GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-                    userErrorMessage, {tr("OK")}, 0, 0);
-                LOG_ERROR(QString("Import failed : %1").arg(logErrorMessage));
-                return;
-            }
-
-            bool ok;
-            double growth = tokens[1].toDouble(&ok);
-            if (!ok) {
-                userErrorMessage = tr("%1 value \"%2\" is not a valid number at line no %3.")
-                    .arg(growthName).arg(tokens[1]).arg(lineNo);
-                logErrorMessage  = QString("%1 value \"%2\" is not a valid number "
-                    "at line no %3.").arg(growthName).arg(tokens[1]).arg(lineNo);
-                GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-                    userErrorMessage, {tr("OK")}, 0, 0);
-                LOG_ERROR(QString("Import failed : %1").arg(logErrorMessage));
-                return;
-            }
+        for (const CsvImportRow &row : result.rows) {
+            double growth = row.cells[1].toDouble();
             if (growth < Growth::MIN_GROWTH_DOUBLE || growth > Growth::MAX_GROWTH_DOUBLE) {
-                userErrorMessage = tr("%1 value \"%2\" is out of the allowed range "
+                importFailed(tr("%1 value \"%2\" is out of the allowed range "
                     "[%3, %4] at line no %5.")
                     .arg(growthName)
-                    .arg(tokens[1])
+                    .arg(row.rawCells[1])
                     .arg(Growth::MIN_GROWTH_DOUBLE)
                     .arg(Growth::MAX_GROWTH_DOUBLE)
-                    .arg(lineNo);
-                logErrorMessage = QString("%1 value \"%2\" out of range at line no %3.")
-                    .arg(growthName).arg(tokens[1]).arg(lineNo);
-                GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-                    userErrorMessage, {tr("OK")}, 0, 0);
-                LOG_ERROR(QString("Import failed : %1").arg(logErrorMessage));
+                    .arg(row.lineNo),
+                    QString("%1 value \"%2\" out of range at line no %3.")
+                    .arg(growthName).arg(row.rawCells[1]).arg(row.lineNo));
                 return;
             }
 
-            data.insert(date, Growth::fromDoubleToDecimal(growth));
+            data.insert(row.cells[0].toDate(), Growth::fromDoubleToDecimal(growth));
         }
 
         GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::INFORMATION, tr("Information"),
-            QString(tr("Import succeeded, %1 entries have been imported.")).arg(data.size()), {tr("OK")}, 0, 0);
+            CsvImporter::successMessage(data.size(), result), {tr("OK")}, 0, 0);
         emit signalImportResult(data);
         this->hide();
         LOG_INFO(QString("Import succeeded"));
 
     } catch (const std::exception& e) {
-        userErrorMessage = tr("An unexpected error has occurred.<br><br>Details : %1").arg(e.what());
-        logErrorMessage  = QString("An unexpected error has occurred. Details : %1").arg(e.what());
-        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-            userErrorMessage, {tr("OK")}, 0, 0);
-        LOG_ERROR(QString("Import failed : %1").arg(logErrorMessage));
+        importFailed(tr("An unexpected error has occurred.<br><br>Details : %1").arg(e.what()),
+            QString("An unexpected error has occurred. Details : %1").arg(e.what()));
     }
 }
 

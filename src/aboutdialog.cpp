@@ -21,6 +21,7 @@
 #include "ui_aboutdialog.h"
 #include "gbpcontroller.h"
 #include "gbplogger.h"
+#include "gbpqmessage.h"
 #include "uiutil.h"
 #include <QApplication>
 #include <QDesktopServices>
@@ -123,8 +124,15 @@ void AboutDialog::on_closePushButton_clicked()
 
 void AboutDialog::on_viewLogPushButton_clicked()
 {
-    QDesktopServices::openUrl(
-        QUrl::fromLocalFile(GbpLogger::getInstance().getLogFullFileName()));
+    QString logFullFileName = GbpLogger::getInstance().getLogFullFileName();
+    bool success = QDesktopServices::openUrl(QUrl::fromLocalFile(logFullFileName));
+    if (success == false) {
+        LOG_ERROR("->Could not open log file with a system viewer");
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Could not open the log file with a system viewer. You can open it "
+            "manually at:\n%1").arg(QDir::toNativeSeparators(logFullFileName)),
+            {tr("OK")}, 0, 0);
+    }
 }
 
 

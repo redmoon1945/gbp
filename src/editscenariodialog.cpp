@@ -17,6 +17,7 @@
  */
 
 #include "editscenariodialog.h"
+#include "csdcolordialog.h"
 #include <QTimer>
 #include "ui_editscenariodialog.h"
 #include "gbpcontroller.h"
@@ -58,6 +59,17 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale) :
         this, &EditScenarioDialog::onAddMenuIrregularClicked);
     this->addAction(periodicAction);
     this->addAction(irregularAction);
+
+    auto *copyColorAction = new QAction(tr("Copy color"), this);
+    copyColorAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C));
+    connect(copyColorAction, &QAction::triggered,
+        this, &EditScenarioDialog::onCopyColorShortcut);
+    auto *pasteColorAction = new QAction(tr("Paste color"), this);
+    pasteColorAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_V));
+    connect(pasteColorAction, &QAction::triggered,
+        this, &EditScenarioDialog::onPasteColorShortcut);
+    this->addAction(copyColorAction);
+    this->addAction(pasteColorAction);
 
     // reset min max of constant inflation spinbox programmatically (annual value !!)
     ui->inflationConstantDoubleSpinBox->setMinimum(Growth::MIN_GROWTH_DOUBLE);
@@ -286,6 +298,21 @@ EditScenarioDialog::EditScenarioDialog(QLocale locale) :
     QObject::connect(setFilterTagsDlg, &ChooseTagsDialog::signalCompleted,
         this, &EditScenarioDialog::slotSetFilterTagsCompleted);
 
+    // Change detection for the fields edited directly in this dialog (duration and inflation
+    // type are handled in their own slots)
+    QObject::connect(ui->scenarioNameLineEdit, &QLineEdit::textChanged,
+        this, &EditScenarioDialog::updateContentChanged);
+    QObject::connect(ui->DescPlainTextEdit, &QTextEdit::textChanged,
+        this, &EditScenarioDialog::updateContentChanged);
+    QObject::connect(ui->inflationConstantDoubleSpinBox, &QDoubleSpinBox::valueChanged,
+        this, &EditScenarioDialog::updateContentChanged);
+
+    // Indicator of changes not applied yet : orange warning sign, explained by its tooltip
+    // (same as in EditPeriodicDialog). Shown/hidden by contentHasChanged().
+    ui->modifiedWarningLabel->setText("\u26A0");
+    ui->modifiedWarningLabel->setStyleSheet("color: #FF9800;");
+    ui->modifiedWarningLabel->setVisible(false);
+
     // Constructor is completed
     started = true;
 
@@ -311,6 +338,13 @@ void EditScenarioDialog::slotPrepareContent(CurrencyInfo newCurrInfo)
     if(scenario.isNull()){
         return; // if no scenario loaded (should not happen)
     }
+
+    // Suspend change detection while the form is filled : each field set below emits a
+    // change signal, and checking a half-filled form is useless
+    fillingForm = true;
+
+    // Keep a reference to detect unsaved changes later (see originalScenario doc comment)
+    originalScenario = scenario;
 
     QDate maxDate = GbpController::getInstance().getToday()
         .addYears(Constants::DEFAULT_DURATION_FE_GENERATION);
@@ -368,18 +402,25 @@ void EditScenarioDialog::slotPrepareContent(CurrencyInfo newCurrInfo)
     // **********************************************************************************
 
 
-    this->setWindowTitle(tr("Edit current scenario"));
+    // [*] : replaced by "*" in the displayed title when there are changes not applied yet
+    // (see setWindowModified() in contentHasChanged())
+    this->setWindowTitle(tr("Edit current scenario[*]"));
 
     // refresh the table content
     refreshCsdTableContent();
 
     ui->scenarioNameLineEdit->setFocus();
 
+    // Form complete : resume change detection and check once (expected : no change)
+    fillingForm = false;
+    updateContentChanged();
+
 }
 
 
 void EditScenarioDialog::slotPlainTextEditionResult(QString result)
 {
+    // change detection is triggered by the textChanged signal of DescPlainTextEdit
     ui->DescPlainTextEdit->setPlainText(result);
 }
 
@@ -394,6 +435,7 @@ void EditScenarioDialog::slotPlainTextEditionCompleted()
 void EditScenarioDialog::slotEditVariableInflationResult(Growth growthOut)
 {
     tempVariableInflation = growthOut;
+    updateContentChanged();
 }
 
 
@@ -429,6 +471,8 @@ void EditScenarioDialog::slotEditPeriodicCsdResult(bool isIncome,
         // does not always work...
         ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);
     }
+
+    updateContentChanged();
 }
 
 
@@ -464,6 +508,8 @@ void EditScenarioDialog::slotEditIrregularCsdResult(bool isIncome,
         // does not always work...
         ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);
     }
+
+    updateContentChanged();
 }
 
 
@@ -484,6 +530,8 @@ void EditScenarioDialog::slotManageTagsResult(Tags newTags, TagCsdRelationships 
     // In any case, links may have been changed and there is no simple way to know it.
     // Refresh the table's content.
     refreshCsdTableContent();
+
+    updateContentChanged();
 }
 
 
@@ -542,7 +590,7 @@ void EditScenarioDialog::on_editGrowthPushButton_clicked()
 void EditScenarioDialog::onAddMenuPeriodicClicked()
 {
     bool isIncome = ui->incomesRadioButton->isChecked();
-    QDate maxDate = GbpController::getInstance().getToday().addYears(
+    QDate maxDate = Scenario::getMaxDateFeGeneration(GbpController::getInstance().getToday(),
         ui->maxDurationSpinBox->value());
     // launch the edit dialog to create a new Periodic FSD
     emit signalEditPeriodicCsdPrepareContent(true, isIncome, QWeakPointer<PeriodicCsd>(),
@@ -555,7 +603,7 @@ void EditScenarioDialog::onAddMenuIrregularClicked()
 {
     // TODO
     bool isIncome = ui->incomesRadioButton->isChecked();
-    QDate maxDate = GbpController::getInstance().getToday().addYears(
+    QDate maxDate = Scenario::getMaxDateFeGeneration(GbpController::getInstance().getToday(),
         ui->maxDurationSpinBox->value());
     emit signalEditIrregularCsdPrepareContent(true, isIncome, QWeakPointer<IrregularCsd>(),
                                               currInfo, maxDate,{},tags);
@@ -575,6 +623,7 @@ void EditScenarioDialog::on_cancelPushButton_clicked()
     expensesIrregularCsd.clear();
     tags.clear();
     tagCsdRelationships.clear();
+    originalScenario.clear();
 
     emit signalEditScenarioCompleted();
 }
@@ -584,6 +633,7 @@ void EditScenarioDialog::on_inflationVariableRadioButton_clicked()
 {
     ui->editGrowthPushButton->setEnabled(true);
     ui->inflationConstantDoubleSpinBox->setEnabled(false);
+    updateContentChanged();
 }
 
 
@@ -591,6 +641,7 @@ void EditScenarioDialog::on_inflationConstantRadioButton_clicked()
 {
     ui->editGrowthPushButton->setEnabled(false);
     ui->inflationConstantDoubleSpinBox->setEnabled(true);
+    updateContentChanged();
 }
 
 
@@ -633,42 +684,63 @@ void EditScenarioDialog::on_fullViewPushButton_clicked()
 }
 
 
-void EditScenarioDialog::on_applyPushButton_clicked()
+QSharedPointer<Scenario> EditScenarioDialog::buildScenarioFromCurrentState(
+    BuildScenarioResult &result) const
 {
-    // *** gather & validate some data in the form to create a new Scenario ***
+    result = BuildScenarioResult::SUCCESS;
+
     QString name = ui->scenarioNameLineEdit->text().trimmed();
     QString desc = ui->DescPlainTextEdit->toPlainText();
     quint16 maxDuration = ui->maxDurationSpinBox->value();
-    // inflation
+
     Growth inflation;
     if (ui->inflationConstantRadioButton->isChecked()){
         double annualBasisInfDouble = ui->inflationConstantDoubleSpinBox->value();
-        inflation = Growth::fromConstantAnnualPercentageDouble(annualBasisInfDouble);
+        try {
+            inflation = Growth::fromConstantAnnualPercentageDouble(annualBasisInfDouble);
+        } catch (const std::exception&) {
+            result = BuildScenarioResult::ERROR_INVALID_INFLATION;
+            return QSharedPointer<Scenario>();
+        }
     } else{
         inflation = tempVariableInflation;
     }
 
-    LOG_INFO(QString("Attempting to apply changes made to a scenario named %1").arg(REDACT(name)));
+    try {
+        return QSharedPointer<Scenario>(new Scenario(
+            Scenario::LATEST_VERSION, name, desc, maxDuration, inflation, currencyIsoCode,
+            incomesPeriodicCsd, incomesIrregularCsd, expensesPeriodicCsd, expensesIrregularCsd,
+            tags, tagCsdRelationships));
+    } catch (const std::exception&) {
+        result = BuildScenarioResult::ERROR_OTHER;
+        return QSharedPointer<Scenario>();
+    }
+}
+
+
+void EditScenarioDialog::on_applyPushButton_clicked()
+{
+    LOG_INFO(QString("Attempting to apply changes made to a scenario named %1")
+        .arg(REDACT(ui->scenarioNameLineEdit->text().trimmed())));
 
     // *** Create a completely new scenario from the edit dialog data.
     // *** Note that all Csd QSharedPointers will be different from the current scenario,
     // *** which creates a problem if data does not need to be regenerated, since they
     // *** are referenced elsewhere by WeakPointers. We will address this later.
-    QSharedPointer<Scenario> newScenario;
-    try {
-        newScenario = QSharedPointer<Scenario>(new Scenario(
-            Scenario::LATEST_VERSION, name, desc, maxDuration, inflation, currencyIsoCode,
-            incomesPeriodicCsd, incomesIrregularCsd, expensesPeriodicCsd, expensesIrregularCsd,
-            tags, tagCsdRelationships));
-    } catch (const std::exception& e) {
-        // we should not get any exception...but plan for the worst
+    BuildScenarioResult buildResult;
+    QSharedPointer<Scenario> newScenario = buildScenarioFromCurrentState(buildResult);
+    if (buildResult != BuildScenarioResult::SUCCESS) {
+        // we should not get here...but plan for the worst
+        QString detail = (buildResult == BuildScenarioResult::ERROR_INVALID_INFLATION)
+            ? tr("The inflation value is out of the allowed range")
+            : tr("Unknown error");
         QString errorString = QString(tr("An unexpected error has occurred while creating a "
             "scenario.\n\nDetails : %1"))
-            .arg(e.what());
+            .arg(detail);
         GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
             errorString, {tr("OK")}, 0, 0);
         LOG_ERROR( QString("    Modification to this existing scenario failed, unexpected"
-            " exception occurred : %1").arg(e.what()));
+            " error occurred, code=%1").arg(static_cast<int>(buildResult)));
         LOG_INFO("Apply changes has completed");
         return;
     }
@@ -679,13 +751,10 @@ void EditScenarioDialog::on_applyPushButton_clicked()
     //        regenerated before chart is refreshed.
     // *** 2) Financial events list will be different : only cosmetic changes or no change
     bool regenerateData = true;
-    // Get current scenario(if any loaded)
-    QSharedPointer<Scenario> currScenario = GbpController::getInstance().getScenario()
-        .toStrongRef();
-    if(currScenario.isNull()==false){
+    if(originalScenario.isNull()==false){
         // compare
         QString diff;
-        regenerateData = !(currScenario->evaluateIfSameFeStream(newScenario, diff));
+        regenerateData = !(originalScenario->evaluateIfSameFeStream(newScenario, diff));
         if(regenerateData==true){
             LOG_INFO(QString("    Changes made will trigger a full recalculation of data : %1")
                 .arg(diff));
@@ -693,7 +762,7 @@ void EditScenarioDialog::on_applyPushButton_clicked()
             LOG_INFO("    Changes made will NOT trigger a full recalculation of data");
         }
     } else {
-        LOG_ERROR("    There is no current scenario (should not happen)");
+        LOG_ERROR("    There is no original scenario reference (should not happen)");
         LOG_INFO("Apply changes has completed");
         return ; // should not happen
     }
@@ -705,8 +774,10 @@ void EditScenarioDialog::on_applyPushButton_clicked()
 
         // --- Incomes, Periodic ---
         {
-            auto curHash = currScenario->getIncomePeriodicCsds();
-            auto newHash = newScenario->getIncomePeriodicCsds();
+            QHash<QUuid, QSharedPointer<PeriodicCsd>> curHash =
+                originalScenario->getIncomePeriodicCsds();
+            QHash<QUuid, QSharedPointer<PeriodicCsd>> newHash =
+                newScenario->getIncomePeriodicCsds();
             for (auto it = curHash.begin(); it != curHash.end(); ++it) {
                 const QUuid id = it.key();
                 QSharedPointer<PeriodicCsd>& curCsd = it.value();// non-const ref editable in place
@@ -725,8 +796,10 @@ void EditScenarioDialog::on_applyPushButton_clicked()
 
         // --- Incomes, Irregular ---
         {
-            auto curHash = currScenario->getIncomeIrregularCsds();
-            auto newHash = newScenario->getIncomeIrregularCsds();
+            QHash<QUuid, QSharedPointer<IrregularCsd>> curHash =
+                originalScenario->getIncomeIrregularCsds();
+            QHash<QUuid, QSharedPointer<IrregularCsd>> newHash =
+                newScenario->getIncomeIrregularCsds();
             for (auto it = curHash.begin(); it != curHash.end(); ++it) {
                 const QUuid id = it.key();
                 QSharedPointer<IrregularCsd>& curCsd = it.value();// non-const ref editable in place
@@ -745,8 +818,10 @@ void EditScenarioDialog::on_applyPushButton_clicked()
 
         // --- Expenses, Periodic ---
         {
-            auto curHash = currScenario->getExpensePeriodicCsds();
-            auto newHash = newScenario->getExpensePeriodicCsds();
+            QHash<QUuid, QSharedPointer<PeriodicCsd>> curHash =
+                originalScenario->getExpensePeriodicCsds();
+            QHash<QUuid, QSharedPointer<PeriodicCsd>> newHash =
+                newScenario->getExpensePeriodicCsds();
             for (auto it = curHash.begin(); it != curHash.end(); ++it) {
                 const QUuid id = it.key();
                 QSharedPointer<PeriodicCsd>& curCsd = it.value();// non-const ref editable in place
@@ -765,8 +840,10 @@ void EditScenarioDialog::on_applyPushButton_clicked()
 
         // --- Expenses, Irregular ---
         {
-            auto curHash = currScenario->getExpenseIrregularCsds();
-            auto newHash = newScenario->getExpenseIrregularCsds();
+            QHash<QUuid, QSharedPointer<IrregularCsd>> curHash =
+                originalScenario->getExpenseIrregularCsds();
+            QHash<QUuid, QSharedPointer<IrregularCsd>> newHash =
+                newScenario->getExpenseIrregularCsds();
             for (auto it = curHash.begin(); it != curHash.end(); ++it) {
                 const QUuid id = it.key();
                 QSharedPointer<IrregularCsd>& curCsd = it.value();// non-const ref editable in place
@@ -785,39 +862,41 @@ void EditScenarioDialog::on_applyPushButton_clicked()
 
     }
 
-    // we dont need the current scenario Strong Reference
-    currScenario.reset();
-
     // *** switch to the new/editted scenario
     GbpController::getInstance().setScenario(newScenario);
 
+    // this is the new baseline: no changes have been made relative to it yet
+    originalScenario = newScenario;
+
+    // now ready to declare no change since last edit
+    contentHasChanged(false);
+
     // Make our own internal copies of Csd Hashes independant again. We have to do that
     // because of the QSharedPointer issue.
-    currScenario = GbpController::getInstance().getScenario().toStrongRef();
-    incomesPeriodicCsd = PeriodicCsd::deepCopyHashmap(currScenario->getIncomePeriodicCsds());
-    incomesIrregularCsd = IrregularCsd::deepCopyHashmap(currScenario->getIncomeIrregularCsds());
-    expensesPeriodicCsd = PeriodicCsd::deepCopyHashmap(currScenario->getExpensePeriodicCsds());
-    expensesIrregularCsd = IrregularCsd::deepCopyHashmap(currScenario->getExpenseIrregularCsds());
+    incomesPeriodicCsd = PeriodicCsd::deepCopyHashmap(newScenario->getIncomePeriodicCsds());
+    incomesIrregularCsd = IrregularCsd::deepCopyHashmap(newScenario->getIncomeIrregularCsds());
+    expensesPeriodicCsd = PeriodicCsd::deepCopyHashmap(newScenario->getExpensePeriodicCsds());
+    expensesIrregularCsd = IrregularCsd::deepCopyHashmap(newScenario->getExpenseIrregularCsds());
 
     // *** log the changes
     LOG_INFO(  "    Modifications to the existing scenario have been applied "
         "(but not saved yet)");
     LOG_DEBUG_INFO( QString("      Name = %1")
-        .arg(REDACT(currScenario->getName())));
+        .arg(REDACT(newScenario->getName())));
     LOG_DEBUG_INFO( QString("      Currency ISO code = %1")
-        .arg(currScenario->getCurrencyIsoCode()));
+        .arg(newScenario->getCurrencyIsoCode()));
     LOG_DEBUG_INFO( QString("      Version = %1")
-        .arg(currScenario->getVersion()));
+        .arg(newScenario->getVersion()));
     LOG_DEBUG_INFO( QString("      Fe Generation Duration = %1")
-        .arg(currScenario->getFeGenerationDuration()));
+        .arg(newScenario->getFeGenerationDuration()));
     LOG_DEBUG_INFO( QString("      No of periodic incomes = %1")
-        .arg(currScenario->getIncomePeriodicCsds().size()));
+        .arg(newScenario->getIncomePeriodicCsds().size()));
     LOG_DEBUG_INFO( QString("      No of irregular incomes = %1")
-        .arg(currScenario->getIncomeIrregularCsds().size()));
+        .arg(newScenario->getIncomeIrregularCsds().size()));
     LOG_DEBUG_INFO( QString("      No of periodic expenses = %1")
-        .arg(currScenario->getExpensePeriodicCsds().size()));
+        .arg(newScenario->getExpensePeriodicCsds().size()));
     LOG_DEBUG_INFO( QString("      No of irregular expenses = %1")
-        .arg(currScenario->getExpenseIrregularCsds().size()));
+        .arg(newScenario->getExpenseIrregularCsds().size()));
     LOG_INFO("Apply changes has completed");
 
     // *** Provide the editing result to caller
@@ -1036,7 +1115,7 @@ void EditScenarioDialog::on_editPushButton_clicked()
         if (found==false) {
             return; // should not happen
         }
-        QDate maxDate = GbpController::getInstance().getToday().addYears(
+        QDate maxDate = Scenario::getMaxDateFeGeneration(GbpController::getInstance().getToday(),
             ui->maxDurationSpinBox->value());
         if (type == Csd::CsdType::PERIODIC){
             QSharedPointer<PeriodicCsd> ps = getPeriodicCsdFromId(selectedIdList.at(0),found);
@@ -1108,6 +1187,8 @@ void EditScenarioDialog::on_duplicatePushButton_clicked()
         // does not always work...
         ui->itemsTableView->scrollTo(index,QAbstractItemView::PositionAtCenter);
     }
+
+    updateContentChanged();
 }
 
 
@@ -1130,8 +1211,10 @@ void EditScenarioDialog::on_deletePushButton_clicked()
     // Remove the Csds
     removeCsds(selectedIdList);
 
-    // Last thing to do : update the table
+    // update the table
     refreshCsdTableContent();
+
+    updateContentChanged();
 }
 
 
@@ -1166,6 +1249,8 @@ void EditScenarioDialog::on_enablePushButton_clicked()
 
     // reselect the items
     selectRowsInTableView(selectedIdList);
+
+    updateContentChanged();
 }
 
 
@@ -1188,10 +1273,12 @@ void EditScenarioDialog::on_disablePushButton_clicked()
 
     // reselect the items
     selectRowsInTableView(selectedIdList);
+
+    updateContentChanged();
 }
 
 
-// Set the color of the names of the selected Csds
+// Copy, paste, edit or reset the color of the names of the selected Csds
 void EditScenarioDialog::on_setColorPushButton_clicked()
 {
     // make sure at least 1 row is selected
@@ -1203,32 +1290,81 @@ void EditScenarioDialog::on_setColorPushButton_clicked()
         return;
     }
 
-    // This is the custom color that will be chosen, if custom selection is requested.
     QColor color;
-
-    // Ask if we have to revert to default system color or rather custom one
-    int choice = GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::QUESTION, tr("Question"),
-        tr("Do you want to revert back to the default system color or choose a custom one ?"),
-        {tr("Cancel"),tr("System's default"),tr("Custom color")},2,0 );
-    if(choice==-1){
-        // ESC pressed
-        return ;
-    } else if (choice==0){
-        // Cancel button pressed
-        return ;
-    } else if (choice==1){
-        // revert back to system default : set color to "invalid"
-        color = QColor();
-    } else {
-        // Pick a custom color
-        color = QColorDialog::getColor(Qt::gray ,this, tr("Color chooser"));
-        if (color.isValid()==false) {
-            return; // user cancelled
+    // A Csd using the system default has no color to copy, and nothing to revert
+    const bool singleCsdSystemDefault = (selectedIdList.size()==1)
+        && (getCsdColor(selectedIdList.first()).isValid()==false);
+    std::optional<QColor> colorToCopy;
+    if ((selectedIdList.size()==1) && (singleCsdSystemDefault==false)) {
+        colorToCopy = getCsdColor(selectedIdList.first());
+    }
+    CsdColorDialog colorDialog(colorToCopy, singleCsdSystemDefault==false, clipboardColor, this);
+    switch (colorDialog.exec()) {
+        case CsdColorDialog::COPY:
+            clipboardColor = getCsdColor(selectedIdList.first());
+            return; // the scenario is not changed
+        case CsdColorDialog::PASTE:
+            color = clipboardColor.value();
+            break;
+        case CsdColorDialog::EDIT: {
+            // The starting color is the one of the topmost selected Csd. A Csd using the system
+            // default has no color to start from : use gray
+            QColor startColor = getCsdColor(getTopmostSelectedCsd());
+            if (startColor.isValid()==false) {
+                startColor = Qt::gray;
+            }
+            color = QColorDialog::getColor(startColor, this, tr("Color chooser"));
+            if (color.isValid()==false) {
+                return; // user cancelled
+            }
+            break;
         }
+        case CsdColorDialog::SYSTEM_DEFAULT:
+            color = QColor(); // "invalid" means system default
+            break;
+        case CsdColorDialog::NONE:
+        default:
+            return; // ESC pressed or window closed
     }
 
-    // Apply to all selected Csds
-    foreach (QUuid id, selectedIdList) {
+    applyColorToCsds(selectedIdList, color);
+}
+
+
+// Ctrl+Shift+C : a selected Csd using the system default has no color to copy
+void EditScenarioDialog::onCopyColorShortcut()
+{
+    QList<QUuid> selectedIdList = getSelection();
+    if (selectedIdList.size()==0) {
+        return;
+    }
+    if (selectedIdList.size()>1) {
+        GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
+            tr("Select only one item"), {tr("OK")}, 0, 0);
+        ui->itemsTableView->setFocus();    // fix the strange behavior
+        return;
+    }
+    QColor color = getCsdColor(selectedIdList.first());
+    if (color.isValid()) {
+        clipboardColor = color;
+    }
+}
+
+
+// Ctrl+Shift+V
+void EditScenarioDialog::onPasteColorShortcut()
+{
+    QList<QUuid> selectedIdList = getSelection();
+    if ((selectedIdList.size()==0) || (clipboardColor.has_value()==false)) {
+        return;
+    }
+    applyColorToCsds(selectedIdList, clipboardColor.value());
+}
+
+
+void EditScenarioDialog::applyColorToCsds(const QList<QUuid>& idList, const QColor& color)
+{
+    foreach (QUuid id, idList) {
         if (incomesPeriodicCsd.contains(id)==true) {
             QSharedPointer<PeriodicCsd> ps = incomesPeriodicCsd.value(id);
             ps->setDecorationColor(color);
@@ -1250,6 +1386,43 @@ void EditScenarioDialog::on_setColorPushButton_clicked()
 
     // update table
     refreshCsdTableContent();
+
+    // reselect the items
+    selectRowsInTableView(idList);
+
+    updateContentChanged();
+}
+
+
+// Invalid color means system default
+QColor EditScenarioDialog::getCsdColor(const QUuid& id) const
+{
+    if (incomesPeriodicCsd.contains(id)==true) {
+        return incomesPeriodicCsd.value(id)->getDecorationColor();
+    } else if (incomesIrregularCsd.contains(id)==true) {
+        return incomesIrregularCsd.value(id)->getDecorationColor();
+    } else if (expensesPeriodicCsd.contains(id)==true) {
+        return expensesPeriodicCsd.value(id)->getDecorationColor();
+    } else if (expensesIrregularCsd.contains(id)==true) {
+        return expensesIrregularCsd.value(id)->getDecorationColor();
+    }
+    return QColor();
+}
+
+
+// selectedRows() follows the order of the selection ranges, not the order of the rows
+QUuid EditScenarioDialog::getTopmostSelectedCsd()
+{
+    int topRow = -1;
+    const QModelIndexList rows = ui->itemsTableView->selectionModel()->selectedRows();
+    for (const QModelIndex& index : rows) {
+        if ((topRow==-1) || (index.row()<topRow)) {
+            topRow = index.row();
+        }
+    }
+    bool found;
+    QUuid id = itemTableModel->getId(topRow,found);
+    return found ? id : QUuid();
 }
 
 
@@ -1266,8 +1439,9 @@ void EditScenarioDialog::on_itemsTableView_doubleClicked(const QModelIndex &inde
 
 
 
-void EditScenarioDialog::on_maxDurationSpinBox_valueChanged(int arg1)
+void EditScenarioDialog::on_maxDurationSpinBox_valueChanged(int /*arg1*/)
 {
+    updateContentChanged();
 }
 
 
@@ -1433,6 +1607,49 @@ QSharedPointer<IrregularCsd> EditScenarioDialog::getIrregularCsdFromId(QUuid id,
 }
 
 
+void EditScenarioDialog::contentHasChanged(bool v)
+{
+    // override the value, don't care if it is the same as the cost is negligible
+    contentChanged.set(v);
+
+    // Visual indicators : warning sign next to the buttons, "*" in the window title
+    ui->modifiedWarningLabel->setVisible(hasContentChanged());
+    setWindowModified(hasContentChanged());
+
+    // Update buttons to reflect the new situation
+    if (hasContentChanged()==true) {
+        ui->closePushButton->setVisible(false);
+        ui->cancelPushButton->setVisible(true);
+        ui->applyPushButton->setVisible(true);
+    } else {
+        ui->closePushButton->setVisible(true);
+        ui->cancelPushButton->setVisible(false);
+        ui->applyPushButton->setVisible(false);
+    }
+
+}
+
+bool EditScenarioDialog::hasContentChanged() const
+{
+    return contentChanged.get();
+}
+
+
+void EditScenarioDialog::updateContentChanged()
+{
+    if (fillingForm || originalScenario.isNull()) {
+        return;     // form being filled, or dialog not prepared : nothing to check
+    }
+    BuildScenarioResult result;
+    QSharedPointer<Scenario> built = buildScenarioFromCurrentState(result);
+    if ( (result != BuildScenarioResult::SUCCESS) || built.isNull() ) {
+        contentHasChanged(true);    // keep Apply available : it will report the error
+        return;
+    }
+    contentHasChanged( !(*built == *originalScenario) );
+}
+
+
 /**
  * @brief Called when filter tag combination mode selection is changed. WARNING : this is
  * also called when we insert item in the combobox at init time
@@ -1465,5 +1682,11 @@ void EditScenarioDialog::showEvent(QShowEvent* event)
             .arg(width()).arg(height()));
         ui->scenarioNameLineEdit->deselect();
     });
+}
+
+
+void EditScenarioDialog::on_closePushButton_clicked()
+{
+    on_cancelPushButton_clicked();
 }
 

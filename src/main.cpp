@@ -350,6 +350,9 @@ static void listWorkspaces()
     QString configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
     QString appNameStr = Constants::APP_NAME;
 
+    std::cout << "Configuration directory : "
+              << QDir::toNativeSeparators(configPath).toStdString() << "\n\n";
+
     QDir dir(configPath);
     if (!dir.exists()) {
         std::cout << "  No workspaces found.\n";
@@ -698,7 +701,8 @@ static void checkHelpArgument(int argc, char *argv[])
             std::string appVer = Constants::APP_VERSION.toStdString();
             std::cout <<  appName << " v" << appVer << "\n";
             std::cout << "\nUSAGE:\n";
-            std::cout << "  gbp [options]\n";
+            std::cout << "  Linux   : ./gbp-" << appVer << "-x86_64.AppImage [options]\n";
+            std::cout << "  Windows : gbp.exe [options]\n";
             std::cout << "\nOPTIONS:\n";
             std::cout << "  -h, --help\n";
             std::cout << "    Display help message and exit\n";

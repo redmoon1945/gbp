@@ -58,6 +58,7 @@ protected:
 private:
     Ui::LoadIrregularTextFileDialog *ui;
 
+
     // misc variables
     QLocale theLocale;
     CurrencyInfo currInfo;

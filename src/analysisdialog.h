@@ -23,9 +23,12 @@
 #include <QColor>
 #include <QDialog>
 #include <QChartView>
+#include <QLineSeries>
+#include <QTimer>
 #include <QPieSeries>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QStyledItemDelegate>
 #include <QListWidget>
 #include <QBarSeries>
 #include <QBarCategoryAxis>
@@ -80,6 +83,7 @@ public:
     explicit AnalysisDialog(QLocale theLocale, QWidget *parent = nullptr);
     ~AnalysisDialog();
     void themeChanged();
+    void updateHelpText();
 
 
 private slots:
@@ -95,6 +99,7 @@ private slots:
     void on_tagsSelectTagsPushButton_clicked();
     void on_tagsIncomesRadioButton_clicked();
     void on_tagsExpensesRadioButton_clicked();
+    void on_tagsTableWidget_itemSelectionChanged();
     void on_rwClearSelectionPushButton_clicked();
     void on_globalExportCsvPushButton_clicked();
     void on_globalExportImagePushButton_clicked();
@@ -159,6 +164,25 @@ private:
 
         bool operator<(const QTableWidgetItem& other) const override;
 
+    };
+
+    /**
+     * @brief Draws a percentage column as a horizontal bar (whole cell = 100 %) followed by the
+     * percentage text. Used for "Weight" in the tags table and "% of tag" in the breakdown table.
+     * @details The fraction (0 to 1) is read from Qt::UserRole. The text has its own area at the
+     * right of the cell, as wide as the widest text of the column (see setTextWidth()), so that
+     * all the bars start at the same place and have the same scale.
+     */
+    class WeightBarDelegate : public QStyledItemDelegate {
+    public:
+        explicit WeightBarDelegate(QObject* parent = nullptr) : QStyledItemDelegate(parent) {}
+        void paint(QPainter* painter, const QStyleOptionViewItem& option,
+            const QModelIndex& index) const override;
+        QSize sizeHint(const QStyleOptionViewItem& option,
+            const QModelIndex& index) const override;
+        void setTextWidth(int width) { textWidth = width; }
+    private:
+        int textWidth = 0; // width of the widest percentage text of the column, in pixels
     };
 
     // For Period - *
@@ -257,6 +281,18 @@ private:
         bool operator!=(const TagContribution& o) const;
     };
 
+    /**
+     * @struct CsdContribution
+     * @brief Hold info about the contribution of one CSD to one tag, for either incomes or
+     * expenses financial events.
+     */
+    struct CsdContribution{
+        QString name;     /// CSD name
+        QColor color;     /// CSD decoration color
+        double amount = 0; /// total amount for that CSD in the period
+        int count = 0;    /// number of individual financial events of that CSD in the period
+    };
+
 
     // ---------------------------------------------------------------------------------------------
     // -------------------------------------- Variables --------------------------------------------
@@ -290,6 +326,15 @@ private:
     QChartView *chartViewYearlyReport = nullptr;
     QBarCategoryAxis* chartYearlyReportAxisX;
     QValueAxis* chartYearlyReportAxisY;
+
+    // +++ Tags tables : bars drawn in the Weight and "% of tag" columns (owned by the tables) +++
+    WeightBarDelegate* tagsWeightDelegate = nullptr;
+    WeightBarDelegate* tagsBreakdownPctDelegate = nullptr;
+
+    // +++ Tags breakdown pie chart +++
+    QChart* tagsPieChart = nullptr;
+    QChartView* tagsPieChartView = nullptr;
+    QString tagsPieHoveredText; // tooltip text of the hovered slice, empty if none
 
     // +++ Tags bar BarChart +++
     QChart* chartTags;
@@ -364,6 +409,25 @@ private:
      */
     QHash<QUuid,TagContribution> tagsTableData;
 
+    /**
+     * @brief Breakdown of each tag of tagsTableData into its contributing CSDs. Outer key is
+     * the tag ID, inner key is the CSD ID.
+     */
+    QHash<QUuid,QHash<QUuid,CsdContribution>> tagsBreakdownData;
+
+    /**
+     * @brief ID of the tag selected in the Tags table in Income and in Expenses mode, which is
+     * the one shown in the breakdown table. Null if none. Each mode keeps its own selection, so
+     * that it survives a redisplay and a switch to the other mode and back.
+     */
+    QUuid tagsBreakdownTagIdIncome;
+    QUuid tagsBreakdownTagIdExpense;
+
+    /**
+     * @brief Return the ID of the tag selected in the current mode (Income or Expenses).
+     */
+    QUuid& tagsBreakdownTagId();
+
     // +++ CSD Comparison tab +++
 
     QSet<QUuid> csdCheckedIncomeIds;
@@ -378,6 +442,51 @@ private:
     QScatterSeries*    csdLastSelectedSeries = nullptr;
     int                csdLastSelectedIndex  = -1;
     QMap<QUuid, int>   csdColorAssign[2];    // persistent color slot per UUID, [0]=income [1]=expense
+
+    QList<QUuid> csdDisplayedIds;                   // CSDs displayed, in color assignment order
+    QMap<QUuid, QList<QPointF>> csdDisplayedPoints; // their real points (no step points), by x
+    QMap<QUuid, QColor> csdDisplayedColors;         // their curve color
+    QList<QLineSeries*> csdLineSeries;              // their curves, same order as the IDs
+    QTimer* csdMarkersTimer = nullptr; // rebuilds the markers during/after a zoom or a pan
+
+    /**
+     * @brief Financial events of every income CSD and of every expense CSD, as chart points
+     * (x = date in ms, y = absolute amount, sorted by date), for the date range of the event
+     * data (see eventDataRebuild()).
+     */
+    QHash<QUuid, QList<QPointF>> csdPointsCacheIncomes;
+    QHash<QUuid, QList<QPointF>> csdPointsCacheExpenses;
+
+    // +++ Event data shared by the Relative Weight, Tags and Compare CSD tabs +++
+
+    /**
+     * @brief Totals of the financial events of one CSD in a date range.
+     */
+    struct CsdEventTotal {
+        QString name;          // CSD name
+        QColor color;          // CSD decoration color
+        double amount = 0;     // sum of the amounts (negative for expenses)
+        double absAmount = 0;  // sum of the absolute amounts
+        int count = 0;         // number of financial events
+    };
+
+    /**
+     * @brief Event data computed in a single pass over all the financial events of the
+     * scenario, for one date range, by eventDataRebuild() : totals per CSD and grand totals
+     * (used by Relative Weight and Tags), and the points of the Compare CSD caches. Built when
+     * the dialog is prepared and when other dates are applied, then reused by the tabs
+     * (switching Income/Expenses, selecting tags or CSDs, ...) without scanning the financial
+     * events again. Freed by eventDataClear() when the dialog closes.
+     */
+    QHash<QUuid, CsdEventTotal> eventCsdTotalsIncomes;
+    QHash<QUuid, CsdEventTotal> eventCsdTotalsExpenses;
+    double eventDaysTotalIncomes = 0;   // sum of the daily totals of incomes
+    double eventDaysTotalExpenses = 0;  // sum of the daily totals of expenses
+    double eventAbsTotalIncomes = 0;    // sum of the absolute amounts of income events
+    double eventAbsTotalExpenses = 0;   // sum of the absolute amounts of expense events
+    bool  eventDataValid = false;       // false : must be rebuilt before use
+    QDate eventDataFrom;                // date range the event data was built for
+    QDate eventDataTo;
 
 
 
@@ -635,9 +744,28 @@ private:
      * @param data Output hash keyed by tag UUID; cleared and repopulated by this call.
      * @param totalWithoutTags Output: total income (>0) or expense (<0) for the period,
      * computed independently of tag filtering.
+     * @param breakdown Output hash keyed by tag UUID, then by CSD UUID : contribution of each
+     * CSD to each tag. Cleared and repopulated by this call.
      */
     void tagsRebuildData(QDate from, QDate to, QHash<QUuid,TagContribution>& data,
-        double &totalWithoutTags);
+        double &totalWithoutTags, QHash<QUuid,QHash<QUuid,CsdContribution>>& breakdown);
+
+    /**
+     * @brief Redisplay the breakdown table for the tag tagsBreakdownTagId, using
+     * tagsBreakdownData. Show an explanation message if no tag is selected or if the tag has
+     * no financial events in the period.
+     */
+    void tagsRedisplayBreakdown();
+
+    /**
+     * @brief Redisplay the pie chart of the breakdown : one slice per CSD of the selected
+     * tag, using the colors shown in front of the CSD names in the breakdown table. Slices
+     * have no label : hovering a slice shows its name, amount and percentage in a tooltip.
+     * @param slices Ordered (largest first) list of (CSD name, amount, color) for the slices.
+     * Smallest CSDs are expected to be already grouped in a single "Others" slice. An empty
+     * list clears the chart.
+     */
+    void tagsRedisplayPie(const QList<std::tuple<QString,double,QColor>>& slices);
 
     /**
      * @brief Update the "N selected" label in the Tags tab to reflect the current
@@ -662,6 +790,36 @@ private:
     void csdRescaleChart();
     void csdPointClicked(QScatterSeries* series, const QPointF& pt);
     void csdClearSelectedPoint();
+
+    /**
+     * @brief Rebuild the point markers of the displayed curves, for the visible X range only.
+     * No marker is created if "Points" is unchecked, or if there would be more than the maximum
+     * number of points (chart_max_points setting) of them, all curves together (a message is
+     * shown instead). The selected point is kept if it is still visible.
+     */
+    void csdRebuildMarkers();
+
+    /**
+     * @brief Forget the displayed curves (their series must already be deleted, e.g. by
+     * removeAllSeries()) and the selected point.
+     */
+    void csdClearCachedData();
+
+    /**
+     * @brief Rebuild the event data (totals per CSD, grand totals, Compare CSD points) for a
+     * date range, by scanning all the financial events of the scenario once.
+     */
+    void eventDataRebuild(QDate from, QDate to);
+
+    /**
+     * @brief Rebuild the event data only if it is not valid or was built for other dates.
+     */
+    void eventDataEnsure(QDate from, QDate to);
+
+    /**
+     * @brief Free all the event data. It will be rebuilt when needed.
+     */
+    void eventDataClear();
 
 };
 

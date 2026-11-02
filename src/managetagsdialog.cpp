@@ -54,6 +54,12 @@ ManageTagsDialog::ManageTagsDialog(QLocale aLocale,QWidget *parent)
     // Always Select the fist tab
     ui->tagsTabWidget->setCurrentIndex(0);
 
+    // Warning sign displayed next to the buttons when there are changes not applied yet
+    // (same as in EditScenarioDialog). Shown/hidden by contentHasChanged().
+    ui->modifiedWarningLabel->setText("\u26A0");
+    ui->modifiedWarningLabel->setStyleSheet("color: #FF9800;");
+    ui->modifiedWarningLabel->setVisible(false);
+
     QFont appFont = QApplication::font();
 
     // set up the list model for tags in the TagsDef table view
@@ -146,6 +152,14 @@ void ManageTagsDialog::slotPrepareContent(Tags newTags, TagCsdRelationships newR
     relationships = newRelationships;
     allCsds = newCsdItems;
 
+    // Keep a copy to detect unsaved changes later
+    originalTags = newTags;
+    originalRelationships = newRelationships;
+
+    // [*] : replaced by "*" when there are changes not applied yet (see setWindowModified() in
+    // contentHasChanged())
+    this->setWindowTitle(tr("Manage Tags") + "[*]");
+
     // First, update tags definitions
     tagsDef_UpdateTagList();
 
@@ -158,6 +172,7 @@ void ManageTagsDialog::slotPrepareContent(Tags newTags, TagCsdRelationships newR
 
     ui->tagsDefTableView->setFocus();
 
+    contentHasChanged(false);   // only "Close" at first
 }
 
 
@@ -166,7 +181,14 @@ void ManageTagsDialog::on_ManageTagsDialog_rejected()
     on_cancelPushButton_clicked();
 }
 
+// Changes not applied : discard them and close
 void ManageTagsDialog::on_cancelPushButton_clicked()
+{
+    on_closePushButton_clicked();
+}
+
+
+void ManageTagsDialog::on_closePushButton_clicked()
 {
     emit signalManageTagsCompleted();
     hide();
@@ -218,6 +240,8 @@ void ManageTagsDialog::slotEditTagResult(Tag newtag)
 
     // make visible the new or edited tag
     makeVisibleTag(newtag.getId());
+
+    updateContentChanged();
 }
 
 
@@ -344,6 +368,8 @@ void ManageTagsDialog::on_tagsDefDeletePushButton_clicked()
     }
     // refresh the list
     tagsDef_UpdateTagList();
+
+    updateContentChanged();
 }
 
 
@@ -439,6 +465,8 @@ void ManageTagsDialog::on_tagsDefDuplicatePushButton_clicked()
 
     // make visible the first one (does not mean the first sorted one...)
     makeVisibleTag(firstDuplicate);
+
+    updateContentChanged();
 }
 
 
@@ -489,6 +517,8 @@ void ManageTagsDialog::on_tagsDefImportPushButton_clicked()
 
         // Refresh tags lsit
         tagsDef_UpdateTagList();
+
+        updateContentChanged();
 
     } else {
         return; // user canceled
@@ -596,7 +626,7 @@ void ManageTagsDialog::on_tagsViewTagsListWidget_itemSelectionChanged()
 
 void ManageTagsDialog::tagsView_UpdateCsdListLabel()
 {
-    QString s = tr("Linked cash stream definitions");
+    QString s = tr("Linked Cash stream definitions");
     if (ui->tagsViewCsdListWidget->count()!=0) {
         s = QString("%1 (%2)").arg(s).arg(locale.toString(ui->tagsViewCsdListWidget->count()));
     }
@@ -680,8 +710,8 @@ void ManageTagsDialog::on_tagsViewAddLinkPushButton_clicked()
 
     if (csdSet.size()==0) {
         // all Fsds are already in relationship with the selected tag
-        QString errorString = QString(tr("No more cash stream definition to link. All the existing "
-            "ones defined the scenario have already been linked to this tag."));
+        QString errorString = QString(tr("No more Cash stream definitions to link. All the "
+            "existing ones defined in the scenario have already been linked to this tag."));
         GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::WARNING, tr("Warning"),
             errorString, {tr("OK")}, 0, 0);
         return;
@@ -717,6 +747,8 @@ void ManageTagsDialog::on_tagsViewDeleteLinksPushButton_clicked()
 
     // update list of FSD
     tagsView_UpdateCsdList();
+
+    updateContentChanged();
 }
 
 
@@ -736,6 +768,8 @@ void ManageTagsDialog::slotChooseCsdsResult(QSet<QUuid> newCsdsToLink)
 
     // update csd list
     tagsView_UpdateCsdList();
+
+    updateContentChanged();
 }
 
 
@@ -763,6 +797,8 @@ void ManageTagsDialog::slotChooseTagsResult(QSet<QUuid> selectedTagsIds)
 
     // update tag list
     csdsView_UpdateTagList();
+
+    updateContentChanged();
 }
 
 
@@ -886,7 +922,7 @@ void ManageTagsDialog::csdsView_SelectCsd(QUuid csdId)
 
 void ManageTagsDialog::csdsView_UpdateTagListLabel()
 {
-    QString s = tr("Linked Tags");
+    QString s = tr("Linked tags");
     if (ui->csdsViewTagsListWidget->count()!=0) {
         s = QString("%1 (%2)").arg(s).arg(locale.toString(ui->csdsViewTagsListWidget->count()));
     }
@@ -932,6 +968,8 @@ void ManageTagsDialog::on_csdsViewUnlinkPushButton_clicked()
 
     // update list of Tags
     csdsView_UpdateTagList();
+
+    updateContentChanged();
 }
 
 
@@ -970,8 +1008,8 @@ void ManageTagsDialog::on_csdsViewLinkPushButton_clicked()
 
     if (tagsUnlinked.size()==0) {
         // all Tags are already in relationship with the selected csd
-        QString errorString = QString(tr("No more tags to link. All the existing "
-            "ones defined the scenario have already been linked to this cash stream definition."));
+        QString errorString = QString(tr("No more tags to link. All the existing ones defined "
+            "in the scenario have already been linked to this Cash stream definition."));
         GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::INFORMATION, tr("Information"),
             errorString, {tr("OK")}, 0, 0);
         return;
@@ -1003,3 +1041,39 @@ void ManageTagsDialog::showEvent(QShowEvent* event)
     });
 }
 
+
+//----- Change tracking ----------------------------------------------------------------------------
+
+
+void ManageTagsDialog::contentHasChanged(bool v)
+{
+    // override the value, don't care if it is the same as the cost is negligible
+    contentChanged.set(v);
+
+    // Visual indicators : warning sign next to the buttons, "*" in the window title
+    ui->modifiedWarningLabel->setVisible(hasContentChanged());
+    setWindowModified(hasContentChanged());
+
+    // Update buttons to reflect the new situation
+    if (hasContentChanged()==true) {
+        ui->closePushButton->setVisible(false);
+        ui->cancelPushButton->setVisible(true);
+        ui->applyPushButton->setVisible(true);
+    } else {
+        ui->closePushButton->setVisible(true);
+        ui->cancelPushButton->setVisible(false);
+        ui->applyPushButton->setVisible(false);
+    }
+}
+
+
+bool ManageTagsDialog::hasContentChanged() const
+{
+    return contentChanged.get();
+}
+
+
+void ManageTagsDialog::updateContentChanged()
+{
+    contentHasChanged( (tags != originalTags) || (relationships != originalRelationships) );
+}

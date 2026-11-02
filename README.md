@@ -2,19 +2,19 @@
 
 ## What's new ?
 
-Version **1.8.1** is out (29 August 2026) ! This is a **bug-fix release**, with addition of a French user manual and quick tutorial, making gbp French support complete (English is the default language and will always be). Here are the main changes compared to 1.8.0 (see CHANGELOG for details) :
+Version **1.9.0**, released on 5 November 2026, brings <u>substantial</u> improvements ! Here are the main changes compared to 1.8.2 (see CHANGELOG for the many other changes and additional details) :
 
-- **Installation simplified** : On Linux, GBP no longer requires a separate installation of the FUSE 2 library (`libfuse2`) as a prerequisite.
+- **Dramatically faster loading and calculations** : GBP now handles very large scenarios with ease, even with daily financial streams over 100 years. Operations that took many seconds (sometimes minutes) now take two seconds at most, most of them almost instantly. This is done in part by limiting the number of points (a.k.a. "markers") displayed to a configurable ceiling (2000 by default).
 
-- **Full French translation for bundled documentation** : the User Manual and Quick Tutorial are now available in French, in addition to English which is the default.
+- **Changes not applied are shown** : in Edit Scenario, the financial stream dialogs, Manage Tags, Options and the description editor, an orange ⚠ appears next to the buttons at the bottom, the window title ends with "\*", and "Close" is replaced by "Cancel" and the button that applies the changes ("Save" in Options).
 
-- **Dynamic column sizing** : table columns in several dialogs (Edit Irregular Financial Stream Definition, Edit Scenario, Manage Tags, Edit Variable Growth, Analysis — Tags tab) now resize themselves to fit their actual content, instead of relying on a fixed estimate made once at startup. This fixes long content getting truncated with an ellipsis on some platform/locale combinations — most visibly a German long-format date on Windows, where the fixed estimate didn't leave enough room for the font actually used there.
+- **Tag breakdown** : in Analysis, Tags tab, selecting a tag shows the Cash stream definitions contributing to it, as a table and a pie chart.
 
-- **Better support for international locales** : numbers and dates across the app are now more consistently rendered in the application's actual locale — including locales with their own numbering system (e.g. Bengali or Arabic digits), where several places had been silently falling back to plain Western digits or picking up formatting that doesn't belong on an identifier (like a thousands separator on a year).
+- **Enhanced color settings** : in Edit Scenario, the colors of Cash stream definitions can now be copied and pasted, including with keyboard shortcuts.
 
-- In **Custom Date Interval dialog :**
-  
-  - **Custom date interval (chart) remembers your last selection** : the "Custom" chart range dialog no longer resets its "From"/"To" dates to the chart's current view every time it is opened ; your previous selection is kept instead, and only adjusted if it falls outside what the loaded scenario can actually calculate.
+- **New Quick Tutorial** : completely rewritten, in English and French, to be easier to read and to follow, with diagrams of the main windows and a worked example.
+
+- **Two versions for Linux** : the "Embedded manuals version" as before and considered as the default, and a much smaller "Online manuals version" (see Installation) for cases where disk space is critical.
 
 ## Screenshots
 
@@ -46,15 +46,16 @@ Analysis - Heatmap
 
 ### On Linux
 
-GBP is distributed as an “AppImage” on Linux platform, which is a single-file executable packaging format allowing a program to run on many Linux distributions. There is nothing else to install in most cases. After downloading the most recent AppImage application from https://github.com/redmoon1945/gbp/releases, user has to enable “executable” permission on the file and it is ready to be launched. 
+GBP is distributed as an “AppImage” on Linux platform, which is a single-file executable packaging format allowing a program to run on many Linux distributions. There is nothing else to install in most cases. After downloading the most recent AppImage application from https://github.com/redmoon1945/gbp/releases, user has to enable “executable” permission on the file and it is ready to be launched.
 
-###### **Lunduke Computer Operating System (LCOS) case**
+###### Two versions : embedded or online manuals
 
-As of sept 2026, LCOS 0.2 is still an alpha version, intended for testing only, it will probably greatly evolve in the coming months. You have to install FUSE 3 to execute an AppImage file like gbp. 
+Two AppImages are provided for each version of GBP. They differ only by how the documentation is provided ; GBP works the same way in both :
 
-`sudo apt install fuse3`
+* `gbp-x.y.z-x86_64.AppImage`, the "Embedded manuals version" : the User Manual, the Quick Tutorial (PDF, English and French) and the Change Log (PDF, English) are included, and opened by the default PDF viewer of the system.
+* `gbp-x.y.z-nomanual-x86_64.AppImage`, the "Online manuals version" : use it when disk space is really critical. Much smaller, it does not include these documents. "Help → User Manual", "Help → Quick Tutorial" and "Help → Change log" show the address where the PDF can be downloaded from this repository (directory "doc"), with a button to copy it : paste it in your web browser. GBP itself never accesses the Internet.
 
-gbp works well, even if there are several minor "warning messages" written to the console, all related to what is or is not implemented at this stage in LCOS.
+In both versions, the Welcome document (PDF) is included and opens at the first start.
 
 ###### NixOS case
 
@@ -63,51 +64,69 @@ NixOS does not use the traditional Linux filesystem layout (no `/lib64`, no FHS-
 To run the GBP AppImage on NixOS, you have two options :
 
 * **One-off / try it out** : run it through `appimage-run`, without installing anything permanently :
-  
-  `nix-shell -p appimage-run --run "appimage-run ./gbp-x.y.z.AppImage"`
+
+  `nix-shell -p appimage-run --run "appimage-run ./gbp-x.y.z-x86_64.AppImage"`
 
 * **Permanent fix (recommended)** : enable AppImage support system-wide by adding this to your `configuration.nix`, then running `sudo nixos-rebuild switch` :
-  
+
   ```nix
   programs.appimage = {
     enable = true;
     binfmt = true;
   };
   ```
-  
-  Once enabled, AppImages (including GBP's) can be launched directly, e.g. `./gbp-x.y.z.AppImage`, or by double-clicking them in a file manager, just like on any other distribution.
+
+  Once enabled, AppImages (including GBP's) can be launched directly, e.g. `./gbp-x.y.z-x86_64.AppImage`, or by double-clicking them in a file manager, just like on any other distribution.
 
 Note that GBP's configuration and log files are stored under the standard XDG user directories (`~/.config` and `~/.local/share`), so they behave normally on NixOS regardless of how the AppImage is launched.
 
+###### Omarchy case
+
+On Omarchy (Hyprland), in the "About Graphical Budget Planner" window (Help menu), the "View" button next to "Log file :" opens the `.txt` log file through the system's default handler for the `text/plain` MIME type. On a default Omarchy setup, that handler is `nvim`, a terminal-based editor. Since `nvim` isn't spawned in its own terminal window, it takes over the terminal GBP was launched from instead of opening in a separate window.
+
+This is not a GBP bug, but a consequence of the default MIME association on Omarchy. To fix it, reassign the default `text/plain` handler to a GUI text editor :
+
+```bash
+xdg-mime query default text/plain
+ls /usr/share/applications/ ~/.local/share/applications/ | grep -i -E 'edit|text|kate|gedit|code'
+xdg-mime default <your-editor>.desktop text/plain
+```
+
+Replace `<your-editor>.desktop` with the `.desktop` file of any installed GUI editor (e.g. `gnome-text-editor.desktop`, `kate.desktop`, `code.desktop`). Once set, "View" will open the log file in that GUI editor instead of taking over the terminal.
+
 ### On Windows®
 
-Download the ".zip" file binary from the repository mentioned above and unzip it in the folder of your choice. Launch gpb.exe to execute GBP.
+GBP is distributed as a simple zip file (see https://github.com/redmoon1945/gbp/releases) : unzip it in a folder of your choice and run the gbp.exe application found inside. The zip file includes the User Manual and the Quick Tutorial.
 
 ## Supported Platforms and Languages, System Requirements
 
-GBP is intended to be run first and foremost on the Linux Operating System. But since it is built using the Qt cross platform toolkit, a version of GBP for the Windows® Operating System is also provided and fully tested. A version for MAC could be easily produced if requested.
+GBP is intended to be run first and foremost on the Linux Operating System. But since it is built using the Qt cross platform toolkit, a version of GBP for the Windows® Operating System is also provided and fully tested (on Windows® 11 Home Edition only). A version for Mac could easily be created if there is demand for it. A mouse is required to use the software.
 
-GBP does not use a lot of RAM (typically between 25 and 250 MB, depending on the scenario) and necessitate roughly 50 MB of disk space (not taken into account the scenario files that you will create and GBP log files, which are all pretty small anyways).
+GBP is light on RAM usage — typically between 40 and 250 MB even in the most demanding case. It necessitates roughly 55 MB of disk space, about 30 MB for the "Online manuals version" on Linux (not taken into account the scenario files that you will create and GBP log files, which are all very small anyways).
 
-As of september 2026, GBP has been extensively tested on the following platforms : 
+A screen resolution of **1500 x 900** is usually required, but it can be more depending on the application font used. Some guidelines :
 
-* **Kubuntu 26.04 LTS**, KDE 6.6.4, Wayland, Kernel 7.0.0-22
-* **Linux Mint** Debian Edition 7, Cinnamon 6.4.13, X11, Kernel 6.12.94
+* Linux : Noto Sans 10, 12 or 16 : 1500 x 900 ; Noto Sans 24 : 1863 x 1047
+* Windows : Segoe UI 9 : 1500 x 900 ; Segoe UI 24 : 1777 x 1035 ; Arial 18 or Comic Sans MS 18 : 1500 x 900
+
+As of November 2026, GBP has been extensively tested on the following platforms :
+
+* **Kubuntu 26.04.1 LTS**, KDE 6.6.6, Wayland, Kernel 7.0.0-42
+* **Linux Mint** Debian Edition 7, Cinnamon 6.6.9, X11, Kernel 6.12.113
 * **Windows® 11** Home Edition
 
 It has also been tested, but not as extensively, on the following platforms :
 
-* LCOS 0.2, XFCE 4.20, Libre X11, Kernel 6.12.101
-* MX linux 25, XFCE 4.20.1, X11, Kernel 6.16.12
-* Fedora 43, KDE Plasma 6.6.5, Wayland, Kernel 7.0.11-100
-* OpenMandriva Lx 5.0, X11, KDE Plasma 5.27.9, kernel 6.6.2
-* Ubuntu 24.04.04 LTS, Gnome 46, Kernel 6.7.0-35
-* Ubuntu 22.04.5 LTS, Gnome 42.9, X11, Kernel 6.8.0-52
-* Ubuntu 22.04.5 LTS, Gnome 42.9, Wayland, Kernel 6.8.0-52
+* LCOS 1.0, XFCE 4.20, Libre X11, Kernel 7.2.6-lunduke1
+* Omarchy 4.04, Wayland Hyprland, Kernel 7.2.3
+* MX linux 25.3, XFCE 4.20.1, X11, Kernel 7.2.8
+* Fedora 44, KDE Plasma 6.7.5, Wayland, Kernel 7.2.13
+* OpenMandriva Lx 6.0, LXQt 2.2.0, kernel 6.14.2
+* Ubuntu 24.04.05 LTS, Gnome 46, Kernel 7.0.0-42
+* Ubuntu 22.04.05 LTS, Gnome 42.9, X11, Kernel 6.8.0-138
+* Ubuntu 22.04.05 LTS, Gnome 42.9, Wayland, Kernel 6.8.0-138
 
 GBP supports English and French languages. By default, English is used, but if the host Operating System is in French (whatever the country), then GBP will switch to French. More languages will hopefully be added in the future, if resources to translate are available.
-
-A mouse is required to use the software. A screen resolution of **1650 x 1080** or better is required.
 
 ## License, Disclaimers and Source Code Repository
 
@@ -126,7 +145,7 @@ Credits :
 
 ## Usage
 
-See the detailed User Manual to get in depth information about this application : gbp/doc/Graphical Budget Planner - User Manual.pdf 
+See the detailed User Manual to get in depth information about this application : [doc/user_manual-en.pdf](doc/user_manual-en.pdf) (in French : [doc/user_manual-fr.pdf](doc/user_manual-fr.pdf)), and the Quick Tutorial : [doc/quick_tutorial-en.pdf](doc/quick_tutorial-en.pdf) (in French : [doc/quick_tutorial-fr.pdf](doc/quick_tutorial-fr.pdf)).
 
 Graphical Budget Planner (GBP) is an open source Qt desktop application intended to ease significantly the process of creating, maintaining and analyzing a personal budget. It allows the following :
 
@@ -144,4 +163,4 @@ GBP is all about CASH BALANCE **FORECASTING** : the key principle adopted in the
 
 ## Building GBP
 
-If you want to build yourself the application for Linux and not use the provided binaries in the "Releases" folder, see the Building.md
+If you want to build yourself the application and not use the provided binaries in the "Releases" folder, see the Building.md

@@ -36,37 +36,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="instructionslabel">
-       <property name="font">
-        <font>
-         <bold>true</bold>
-         <underline>true</underline>
-        </font>
-       </property>
-       <property name="text">
-        <string>Instructions</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPlainTextEdit" name="instructionsPlainTextEdit">
-       <property name="font">
-        <font>
-         <italic>true</italic>
-        </font>
-       </property>
-       <property name="plainText">
-        <string>This import process loads, from an external file, a list of entries. Current entries will be deleted. This is useful when values are computed by an external model and entering them manually would be tedious. The file must be a Unicode-encoded text file (UTF-8, UTF-16 or UTF-32). Each line defines exactly one entry. Empty lines are not allowed. Format of each line: 
-
-    &lt;date&gt;TAB&lt;growth&gt;
-
-where
-
-&lt;date&gt; : Transition date (first day the new value applies). ISO 8601 format: YYYY-MM-DD. E.g. 2025-01-01
-TAB : Tab character (0x09)
-&lt;growth&gt; : Annual growth (or inflation) rate in percentage, as a decimal number. Decimal separator must be .  E.g. 8.9234 means 8.9234%. Range: -100 to 10000. Up to 5 decimal places stored.
-
-If two lines share the same date, the last one wins. </string>
+      <widget class="QTextEdit" name="instructionsTextEdit">
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

@@ -52,10 +52,10 @@ public:
     struct FactorySettings{
         uint chartPointSize = 10;
         ChartTheming chartTheming = ChartTheming::FOLLOW_DESKTOP_THEME;
-        QColor darkModeCurveColor = QColor(128, 0, 0);
+        QColor darkModeCurveColor = QColor(255, 0, 0);
         QColor lightModeCurveColor = QColor(0, 0, 128);
-        QColor darkModePointColor = QColor(255, 0, 0);
-        QColor lightModePointColor = QColor(0, 0, 255);
+        QColor darkModePointColor = QColor(255, 255, 0);
+        QColor lightModePointColor = QColor(255, 140, 0);
         QColor darkModeSelectedPointColor = QColor(0, 255, 0);
         QColor lightModeSelectedPointColor = QColor(0, 128, 0);
         bool exportTextNumberLocalized = false;
@@ -78,8 +78,16 @@ public:
         bool showTooltips = true;
         QColor incomeColor = Util::getOptimizedGreen();
         QColor expenseColor = Util::getOptimizedRed();
+        uint chartMaxPoints = 2000;
     };
 
+
+    // Allowed range (inclusive) for the size in pixels of the points in a chart
+    static constexpr uint CHART_POINT_SIZE_MIN = 5;
+    static constexpr uint CHART_POINT_SIZE_MAX = 25;
+    // Allowed range (inclusive) for the maximum number of points shown at once in a chart
+    static constexpr uint CHART_MAX_POINTS_MIN = 100;
+    static constexpr uint CHART_MAX_POINTS_MAX = 10000;
 
     // methods
     static GbpController& getInstance();
@@ -158,11 +166,18 @@ public:
     GbpController& operator=(const GbpController&) = delete;
     GbpController& operator=(GbpController&&) = delete;
 
-    // Getters and setters, for elements in config file
+    //--- Getters and setters, for elements in config file ---
+
     QStringList getRecentFilenames() const;
     void setRecentFilenames(const QStringList &newRecentFilenames);
     uint getChartPointSize() const;
-    void setChartPointSize(uint newChartPointSize);
+    /**
+     * @brief Set the size in pixels of the points in a chart.
+     * @param newChartPointSize New value, which must be in [CHART_POINT_SIZE_MIN,
+     * CHART_POINT_SIZE_MAX].
+     * @return false if the value is out of range : the current value is then left unchanged.
+     */
+    bool setChartPointSize(uint newChartPointSize);
     GbpController::ChartTheming getChartTheming() const;
     void setChartTheming(GbpController::ChartTheming newchartTheming);
     QColor getDarkModeCurveColor() const;
@@ -226,8 +241,10 @@ public:
     void setLastDirImport(const QString &newLastDirImport);
     QString getLastDirExport() const;
     void setLastDirExport(const QString &newLastDirExport);
+    uint getChartMaxPoints() const;
+    void setChartMaxPoints(uint newChartMaxPoints);
 
-    // For elements NOT in INI file
+    //--- Getters and setters for elements NOT in INI file ---
     bool getNoSettingsFileAtStartup() const;
     QDate getToday() const;
     QDate getTomorrow() const;
@@ -252,6 +269,7 @@ private:
 
     // charts characteristics
     uint chartPointSize;
+    uint chartMaxPoints; // max no of points shown at once (main chart, Compare CSD, Visualize Occ.)
     GbpController::ChartTheming chartTheming;
     QColor darkModeCurveColor;
     QColor lightModeCurveColor;

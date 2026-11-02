@@ -361,8 +361,13 @@ void Growth::changeByFactor(double factor, bool& capped)
             break;
         case Type::CONSTANT:
             ld = std::round(annualConstantGrowth * factor);
+            // A negative growth multiplied by a factor > 1 can go below -100% : cap it too,
+            // otherwise the monthly growth becomes NaN (root of a negative number)
             if( ld > MAX_GROWTH_DECIMAL){
                 ld = MAX_GROWTH_DECIMAL;
+                capped = true;
+            } else if( ld < MIN_GROWTH_DECIMAL){
+                ld = MIN_GROWTH_DECIMAL;
                 capped = true;
             }
             annualConstantGrowth = static_cast<qint64>(ld);
@@ -373,6 +378,9 @@ void Growth::changeByFactor(double factor, bool& capped)
                 ld = std::round(value * factor);
                 if( ld > MAX_GROWTH_DECIMAL){
                     ld = MAX_GROWTH_DECIMAL;
+                    capped = true;
+                } else if( ld < MIN_GROWTH_DECIMAL){
+                    ld = MIN_GROWTH_DECIMAL;
                     capped = true;
                 }
                 value = static_cast<qint64>(ld);
@@ -499,6 +507,16 @@ QList<quint64> Growth::adjustForGrowth(quint64 amount, const QList<QDate> &occur
         // continue processing
         long double t = std::round(static_cast<long double>(amount) * growthMultiplier *
             pvMultiplierVector[multiplierVectorIndex]);
+        // Safety net : a NaN or infinite value cannot be capped nor converted to an integer
+        // (undefined behavior). Should never happen since growth values are validated.
+        if ( !std::isfinite(t) ){
+            ok.errorMessageUI = tr("%1 : Growth calculation produced an invalid value")
+                .arg(__func__);
+            ok.errorMessageLog = QString("%1 : Growth calculation produced an invalid value "
+                "for date %2").arg(__func__, date.toString(Qt::ISODate));
+            result.clear();
+            return result;
+        }
         if ( t > maxLimitDecimalAsDouble ){
             t = maxLimitDecimalAsDouble;
             ok.saturationCount++;
@@ -666,20 +684,23 @@ void Growth::areFactorsValid(QMap<QDate, double> factorsToBeChecked,
     }
     // be sure growth value is in the right range
     foreach(double val, factorsToBeChecked.values()){
+        // Note : use 2 separate arg() calls. arg(a, b) with a number would use b as the field
+        // width, not as the value for %2 (and a huge width builds a huge string)
         if ( val < MIN_GROWTH_DOUBLE ){
             result.userErrorMessage = tr("Growth %1 is smaller than the minimum allowed of %2")
-            .arg(val,Growth::MIN_GROWTH_DECIMAL);
+                .arg(val).arg(Growth::MIN_GROWTH_DOUBLE);
             result.logErrorMessage = QString("Growth %1 is smaller than the minimum allowed of %2")
-                .arg(val,Growth::MIN_GROWTH_DOUBLE);
+                .arg(val).arg(Growth::MIN_GROWTH_DOUBLE);
             return ;
         }
         if ( val>MAX_GROWTH_DOUBLE ){
             result.userErrorMessage = tr("Growth %1 is bigger than the maximum allowed of %2")
-            .arg(val, Growth::MAX_GROWTH_DECIMAL);
+                .arg(val).arg(Growth::MAX_GROWTH_DOUBLE);
             result.logErrorMessage = QString("Growth %1 is bigger than the maximum allowed of %2")
-                .arg(val, Growth::MAX_GROWTH_DOUBLE);
+                .arg(val).arg(Growth::MAX_GROWTH_DOUBLE);
             return ;
-        }    }
+        }
+    }
 
     // all is well
     result.status = Util::ResultOfOperationStatus::SUCCESS;
@@ -724,20 +745,25 @@ void Growth::areFactorsValid(QMap<QDate, qint64> factorsToBeChecked,
     }
     // be sure growth value is in the right range
     foreach(qint64 val, factorsToBeChecked.values()){
+        // Note : use 2 separate arg() calls. arg(a, b) with a number would use b as the field
+        // width, not as the value for %2 (and a huge width builds a huge string).
+        // Values are shown in percentage, not in decimal form.
+        double valPercent = static_cast<double>(fromDecimalToDouble(val));
         if ( val < MIN_GROWTH_DECIMAL ){
             result.userErrorMessage = tr("Growth %1 is smaller than the minimum allowed of %2")
-                .arg(val,Growth::MIN_GROWTH_DECIMAL);
+                .arg(valPercent).arg(Growth::MIN_GROWTH_DOUBLE);
             result.logErrorMessage = QString("Growth %1 is smaller than the minimum allowed of %2")
-                .arg(val,Growth::MIN_GROWTH_DECIMAL);
+                .arg(valPercent).arg(Growth::MIN_GROWTH_DOUBLE);
             return ;
         }
         if ( val>MAX_GROWTH_DECIMAL ){
             result.userErrorMessage = tr("Growth %1 is bigger than the maximum allowed of %2")
-                .arg(val, Growth::MAX_GROWTH_DECIMAL);
+                .arg(valPercent).arg(Growth::MAX_GROWTH_DOUBLE);
             result.logErrorMessage = QString("Growth %1 is bigger than the maximum allowed of %2")
-                .arg(val, Growth::MAX_GROWTH_DECIMAL);
+                .arg(valPercent).arg(Growth::MAX_GROWTH_DOUBLE);
             return ;
-        }    }
+        }
+    }
 
     // all is well
     result.status = Util::ResultOfOperationStatus::SUCCESS;

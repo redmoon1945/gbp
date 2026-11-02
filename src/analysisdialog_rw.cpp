@@ -27,6 +27,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStringView>
+#include <QGuiApplication>
 #include <QBarSet>
 #include <QBarCategoryAxis>
 #include <QValueAxis>
@@ -79,59 +80,34 @@ void AnalysisDialog::rwUpdateChart()
     // contributions of each CSD if grouping=INCOMES or EXPENSES or each tag if grouping=TAGS.
     // Results : key = CSD or tag UUID, value = total amount contributed
     // in the period (never negative)
+    // The totals per CSD come from the event data shared by the tabs (no new scan of the
+    // financial events if it is already built for these dates)
     QHash<QUuid,double> bins = {}; // hold the temp results, to be sorted later
     double grandTotal=0;
-    QList<CombinedFeStreams::DailyInfo> listDi = chartRawData->getCombinedStreams();
-    const qsizetype size = listDi.size();
-    for (int var = 0; var < size; ++var) {
-
-        // +++ Pre-processing +++
-        CombinedFeStreams::DailyInfo di = listDi[var];
-        if(di.used == false){
-            continue;
-        }
-        QDate date = tomorrow.addDays(var);
-
-        // +++ processing +++
-
-        if( (date<from) || (date>to) ){
-            continue;   // not in the interval
-        }
-        if( (grouping==RelWeightGrouping::RWGROUPING_INCOMES) ||
-            (grouping==RelWeightGrouping::RWGROUPING_EXPENSES)){
-            // set a generic pointer of the list of CSD (either incomes or expenses)
-            QList<Fe> *prtCsdList = ((grouping==RelWeightGrouping::RWGROUPING_INCOMES)
-                ?(&(di.incomesList)):(&(di.expensesList)));
-            // Iterate through the list of CSD of that occurrence day
-            for( int i=0; i<prtCsdList->count(); ++i ){
-                Fe fed = prtCsdList->at(i);
-                QSharedPointer<Csd> csdRef = fed.csdPtr.toStrongRef();
-                if (csdRef.isNull()) {
-                    continue; // should never happen
-                }
-                grandTotal = CurrencyHelper::add(grandTotal, fabs(fed.amount),
-                    currInfo.noOfDecimal);
-                double binValue = bins.value(csdRef->getId(),-1);
-                if(binValue >= 0){// existing entry
-                    binValue = CurrencyHelper::add(binValue, fabs(fed.amount),
-                        currInfo.noOfDecimal);
-                } else { // new entry
-                    binValue = fabs(fed.amount);
-                }
-                bins.insert(csdRef->getId(), binValue); // replace current value or create new one
-            }
-        } else{
-            // Illegal grouping : should never happen
-            throw std::logic_error(QString("%1: Invalid grouping value").arg(Q_FUNC_INFO).toStdString());
-        }
+    if( (grouping!=RelWeightGrouping::RWGROUPING_INCOMES) &&
+        (grouping!=RelWeightGrouping::RWGROUPING_EXPENSES)){
+        // Illegal grouping : should never happen
+        throw std::logic_error(QString("%1: Invalid grouping value").arg(Q_FUNC_INFO)
+            .toStdString());
     }
+    eventDataEnsure(from, to);
+    const bool incomes = (grouping==RelWeightGrouping::RWGROUPING_INCOMES);
+    const QHash<QUuid, CsdEventTotal>& totals =
+        incomes ? eventCsdTotalsIncomes : eventCsdTotalsExpenses;
+    for (auto it = totals.constBegin(); it != totals.constEnd(); ++it) {
+        bins.insert(it.key(), it.value().absAmount);
+    }
+    grandTotal = incomes ? eventAbsTotalIncomes : eventAbsTotalExpenses;
 
     // *** step 2 : sort the bins by amount (biggest to smallest).
     QList<LegendItemInfo> tempList; // result of the sort
     foreach(QUuid id, bins.keys()){
         double d = bins.value(id);
         // rank will be set later after the sort
-        LegendItemInfo p = {.rank=0, .amount = d, .percentage= (100*d/grandTotal), .id = id};
+        // grandTotal can be 0 when all amounts in the period are 0 (e.g. Csd with amount 0, or
+        // -100% growth) : percentage is then meaningless and set to 0 instead of NaN (0/0)
+        double percentage = (grandTotal > 0) ? (100*d/grandTotal) : 0;
+        LegendItemInfo p = {.rank=0, .amount = d, .percentage = percentage, .id = id};
         tempList.append(p);
     }
     std::sort(tempList.begin(), tempList.end(), [](const LegendItemInfo& p1, const LegendItemInfo& p2) {
@@ -229,6 +205,30 @@ void AnalysisDialog::rwUpdateChart()
         slice->setBrush(colorsRelativeWeigth[i]);
     }
     chartRelativeWeight->addSeries(seriesRelativeWeigth);
+
+    // Clicking a slice selects the matching legend item, as a click on that item would : alone,
+    // added/removed with Ctrl, or as a range from the current item with Shift
+    connect(seriesRelativeWeigth, &QPieSeries::clicked, this, [this](QPieSlice* slice) {
+        int row = seriesRelativeWeigth->slices().indexOf(slice);
+        QListWidgetItem* item = ui->rwListWidget->item(row);
+        if (item == nullptr) {
+            return;
+        }
+        Qt::KeyboardModifiers mods = QGuiApplication::keyboardModifiers();
+        int currentRow = ui->rwListWidget->currentRow();
+        if (mods & Qt::ControlModifier) {
+            ui->rwListWidget->setCurrentItem(item, QItemSelectionModel::Toggle);
+        } else if ((mods & Qt::ShiftModifier) && (currentRow != -1)) {
+            QAbstractItemModel* model = ui->rwListWidget->model();
+            QItemSelection range(model->index(std::min(currentRow, row), 0),
+                model->index(std::max(currentRow, row), 0));
+            ui->rwListWidget->selectionModel()->select(range,
+                QItemSelectionModel::ClearAndSelect);
+        } else {
+            ui->rwListWidget->setCurrentItem(item, QItemSelectionModel::ClearAndSelect);
+        }
+        ui->rwListWidget->scrollToItem(item);
+    });
 
     // *** step 6 : Update legend (items the right listbox) ***
     ui->rwListWidget->clear();

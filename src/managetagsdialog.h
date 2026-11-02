@@ -79,6 +79,7 @@ private slots:
     // General
     void on_cancelPushButton_clicked();
     void on_applyPushButton_clicked();
+    void on_closePushButton_clicked();
     void on_ManageTagsDialog_rejected();
     void on_tagsTabWidget_currentChanged(int index);
 
@@ -175,6 +176,51 @@ private:
     QList<QUuid> csdsView_GetSelectedCsdsIds();
     void csdsView_SelectCsd(QUuid csdId);
     void csdsView_UpdateTagListLabel();
+
+    // Change tracking
+    /**
+     * @brief Record that the tags and/or relationships have been modified (or not), and update
+     * some UI hints : warning sign, "*" in the window title, bottom buttons.
+     * @details The only function allowed to write ContentChange::changed - enforced by
+     * ContentChange's friend declaration. See ContentChange below.
+     * @param v New value of the flag.
+     */
+    void contentHasChanged(bool v);
+
+    /**
+     * @brief Whether the tags or relationships differ from originalTags / originalRelationships.
+     * @return True if there are changes not applied yet.
+     */
+    bool hasContentChanged() const;
+
+    /**
+     * @brief Detect if the tags or relationships differ from what was received in
+     * slotPrepareContent(), and update the "content has changed" flag and the bottom buttons
+     * accordingly.
+     * @details Compares with Tags::operator== and TagCsdRelationships::operator==. Must be called
+     * after anything that modifies tags or relationships, in any of the 3 tabs.
+     */
+    void updateContentChanged();
+
+    /**
+     * @brief Guards the "content has changed" flag so that only contentHasChanged() and
+     * hasContentChanged() can read or write it (same as in EditScenarioDialog).
+     */
+    class ContentChange
+    {
+        bool changed = false;
+        bool get() const { return changed; }
+        void set(bool v)  { changed = v; }
+        friend void ManageTagsDialog::contentHasChanged(bool v);
+        friend bool ManageTagsDialog::hasContentChanged() const;
+    };
+
+    ContentChange contentChanged;
+
+    // Copies of the tags and relationships as they were when the dialog was prepared, kept as a
+    // reference for detecting changes not applied yet.
+    Tags originalTags;
+    TagCsdRelationships originalRelationships;
 
 };
 

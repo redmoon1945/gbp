@@ -161,7 +161,7 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>6</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="relativeWeightTab">
       <attribute name="title">
@@ -1693,33 +1693,154 @@
           </spacer>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_PieChart">
-           <item>
-            <widget class="QTableWidget" name="tagsTableWidget">
-             <property name="focusPolicy">
-              <enum>Qt::FocusPolicy::NoFocus</enum>
+          <widget class="QSplitter" name="tagsSplitter">
+           <property name="orientation">
+            <enum>Qt::Orientation::Vertical</enum>
+           </property>
+           <property name="childrenCollapsible">
+            <bool>false</bool>
+           </property>
+           <widget class="QWidget" name="tagsTablePanel">
+            <layout class="QVBoxLayout" name="verticalLayout_tagsTable">
+             <property name="leftMargin">
+              <number>0</number>
              </property>
-             <property name="editTriggers">
-              <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+             <property name="topMargin">
+              <number>0</number>
              </property>
-             <property name="alternatingRowColors">
-              <bool>false</bool>
+             <property name="rightMargin">
+              <number>0</number>
              </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+             <property name="bottomMargin">
+              <number>0</number>
              </property>
-             <property name="selectionBehavior">
-              <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+             <item>
+              <widget class="QTableWidget" name="tagsTableWidget">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a tag to see, below, the Cash Stream Definitions contributing to it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="editTriggers">
+                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>false</bool>
+               </property>
+               <property name="selectionMode">
+                <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+               </property>
+               <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+               </property>
+               <property name="sortingEnabled">
+                <bool>true</bool>
+               </property>
+               <attribute name="horizontalHeaderHighlightSections">
+                <bool>false</bool>
+               </attribute>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_tagsAboveSplitter">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="tagsBreakdownPanel">
+            <layout class="QVBoxLayout" name="verticalLayout_tagsBreakdown" stretch="0,0,1">
+             <property name="leftMargin">
+              <number>0</number>
              </property>
-             <property name="sortingEnabled">
-              <bool>true</bool>
+             <property name="topMargin">
+              <number>0</number>
              </property>
-             <attribute name="horizontalHeaderHighlightSections">
-              <bool>false</bool>
-             </attribute>
-            </widget>
-           </item>
-          </layout>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <spacer name="verticalSpacer_tagsBelowSplitter">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="tagsBreakdownLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string notr="true"/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSplitter" name="tagsBreakdownSplitter">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="childrenCollapsible">
+                <bool>false</bool>
+               </property>
+               <widget class="QTableWidget" name="tagsBreakdownTableWidget">
+                <property name="focusPolicy">
+                 <enum>Qt::FocusPolicy::NoFocus</enum>
+                </property>
+                <property name="editTriggers">
+                 <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+                </property>
+                <property name="alternatingRowColors">
+                 <bool>false</bool>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+                </property>
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+                <attribute name="horizontalHeaderHighlightSections">
+                 <bool>false</bool>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="tagsPieWidget" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>220</width>
+                  <height>180</height>
+                 </size>
+                </property>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </item>
         </layout>
        </item>
@@ -1925,7 +2046,7 @@
             </layout>
            </widget>
            <widget class="QWidget" name="csdRightPanel">
-            <layout class="QVBoxLayout" name="verticalLayout_csd_right" stretch="1,0">
+            <layout class="QVBoxLayout" name="verticalLayout_csd_right" stretch="0,1,0">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -1938,6 +2059,19 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
+             <item>
+              <widget class="QLabel" name="csdLegendLabel">
+               <property name="text">
+                <string notr="true"/>
+               </property>
+               <property name="textFormat">
+                <enum>Qt::TextFormat::RichText</enum>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QWidget" name="csdChartWidget" native="true">
                <property name="minimumSize">
@@ -1983,6 +2117,13 @@
                  </property>
                  <property name="checked">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="csdPointsHiddenLabel">
+                 <property name="text">
+                  <string notr="true"/>
                  </property>
                 </widget>
                </item>
@@ -2139,11 +2280,11 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup_5"/>
-  <buttongroup name="buttonGroup_6"/>
   <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_6"/>
+  <buttongroup name="buttonGroup_3"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_4"/>
  </buttongroups>
 </ui>

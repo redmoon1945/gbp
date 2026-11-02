@@ -199,6 +199,18 @@ public:
      */
     static qint64 extractQint64FromDoubleWithNoFractionalPart(double amount, int &result)  ;
 
+    /**
+     * @brief Convert into a quint16 a double that contains no fractional part.
+     * @param amount The double value to convert. Must be >= 0.
+     * @param maxValue Maximum value allowed for the result.
+     * @param result Indicate if the operation is a success :
+     *    0 : success
+     *   -1 : fail, amount has a fractional part and so does not contain an int.
+     *   -2 : fail, amount is bigger than maxValue (including +infinite).
+     *   -3 : fail, amount is negative (including -infinite).
+     *   -4 : fail, amount is not a number (NaN).
+     * @return The converted value, if the operation was a success. If not, 0 is returned.
+     */
     static quint16 extractQuint16FromDoubleWithNoFracPart(double amount, quint16 maxValue,
         int &result)  ;
 
@@ -214,18 +226,19 @@ public:
      * @param mode Formatting mode: Standard, Exponential, or Mixed (see DoubleFormatMode).
      * @param params Formatting parameters (see DoubleFormatParams).
      * @return The formatted string representation of the amount.
-     * @throws std::invalid_argument if params.maxThreshold or params.minThreshold is negative,
-     *         or params.expSignificantDigits == 0.
+     * @throws std::invalid_argument if params.mixed.maxThreshold or params.mixed.minThreshold
+     *         is negative, or params.exponential.significantDigits == 0.
      *
-     * @par Example
+     * @par Example (en_US locale)
      * - formatDouble(123.45, locale, DoubleFormatMode::Standard, {}) returns "123.45"
-     * - formatDouble(123.45, locale, DoubleFormatMode::Standard, {.noOfDecimals=4})
-     *       returns "123.4500"
+     * - formatDouble(123.45, locale, DoubleFormatMode::Standard,
+     *       {.standard={.noOfDecimals=4}}) returns "123.4500"
      * - formatDouble(1234567.0, locale, DoubleFormatMode::Exponential, {}) returns "1.23e6"
      * - formatDouble(1234567.0, locale, DoubleFormatMode::Mixed,
-     *       {.noOfDecimals=2, .maxThreshold=1e6, .expSignificantDigits=4}) returns "1.235e6"
+     *       {.standard={.noOfDecimals=2}, .exponential={.significantDigits=4},
+     *       .mixed={.maxThreshold=1e6}}) returns "1.235e6"
      * - formatDouble(0.00042, locale, DoubleFormatMode::Mixed,
-     *       {.noOfDecimals=2, .minThreshold=0.001}) returns "4.2e-4"
+     *       {.standard={.noOfDecimals=2}, .mixed={.minThreshold=0.001}}) returns "4.20e-4"
      */
     static QString formatDouble(double amount, const QLocale &locale, DoubleFormatMode mode,
         DoubleFormatParams params);
@@ -237,10 +250,10 @@ public:
     /**
      * @brief Calculate the present value P of a future value F,
      * that is P = F/factor, where factor = (1 + r)^n.
-     * @param discountRate Discount rate per period ("r"), in percentage. Must be >= 0.
+     * @param discountRate Discount rate per period ("r"), in percentage. Should be >= 0 : it is
+     * NOT checked (a value <= -100 gives a meaningless or infinite result).
      * @param period Number of period ("n") AFTER present period. Can be negative.
-     * @return The present value.
-     * @throws std::invalid_argument if discountRate<0.
+     * @return The present value. F is returned unchanged if discountRate or period is 0.
      */
     static long double presentValue(long double futureValue, double discountRate, int period);
 
@@ -248,10 +261,10 @@ public:
     /**
      * @brief Calculate the future value F of a present value P,
      * that is P*factor = F, where factor = (1 + r)^n.
-     * @param discountRate Discount rate per period ("r"), in percentage. Must be >= 0.
+     * @param discountRate Discount rate per period ("r"), in percentage. Should be >= 0 : it is
+     * NOT checked (a value <= -100 gives a meaningless or zero result).
      * @param period Number of period ("n") AFTER present period. Can be negative.
-     * @return The future value.
-     * @throws std::invalid_argument if discountRate<0.
+     * @return The future value. P is returned unchanged if discountRate or period is 0.
      */
     static long double futureValue(long double presentValue, double discountRate, int period);
 
@@ -269,7 +282,7 @@ public:
      * @param discountRate Discount rate per period, in percentage (e.g., 5.0 for 5%). Must be >= 0.
      * @param period Number of periods from the present: positive for future, negative for past.
      * @return The conversion factor.
-     * @throws std::invalid_argument if discountRate < 0.
+     * @throws std::out_of_range if discountRate < 0.
      */
     static long double toPvConversionFactor(long double discountRate, int period);
 
@@ -291,15 +304,17 @@ public:
      * Year must be >= 0.
      * @param target The date whose month offset from reference is calculated.
      * Year must be >= 0.
-     * @return Signed number of complete months from reference to target.
-     *         Positive if target > reference, negative if target < reference,
+     * @return Signed number of calendar months from the month of reference to the month of
+     *         target. Positive if target is in a later month, negative if in an earlier month,
      *         zero if in the same month.
-     * @note Calculates month offset, not inclusive count. The day component
-     *       determines whether a month is complete.
+     * @note Calculates a calendar month offset, not a count of complete months : the day
+     *       component is ignored. This is what Growth needs (index of the month of an
+     *       occurrence).
      *       Examples:
      *       - QDate(1000,1,15) to QDate(1000,3,15) → 2 months
      *       - QDate(1000,3,15) to QDate(1000,1,15) → -2 months
-     *       - QDate(1000,1,31) to QDate(1000,3,1)  → 1 month (not 2)
+     *       - QDate(1000,1,31) to QDate(1000,3,1)  → 2 months
+     *       - QDate(1000,1,1)  to QDate(1000,1,31) → 0 month (same month)
      * @throws std::invalid_argument If either date is invalid or has year < 0.
      */
     static int noOfMonthsDifference(QDate reference , QDate target);
@@ -314,37 +329,68 @@ public:
      * Year must be >= 0.
      * @param target The date whose year offset from reference is calculated.
      * Year must be >= 0.
-     * @return Signed number of complete years from reference to target.
-     *         Positive if target > reference, negative if target < reference,
+     * @return Signed number of calendar years from the year of reference to the year of
+     *         target. Positive if target is in a later year, negative if in an earlier year,
      *         zero if in the same year.
-     * @note Calculates year offset, not inclusive count. The month and day
-     *       components determine whether a year is complete.
+     * @note Calculates a calendar year offset, not a count of complete years : the month and
+     *       day components are ignored.
      *       Examples:
      *       - QDate(1000,6,15) to QDate(2000,6,15) → 1000 years
      *       - QDate(2000,6,15) to QDate(1000,6,15) → -1000 years
      *       - QDate(1000,1,1) to QDate(1000,12,31) → 0 years (same year)
+     *       - QDate(1999,12,31) to QDate(2000,1,1) → 1 year
      * @throws std::invalid_argument If either date is invalid or has year < 0.
      */
     static int noOfYearsDifference(QDate reference , QDate target);
 
     /**
-     * @brief Adjust X-axis time range by expanding or contracting around the midpoint.
+     * @brief Expand an X-axis time range to leave a margin on each side.
+     * @details The range [min, max] grows by expansionFactor of its length in total, i.e.
+     * round(expansionFactor/2 * no of days) whole days on each side (e.g. 100 days with 0.1 :
+     * 5 days on each side). If min == max, the range is set to [min - 1 day, max + 1 day],
+     * whatever expansionFactor is. The range is never contracted.
      * @param min Minimum datetime value (modified in place).
-     * @param max Maximum datetime value (modified in place).
-     * @param expansionFactor Factor to expand (>1.0) or contract (<1.0) the range.
+     * @param max Maximum datetime value (modified in place). Must not be smaller than min.
+     * @param expansionFactor Total expansion, as a portion of the range. Must be in [0, 0.1].
+     * @throws std::invalid_argument If max < min or expansionFactor is not in [0, 0.1].
      */
     static void calculateZoomXaxis( QDateTime &min, QDateTime &max, double expansionFactor);
 
     /**
-     * @brief Adjust Y-axis numeric range by expanding or contracting around the midpoint.
+     * @brief Expand a Y-axis numeric range to leave a margin on each side.
+     * @details The range [min, max] grows by expansionFactor of its length in total, i.e.
+     * expansionFactor/2 * (max - min) on each side (e.g. [0, 100] with 0.1 : [-5, 105]).
+     * Special cases : if min == max == 0, the range is set to [-1, 1] ; if min == max != 0,
+     * 5% of |min| is added on each side, whatever expansionFactor is. The range is never
+     * contracted.
      * @param min Minimum Y value (modified in place).
-     * @param max Maximum Y value (modified in place).
-     * @param expansionFactor Factor to expand (>1.0) or contract (<1.0) the range.
+     * @param max Maximum Y value (modified in place). Must not be smaller than min.
+     * @param expansionFactor Total expansion, as a portion of the range. Must be in [0, 0.1].
+     * @throws std::invalid_argument If max < min or expansionFactor is not in [0, 0.1].
      */
     static void calculateZoomYaxis(double &min, double &max, double expansionFactor);
 
     static bool findMinMaxInYvalues(const QList<QPointF> ptList, double from, double to, double &min, double &max);
     static QString wordCapitalize(bool upper, QString s);
+
+    /**
+     * @brief Short date format of a locale, always with a 4-digit year.
+     * @details Some locales have a 2-digit year in their short format (e.g. "M/d/yy" for
+     * en_US), which makes 2026 and 2126 look the same, while GBP dates go up to 100 years
+     * ahead. The year is then widened to 4 digits ("M/d/yyyy"), the rest of the format is kept.
+     * @param locale The locale.
+     * @return The format, to be used with QLocale::toString(QDate, QString).
+     */
+    static QString shortDateFormatFullYear(const QLocale &locale);
+
+    /**
+     * @brief Text for a single-line field: each TAB and line break is replaced by a space.
+     * @details A line edit keeps the TAB and line breaks that are pasted in it, and a
+     * scenario file edited by hand can contain them too. "\r\n" gives a single space.
+     * @param text The text.
+     * @return The text, without TAB, "\n" or "\r".
+     */
+    static QString toSingleLine(const QString &text);
 
     /**
      * @brief Change the size of a font according to some parametric constraints, without affecting

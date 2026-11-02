@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/Doc">
+        <file>resources/changelog-en.pdf</file>
+        <file>resources/quick_tutorial-en.pdf</file>
+        <file>resources/quick_tutorial-fr.pdf</file>
+        <file>resources/user_manual-en.pdf</file>
+        <file>resources/user_manual-fr.pdf</file>
+    </qresource>
+</RCC>

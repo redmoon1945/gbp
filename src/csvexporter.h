@@ -13,9 +13,10 @@
  * @brief Specifies the ISO-8601 granularity of a date column in CSV export
  *
  * All values produce culture-neutral ISO-8601 output unless the @c locale flag
- * is set on the column — in which case @c YearMonthDay uses @c QLocale::ShortFormat
- * for human-readable output. @c Year and @c YearMonth always produce ISO output
- * regardless of the locale flag (Qt provides no partial locale date formats).
+ * is set on the column — in which case @c YearMonthDay uses @c QLocale::ShortFormat,
+ * with a 4-digit year (Util::shortDateFormatFullYear()), for human-readable output.
+ * @c Year and @c YearMonth always produce ISO output regardless of the locale flag
+ * (Qt provides no partial locale date formats).
  */
 enum class CsvDateFormat {
     Year,         ///< ISO-8601, year only: "2025"
@@ -85,7 +86,8 @@ struct CsvColumnType {
      * @brief Creates a Date column type with the specified format
      * @param format The ISO-8601 granularity (Year, YearMonth, or YearMonthDay)
      * @param locale If @c true and @p format is @c YearMonthDay, formats using
-     *               the locale's short date format (e.g. "28/03/2026").
+     *               the locale's short date format, with a 4-digit year
+     *               (e.g. "28/03/2026", "3/28/2026").
      *               Ignored for @c Year and @c YearMonth (always ISO). Default: @c false.
      * @return CsvColumnType configured for date data
      */
@@ -117,8 +119,9 @@ struct CsvColumnType {
     /**
      * @brief Creates a Double column type with maximum precision
      *
-     * Uses Qt's default full-precision formatting, producing the shortest representation
-     * that round-trips back to the same double value.
+     * Produces the shortest representation that round-trips back to the same double value.
+     * Scientific notation is used only for very big or very small values, always with an
+     * ASCII exponent (e.g. "1e+12", or "1,5e+12" when localized).
      *
      * @param locale If @c true, format with locale decimal point and separators.
      *               If @c false, use culture-neutral dot separator. Default: @c false.
@@ -188,6 +191,7 @@ struct CsvExportResult {
  * - Currency formatting via CurrencyHelper with optional localization
  * - ISO-8601 date formatting with configurable granularity
  * - Optional (absent) cell values via @c QVariant{} — produces an empty cell for any type
+ * - RFC 4180 quoting of cells containing the separator, a line break or a quote
  * - Detailed export results for error handling and user feedback
  *
  * @note All dialogs are application-modal (block all application windows).
@@ -317,6 +321,35 @@ private:
         const QLocale& locale,
         const CurrencyInfo& currInfo
     );
+
+    /**
+     * @brief Formats a double with all its significant digits (shortest exact representation)
+     *
+     * Scientific notation is used only for very big or very small values. When
+     * @p localized is @c true, the mantissa is localized but the exponent stays ASCII
+     * (e.g. "1,234567891e+06"), so that spreadsheets can read it in every locale.
+     *
+     * @param[in] val        The value
+     * @param[in] localized  If @c true, use the locale's digits, decimal point and minus sign
+     * @param[in] locale     Locale used when @p localized is @c true
+     *
+     * @return The formatted value
+     */
+    static QString formatFullPrecision(double val, bool localized, const QLocale& locale);
+
+    /**
+     * @brief Quotes a cell the RFC 4180 way, if needed
+     *
+     * A cell containing @p separator, a line break or a double quote is put between double
+     * quotes, and each of its double quotes is doubled (e.g. @c Big "A" becomes
+     * @c "Big ""A"""). Other cells are returned unchanged.
+     *
+     * @param[in] cell       The formatted cell
+     * @param[in] separator  Column separator character
+     *
+     * @return The cell, quoted if needed
+     */
+    static QString quoteCell(const QString& cell, QChar separator);
 };
 
 #endif // CSVEXPORTER_H

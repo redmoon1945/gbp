@@ -61,7 +61,7 @@ Scenario::Scenario(const QString version, const QString name, const QString desc
     QHash<QUuid,QSharedPointer<IrregularCsd>> expenseIrregularCsdSet,
     const Tags newTags, const TagCsdRelationships newtagCsdRelationships) :
     version(version.left(VERSION_MAX_LEN)),
-    name(name.left(NAME_MAX_LEN)), description(description.left(DESC_MAX_LEN)),
+    name(normalizeName(name)), description(description.left(DESC_MAX_LEN)),
     feGenerationDuration(feGenerationDuration), inflation(inflation),
     currencyIsoCode(currencyIsoCode),
     incomePeriodicCsds(incomePeriodicCsdSet), incomeIrregularCsds(incomeIrregularCsdSet),
@@ -73,7 +73,7 @@ Scenario::Scenario(const QString version, const QString name, const QString desc
 Scenario &Scenario::operator=(const Scenario &o)
 {
     this->version = o.version.left(VERSION_MAX_LEN);
-    this->name = o.name.left(NAME_MAX_LEN);
+    this->name = normalizeName(o.name);
     this->description = o.description.left(DESC_MAX_LEN);
     this->feGenerationDuration = o.feGenerationDuration;
     this->inflation = o.inflation;
@@ -137,8 +137,6 @@ Scenario::FileResult Scenario::saveToFile(QString fullFileName) const
     jobject["FeGenerationDuration"] = feGenerationDuration;
     jobject["Inflation"] = inflation.toJson();
     jobject["CurrencyCode"] = currencyIsoCode;
-    // Also write CountryCode for backward compatibility with GBP 1.7 and below
-    jobject["CountryCode"] = CurrencyHelper::getRepresentativeCountryForCurrency(currencyIsoCode);
 
     try {
         // incomes - Periodic
@@ -385,6 +383,21 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
                 .arg(d);
             return result;
         }
+        if ( ok==-3 ){
+            result.logErrorMessage = QString("FeGenerationDuration: Value %1 is negative")
+                .arg(d);
+            return result;
+        }
+        if ( ok==-4 ){
+            result.logErrorMessage = QString("FeGenerationDuration: Value is not a number");
+            return result;
+        }
+        // a duration of 0 would give a scenario without any day to generate events for
+        if ( feGenDuration < Constants::MIN_DURATION_FE_GENERATION ){
+            result.logErrorMessage = QString("FeGenerationDuration: Value %1 is too small")
+                .arg(d);
+            return result;
+        }
     }
 
     // currency code (GBP 1.8+: CurrencyCode field; GBP 1.7 and below: derive from CountryCode)
@@ -417,16 +430,12 @@ Scenario::FileResult Scenario::loadFromFile(QString fullFileName)
             return result;
         }
         QString countryCode = buf.toString();
-        if (!CurrencyHelper::countryExists(countryCode)) {
-            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
-            result.logErrorMessage = QString("CountryCode %1 is invalid").arg(countryCode);
-            return result;
-        }
         bool found;
         CurrencyInfo ci = CurrencyHelper::getCurrencyInfoFromCountryCode(
             countryCode, QLocale::Language::English, found);
         if (!found) {
-            result.code = FileResultCode::LOAD_JSON_SEMANTIC_ERROR;
+            result.code = FileResultCode::LOAD_NO_CURRENCY_FOR_COUNTRY;
+            result.countryCode = countryCode;
             result.logErrorMessage = QString("Cannot derive currency from CountryCode %1")
                 .arg(countryCode);
             return result;
@@ -847,7 +856,8 @@ QSharedPointer<CombinedFeStreams> Scenario::generateFinancialEvents(QDate today,
 
     // calculate the number of max days acccording to the scenario limit
     // and create the combinedStream object
-    QDate maxDate = today.addYears(feGenerationDuration); // compute max date for FeGeneration
+    // compute max date for FeGeneration
+    QDate maxDate = getMaxDateFeGeneration(today, feGenerationDuration);
     QDate tomorrow = today.addDays(1);
     qint64 tomorrowJulianDays = tomorrow.toJulianDay();
     int maxNoOfdays = maxDate.toJulianDay() - tomorrowJulianDays + 1;
@@ -1188,6 +1198,8 @@ QString Scenario::FileResult::codeToString()
                 return "LOAD ERROR";
             case FileResultCode::LOAD_UNKNOWN_VERSION:
                 return "UNKNOWN FILE VERSION";
+            case FileResultCode::LOAD_NO_CURRENCY_FOR_COUNTRY:
+                return "NO CURRENCY FOR COUNTRY CODE";
             default:
                 return "UNKNOWN";
     }
@@ -1292,6 +1304,7 @@ void Scenario::FileResult::init()
 {
     code = FileResultCode::ERROR_OTHER;
     logErrorMessage = "";
+    countryCode = "";
     version1found = false;
     scenarioPtr = QSharedPointer<Scenario>( scenarioPtr); // null
 }
@@ -1316,7 +1329,7 @@ QString Scenario::getName() const
 
 void Scenario::setName(const QString &newName)
 {
-    name = newName;
+    name = normalizeName(newName);
 }
 
 QString Scenario::getDescription() const
@@ -1397,6 +1410,11 @@ quint16 Scenario::getFeGenerationDuration() const
     return feGenerationDuration;
 }
 
+QDate Scenario::getMaxDateFeGeneration(QDate today, quint16 duration)
+{
+    return today.addYears(duration);
+}
+
 void Scenario::setFeGenerationDuration(quint16 newFeGenerationDuration)
 {
     feGenerationDuration = newFeGenerationDuration;
@@ -1422,3 +1440,8 @@ void Scenario::setTagCsdRelationships(const TagCsdRelationships &newtagCsdRelati
     tagCsdRelationships = newtagCsdRelationships;
 }
 
+
+QString Scenario::normalizeName(const QString &n)
+{
+    return n.left(NAME_MAX_LEN).trimmed();
+}

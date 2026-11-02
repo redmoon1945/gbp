@@ -19,6 +19,7 @@
 #ifndef EDITSCENARIODIALOG_H
 #define EDITSCENARIODIALOG_H
 
+#include <optional>
 #include <QDialog>
 #include "plaintexteditiondialog.h"
 #include "periodiccsd.h"
@@ -26,6 +27,7 @@
 #include "editvariablegrowthdialog.h"
 #include "editperiodicdialog.h"
 #include "editirregulardialog.h"
+#include "scenario.h"
 #include "scenariocsdtablemodel.h"
 #include "tagcsdrelationships.h"
 #include "tags.h"
@@ -40,7 +42,14 @@ QT_END_NAMESPACE
 
 
 /**
- * @brief Dialog to edit the content of an existing scenario
+ * @brief Dialog to edit the content of an existing scenario.
+ * @details Long-lived, reused instance: slotPrepareContent() deep-copies the scenario's
+ * CSDs/tags into working-copy members (incomesPeriodicCsd, tags, etc.) so edits never touch
+ * the live scenario, and pins a strong reference to that pre-edit state in originalScenario
+ * (not re-fetched from GbpController, whose "current scenario" can move mid-edit).
+ * buildScenarioFromCurrentState() rebuilds a Scenario from the working state; comparing it to
+ * originalScenario drives "unsaved changes" tracking (contentHasChanged()). Cancel/reject (ESC)
+ * releases the working copies and originalScenario.
  */
 class EditScenarioDialog : public QDialog
 {
@@ -123,6 +132,7 @@ private slots:
     void on_inflationConstantRadioButton_clicked();
     void on_fullViewPushButton_clicked();
     void on_cancelPushButton_clicked();
+    void on_closePushButton_clicked();
     void on_editGrowthPushButton_clicked();
     void on_applyPushButton_clicked();
     void on_EditScenarioDialog_rejected();
@@ -139,6 +149,8 @@ private slots:
     void on_manageTagsPushButton_clicked();
     void onAddMenuPeriodicClicked();
     void onAddMenuIrregularClicked();
+    void onCopyColorShortcut();
+    void onPasteColorShortcut();
     // filter change events
     void on_incomesRadioButton_toggled(bool checked);
     void on_filterPeriodicsCheckBox_checkStateChanged(const Qt::CheckState &arg1);
@@ -148,6 +160,7 @@ private slots:
     void on_filterTagsCheckBox_checkStateChanged(const Qt::CheckState &arg1);
     void on_filterTagsPushButton_clicked();
     void on_filterTagsCombinationComboBox_currentIndexChanged(int index);
+
 
 protected:
     /**
@@ -162,65 +175,27 @@ protected:
     void showEvent(QShowEvent* event) override;
 
 private:
-    Ui::EditScenarioDialog *ui;
 
-    bool started; ///< True if this object has completed constructor phase
-
-    // used to display double amount with proper decimal and thousands separators
-    QLocale displayLocale;
-
-    // children dialogs
-    PlainTextEditionDialog* editDescriptionDialog;
-    EditVariableGrowthDialog* ecInflation;  // to edit variable inflation
-    EditPeriodicDialog* psCsdDialog;  // to edit one particular Periodic Stream Def
-    EditIrregularDialog* irCsdDialog; // to edit one particular irregular Stream Def
-    ManageTagsDialog* manageTagsDlg;       // to edit scenario's tags and relationships
-    ChooseTagsDialog* setFilterTagsDlg; //to edit the set of tags used as filters for CSD display
-
-    // --- Edited scenario elements that cannot be represented by UI elements ---
+    // ********************** FIRST : ENUM, Struct **********************
 
     /**
-     * @brief List of WORKING COPY of periodic income Csds. This is a DEEP copy, initially
-     * set from the current scenario. Key is CSD ID.
+     * @brief Outcome of buildScenarioFromCurrentState().
      */
-    QHash<QUuid,QSharedPointer<PeriodicCsd>> incomesPeriodicCsd;
+    enum class BuildScenarioResult {
+        SUCCESS,
+        ERROR_INVALID_INFLATION,  ///< Constant inflation value rejected by Growth
+        ERROR_OTHER               ///< Generic/unexpected error (catch-all)
+    };
 
-    /**
-     * @brief List of WORKING COPY of irregular income Csds. This is a DEEP copy, initially
-     * set from the current scenario. Key is CSD ID.
-     */
-    QHash<QUuid,QSharedPointer<IrregularCsd>> incomesIrregularCsd;
 
-    /**
-     * @brief List of WORKING COPY of periodic expense Csds. This is a DEEP copy, initially
-     * set from the current scenario. Key is CSD ID.
-     */
-    QHash<QUuid,QSharedPointer<PeriodicCsd>> expensesPeriodicCsd;
-
-    /**
-     * @brief List of WORKING COPY of expense irregular Csds. This is a DEEP copy, initially
-     * set from the current scenario. Key is CSD ID.
-     */
-    QHash<QUuid,QSharedPointer<IrregularCsd>> expensesIrregularCsd;
-
-    Growth tempVariableInflation;           // to hold the inflation data for Variable type
-    QString currencyIsoCode;
-    CurrencyInfo currInfo;
-
-    // Tags and relationships
-    Tags tags;
-    TagCsdRelationships tagCsdRelationships; // All tags links of this scenario
-
-    // Set of Tag Id used for CDS filtering. This is NOT part of a Scenario data.
-    FilterTags filterTags;
-
-    // -------------------------------------------------------------------------------
-
-    // ListView model
-    ScenarioCsdTableModel* itemTableModel;
+    // ********************** SECOND : METHODS **********************
 
     // misc methods
     QList<QUuid> getSelection();
+
+    void applyColorToCsds(const QList<QUuid>& idList, const QColor& color);
+    QColor getCsdColor(const QUuid& id) const;
+    QUuid getTopmostSelectedCsd();
     void setFilterString();
     Growth getInflationCurrentlyDefined();
     void selectRowsInTableView(QList<QUuid> idList);
@@ -277,6 +252,155 @@ private:
      * @return The Csd, wrapped in a QSharedPointer.
      */
     QSharedPointer<IrregularCsd> getIrregularCsdFromId(QUuid id, bool &found);
+
+    /**
+     * @brief Build a new Scenario reflecting the dialog's current working state (name, description,
+     * duration, inflation fields, and the working CSD/tag members).
+     * @details Used both to apply changes and to compare against the original scenario to
+     * detect unsaved changes. Never throws.
+     * @param result Set to the outcome of the build. Always set, even on success.
+     * @return The built Scenario, wrapped in a QSharedPointer, or a null QSharedPointer
+     * (check with isNull()) on failure - see result.
+     */
+    QSharedPointer<Scenario> buildScenarioFromCurrentState(BuildScenarioResult &result) const;
+
+    /**
+     * @brief Record that the working copy of the scenario has been modified (or not), and update
+     * some UI hints.
+     * @details The only function allowed to write ContentChange::changed - enforced by
+     * ContentChange's friend declaration, not just by convention. See ContentChange below.
+     * @param v New value of the flag.
+     */
+    void contentHasChanged(bool v);
+
+    /**
+     * @brief Whether the working copy of the scenario has been modified since it was
+     * last reset (e.g. on load, or after a successful save).
+     * @return True if there are unsaved changes.
+     */
+    bool hasContentChanged() const;
+
+    /**
+     * @brief Detect if the scenario defined by the dialog differs from originalScenario, and
+     * update the "content has changed" flag and the bottom buttons accordingly.
+     * @details Rebuilds a scenario from the current state (buildScenarioFromCurrentState()) and
+     * compares it to originalScenario (Scenario::operator==). Must be called after anything that
+     * can change the scenario data. Does nothing while the form is being filled (fillingForm)
+     * or if the dialog has not been prepared. A failed rebuild is considered as a change, so
+     * that Apply stays available and reports the error.
+     */
+    void updateContentChanged();
+
+
+    // ********************** THIRD : INNER CLASSES **********************
+
+    /**
+     * @brief Guards the "content has changed" flag so that only contentHasChanged() and
+     * hasContentChanged() can read or write it.
+     * @details A plain `bool contentChanged;` member would rely on every method in this class
+     * (present and future) to remember to go through the setter instead of just writing
+     * `contentChanged = ...;` directly. In a dialog this size, that's an easy mistake to make
+     * and an easy one to miss in review - a stray direct write would silently break the
+     * "unsaved changes" tracking. Wrapping the flag in this private nested class turns that
+     * mistake into a compile error instead: ContentChange::changed is private to ContentChange,
+     * and only contentHasChanged()/hasContentChanged() are friended to reach it.
+     */
+    class ContentChange
+    {
+        bool changed = false;
+        bool get() const { return changed; }
+        void set(bool v)  { changed = v; }
+        friend void EditScenarioDialog::contentHasChanged(bool v);
+        friend bool EditScenarioDialog::hasContentChanged() const;
+    };
+
+
+    // ********************** FOURTH : VARIABLES **********************
+
+    Ui::EditScenarioDialog *ui;
+
+    bool started; ///< True if this object has completed constructor phase
+
+    // used to display double amount with proper decimal and thousands separators
+    QLocale displayLocale;
+
+    // children dialogs
+    PlainTextEditionDialog* editDescriptionDialog;
+    EditVariableGrowthDialog* ecInflation;  // to edit variable inflation
+    EditPeriodicDialog* psCsdDialog;  // to edit one particular Periodic Stream Def
+    EditIrregularDialog* irCsdDialog; // to edit one particular irregular Stream Def
+    ManageTagsDialog* manageTagsDlg;       // to edit scenario's tags and relationships
+    ChooseTagsDialog* setFilterTagsDlg; //to edit the set of tags used as filters for CSD display
+
+    /**
+     * @brief The scenario as it was when the dialog was opened (or last reset via
+     * slotPrepareContent), kept as a reference for detecting unsaved changes.
+     * @details Never mutated by this dialog - all edits happen on the separate working-copy
+     * members below. Compared against buildScenarioFromCurrentState() to determine whether
+     * the working copy differs from what was originally loaded.
+     */
+    QSharedPointer<Scenario> originalScenario;
+
+    /**
+     * @brief Color copied with the "Color..." button or Ctrl+Shift+C. Empty if nothing was copied.
+     */
+    std::optional<QColor> clipboardColor;
+
+    // --- Edited scenario elements that cannot be represented by UI elements ---
+
+    /**
+     * @brief List of WORKING COPY of periodic income Csds. This is a DEEP copy, initially
+     * set from the current scenario. Key is CSD ID.
+     */
+    QHash<QUuid,QSharedPointer<PeriodicCsd>> incomesPeriodicCsd;
+
+    /**
+     * @brief List of WORKING COPY of irregular income Csds. This is a DEEP copy, initially
+     * set from the current scenario. Key is CSD ID.
+     */
+    QHash<QUuid,QSharedPointer<IrregularCsd>> incomesIrregularCsd;
+
+    /**
+     * @brief List of WORKING COPY of periodic expense Csds. This is a DEEP copy, initially
+     * set from the current scenario. Key is CSD ID.
+     */
+    QHash<QUuid,QSharedPointer<PeriodicCsd>> expensesPeriodicCsd;
+
+    /**
+     * @brief List of WORKING COPY of expense irregular Csds. This is a DEEP copy, initially
+     * set from the current scenario. Key is CSD ID.
+     */
+    QHash<QUuid,QSharedPointer<IrregularCsd>> expensesIrregularCsd;
+
+    Growth tempVariableInflation;           // to hold the inflation data for Variable type
+    QString currencyIsoCode;
+    CurrencyInfo currInfo;
+
+    // Tags and relationships
+    Tags tags;
+    TagCsdRelationships tagCsdRelationships; // All tags links of this scenario
+
+    // Set of Tag Id used for CDS filtering. This is NOT part of a Scenario data.
+    FilterTags filterTags;
+
+    // -------------------------------------------------------------------------------
+
+    // ListView model
+    ScenarioCsdTableModel* itemTableModel;
+
+    /**
+     * @brief Manage the "Content has changed" flag
+     */
+    ContentChange contentChanged;
+
+    /**
+     * @brief True while slotPrepareContent() fills the form : change detection is suspended,
+     * since each field set emits a change signal and checking a half-filled form is useless.
+     */
+    bool fillingForm = false;
+
+
+
 
 };
 

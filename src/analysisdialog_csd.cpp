@@ -17,20 +17,39 @@
  */
 
 #include "analysisdialog.h"
+#include "currencyhelper.h"
 #include "customqchartview.h"
 #include "ui_analysisdialog.h"
 #include "gbpcontroller.h"
+#include "scenario.h"
 #include "gbplogger.h"
 #include "util.h"
+#include <QBuffer>
 #include <QDateTimeAxis>
 #include <QLegendMarker>
 #include <QLineSeries>
 #include <QScatterSeries>
+#include <QTimeZone>
 #include <QListWidgetItem>
 #include <QMessageBox>
 #include <QPainter>
 #include <algorithm>
 #include <limits>
+
+
+// Okabe-Ito palette: verified ≥3:1 contrast against both black and white backgrounds.
+static const QColor csdColors[10] = {
+    QColor(  0, 114, 178),  // blue
+    QColor(213,  94,   0),  // vermillion
+    QColor(  0, 158, 115),  // teal green
+    QColor(204, 121, 167),  // mauve
+    QColor(230, 159,   0),  // amber
+    QColor( 86, 180, 233),  // sky blue
+    QColor(220,  50,  47),  // red
+    QColor(148, 103, 189),  // purple
+    QColor(140,  86,  75),  // brown
+    QColor(127, 127, 127),  // gray
+};
 
 
 void AnalysisDialog::csdInitChart()
@@ -72,6 +91,20 @@ void AnalysisDialog::csdInitChart()
         GbpController::getInstance().getWheelRotatedAwayZoomIn(), ui->csdChartWidget);
     csdChartView->setRenderHint(QPainter::Antialiasing, true);
 
+    // The markers only cover the visible X range (plus a margin) : rebuild them when it
+    // changes, at most every 100 ms during a pan or a zoom (not at each mouse move, which would
+    // make the pan jerky, nor only at its end, which would leave the new part of the curves
+    // without markers during a long pan)
+    csdMarkersTimer = new QTimer(this);
+    csdMarkersTimer->setSingleShot(true);
+    csdMarkersTimer->setInterval(100);
+    connect(csdMarkersTimer, &QTimer::timeout, this, &AnalysisDialog::csdRebuildMarkers);
+    connect(csdAxisX, &QDateTimeAxis::rangeChanged, this, [this]() {
+        if (!csdDisplayedIds.isEmpty() && !csdMarkersTimer->isActive()) {
+            csdMarkersTimer->start();
+        }
+    });
+
     csdThemeChanged();
 }
 
@@ -104,6 +137,10 @@ void AnalysisDialog::csdThemeChanged()
             scatter->setSelectedColor(
                 GbpController::getInstance().getLightModeSelectedPointColor());
     }
+
+    // Theme change also resets the curve colors (no longer matching the legend and the list
+    // icons): rebuild
+    csdRedisplayChart();
 }
 
 
@@ -116,27 +153,34 @@ void AnalysisDialog::csdRedisplayList()
         const QSignalBlocker blocker(ui->csdListWidget);
         ui->csdListWidget->clear();
         if (csdChart) csdChart->removeAllSeries();
+        csdLineSeries.clear();
+        csdDisplayedIds.clear();
+        ui->csdLegendLabel->clear();
+        ui->csdPointsHiddenLabel->clear();
+        ui->csdPointsHiddenLabel->setToolTip(QString());
         return;
     }
 
     bool incomeMode = ui->csdIncomesRadioButton->isChecked();
 
-    // Collect unique CSDs from the entire raw data (UUID -> name, decoration color)
+    // Collect the active CSDs of the current mode (UUID -> name, decoration color), directly
+    // from the scenario's definitions : much faster than scanning all the financial events.
+    // A CSD without any financial event is listed too (its curve is then empty).
     QMap<QUuid, QString> csdIdToName;
     QMap<QUuid, QColor>  csdIdToColor;
-    const QList<CombinedFeStreams::DailyInfo>& listDi = chartRawData->getCombinedStreams();
-    for (const CombinedFeStreams::DailyInfo& di : listDi) {
-        if (!di.used) continue;
-        const QList<Fe>& feList = incomeMode ? di.incomesList : di.expensesList;
-        for (const Fe& fe : feList) {
-            QSharedPointer<Csd> csd = fe.csdPtr.toStrongRef();
-            if (csd.isNull() || !csd->getActive()) continue;
-            QUuid id = csd->getId();
-            if (!csdIdToName.contains(id)) {
-                csdIdToName.insert(id, csd->getName());
-                csdIdToColor.insert(id, csd->getDecorationColor());
-            }
-        }
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if (!scenario.isNull()) {
+        auto addActive = [&](const QSharedPointer<Csd>& csd) {
+            if (csd.isNull() || !csd->getActive()) return;
+            csdIdToName.insert(csd->getId(), csd->getName());
+            csdIdToColor.insert(csd->getId(), csd->getDecorationColor());
+        };
+        const auto periodics = incomeMode ? scenario->getIncomePeriodicCsds() :
+            scenario->getExpensePeriodicCsds();
+        for (const QSharedPointer<PeriodicCsd>& csd : periodics) addActive(csd);
+        const auto irregulars = incomeMode ? scenario->getIncomeIrregularCsds() :
+            scenario->getExpenseIrregularCsds();
+        for (const QSharedPointer<IrregularCsd>& csd : irregulars) addActive(csd);
     }
 
     // Sort by name (case-insensitive) for display
@@ -180,17 +224,25 @@ void AnalysisDialog::csdRedisplayChart()
     if (!ready || !csdChart) return;
 
     csdClearSelectedPoint();
+    csdMarkersTimer->stop();
+    csdLineSeries.clear();      // the series themselves are deleted by removeAllSeries()
+    csdDisplayedIds.clear();
+    csdDisplayedPoints.clear();
+    csdDisplayedColors.clear();
+    ui->csdPointsHiddenLabel->clear();
+    ui->csdPointsHiddenLabel->setToolTip(QString());
 
-    auto clearListIcons = [this]() {
+    auto clearListIconsAndLegend = [this]() {
         const QSignalBlocker blocker(ui->csdListWidget);
         for (int i = 0; i < ui->csdListWidget->count(); ++i)
             ui->csdListWidget->item(i)->setIcon(QIcon());
+        ui->csdLegendLabel->clear();
     };
 
     QSharedPointer<CombinedFeStreams> chartRawData = chartRawDataRef.toStrongRef();
     if (chartRawData.isNull()) {
         csdChart->removeAllSeries();
-        clearListIcons();
+        clearListIconsAndLegend();
         return;
     }
 
@@ -199,9 +251,13 @@ void AnalysisDialog::csdRedisplayChart()
     QDate tomorrow = GbpController::getInstance().getTomorrow();
     if (!from.isValid() || !to.isValid() || to < from || from < tomorrow) {
         csdChart->removeAllSeries();
-        clearListIcons();
+        clearListIconsAndLegend();
         return;
     }
+
+    // Build the caches of points if not done yet for these dates (dialog just prepared, or
+    // dates applied), even if nothing is selected yet, so that the first selection is fast
+    eventDataEnsure(from, to);
 
     bool incomeMode = ui->csdIncomesRadioButton->isChecked();
     const QSet<QUuid>& selectedIds =
@@ -211,6 +267,7 @@ void AnalysisDialog::csdRedisplayChart()
     QList<QUuid> checkedOrder;
     QMap<QUuid, QString> checkedNames;
     QMap<QUuid, QList<QPointF>> csdRawPoints;
+    QMap<QUuid, double> csdTotals;          // sum of amounts within [from, to], per CSD
 
     for (int i = 0; i < ui->csdListWidget->count(); ++i) {
         QListWidgetItem* item = ui->csdListWidget->item(i);
@@ -224,7 +281,7 @@ void AnalysisDialog::csdRedisplayChart()
 
     if (checkedOrder.isEmpty()) {
         csdChart->removeAllSeries();
-        clearListIcons();
+        clearListIconsAndLegend();
         return;
     }
 
@@ -245,34 +302,26 @@ void AnalysisDialog::csdRedisplayChart()
         }
     }
 
-    // Single pass through raw data — listDi is already in ascending date order
-    const QList<CombinedFeStreams::DailyInfo>& listDi = chartRawData->getCombinedStreams();
-    const qsizetype diSize = listDi.size();
-    for (qsizetype var = 0; var < diSize; ++var) {
-        const CombinedFeStreams::DailyInfo& di = listDi[var];
-        if (!di.used) continue;
-        QDate diDate = tomorrow.addDays(static_cast<int>(var));
-        if (diDate < from || diDate > to) continue;
-
-        qreal xVal = static_cast<qreal>(
-            QDateTime(diDate, QTime(0, 0, 0)).toMSecsSinceEpoch());
-        const QList<Fe>& feList = incomeMode ? di.incomesList : di.expensesList;
-
-        for (const Fe& fe : feList) {
-            QSharedPointer<Csd> csd = fe.csdPtr.toStrongRef();
-            if (csd.isNull()) continue;
-            QUuid id = csd->getId();
-            if (!csdRawPoints.contains(id)) continue;
-            csdRawPoints[id].append({xVal, qAbs(fe.amount)});
+    // Points of the selected CSDs, taken from the cache of the current mode
+    const QHash<QUuid, QList<QPointF>>& pointsCache =
+        incomeMode ? csdPointsCacheIncomes : csdPointsCacheExpenses;
+    for (const QUuid& id : checkedOrder) {
+        const QList<QPointF> pts = pointsCache.value(id); // shared, not copied
+        csdRawPoints.insert(id, pts);
+        double total = 0;
+        for (const QPointF& pt : pts) {
+            total += pt.y();
         }
+        csdTotals.insert(id, total);
     }
 
     // Create series and add to chart
     csdChart->removeAllSeries();
-    QList<QLineSeries*> createdSeries;
-
+    csdDisplayedIds = checkedOrder;
     for (const QUuid& id : checkedOrder) {
         const QList<QPointF>& rawPts = csdRawPoints.value(id);
+        csdDisplayedPoints.insert(id, rawPts);
+        csdDisplayedColors.insert(id, csdColors[colorAssign.value(id)]);
 
         // Build step data using the MainWindow shadow approach:
         // insert a fake point 1 ms before each event at the previous Y value so the
@@ -292,63 +341,38 @@ void AnalysisDialog::csdRedisplayChart()
         csdChart->addSeries(series);
         series->attachAxis(csdAxisX);
         series->attachAxis(csdAxisY);
-        createdSeries.append(series);
+        csdLineSeries.append(series);
     }
 
-    // Okabe-Ito palette: verified ≥3:1 contrast against both black and white backgrounds.
-    static const QColor csdColors[10] = {
-        QColor(  0, 114, 178),  // blue
-        QColor(213,  94,   0),  // vermillion
-        QColor(  0, 158, 115),  // teal green
-        QColor(204, 121, 167),  // mauve
-        QColor(230, 159,   0),  // amber
-        QColor( 86, 180, 233),  // sky blue
-        QColor(220,  50,  47),  // red
-        QColor(148, 103, 189),  // purple
-        QColor(140,  86,  75),  // brown
-        QColor(127, 127, 127),  // gray
-    };
-
-    // Separate scatter series for point markers: the step line contains fake "hold"
-    // points 1 ms before each real point, so setPointsVisible on the line would render
-    // two overlapping dots per event. Use a dedicated QScatterSeries with raw points only.
-    bool showPoints = ui->csdShowPointsCheckBox->isChecked();
-    qreal pointSize = GbpController::getInstance().getChartPointSize();
-    QList<QScatterSeries*> createdMarkers;
-    for (int i = 0; i < checkedOrder.size(); ++i) {
-        const QUuid& id = checkedOrder[i];
-        QScatterSeries* markers = new QScatterSeries();
-        markers->setName(QString());
-        markers->append(csdRawPoints.value(id));
-        markers->setMarkerSize(pointSize);
-        markers->setVisible(showPoints);
-        csdChart->addSeries(markers);
-        markers->attachAxis(csdAxisX);
-        markers->attachAxis(csdAxisY);
-        if (GbpController::getInstance().useDarkModeForChart())
-            markers->setSelectedColor(GbpController::getInstance().getDarkModeSelectedPointColor());
-        else
-            markers->setSelectedColor(GbpController::getInstance().getLightModeSelectedPointColor());
-        const auto legendMarkers = csdChart->legend()->markers(markers);
-        for (QLegendMarker* lm : legendMarkers)
-            lm->setVisible(false);
-        connect(markers, &QScatterSeries::clicked, this,
-            [this, markers](const QPointF& pt) { csdPointClicked(markers, pt); });
-        createdMarkers.append(markers);
-    }
-
-    // Apply all colors after every addSeries() is done: Qt Charts re-applies the theme
+    // Apply the colors after every addSeries() is done: Qt Charts re-applies the theme
     // to all existing series on each addSeries() call, so colors must be set last.
-    for (int i = 0; i < createdSeries.size(); ++i) {
-        QPen pen(csdColors[colorAssign.value(checkedOrder[i])]);
+    for (int i = 0; i < csdLineSeries.size(); ++i) {
+        QPen pen(csdDisplayedColors.value(checkedOrder[i]));
         pen.setWidth(2);
-        createdSeries[i]->setPen(pen);
+        csdLineSeries[i]->setPen(pen);
     }
-    for (int i = 0; i < createdMarkers.size(); ++i) {
-        const QColor& col = csdColors[colorAssign.value(checkedOrder[i])];
-        createdMarkers[i]->setColor(col);
-        createdMarkers[i]->setBorderColor(col);
+
+    // Legend above the chart: colored square + total amount, per displayed curve.
+    // The square is an inline PNG image (not the U+25A0 glyph, which sits on the baseline)
+    // so that it can be vertically centered on the text line.
+    // Entries are separated by a normal space so the label wraps between entries only.
+    const int legendSquareSize = ui->csdLegendLabel->fontMetrics().height() * 6 / 10;
+    QStringList legendParts;
+    for (const QUuid& id : checkedOrder) {
+        QPixmap square(legendSquareSize, legendSquareSize);
+        square.fill(csdColors[colorAssign.value(id)]);
+        QByteArray pngData;
+        QBuffer buffer(&pngData);
+        buffer.open(QIODevice::WriteOnly);
+        square.save(&buffer, "PNG");
+        const QString total = CurrencyHelper::formatAmount(csdTotals.value(id), currInfo,
+            locale, false);
+        legendParts.append(QString("<img src=\"data:image/png;base64,%1\" "
+            "style=\"vertical-align: middle;\">&nbsp;%2")
+            .arg(QString::fromLatin1(pngData.toBase64()), total.toHtmlEscaped()));
     }
+    ui->csdLegendLabel->setText(tr("Sums : ").toHtmlEscaped()
+        + legendParts.join("&nbsp;&nbsp;&nbsp; "));
 
     // Update list item icons: colored square for checked items, transparent for unchecked.
     // QSignalBlocker prevents setIcon from re-triggering itemChanged.
@@ -374,6 +398,10 @@ void AnalysisDialog::csdRedisplayChart()
 
     csdRescaleChart();
 
+    // Point markers for the visible range, now that the axes are set
+    csdRebuildMarkers();
+    csdMarkersTimer->stop(); // the rescale above started it : the markers are already built
+
     // Y axis format
     QString yValFormat = QString("\%.%1f").arg(currInfo.noOfDecimal);
     csdAxisY->setLabelFormat(yValFormat);
@@ -385,6 +413,18 @@ void AnalysisDialog::csdRedisplayChart()
     QFont yFont = csdAxisY->labelsFont();
     yFont.setPointSize(static_cast<int>(csdYAxisFontSize));
     csdAxisY->setLabelsFont(yFont);
+}
+
+
+void AnalysisDialog::csdClearCachedData()
+{
+    if (csdMarkersTimer) csdMarkersTimer->stop();
+    csdLineSeries.clear();
+    csdDisplayedIds.clear();
+    csdDisplayedPoints.clear();
+    csdDisplayedColors.clear();
+    csdLastSelectedSeries = nullptr;
+    csdLastSelectedIndex  = -1;
 }
 
 
@@ -485,10 +525,154 @@ void AnalysisDialog::on_csdUnselectAllPushButton_clicked()
 
 void AnalysisDialog::on_csdShowPointsCheckBox_stateChanged(int /*arg1*/)
 {
-    bool showPoints = ui->csdShowPointsCheckBox->isChecked();
+    csdRebuildMarkers();
+}
+
+
+void AnalysisDialog::csdRebuildMarkers()
+{
+    if (!csdChart) return;
+    csdMarkersTimer->stop();
+
+    // Remember the selected point, to select it again if it is still visible
+    QUuid selectedId;
+    QPointF selectedPt;
+    if (csdLastSelectedSeries && csdLastSelectedIndex >= 0) {
+        selectedId = csdLastSelectedSeries->property("csdId").toUuid();
+        selectedPt = csdLastSelectedSeries->at(csdLastSelectedIndex);
+    }
+    csdLastSelectedSeries = nullptr;
+    csdLastSelectedIndex  = -1;
+
+    // Remove the current markers
     for (QAbstractSeries* absS : csdChart->series()) {
-        if (qobject_cast<QScatterSeries*>(absS))
-            absS->setVisible(showPoints);
+        if (qobject_cast<QScatterSeries*>(absS)) {
+            csdChart->removeSeries(absS);
+            delete absS;
+        }
+    }
+    ui->csdPointsHiddenLabel->clear();
+    ui->csdPointsHiddenLabel->setToolTip(QString());
+    ui->csdShowPointsCheckBox->setEnabled(true);
+    auto showSelectionLabels = [this](bool visible) {
+        ui->csdPointXLabel->setVisible(visible);
+        ui->csdSelectedPointDateLabel->setVisible(visible);
+        ui->csdSelectedPointValueLabel->setVisible(visible);
+    };
+    showSelectionLabels(true);
+
+    auto clearSelectedLabels = [this]() {
+        ui->csdSelectedPointDateLabel->clear();
+        ui->csdSelectedPointValueLabel->clear();
+    };
+    if (!ui->csdShowPointsCheckBox->isChecked() || csdDisplayedIds.isEmpty()) {
+        // without markers ("Points" unchecked), no point can be selected
+        showSelectionLabels(ui->csdShowPointsCheckBox->isChecked());
+        clearSelectedLabels();
+        return;
+    }
+
+    // Visible part of each curve (points are sorted by date)
+    const qreal xMin = static_cast<qreal>(csdAxisX->min().toMSecsSinceEpoch());
+    const qreal xMax = static_cast<qreal>(csdAxisX->max().toMSecsSinceEpoch());
+    auto byX = [](const QPointF& p, qreal x) { return p.x() < x; };
+    QList<QList<QPointF>> visiblePoints;
+    qsizetype total = 0;
+    // Maximum number of markers displayed at once, all curves together. Beyond that, the markers
+    // are not created (they would be too dense to be useful, and Qt Charts creates one graphic
+    // item per marker, which becomes very slow).
+    const qsizetype maxMarkers = GbpController::getInstance().getChartMaxPoints();
+    for (const QUuid& id : csdDisplayedIds) {
+        const QList<QPointF>& pts = csdDisplayedPoints[id];
+        auto first = std::lower_bound(pts.cbegin(), pts.cend(), xMin, byX);
+        auto last  = std::upper_bound(first, pts.cend(), xMax,
+            [](qreal x, const QPointF& p) { return x < p.x(); });
+        visiblePoints.append(QList<QPointF>(first, last));
+        total += visiblePoints.last().size();
+    }
+    if (total > maxMarkers) {
+        // The checkbox is inactive (but stays checked) until the limit is no longer exceeded,
+        // e.g. after a zoom in : the markers then come back by themselves
+        ui->csdShowPointsCheckBox->setEnabled(false);
+        showSelectionLabels(false); // no point can be selected without markers
+        // "ⓘ" sign 1 average character away from the checkbox, the reason in its tooltip
+        ui->csdPointsHiddenLabel->setIndent(
+            ui->csdPointsHiddenLabel->fontMetrics().averageCharWidth());
+        ui->csdPointsHiddenLabel->setText("\u24D8");
+        ui->csdPointsHiddenLabel->setToolTip(tr("Too many points in view to show them\n"
+            "(limit set in Options) : zoom in or select fewer CSDs."));
+        clearSelectedLabels();
+        return;
+    }
+
+    // The markers also cover half the visible width on each side, so that they are already
+    // there when these points come into view during a pan (unless it makes too many markers)
+    const qreal margin = (xMax - xMin) / 2;
+    QList<QList<QPointF>> withMargin;
+    qsizetype totalWithMargin = 0;
+    for (const QUuid& id : csdDisplayedIds) {
+        const QList<QPointF>& pts = csdDisplayedPoints[id];
+        auto first = std::lower_bound(pts.cbegin(), pts.cend(), xMin - margin, byX);
+        auto last  = std::upper_bound(first, pts.cend(), xMax + margin,
+            [](qreal x, const QPointF& p) { return x < p.x(); });
+        withMargin.append(QList<QPointF>(first, last));
+        totalWithMargin += withMargin.last().size();
+    }
+    if (totalWithMargin <= 2 * maxMarkers) {
+        visiblePoints = withMargin;
+    }
+
+    // Separate scatter series for point markers: the step line contains fake "hold"
+    // points 1 ms before each real point, so setPointsVisible on the line would render
+    // two overlapping dots per event. Use a dedicated QScatterSeries with real points only.
+    const qreal pointSize = GbpController::getInstance().getChartPointSize();
+    const QColor selectedColor = GbpController::getInstance().useDarkModeForChart() ?
+        GbpController::getInstance().getDarkModeSelectedPointColor() :
+        GbpController::getInstance().getLightModeSelectedPointColor();
+    QList<QScatterSeries*> createdMarkers;
+    for (int i = 0; i < csdDisplayedIds.size(); ++i) {
+        QScatterSeries* markers = new QScatterSeries();
+        markers->setProperty("csdId", csdDisplayedIds[i]);
+        markers->append(visiblePoints[i]);
+        markers->setMarkerSize(pointSize);
+        csdChart->addSeries(markers);
+        markers->attachAxis(csdAxisX);
+        markers->attachAxis(csdAxisY);
+        markers->setSelectedColor(selectedColor);
+        connect(markers, &QScatterSeries::clicked, this,
+            [this, markers](const QPointF& pt) { csdPointClicked(markers, pt); });
+        createdMarkers.append(markers);
+    }
+
+    // Apply all colors after every addSeries() is done: Qt Charts re-applies the theme
+    // to all existing series (the curves too) on each addSeries() call.
+    for (int i = 0; i < csdLineSeries.size() && i < csdDisplayedIds.size(); ++i) {
+        QPen pen(csdDisplayedColors.value(csdDisplayedIds[i]));
+        pen.setWidth(2);
+        csdLineSeries[i]->setPen(pen);
+    }
+    for (int i = 0; i < createdMarkers.size(); ++i) {
+        const QColor col = csdDisplayedColors.value(csdDisplayedIds[i]);
+        createdMarkers[i]->setColor(col);
+        createdMarkers[i]->setBorderColor(col);
+    }
+
+    // Select again the point that was selected, if it is still visible
+    bool reselected = false;
+    if (!selectedId.isNull()) {
+        const int seriesIndex = csdDisplayedIds.indexOf(selectedId);
+        if (seriesIndex >= 0) {
+            const int pointIndex = visiblePoints[seriesIndex].indexOf(selectedPt);
+            if (pointIndex >= 0) {
+                createdMarkers[seriesIndex]->setPointSelected(pointIndex, true);
+                csdLastSelectedSeries = createdMarkers[seriesIndex];
+                csdLastSelectedIndex  = pointIndex;
+                reselected = true;
+            }
+        }
+    }
+    if (!reselected) {
+        clearSelectedLabels();
     }
 }
 

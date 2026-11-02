@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1163</width>
-    <height>779</height>
+    <height>782</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -324,7 +324,7 @@
                 </sizepolicy>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Any number value used in any CSV export process is localized, that is the &amp;quot;thousands separator&amp;quot; and &amp;quot;decimal separator&amp;quot; are set according to the default language used on the computer. &lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : &amp;quot;thousands separator&amp;quot; is not used and &amp;quot;decimal separator&amp;quot; is &amp;quot;.&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt; : Any number value used in any CSV export process is localized, that is the &amp;quot;thousands separator&amp;quot; and &amp;quot;decimal separator&amp;quot; are set according to the default language used on the computer. &lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt; : &amp;quot;thousands separator&amp;quot; is not used and &amp;quot;decimal separator&amp;quot; is &amp;quot;.&amp;quot;&lt;/p&gt;&lt;p&gt;Numbers follow the international CLDR conventions. Some spreadsheets may not read them: uncheck this option to get plain numbers (e.g. 1234567.89).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>
@@ -454,7 +454,7 @@
                 <number>3</number>
                </property>
                <property name="minimum">
-                <double>-100.000000000000000</double>
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
                 <double>100.000000000000000</double>
@@ -770,6 +770,40 @@
                </layout>
               </item>
               <item row="1" column="0">
+               <widget class="QLabel" name="maxPointsLabel">
+                <property name="text">
+                 <string>Max number of points shown :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayoutMaxPoints">
+                <item>
+                 <widget class="QSpinBox" name="maxPointsSpinBox">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum number of points shown at once in the Cash Balance chart, the Compare CSD chart and the Visualize Occurrences chart. When there are more of them in view, zoom in to see them.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="singleStep">
+                   <number>100</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacerMaxPoints">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="2" column="0">
                <widget class="QLabel" name="label_8">
                 <property name="font">
                  <font>
@@ -781,7 +815,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="2" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_17">
                 <item>
                  <widget class="QSpinBox" name="scalingMainChartSpinBox">
@@ -817,14 +851,14 @@
                 </item>
                </layout>
               </item>
-              <item row="2" column="0">
+              <item row="3" column="0">
                <widget class="QLabel" name="label_15">
                 <property name="text">
                  <string>Mouse wheel rotated away from user will :</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
+              <item row="3" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_10">
                 <item>
                  <widget class="QRadioButton" name="wheelZoomOutRadioButton">
@@ -880,14 +914,14 @@
                 </item>
                </layout>
               </item>
-              <item row="3" column="0">
+              <item row="4" column="0">
                <widget class="QLabel" name="label_17">
                 <property name="text">
                  <string>Show a colored line at Y=0 value :</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
+              <item row="4" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_9">
                 <item>
                  <widget class="QCheckBox" name="showYzeroLineCheckBox">
@@ -920,14 +954,14 @@
                 </item>
                </layout>
               </item>
-              <item row="4" column="0">
+              <item row="5" column="0">
                <widget class="QLabel" name="label_18">
                 <property name="text">
                  <string>X-Axis date format :</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
+              <item row="5" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_12">
                 <item>
                  <widget class="QRadioButton" name="xAxisDateLocaleRadioButton">
@@ -1018,7 +1052,7 @@
                 </item>
                </layout>
               </item>
-              <item row="5" column="0">
+              <item row="6" column="0">
                <widget class="QLabel" name="label_2">
                 <property name="font">
                  <font>
@@ -1030,7 +1064,7 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
+              <item row="6" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_11">
                 <item>
                  <widget class="QRadioButton" name="chartThemingLightRadioButton">
@@ -2218,6 +2252,29 @@
       </spacer>
      </item>
      <item>
+      <widget class="QLabel" name="modifiedWarningLabel">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The settings have been modified in this window. Click &amp;quot;Save&amp;quot; to save the changes, or &amp;quot;Cancel&amp;quot; to discard them.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string notr="true">!</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closePushButton">
+       <property name="text">
+        <string>Close</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="cancelPushButton">
        <property name="text">
         <string>Cancel</string>
@@ -2250,10 +2307,10 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup_5"/>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_4"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_4"/>
+  <buttongroup name="buttonGroup_5"/>
+  <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

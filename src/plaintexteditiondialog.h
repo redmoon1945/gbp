@@ -45,7 +45,9 @@ private slots:
 
     void on_applyChangesPushButton_clicked();
     void on_cancelPushButton_clicked();
+    void on_closePushButton_clicked();
     void on_PlainTextEditionDialog_rejected();
+    void on_MonoFontCheckBox_toggled(bool checked);
 
 protected:
     void showEvent(QShowEvent* event) override;
@@ -53,6 +55,62 @@ protected:
 private:
     Ui::PlainTextEditionDialog *ui;
     bool readOnly;
+
+    // Mono font choice, shared by all instances for the app session (off at launch)
+    static bool useMonoFont;
+
+    void applyFont();
+
+    /**
+     * @brief Text as it was when the dialog was prepared, read back from the editor (so that
+     * the editor's own normalization does not look like a change). Reference for detecting
+     * changes not applied yet.
+     */
+    QString originalText;
+
+    /**
+     * @brief True while the editor content is set by the dialog itself : change detection is
+     * suspended.
+     */
+    bool fillingForm = false;
+
+    /**
+     * @brief Record that the text has been modified (or not), and update some UI hints :
+     * warning sign, "*" in the window title, bottom buttons.
+     * @details The only function allowed to write ContentChange::changed - enforced by
+     * ContentChange's friend declaration. See ContentChange below.
+     * @param v New value of the flag.
+     */
+    void contentHasChanged(bool v);
+
+    /**
+     * @brief Whether the text in the editor differs from originalText.
+     * @return True if there are changes not applied yet.
+     */
+    bool hasContentChanged() const;
+
+    /**
+     * @brief Detect if the text in the editor differs from originalText, and update the
+     * "content has changed" flag and the bottom buttons accordingly.
+     * @details Called on each textChanged of the editor. Does nothing while fillingForm is true.
+     * In read-only mode, the text cannot change : only "Close" is shown.
+     */
+    void updateContentChanged();
+
+    /**
+     * @brief Guards the "content has changed" flag so that only contentHasChanged() and
+     * hasContentChanged() can read or write it (same as in EditScenarioDialog).
+     */
+    class ContentChange
+    {
+        bool changed = false;
+        bool get() const { return changed; }
+        void set(bool v)  { changed = v; }
+        friend void PlainTextEditionDialog::contentHasChanged(bool v);
+        friend bool PlainTextEditionDialog::hasContentChanged() const;
+    };
+
+    ContentChange contentChanged;
 };
 
 #endif // PLAINTEXTEDITIONDIALOG_H

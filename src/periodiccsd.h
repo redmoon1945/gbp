@@ -307,11 +307,78 @@ public:
     bool getUseScenarioForEndDate() const;
 
     /**
-     * @brief Gets the next event date after the given date.
-     * @param date Reference date.
+     * @brief Gets the next event date after the given date, i.e. date + 1 * (period multiplier)
+     * time units.
+     * @details The result is computed from the given date only, with no knowledge of the
+     * original start date. Depending on the period type :
+     *   - DAILY, WEEKLY : date + (multiplier) days or weeks. No side effect.
+     *   - MONTHLY, YEARLY : uses QDate::addMonths() / QDate::addYears(), which clamp to the last
+     *     day of the target month when the day does not exist (e.g. Jan 31 + 1 month = Feb 28,
+     *     Feb 29 + 1 year = Feb 28).
+     *   - END_OF_MONTHLY : if date is already an end-of-month, returns the last day of the month
+     *     (multiplier) months later. Otherwise, returns the last day of the month
+     *     (multiplier - 1) months later (i.e. the end of the current month when multiplier = 1).
+     *
+     * **WARNING - do not chain calls to generate an occurrence series.** For MONTHLY and
+     * YEARLY, calling this method on its own previous result causes a "day-of-month drift" :
+     * once a day has been clamped in a short month, the original day is lost for good. For
+     * example, a monthly series starting on Jan 31 would become Feb 28, Mar 28, Apr 28, ...
+     * instead of Feb 28, Mar 31, Apr 30, ... and a yearly series starting on Feb 29 2024 would
+     * stay on Feb 28 even in later leap years. To generate a series, use getNthEventDate(),
+     * which always computes from the first occurrence (anchor).
+     *
+     * **WARNING - do not use it to get the first occurrence.** For END_OF_MONTHLY with a
+     * mid-month start date and a multiplier > 1, getNextEventDate(startDate) skips
+     * (multiplier - 1) ends-of-month. Use getFirstEventDate() instead.
+     * @param date Reference date. Must be valid.
      * @return Next event date.
+     * @throws std::invalid_argument If date is invalid or the period type is unknown.
+     * @see getNthEventDate()
      */
     QDate getNextEventDate(QDate date) const;
+
+    /**
+     * @brief Gets the date of the n-th occurrence following an anchor (first occurrence) date.
+     * @details The date is always computed directly from the anchor, i.e. anchor + n * (period
+     * multiplier) time units, and never by stepping from the previous occurrence. This prevents
+     * the "day-of-month drift" that happens when stepping occurrence by occurrence : for
+     * example, a monthly event starting on Jan 31 would otherwise become Feb 28, Mar 28,
+     * Apr 28, ... instead of Feb 28, Mar 31, Apr 30, ... When the anchor's day does not exist in
+     * the target month (MONTHLY) or year (YEARLY, Feb 29), the last day of that month is used.
+     * For END_OF_MONTHLY, the result is always the last day of the target month.
+     * For DAILY and WEEKLY, the result is identical to repeated calls to getNextEventDate().
+     * @param anchor Date of the first occurrence (n = 0). Must be valid. For END_OF_MONTHLY,
+     * it must be an end-of-month date.
+     * @param n Index of the occurrence to compute. n = 0 returns the anchor.
+     * @return The date of the n-th occurrence.
+     * @throws std::invalid_argument If anchor is invalid, the period type is unknown, or anchor
+     * is not an end-of-month date for END_OF_MONTHLY.
+     * @throws std::out_of_range If, for MONTHLY, END_OF_MONTHLY or YEARLY, n * periodMultiplier
+     * does not fit in an int (required by QDate::addMonths() and QDate::addYears()).
+     * @see getNextEventDate()
+     */
+    QDate getNthEventDate(QDate anchor, quint32 n) const;
+
+    /**
+     * @brief Gets the date of the first occurrence (first financial event) of this Csd.
+     * @details This is startDate, except for END_OF_MONTHLY when startDate is not an
+     * end-of-month : the first occurrence is then the last day of startDate's month, WHATEVER
+     * the period multiplier is. The period multiplier only defines the interval BETWEEN
+     * occurrences. For example, with END_OF_MONTHLY every 3 months and startDate = 2025-01-15,
+     * the first occurrence is 2025-01-31 (then 2025-04-30, 2025-07-31, ...).
+     * Note : getNextEventDate(startDate) does NOT return the first occurrence. It returns the
+     * occurrence that follows an occurrence on startDate, i.e. the SECOND occurrence when
+     * startDate is itself the first one (all period types, except END_OF_MONTHLY with a
+     * mid-month startDate). For END_OF_MONTHLY with a mid-month startDate, it counts
+     * (multiplier) ends-of-month from startDate : e.g. every 3 months from 2025-01-15 gives
+     * 2025-03-31, while the first occurrence is 2025-01-31. Always use this method to get the
+     * first occurrence.
+     * The end date is not taken into account : the returned date may be after the effective
+     * end date, in which case there is no occurrence at all.
+     * @return The date of the first occurrence.
+     * @see getNthEventDate() to get the following occurrences from this date.
+     */
+    QDate getFirstEventDate() const;
 
     /**
      * @brief Convert an PeriodType class enum value to an int. This is used when serializing

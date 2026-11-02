@@ -89,7 +89,8 @@ public:
         LOAD_JSON_SEMANTIC_ERROR,    ///< JSON is valid but content is semantically incorrect
         LOAD_CANNOT_UPGRADE,         ///< Cannot upgrade from older file version
         LOAD_ERROR,                  ///< Generic load error
-        LOAD_UNKNOWN_VERSION         ///< File version is unknown or unsupported
+        LOAD_UNKNOWN_VERSION,        ///< File version is unknown or unsupported
+        LOAD_NO_CURRENCY_FOR_COUNTRY ///< GBP 1.7 file : no currency found for its CountryCode
     };
 
     /**
@@ -99,6 +100,7 @@ public:
     struct FileResult{
         FileResultCode code; /// Error code
         QString logErrorMessage; /// Explains the error, for logging (stays in English)
+        QString countryCode; /// for LOAD_NO_CURRENCY_FOR_COUNTRY only : the CountryCode found
         bool version1found;
         QSharedPointer<Scenario> scenarioPtr; /// for Load only, not filled if code != SUCCESS
 
@@ -121,7 +123,8 @@ public:
     /**
      * @brief Detailed Constructor. "EditedBy" is set to current version of GBP.
      * @param version Version of the file.
-     * @param name Name of the scenario. Cut to a max of NAME_MAX_LEN char.
+     * @param name Name of the scenario. Cut to a max of NAME_MAX_LEN char, then leading and
+     * trailing whitespace removed (see normalizeName()).
      * @param description Description of the scenario. Cut to a max of DESC_MAX_LEN char.
      * @param feGenerationDuration Max no of years the FE can be generated, starting from
      * "tomorrow".
@@ -253,12 +256,26 @@ public:
      */
     int getNoOfIrregularExpenses(bool activeOnly);
 
+    /**
+     * @brief Last date (inclusive) for which financial events can be generated.
+     * @details This is the only place where this date is calculated : the engine and all the
+     * dialogs must use it, so that they always agree on the last day of the scenario.
+     * @param today The date of "today" as defined in gbp.
+     * @param duration Scenario duration in years.
+     * @return today + duration years.
+     */
+    static QDate getMaxDateFeGeneration(QDate today, quint16 duration);
 
     // --- Getters and setters ---
 
     QString getVersion() const;
     void setVersion(const QString &newVersion);
     QString getName() const;
+    /**
+     * @brief Set the name of the scenario.
+     * @param newName New name. Cut to a max of NAME_MAX_LEN char, then leading and trailing
+     * whitespace removed (see normalizeName()).
+     */
     void setName(const QString &newName);
     QString getDescription() const;
     void setDescription(const QString &newDescription);
@@ -366,6 +383,16 @@ private:
      */
     bool deepCompareIrregularCsdMaps(const QHash<QUuid, QSharedPointer<IrregularCsd>>& map1,
         const QHash<QUuid, QSharedPointer<IrregularCsd>>& map2) const;
+
+    /**
+     * @brief Normalize a scenario name : a name is either empty, or starts and ends with a
+     * non-whitespace character, with a max of NAME_MAX_LEN char.
+     * @details Cut to NAME_MAX_LEN char first (bounds the work whatever the input size), then
+     * remove leading and trailing whitespace.
+     * @param n Name to normalize.
+     * @return The normalized name.
+     */
+    static QString normalizeName(const QString& n);
 
 };
 

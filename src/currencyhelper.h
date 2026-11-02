@@ -124,7 +124,8 @@ public:
      * @param amount The double to be converted to qint64.
      * @param noOfDecimal No of decimal for the currency.
      * @param result 0 if success, -1 if absolute value of amount is bigger than the maximum
-     * allowed, -2 if noOfDecimal is too big.
+     * allowed, -2 if noOfDecimal is too big, -3 if amount is not a finite number (NaN or
+     * infinite).
      * @return The qint64 produced.
      */
     static qint64 amountDoubleToQint64(double amount, quint8 noOfDecimal, int &result) ;
@@ -217,29 +218,14 @@ public:
     static double add(double a, double b, uint noOfDecimalDigits);
 
     /**
-     * @brief Return a list of 2-letter ISO 3166 alpha-2 country codes (key) and their
-     * names (value). Names are provided in current Locale's language if available, otherwise
-     * in English
-     * @param theLocale The locale.
-     * @return The list.
-     */
-    static QMap<QString, QString> getCountries(QLocale theLocale) ;
-
-    /**
-     * @brief Get a list associating 2-letter ISO 3166 alpha-2 country codes (key) with their
-     * currency (value) in the form of a String with format "%1 (%2) - %3")
-     * where %1=currency ISO code, %2=currency symbol, %3=currency name in the specified language.
+     * @brief Get the currencies that can be selected for a scenario.
+     * @details Only the currencies of the GBP list that are "selectable" are returned.
      * @param language The language for the currency name (English or French).
-     * @return The list.
+     * @return The list. Key is the 3-letter ISO 4217 currency code, value is a String with
+     * format "%1 (%2) - %3" where %1=currency ISO code, %2=currency symbol, %3=currency name in
+     * the specified language.
      */
     static QMap<QString,QString> getCurrencies(QLocale::Language language);
-
-    /**
-     * @brief Indicates if a country exists in the GBP list of countries.
-     * @param countryCode The 2-letter ISO 3166 alpha-2 country code.
-     * @return True if it exists, false otherwise.
-     */
-    static bool countryExists(QString countryCode);
 
     /**
      * @brief Calculate the maximum pixel width of a formatted currency amount string.
@@ -257,14 +243,19 @@ public:
 
     /**
      * @brief Get CurrencyInfo for the currency tied to a specific country.
-     * @details The info returned are:
-     * - currency 3-letter ISO 3166 currency code.
+     * @details Used only to load scenario files of GBP 1.7 and below, which store a country
+     * code instead of a currency code. The currency is the one that all the Qt locales of
+     * that country use. The currency is not found if the country is unknown to Qt, if Qt has
+     * no locale for it, if its locales use more than one currency, or if that currency is not
+     * in the GBP list of currencies.
+     * The info returned are:
+     * - currency 3-letter ISO 4217 currency code.
      * - currency symbol.
      * - currency name in the specified language (English or French).
      * - No of decimal for that currency.
-     * @param countryCode The 2-letter ISO 3166 alpha-2 country code.
+     * @param countryCode The 2-letter ISO 3166 alpha-2 country code (uppercase).
      * @param language The language for the currency name (English or French).
-     * @param found True if the country has been found, false otherwise.
+     * @param found True if the currency has been found, false otherwise.
      * @return The currency info.
      */
     static CurrencyInfo getCurrencyInfoFromCountryCode(const QString &countryCode,
@@ -272,6 +263,8 @@ public:
 
     /**
      * @brief Get CurrencyInfo directly from a 3-letter ISO 4217 currency code.
+     * @details Any currency of the GBP list is found, including the ones that are not
+     * "selectable".
      * @param isoCode The 3-letter ISO 4217 currency code (e.g. "USD").
      * @param language The language for the currency name (English or French).
      * @param found True if the currency has been found, false otherwise.
@@ -287,14 +280,6 @@ public:
      */
     static bool currencyIsoCodeExists(QString isoCode);
 
-    /**
-     * @brief Return a representative 2-letter country code for a given currency ISO code.
-     * @details Used for backward-compatibility when writing scenario files. Returns the
-     * alphabetically first country in the GBP country list that uses the given currency.
-     * @param isoCode The 3-letter ISO 4217 currency code.
-     * @return The country code, or empty string if none found.
-     */
-    static QString getRepresentativeCountryForCurrency(const QString &isoCode);
 
 
 private:
@@ -343,30 +328,39 @@ private:
     static const qint8 MAX_NO_OF_DECIMALS;
 
     /**
-     * @brief List of countries for which the currency has a no of decimal different from 2.
-     * Key = 3-letter ISO 3166 currency code.
-     * Value = No of decimals.
+     * @struct CurrencyDef
+     * @brief Definition of a currency in the GBP list of currencies.
      */
-    static QMap<QString,int> currencyDecimalDigits ;
+    struct CurrencyDef {
+        QString nameEn;     // name in English
+        QString nameFr;     // name in French
+        QString symbol;     // e.g. "$"
+        int noOfDecimal;    // no of fractional decimal units, from 0 to MAX_NO_OF_DECIMALS
+        bool selectable;    // false : can no longer be chosen for a scenario (e.g. retired)
+    };
 
     /**
-     * @brief List of countries. Key is 2-letter ISO 3166 alpha-2 country codes, value
-     * is country name in English
-     * @details We maintain our own list, because Qt has bugs.
-     * @see See https://github.com/umpirsky/country-list/tree/master/data
+     * @brief The GBP list of currencies. Key is the 3-letter ISO 4217 currency code.
+     * @details This is the only source of currencies in GBP : the currency of a scenario
+     * must be in this list.
+     * @warning This list can ONLY be extended. Scenario files store the currency code and
+     * the amounts in minor units (e.g. cents), so :
+     * - NEVER remove an entry : the scenario files using that currency could no longer be
+     *   loaded. To retire a currency, set its "selectable" to false instead.
+     * - NEVER change the key or the no of decimals of an entry : all the amounts of the
+     *   scenario files using that currency would change (e.g. 1000 yen would become 10.00).
      */
-    static QMap<QString,QString> countries ;
+    static const QMap<QString, CurrencyDef> currencies;
 
     /**
-     * @brief List of countries in french. Key is 2-letter ISO 3166 alpha-2 country codes, value
-     * is country name in French.
-     * @details We maintain our own list, because Qt has bugs.
+     * @brief Build a CurrencyInfo from an entry of the GBP list of currencies.
+     * @param isoCode The 3-letter ISO 4217 currency code.
+     * @param def The definition of the currency.
+     * @param language The language for the currency name (English or French).
+     * @return The currency info.
      */
-    static QMap<QString,QString> countries_fr ;
-
-    static QMap<QString, QString> currencyNamesEnglish;
-
-    static QMap<QString, QString> currencyNamesFrench;
+    static CurrencyInfo makeCurrencyInfo(const QString &isoCode, const CurrencyDef &def,
+        QLocale::Language language);
 };
 
 #endif // CURRENCYHELPER_H

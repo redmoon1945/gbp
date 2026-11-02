@@ -29,6 +29,8 @@
 #include <qdatetimeaxis.h>
 #include <qlineseries.h>
 #include <QScatterSeries>
+#include <QTimer>
+#include <optional>
 #include <qvalueaxis.h>
 
 
@@ -102,7 +104,17 @@ private:
     QChart* chart;
     QDateTimeAxis *axisX ;
     QValueAxis *axisY;
-    QScatterSeries *series;
+    QScatterSeries *series = nullptr;    // markers of the financial events visible in the chart
+    QLineSeries *lineSeries = nullptr;   // line through the events, shown instead of the markers
+                                         // when there are too many of them in view
+    /**
+     * @brief All the financial events, as chart points sorted by date. "series" only holds the
+     * visible ones, as markers (see rebuildMarkers()).
+     */
+    QList<QPointF> allPoints;
+    QTimer markersTimer;   // rebuilds the markers during/after a zoom or a pan
+    std::optional<QPointF> selectedPoint; // point selected by the user, if any
+    QString selectedPointText;            // its description, shown when it is visible
     QDateTime xMin, xMax;
     uint xAxisFontSize;
     uint yAxisFontSize;
@@ -143,6 +155,14 @@ private:
     void themeChanged();
     void setSeriesCharacteristics();
     void replaceChartSeries(QList<QPointF> data);
+
+    /**
+     * @brief Rebuild the markers for the visible X range only (plus a margin). If there would be
+     * more than the maximum number of points (chart_max_points setting) of them in view, show
+     * the events as a line instead, with a message.
+     * The selected point is selected again if it is visible.
+     */
+    void rebuildMarkers();
     void rescaleChart();
     void changeYaxisLabelFormat();
 

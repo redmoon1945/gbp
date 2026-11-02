@@ -68,7 +68,8 @@ void EditIrregularElementDialog::slotPrepareContent(bool isIncome, bool newEditM
     editMode = newEditMode;
     existingDates = newExistingDates;
     currInfo = cInfo;
-    latestOldDate = currentDate;    // date may or may not change during an edit, so remember the "old" one
+    // date may or may not change during an edit, so remember the "old" one
+    latestOldDate = currentDate;
     ui->currencyLabel->setText(currInfo.isoCode);
     ui->amountDoubleSpinBox->setDecimals(currInfo.noOfDecimal);
     ui->amountDoubleSpinBox->setMinimum(0);
@@ -130,7 +131,8 @@ void EditIrregularElementDialog::on_applyPushButton_clicked()
         GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::ERROR, tr("Error"),
             QString(tr("Amount is bigger than the "
             "maximum allowed of %1"))
-            .arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)), {tr("OK")}, 0, 0);
+            .arg(CurrencyHelper::maxValueAllowedForAmountInDouble(currInfo.noOfDecimal)),
+            {tr("OK")}, 0, 0);
         return;
     }
 
@@ -163,8 +165,13 @@ void EditIrregularElementDialog::on_applyPushButton_clicked()
 
     // send result back to caller. For "Create", latestOldDate can be anything because
     // it will not be used by caller.
-    emit signalEditElementResult(editMode, latestOldDate, newDate, amount,
-        ui->notesLineEdit->text());
+    // TAB and line breaks can be pasted in the notes : replace them by spaces, and show what
+    // is saved (in create mode, the notes stay for the next item)
+    QString notes = Util::toSingleLine(ui->notesLineEdit->text());
+    if (notes != ui->notesLineEdit->text()) {
+        ui->notesLineEdit->setText(notes);
+    }
+    emit signalEditElementResult(editMode, latestOldDate, newDate, amount, notes);
     if (editMode){
         hide();
         emit signalEditElementCompleted();

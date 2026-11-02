@@ -23,6 +23,7 @@
 #include <QString>
 #include <QStandardPaths>
 #include <QApplication>
+#include <cmath>
 
 
 
@@ -45,6 +46,7 @@ GbpController::GbpController()
 
     // Set default value for settings from factory settings
     chartPointSize = factorySettings.chartPointSize;
+    chartMaxPoints = factorySettings.chartMaxPoints;
     chartTheming = factorySettings.chartTheming;
     darkModeCurveColor = factorySettings.darkModeCurveColor;
     lightModeCurveColor = factorySettings.lightModeCurveColor;
@@ -239,15 +241,19 @@ void GbpController::loadSettings()
         .arg(REDACT(recentFilenames.join("|||"))));
 
     // Chart Point Size in pixels
+    // Converted from the string : QVariant::toUInt() accepts a number too big for a uint and
+    // silently wraps it (e.g. 4294967306 gives 10)
     if (settingsPtr->contains("chart_point_size")){
-        bool ok;
         v = settingsPtr->value("chart_point_size");
-        int anInt = v.toInt(&ok);
-        if ( (!ok) || (anInt<5) || (anInt>25) )  {
-            // settings is invalid
+        QString s = v.toString();
+        bool ok;
+        uint aUint = s.toUInt(&ok);
+        if ( (!ok) || (aUint<CHART_POINT_SIZE_MIN) || (aUint>CHART_POINT_SIZE_MAX) )  {
+            // settings is invalid, revert back to default. Only the start of the value is
+            // logged, in case it is very long
             chartPointSize = factorySettings.chartPointSize;
         } else {
-            chartPointSize = anInt;
+            chartPointSize = aUint;
         }
     } else{
         chartPointSize = factorySettings.chartPointSize;
@@ -586,7 +592,8 @@ void GbpController::loadSettings()
         v = settingsPtr->value("pv_discount_rate");
         bool ok;
         double aDouble = v.toDouble(&ok);
-        if ( (!ok) || (aDouble<0) || (aDouble>100) )  {
+        // NaN passes the range checks below (comparisons with NaN are always false)
+        if ( (!ok) || !std::isfinite(aDouble) || (aDouble<0) || (aDouble>100) )  {
             // settings is invalid, revert back to default
             pvDiscountRate = factorySettings.pvDiscountRate;
         } else {
@@ -754,6 +761,27 @@ void GbpController::loadSettings()
     LOG_INFO(QString("    expense_color = %1")
         .arg(expenseColor.name(QColor::HexRgb)));
 
+    // Maximum number of points shown at once in the main chart, the Compare CSD chart and the
+    // Visualize Occurrences chart.
+    // Converted from the string : QVariant::toUInt() accepts a number too big for a uint and
+    // silently wraps it (e.g. 4294968296 gives 1000)
+    if (settingsPtr->contains("chart_max_points")){
+        v = settingsPtr->value("chart_max_points");
+        QString s = v.toString();
+        bool ok;
+        uint aUint = s.toUInt(&ok);
+        if ( (!ok) || (aUint<CHART_MAX_POINTS_MIN) || (aUint>CHART_MAX_POINTS_MAX) )  {
+            // settings is invalid, revert back to default. Only the start of the value is
+            // logged, in case it is very long
+            chartMaxPoints = factorySettings.chartMaxPoints;
+        } else {
+            chartMaxPoints = aUint;
+        }
+    } else{
+        chartMaxPoints = factorySettings.chartMaxPoints;
+    }
+    LOG_INFO(QString("    chart_max_points = %1").arg(chartMaxPoints));
+
      // loaded is completed and successful
     settingsLoaded = true;
 
@@ -808,6 +836,7 @@ void GbpController::saveSettings()
     settingsPtr->setValue("show_tooltips",showTooltips);
     settingsPtr->setValue("income_color", incomeColor.name(QColor::HexRgb));
     settingsPtr->setValue("expense_color", expenseColor.name(QColor::HexRgb));
+    settingsPtr->setValue("chart_max_points",chartMaxPoints);
 
     settingsPtr->sync();
 }
@@ -1291,7 +1320,24 @@ uint GbpController::getChartPointSize() const
     return chartPointSize;
 }
 
-void GbpController::setChartPointSize(uint newChartPointSize)
+bool GbpController::setChartPointSize(uint newChartPointSize)
 {
+    if ( (newChartPointSize<CHART_POINT_SIZE_MIN) || (newChartPointSize>CHART_POINT_SIZE_MAX) ) {
+        return false;
+    }
     chartPointSize = newChartPointSize;
+    return true;
+}
+
+uint GbpController::getChartMaxPoints() const
+{
+    return chartMaxPoints;
+}
+
+void GbpController::setChartMaxPoints(uint newChartMaxPoints)
+{
+    if ( (newChartMaxPoints<CHART_MAX_POINTS_MIN) || (newChartMaxPoints>CHART_MAX_POINTS_MAX) ) {
+        return ;
+    }
+    chartMaxPoints = newChartMaxPoints;
 }

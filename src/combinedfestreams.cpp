@@ -49,8 +49,12 @@ CombinedFeStreams::CombinedFeStreams(quint32 noOfDays)
 
 
 CombinedFeStreams::CombinedFeStreams(const CombinedFeStreams &o)
+    : combinedStreams(o.combinedStreams),
+      noOfDays(o.noOfDays),
+      noOfElementsUsed(o.noOfElementsUsed),
+      noOfFe(o.noOfFe),
+      csdContributors(o.csdContributors)
 {
-    this->combinedStreams = o.combinedStreams;
 }
 
 

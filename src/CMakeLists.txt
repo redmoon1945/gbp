@@ -35,6 +35,9 @@ set(PROJECT_SOURCES
     constants.h
     csd.h
     csd.cpp
+    csdcolordialog.cpp
+    csdcolordialog.h
+    csdcolordialog.ui
     csdbreakdowndialog.h
     csdbreakdowndialog.cpp
     csdbreakdowndialog.ui
@@ -42,6 +45,8 @@ set(PROJECT_SOURCES
     currencyhelper.h
     csvexporter.cpp
     csvexporter.h
+    csvimporter.cpp
+    csvimporter.h
     customqchartview.cpp
     customqchartview.h
     datehelper.cpp
@@ -138,6 +143,9 @@ set(PROJECT_SOURCES
     selectcurrencydialog.cpp
     selectcurrencydialog.h
     selectcurrencydialog.ui
+    shortcutsdialog.cpp
+    shortcutsdialog.h
+    shortcutsdialog.ui
     tag.h
     tag.cpp
     tagcsdrelationships.h
@@ -182,9 +190,24 @@ qt6_add_executable(gbp MANUAL_FINALIZATION ${PROJECT_SOURCES} ${QM_FILES}
 )
 
 
+# The Welcome PDFs are small : they are built into the executable in both versions.
+target_sources(gbp PRIVATE gbp_welcome.qrc)
+
+# ON  : "Embedded manuals version". The User Manual, Quick Tutorial and Change Log PDFs are built
+#       into the executable (gbp_manuals.qrc).
+# OFF : "Online manuals version". For the User Manual, Quick Tutorial and Change Log, GBP shows
+#       the address of the PDF in the GitHub repository (GBP never accesses the Internet).
+option(GBP_EMBEDDED_MANUALS "Embed the User Manual, Quick Tutorial and Change Log PDFs" ON)
+if(GBP_EMBEDDED_MANUALS)
+    target_sources(gbp PRIVATE gbp_manuals.qrc)
+    target_compile_definitions(gbp PRIVATE GBP_EMBEDDED_MANUALS)
+endif()
+message(STATUS "GBP_EMBEDDED_MANUALS : ${GBP_EMBEDDED_MANUALS}")
+
 target_link_libraries(gbp PRIVATE Qt6::Widgets Qt6::Charts)
 
 set_target_properties(gbp PROPERTIES
+    OUTPUT_NAME graphical-budget-planner
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}

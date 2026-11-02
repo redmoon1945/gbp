@@ -80,7 +80,7 @@ void AnalysisDialog::periodChartRedisplayChart(PeriodType type)
     if (chartRawData->getNoOfElementsUsed()==0){
         (*chartPtr)->removeAllSeries();
         QStringList empty = QStringList();
-        empty.append("No data");
+        empty.append(tr("No data"));
         (*xAxisPtr)->setCategories(empty);
         (*yAxisPtr)->setRange(0,1);
         statLabelPtr->setText("");

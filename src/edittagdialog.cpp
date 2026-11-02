@@ -140,8 +140,9 @@ void EditTagDialog::on_EditTagDialog_rejected()
 
 void EditTagDialog::on_applyPushButton_clicked()
 {
-    // we remove leading and trailing spaces
-    QString cleanedName = ui->nameLineEdit->text().trimmed();
+    // we replace TAB and line breaks (they can be pasted) by spaces, and remove leading and
+    // trailing spaces
+    QString cleanedName = Util::toSingleLine(ui->nameLineEdit->text()).trimmed();
 
     // no of time a tag has a name = content of the name edit box
     quint16 duplicateNameNo = existingTags.containsTagName(cleanedName);

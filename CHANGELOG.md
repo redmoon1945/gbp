@@ -1,5 +1,109 @@
 # Change log for GBP
 
+## 1.8.2 to 1.9.0 (5-nov-2026)
+
+### New features : The big ones
+
+- **Dramatically faster loading and calculations** : GBP now handles very large scenarios with ease, even with daily financial streams over 100 years. Operations that took many seconds (sometimes minutes) now take two seconds at most, most of them almost instantly. This is done in part by limiting the number of points (a.k.a. "markers") displayed to a configurable ceiling (2000 by default). 
+- **Edit Scenario, CSD editing, Manage Tags, Options and description editor dialogs show when there are changes not applied**. An orange ⚠ appears next to the buttons at the bottom, the window title ends with "*", and "Close" is replaced by "Cancel" and the button that applies the changes ("Save" in Options).
+- **Tag breakdown** : in Analysis, Tags tab, selecting a tag shows the Cash stream definitions contributing to it, as a table and a pie chart.
+- **New Quick Tutorial** : completely rewritten, in English and French, to be easier to read and to follow, with diagrams of the main windows and a worked example.
+- **Enhanced color setting in Edit Scenario** : colors of Cash stream definitions can now be copied and pasted, and keyboard shortcuts have been added.
+
+### New features : The details
+
+- **Qt 6.11.3** : GBP is now compiled with Qt 6.11.3 (instead of 6.10.3).
+- **Much faster** : large scenarios are much faster to load, display and analyze, with the same results. For a 100-year scenario with daily financial streams :
+  - **Opening the scenario**, and recalculating the main chart after a change : about 0.5 second instead of about 30 seconds (2 seconds with 400 financial streams, 200 of them daily).
+  - **Panning** the main chart or the Compare CSD chart : the chart stops at once after a fast drag, instead of moving on for about 3 seconds.
+  - **Visualize occurrences** : opens in less than half a second instead of 7.5 seconds.
+  - **Analysis** : in Compare CSD, selecting streams and switching between Income and Expenses are almost instantaneous (instead of 2 seconds to 2 minutes). Applying new dates takes a fraction of a second instead of about 1 second, and the Tags tab is recalculated about 90 times faster.
+  - **Point markers** : they are created only for the visible days, and only when "Points" is checked. Beyond 2000 visible points (configurable in Options), they are hidden, "Points" is grayed out and an ⓘ sign gives the reason when hovered : zoom in to see them (in Visualize occurrences, the events are then shown as a line).
+- **Compare CSD list** : the list shows all the active financial streams of the chosen type, including those without any financial event in the scenario (their curve is then empty). Inactive financial streams are not listed.
+- **Max number of points shown** : new option in Options, Charts tab (from 100 to 10000, 2000 by default). It sets the maximum number of point markers shown at once in the main chart, the Compare CSD chart and the "Visualize occurrences" chart. A change applies immediately, without restarting GBP : the markers are updated at once, and the zoom is kept. When there are too many points to show them, an ⓘ sign is shown instead of a message (there is no room for one) : hovering it gives the reason and says that the limit is set in Options.
+- **New default chart colors** : as the Cash Balance curve is now often shown without its points, the default dark theme curve is now pure red (instead of dark red), with yellow points (instead of red). In the default light theme, the points are now orange (instead of blue), to stand out from the navy curve. The default selected point colors are unchanged. Existing settings are kept : use the ↺ button next to each color in Options to get the new defaults.
+- **Statistics panel** : in the main window, two new values show how many points of the Cash Balance curve are in the visible part of the chart ("Points in view") and how many of them are actually shown ("Points displayed", 0 when "Points" is unchecked or when there are more than 2000 points in view). Both follow the zooms and pans. When "Points" is checked, "Points in view" is shown in the income color if the points are shown, and in the expense color if there are too many of them to be shown. "No of events" is renamed "Total events".
+- **Dialogs show when there are changes not applied** : in Edit Scenario, the periodic and irregular CSD dialogs, Manage Tags, Options and the description editor ("Full view..."), only "Close" is shown at first. As soon as something is modified, an orange ⚠ appears next to the buttons, the window title ends with "*", and "Close" is replaced by "Cancel" and the button that applies the changes ("Save" in Options). Undoing a change brings everything back as before.
+  - Edit Scenario : any change to the scenario counts (name, description, duration, inflation, financial streams, tags...).
+  - CSD dialogs : only when editing an existing CSD, not when creating one.
+  - Manage Tags : any change to the tags or their links counts, in any of the 3 tabs. Selecting items or switching tabs is not a change.
+  - Options : a grayed-out value is not taken into account (e.g. changing the discount rate, then unchecking "Use present value" as it was when the dialog was opened, is not a change).
+  - Description editor : checking or unchecking "Use monospace font" is not a change.
+- **Main window shows when the scenario is not saved** : a "\*" is added after the file name in the window title (e.g. "budget.json\* — GBP", or "Not saved yet\* — GBP" for a new scenario never saved) as soon as the scenario differs from its last opened, created or saved version, after "Apply changes" in Edit Scenario or after Anonymize. The "\*" disappears when the scenario is saved, reloaded or replaced by another one, and also when a later change brings the scenario back to its saved version.
+- **Tag breakdown** : in Analysis, Tags tab, selecting a tag shows below the table the Cash stream definitions contributing to it, with for each one its total amount, its percentage of the tag and its number of financial events. Each mode (Income or Expenses) remembers its own selected tag, which also stays selected when the dates or the selected tags change.
+  - A pie chart at the right of the breakdown shows the share of each CSD in the tag. A colored square in front of each stream name gives the color of its slice. When there are more than 20 CSD, the smallest ones are grouped in a gray "Others" slice.
+  - Hovering a slice shows it in a lighter color, with a hint giving its name, amount and percentage.
+  - The separator between the tags table and the breakdown can be dragged to change their heights, and the one between the breakdown table and the pie chart to change their widths.
+- **Sums in the CSD comparison chart** : in Analysis, Compare CSD tab, a legend above the chart shows, for each displayed curve, a square of the curve's color followed by the sum of its amounts over the selected period.
+- **Clickable pie slices in Relative Weight** : in Analysis, Relative Weight tab, clicking a slice of the pie chart has the same effect as clicking its item in the legend : the item is selected, the slice is pulled out, and its rank, amount and percentage are shown. Ctrl+click adds or removes a slice from the selection, Shift+click selects a range.
+- **More slices by default in Relative Weight** : the "No of most significant incomes/expenses" is now 15 by default (instead of 10). The maximum is still 25.
+- **Two versions for Linux** : each release comes with 2 AppImages, which differ only by the documentation. GBP works the same way in both.
+  - **Embedded manuals version** (gbp-x.y.z-x86_64.AppImage) : as before, the User Manual, the Quick Tutorial and the Change Log are inside.
+  - **Online manuals version** (gbp-x.y.z-nomanual-x86_64.AppImage) : for when disk space is critical. Much smaller, without these PDFs. The Help menu shows where to download them from GitHub, with a button to copy the address. GBP itself never accesses the Internet.
+  - Both contain the Welcome document. On Windows, nothing changes.
+- **User manuals back to full resolution** : the images of the User Manual (English and French) are no longer compressed.
+- **New Quick Tutorial** (Help → Quick Tutorial) : completely rewritten, in English and French (9 pages). Much easier to read.
+- **New Welcome document** : the document shown at the first start is redesigned with the same look as the new Quick Tutorial, on one page . Also much easier to read.
+- **Export of variable growth** : in the Edit variable growth/inflation dialog, a new "Export..." button saves the list to a CSV file (transition date, annual % and monthly %). It follows the date and number localization options of the CSV exports.
+- **Exported files can be imported again** : in the Irregular and variable growth/inflation dialogs, a file written by "Export..." with non-localized values can now be imported as is. The first line is ignored if at least one of its fields is not valid (it is a header), and the final message then shows it. The monthly column of a variable growth file is accepted, and not used. Spaces at the end of the notes are now kept.
+- **Keyboard and mouse shortcuts** (Help → Keyboard and mouse shortcuts) : a new window lists the shortcuts of the main window, the charts, Edit Scenario, the lists and the Relative Weight pie chart, such as Shift + mouse wheel to zoom horizontally only, or Ctrl + mouse wheel to zoom vertically only. The list can be exported to a single HTML file, which can be printed on any paper size from a browser.
+- **Copy and paste the color of Cash stream definitions** : in Edit Scenario, the "Color..." button now opens a "Color settings" window with 4 choices, applied at once to the selected CSD :
+  - **Copy color** : remembers the color of the selected CSD. Available when only one CSD is selected and it does not use the system default.
+  - **Paste color** : applies the copied color, shown in a small square on the button. The copied color is kept until GBP is closed, so it can be pasted in another scenario.
+  - **Edit color...** : opens the color chooser, starting from the current color of the CSD (the topmost one if several are selected).
+  - **System default** : goes back to the normal text color. Not available when the only selected CSD already uses the system default.
+  - **Shortcuts** : Ctrl+Shift+C copies and Ctrl+Shift+V pastes, without opening the window.
+  - The CSD stay selected after a change, so that the color can be changed again at once.
+- **About dialog** : the "Info" tab is now the first one, and the one shown when the dialog opens.
+- **Import instructions** : in the Irregular and Variable growth import windows, the instructions are now formatted with headings, lists and tables, making them easier to read.
+
+### Fixes
+
+- **New scenario on Windows** : after choosing the currency, the main window covered the Edit Scenario window. The Edit Scenario window now stays in front.
+- **Options, discount rate** : a negative discount rate could be entered, and saving it with "Use present value" checked made GBP crash. The rate can no longer be negative.
+- **Command line** : "--help" now shows the real names to start GBP (the AppImage on Linux, gbp.exe on Windows). "-workspace_list" now displays the configuration directory, as "--help" said it did.
+- **Options, "Revert all settings to factory default" (↺)** : the gridlines colors (dark and light modes), the discount rate and the custom date used for "today" were not reset. They now are.
+- **Options, mouse wheel zoom direction** : after selecting "Zoom In" and clicking "Cancel", Options showed "Zoom In" again the next time it was opened, although "Zoom Out" was still the saved setting : saving any other change then saved "Zoom In" too. Also, "Revert all settings to factory default" (↺) did not set it back to "Zoom Out". Options now always shows the saved setting, and ↺ resets it.
+- **Daily Info panel and CSD name colors** : in the main window, changing the "Allow colorization of cash stream definition names" option while a point was selected unselected that point and emptied the Daily Info panel. The point now stays selected, and the panel is redrawn with the new name colors, also when the selected point is out of view.
+- **CSD color** : in the periodic and irregular financial stream dialogs, checking the custom color box and then cancelling the color chooser left the box checked with a gray color. It now goes back to the normal color.
+- **Spaces around CSD names** : the irregular CSD dialog kept the spaces typed before or after the name (the periodic CSD dialog already removed them). They are now removed, and also when a scenario is loaded, for both kinds of CSD. The spaces disappear from the file the next time the scenario is saved.
+- **Tabs and line breaks in names and notes** : a tab or line break pasted in a Cash stream definition name, a tag name or the notes of an irregular event is now replaced by a space, also when a scenario is loaded.
+- **All CSV exports** :
+  - **Dates with a 2-digit year** : with localized dates, some languages (e.g. US English) wrote the year with 2 digits, so 2126 looked like 2026. The year now always has 4 digits. The text tab of "Visualize occurrences" had the same problem and is also fixed.
+  - **Percentages** : the percentages (Relative Weight, growth in the monthly and yearly reports, tag weights) kept only 6 digits, e.g. 1234567.891 became 1.23457e+06, unreadable by spreadsheets in some languages (e.g. Swedish). They are now exact, and the exponent, when needed, is always readable.
+  - **CSD breakdown** : the "Change (%)" column was rounded like an amount, to the decimals of the currency (e.g. 12.756 % became 13 with the yen). It is now exact.
+  - **Text with double quotes** : a Cash stream definition name, a tag name or a note starting with a double quote (") could be cut, lose its quotes or swallow the next rows in spreadsheets. Text containing a double quote is now quoted the standard way, so spreadsheets read it as written.
+  - **Localized numbers** : the Options tooltip now says that they follow the international CLDR conventions, which some spreadsheets cannot read in specific cases for some Locales, and that unchecking the option gives plain numbers.
+- **Irregular CSD import** :
+  - **Quoted notes** : notes put between double quotes by the CSV export (e.g. a note containing `"`) are now imported correctly.
+  - **Instructions** : the maximum amounts were wrong (one digit too many).
+- **Currencies** : GBP now keeps its own list of currencies, used everywhere, instead of deriving them from the countries known by Qt.
+  - **Scenarios that could not be reopened** : a scenario created with the currency of Sierra Leone (SLE), Curaçao and Sint Maarten (XCG) or Zimbabwe (ZWG) was saved, but could not be opened again ("CurrencyCode is invalid"). It now opens.
+  - **Scenarios shown without data** : a scenario file using a currency no longer offered (e.g. Croatian Kuna HRK, Bulgarian Lev BGN, Chilean Unit of Account CLF) was opened, but the chart, statistics and other panels stayed empty. It is now shown normally. These currencies are still not offered for new scenarios.
+  - **Currency selection** : the Vanuatu Vatu (VUV) and the Samoan Tala (WST) are now offered. The names of the XCG, SLE and ZWG currencies were shown as "Unknown", and so were the symbols of a few currencies (e.g. Papua New Guinean Kina, Serbian Dinar). They are now shown.
+  - **Scenario files of GBP 1.7 and below** : they store a country instead of a currency. The currency of some countries (e.g. Vanuatu, Samoa, Palau, Tuvalu) depended on the language of the computer (e.g. Canadian Dollar in Canada, Euro in France). The currency of the country is now always used. A file for a country without a currency (e.g. Antarctica) is refused with a message.
+  - **Scenario files no longer readable by GBP 1.7 and below** : GBP no longer saves the country of the scenario, which only GBP 1.7 and below used.
+
+## 1.8.1 to 1.8.2 (05-oct-2026)
+
+### New features : The big ones
+
+- **Faster creation of several financial streams** : after clicking "Create" in the periodic financial stream dialog, which stays open to create another one, only the name and the description are now cleared. The start date, amount, period, growth and other settings are kept, instead of being reset (the start date was reset to tomorrow). In the irregular financial stream dialog, the "Active" choice and the color are now kept too (the list of events is still cleared).
+
+### Fixes
+
+- **First end-of-month payment no longer skipped** : an "end of month" financial stream repeating every 2 months or more, with a start date not at the end of a month, had its first payment(s) skipped (e.g. every 3 months from Jan 15 : Mar 31, Jun 30... instead of Jan 31, Apr 30...). The first payment is now at the end of the start month.
+- **Monthly and yearly payment dates no longer drift** : a monthly financial stream starting on the 29th, 30th or 31st stayed on an earlier day after a shorter month (e.g. Jan 31, Feb 28, Mar 28... instead of Mar 31), and a yearly one starting on Feb 29 stayed on Feb 28 in later leap years. The original day is now kept.
+- **Present Value Calculator ignored the discount rate** in locales using a decimal comma (e.g. French) or their own digits (e.g. Bengali) : the future value was always equal to the present value. The rate is now always taken into account.
+- **No crash with negative inflation and a large adjustment factor** : a financial stream using the scenario inflation, when that inflation is negative and multiplied by an adjustment factor bringing it below -100% (e.g. -10% x 15 = -150%), produced invalid amounts and could crash GBP. The adjusted inflation is now limited to -100%.
+- **Analysis, Relative Weight** : percentages showed "nan" when all amounts in the period were 0. They now show 0.
+- **Growth validation messages** : out-of-range growth error messages now show the value and its limit correctly (they could previously become huge and exhaust memory).
+- **Invalid values rejected** : "nan" in imported files or in the settings, and a scenario duration of 0 or less in a scenario file, are now refused instead of giving wrong results or a crash.
+- **Monospace font option in the description editor** : the text editor used for descriptions (scenarios, financial streams, tags) has a new "Use monospace font" checkbox to help align tables and numbers. The choice is kept for the rest of the session, but is not saved in the gbp's options.
+- **Linux AppImage** : the file is now named `gbp-<version>-x86_64.AppImage` (e.g. `gbp-1.8.2-x86_64.AppImage`), and the executable inside is now named `graphical-budget-planner`. The desktop file and icon inside are renamed to match (`graphical-budget-planner.desktop`, `graphical-budget-planner.png`), fixing a user-reported warning that the file names did not match the application name in the desktop file.
+- **French translation completed** : a few texts still shown in English are now translated (the "Cache" and "Built on" labels in the About dialog, and the error messages shown when the User Manual, Welcome document, Quick Tutorial or Change Log cannot be opened because the application's cache directory is unavailable).
+- **Smaller documentation images** : the images of the User Manual (English and French) have been compressed to reduce the size of the executable, at the cost of slightly less sharp images.
+
 ## 1.8.0 to 1.8.1 (28-aug-2026)
 
 ### New features : The big ones
@@ -89,23 +193,23 @@
   - A new Heatmap tab has been added, called "Period - heatmap".
     - It displays financial data as a color-coded grid in two granularities, selectable via radio buttons:                                     
       - Monthly : one row per year, one column per month (Jan–Dec), with year and abbreviated month-name headers.
-      - Yearly : years fill a fixed 10-column grid left-to-right, top-to-bottom; the year is written inside each cell and no headers are shown.    
+      - Yearly : years fill a fixed 10-column grid left-to-right, top-to-bottom; the year is written inside each cell and no headers are shown.
     - Three display modes are available:           
       - Incomes : sequential scale — the smallest non-zero income shows a near-background tint of the income color; the highest income shows full  
         saturation. The minimum color is derived automatically from the maximum color.                    
       - Expenses : same sequential scale applied to expenses.
       - Delta (income − expense) : diverging scale centered on pure black (breakeven). Positive periods blend toward the positive-side color;
-        negative periods blend toward the negative-side color. Each side is normalized independently so both extremes always reach full saturation.    
+        negative periods blend toward the negative-side color. Each side is normalized independently so both extremes always reach full saturation.
     - An Exclude current month / year checkbox omits the in-progress period from both the grid and normalization. 
     - Cell states:    
       - Periods with no financial events are shown with a forward-diagonal hatch (/). 
       - Periods outside the scenario range (or excluded) use a backward-diagonal hatch (\).
       - In income or expense mode, a period that has events but zero activity for the active type is treated as no-events rather than colored,     
-        because its zero is uninformative rather than a meaningful breakeven. In delta mode, zero (income == expense) is always colored pure black.    
+        because its zero is uninformative rather than a meaningful breakeven. In delta mode, zero (income == expense) is always colored pure black.
     - Color configuration via the header:               
       - In income or expense mode: one color picker sets the maximum (saturated) color; the minimum tint is derived automatically.                 
       - In delta mode: two color pickers set the positive-extreme and negative-extreme colors independently. Default colors are green (positive) and red (negative).                              
-      - Each picker has a one-click reset to its default. 
+      - Each picker has a one-click reset to its default.
     - A legend at the bottom shows color swatches for the minimum value, maximum value, breakeven (delta mode only), no-events hatch, and          
       out-of-period hatch, with formatted currency labels for min and max.                       
     - Cell size can be adjusted between Normal, Big (1.5×, default), and Bigger (2×) via a combo box in the header; the table scrolls automatically
@@ -180,7 +284,7 @@
     - GBP can now more closely match the selected desktop theme. Dark themes will be respected on most platforms (Gnome, Kde, Cinnamon, XFCE). 
     - Wayland support has improved
   - For Windows :
-    - By default, GBP uses the "Cross-Platform" look. Although it does not perfectly match the native Windows 11 look, it avoids several compatibility issues present in Qt and Windows 11. This default choice may be revisited in future GBP releases. If you prefer, you can manually select the alternative Windows Vista or Windows 11 Native themes. Run gbp -h for more information. 
+    - By default, GBP uses the "Cross-Platform" look. Although it does not perfectly match the native Windows 11 look, it avoids several compatibility issues present in Qt and Windows 11. This default choice may be revisited in future GBP releases. If you prefer, you can manually select the alternative Windows Vista or Windows 11 Native themes. Run gbp -h for more information.
   - All platforms:
     - Colors have been optimized to look great by default on either light or dark themes. The Options dialog now also allows you to customize the colors used for income and expense amounts. With this addition, virtually all color-based elements in GBP can be personalized.
     - Add several command line flags to customize the look or behavior of GBP : type "gbp -h" for details.
@@ -200,7 +304,7 @@
 - In Main Window :
   - The Message toolbar at the bottom of the screen has been removed, thus giving more useful space for the curve. 
   - In the upper toolbar dedicated to set the X axis range, add a "till the END of the YEAR" (EOY) button, to set the X date range from Tomorrow to EOY.
-  - A new "Reload" menu item has been added to the "Scenario" menu. It is used to reload the current scenario from disk, discarding the unsaved modifications that have been made.  
+  - A new "Reload" menu item has been added to the "Scenario" menu. It is used to reload the current scenario from disk, discarding the unsaved modifications that have been made.
 - In Edit Scenario Dialog,
   - Add an explicit combobox to select the "combination mode" of the selected filter tags (AND, OR, NOT). This combobox was previously located in the Tag Selection Dialog (radio buttons).
   - "Filter Tags" string is now in blue, in order to clearly differentiate it from the other type of filters on the left.
@@ -350,7 +454,7 @@
 - In MainWindow, add a new horizontal-only zooming, by pressing the SHIFT key when rotating the mouse wheel.
 - In MainWindow, add a new vertical-only zooming, by pressing the CTRL key when rotating the mouse wheel.
 - In Edit Periodic/Irregular Financial Stream  Definition, add the capability to export the occurences to a CSV file.
-- In Option Dialog, add the option to localize the dates for all CSV exports. 
+- In Option Dialog, add the option to localize the dates for all CSV exports.
 
 ### Fixes
 

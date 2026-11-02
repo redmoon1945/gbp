@@ -182,7 +182,7 @@ void Csd::fromJson(const QJsonObject &jsonObject, CsdType expectedStreamType,
         result.logErrorMessage = QString("Csd %1: Name token is not a string").arg(idString);
         return;
     }
-    name = jsonValue.toString();
+    name = Util::toSingleLine(jsonValue.toString()).trimmed();  // same as the CSD edit dialogs
     if (name.length()>NAME_MAX_LEN){
         result.logErrorMessage = QString("Csd %1: Name is too long (max length is %2)")
             .arg(idString).arg(NAME_MAX_LEN);
@@ -202,7 +202,7 @@ void Csd::fromJson(const QJsonObject &jsonObject, CsdType expectedStreamType,
     desc = jsonValue.toString();
     if(desc.length()>DESC_MAX_LEN){
         result.logErrorMessage = QString("Csd %1: Description is too long (max length is %2)")
-            .arg(idString).arg(NAME_MAX_LEN);
+            .arg(idString).arg(DESC_MAX_LEN);
         return;
     }
 

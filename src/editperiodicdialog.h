@@ -105,6 +105,7 @@ public slots:
 private slots:
     void on_applyPushButton_clicked();
     void on_closePushButton_clicked();
+    void on_cancelPushButton_clicked();
     void on_EditPeriodicDialog_rejected();
     void on_decorationColorPushButton_clicked();
     void on_decorationColorCheckBox_clicked();
@@ -182,6 +183,9 @@ private:
     void updateGrowthTypeCombobox(GrowthType type);
     GrowthType getGrowthTypeSelected();
     void setDecorationColorInfo();
+    // Open the color chooser on the current color. Return true if a color was chosen
+    // (decorationColor updated), false if the user cancelled (nothing changed)
+    bool chooseDecorationColor();
     QString convertTagIDSetToString();
     void updateTagListTextBox();
 
@@ -201,6 +205,59 @@ private:
      */
     QSharedPointer<FeStream> generateFinancialEvents(const Growth &scenarioInflation,
         QWeakPointer<Csd> weakCsdPtr, uint& saturationCount, FeMinMaxInfo& minMax);
+
+    /**
+     * @brief Record that the Csd being edited has been modified (or not), and update some UI
+     * hints : warning sign, "*" in the window title, bottom buttons. Edit mode only.
+     * @details The only function allowed to write ContentChange::changed - enforced by
+     * ContentChange's friend declaration. See ContentChange below.
+     * @param v New value of the flag.
+     */
+    void contentHasChanged(bool v);
+
+    /**
+     * @brief Whether the Csd defined by the form differs from originalCsd.
+     * @return True if there are changes not applied yet.
+     */
+    bool hasContentChanged() const;
+
+    /**
+     * @brief Detect if the Csd defined by the form differs from originalCsd, and update the
+     * "content has changed" flag and the bottom buttons accordingly.
+     * @details Rebuilds a Csd from the form (buildPeriodicCsdFromFormData()) and compares it to
+     * originalCsd (PeriodicCsd::operator==). Must be called after anything that can change the
+     * Csd data. Does nothing in create mode (originalCsd is null) or while the form is being
+     * filled (fillingForm). A failed build (invalid data) is considered as a change, so that
+     * Apply stays available and reports the error.
+     */
+    void updateContentChanged();
+
+    /**
+     * @brief Guards the "content has changed" flag so that only contentHasChanged() and
+     * hasContentChanged() can read or write it (same as in EditScenarioDialog).
+     */
+    class ContentChange
+    {
+        bool changed = false;
+        bool get() const { return changed; }
+        void set(bool v)  { changed = v; }
+        friend void EditPeriodicDialog::contentHasChanged(bool v);
+        friend bool EditPeriodicDialog::hasContentChanged() const;
+    };
+
+    ContentChange contentChanged;
+
+    /**
+     * @brief Edit mode only : copy of the Csd as it was when the dialog was prepared, kept as a
+     * reference for detecting changes not applied yet. Null in create mode.
+     */
+    QSharedPointer<const PeriodicCsd> originalCsd;
+
+    /**
+     * @brief True while slotPrepareContent() fills the form : change detection is suspended,
+     * since each field set emits a change signal and checking a half-filled form is useless.
+     */
+    bool fillingForm = false;
 
 };
 

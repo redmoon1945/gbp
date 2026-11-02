@@ -18,6 +18,12 @@
 
 #include "visualizeoccurrencesdialog.h"
 #include <QTimer>
+#include <QTextBlockFormat>
+#include <QTextCharFormat>
+#include <QTextCursor>
+#include <QTimeZone>
+#include "util.h"
+#include <QApplication>
 #include "csvexporter.h"
 #include "customqchartview.h"
 #include "ui_visualizeoccurrencesdialog.h"
@@ -43,7 +49,23 @@ VisualizeOccurrencesDialog::VisualizeOccurrencesDialog(QLocale locale, QWidget *
 
     ui->widget->installEventFilter(this);   // pass resize event received by "widget" to the Chart widget
     this->locale = locale;
+
+    // "ⓘ" sign shown when there are too many events to show them as points (its tooltip gives
+    // the reason) : no message, there is no room for it
+    ui->pointsLimitLabel->setFont(QApplication::font());
+
+    // The markers only cover the visible X range (plus a margin) : rebuild them when it
+    // changes, at most every 100 ms during a pan or a zoom
+    markersTimer.setSingleShot(true);
+    markersTimer.setInterval(100);
+    connect(&markersTimer, &QTimer::timeout, this, &VisualizeOccurrencesDialog::rebuildMarkers);
+
     initChart();
+    connect(axisX, &QDateTimeAxis::rangeChanged, this, [this]() {
+        if (!markersTimer.isActive()) {
+            markersTimer.start();
+        }
+    });
     // 50% of the space for each widget
     ui->splitter->setSizes(QList<int>({INT_MAX, INT_MAX}));
 }
@@ -112,6 +134,7 @@ void VisualizeOccurrencesDialog::mypoint_clicked(const QPointF pt)
     }
     series->setPointSelected(index,true);
     indexLastPointSelected = index;
+    selectedPoint = pt;
     // }
 
     // display
@@ -120,6 +143,7 @@ void VisualizeOccurrencesDialog::mypoint_clicked(const QPointF pt)
         arg(locale.toString(date, "yyyy-MMM-dd") ,
         locale.toString(pt.y(),'f',currInfo.noOfDecimal));
     ui->selectedPointLabel->setText(s);
+    selectedPointText = s;
 
 }
 
@@ -128,7 +152,14 @@ void VisualizeOccurrencesDialog::on_closePushButton_clicked()
 {
     // clean some objects we dont need (they will be regenerated before the form is re-shown)
     ui->plainTextEdit->clear(); // dont hold the text, no use for that now
+    markersTimer.stop();
     chart->removeAllSeries();
+    series = nullptr;       // deleted by removeAllSeries()
+    lineSeries = nullptr;
+    allPoints.clear();
+    selectedPoint.reset();
+    selectedPointText.clear();
+    indexLastPointSelected = -1;
 
     this->hide();
     emit signalCompleted();
@@ -167,8 +198,8 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
 
         // Periodic
 
-        // Get next event data from start
-        QDate nextEventDate = psd->getNextEventDate(psd->getStartDate());
+        // Get the second event date (growth is never applied on the first event)
+        QDate nextEventDate = psd->getNthEventDate(psd->getFirstEventDate(), 1);
 
         // Special additionnal header for Periodic
         if (psd->getGrowthStrategy()==PeriodicCsd::GrowthStrategy::INFLATION){
@@ -293,10 +324,39 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
             .arg((isd->getIsIncome())?(tr("income")):(tr("expense"))));
     }
 
-    resultStringList.append("");
+    // The header is small : use HTML for it
+    ui->plainTextEdit->clear();
+    ui->plainTextEdit->appendHtml(resultStringList.join("<br>"));
+
+    // The events are inserted as plain text, one block per event. HTML is avoided here because
+    // it is slow to parse, and because "<br>" would put all the events in one single block,
+    // which must then be laid out entirely at once (very slow for tens of thousands of events).
+    QTextCursor cursor(ui->plainTextEdit->document());
+    cursor.movePosition(QTextCursor::End);
+    cursor.beginEditBlock();
+    QTextCharFormat normalFormat;
+    QTextCharFormat indexFormat;
+    QColor indexColor = Util::getOptimizedPurple();
+    if (indexColor.isValid()) {
+        indexFormat.setForeground(indexColor);
+    }
+    // Insert a line, with the event index (found anywhere in the line) shown in purple
+    auto insertLine = [&](const QString& line, const QString& indexStr) {
+        cursor.insertBlock(QTextBlockFormat(), normalFormat);
+        qsizetype pos = line.indexOf(indexStr);
+        if ( (pos == -1) || (indexStr.isEmpty()) ) {
+            cursor.insertText(line, normalFormat);
+            return;
+        }
+        cursor.insertText(line.left(pos), normalFormat);
+        cursor.insertText(indexStr, indexFormat);
+        cursor.insertText(line.mid(pos + indexStr.size()), normalFormat);
+    };
+
+    // Empty line between the header and the events
+    cursor.insertBlock(QTextBlockFormat(), normalFormat);
 
     // Print values into text widget
-    double cummul = 0;
     uint size = feStream->size();
     uint eventIndex = 0;
     // The event index is an identifier, not a quantity - it must never get a thousands
@@ -311,50 +371,42 @@ void VisualizeOccurrencesDialog::updateTextTab(QSharedPointer<FeStream> feStream
 
         // Build the index string
         eventIndex++;
-        QString indexStr = colorizeStringWithHtml(
-            QString("[%1]").arg( indexLocale.toString(eventIndex).rightJustified(5,
-                indexLocale.zeroDigit().at(0)) ) ,
-            Util::getOptimizedPurple());
+        QString indexStr = QString("[%1]").arg( indexLocale.toString(eventIndex).rightJustified(5,
+            indexLocale.zeroDigit().at(0)) );
 
         qint64 amount = feStream->get(var);
 
         QDate date = tomorrow.addDays(var);
         if ( amount > CurrencyHelper::maxValueAllowedForAmount() ){ // should not happen
-            resultStringList.append(QString("%1 %2 : %3").arg(
+            insertLine(QString("%1 %2 : %3").arg(
                 indexStr,
-                locale.toString(date, locale.dateFormat(QLocale::ShortFormat)) ,
+                locale.toString(date, Util::shortDateFormatFullYear(locale)) ,
                 tr("Amount is bigger than the maximum allowed")
-            ));
+            ), indexStr);
         } else {
             double amountDouble = CurrencyHelper::amountQint64ToDouble(amount,
                 currInfo.noOfDecimal, ok);
             if (ok != 0){
-                resultStringList.append(QString("%1 %2 : %3")
+                insertLine(QString("%1 %2 : %3")
                     .arg(indexStr)
-                    .arg(date.toString(Qt::ISODate) , tr("Error during amount conversion")));
+                    .arg(date.toString(Qt::ISODate) , tr("Error during amount conversion")),
+                    indexStr);
             } else {
                 amountString = CurrencyHelper::formatAmount(amountDouble, currInfo, locale, false);
-                cummul = CurrencyHelper::add(cummul, amountDouble, currInfo.noOfDecimal);
-                QString cummulString = CurrencyHelper::formatAmount(cummul,
-                    currInfo, locale, false);
                 QString s;
                 if (date<tomorrow){
                     // if event is in the past, mention it
                     s = s.append(tr("%1 *** PAST -> discarded ***").arg(indexStr));
                 } else {
                     s = tr("%1 %2 : %3").arg(indexStr,
-                        locale.toString(date,locale.dateFormat(
-                            QLocale::ShortFormat)) , amountString);
+                        locale.toString(date, Util::shortDateFormatFullYear(locale)),
+                        amountString);
                 }
-                resultStringList.append(s);
+                insertLine(s, indexStr);
             }
         }
     }
-
-    // Update the PlainText content
-    QString r = resultStringList.join("<br>");
-    ui->plainTextEdit->clear();
-    ui->plainTextEdit->appendHtml(r);
+    cursor.endEditBlock();
 
     //  scroll to the beginning
     ui->plainTextEdit->moveCursor(QTextCursor::Start);
@@ -372,14 +424,16 @@ void VisualizeOccurrencesDialog::updateChartTab(QSharedPointer<FeStream> feStrea
     // add new data
     int convResult;
     double amount;
-    QDateTime momentInTime;
+    // Explicit system time zone: same result as local time, but Qt reads the zone rules once
+    // instead of going through the C library for each day (about 250x faster)
+    const QTimeZone sysTz = QTimeZone::systemTimeZone();
     const qsizetype size = feStream->size();
     for (int var = 0; var < size; ++var) {
         if (feStream->contains(var)==false) {
             continue;
         }
         qint64 amountInt = feStream->get(var);
-        momentInTime.setDate(tomorrow.addDays(var));
+        const QDateTime momentInTime(tomorrow.addDays(var), QTime(0, 0, 0), sysTz);
         amount = CurrencyHelper::amountQint64ToDouble(amountInt, currInfo.noOfDecimal,
             convResult);
         if (convResult==0) {
@@ -403,7 +457,7 @@ void VisualizeOccurrencesDialog::initChart()
     //chart->layout()->setContentsMargins(1, 1, 1, 1);
     //chart->setBackgroundRoundness(0);
     chart->setLocale(locale);
-    chart->setLocalizeNumbers(true);    series = new QScatterSeries();
+    chart->setLocalizeNumbers(true);
 
     // Step 2 : create X axis
     axisX = new QDateTimeAxis;
@@ -539,6 +593,15 @@ void VisualizeOccurrencesDialog::themeChanged()
 }
 
 void VisualizeOccurrencesDialog::setSeriesCharacteristics(){
+    if ( (series == nullptr) || (lineSeries == nullptr) ) {
+        return; // dialog closed
+    }
+    // the line has the color of the points
+    QPen linePen(GbpController::getInstance().useDarkModeForChart() ?
+        GbpController::getInstance().getDarkModePointColor() :
+        GbpController::getInstance().getLightModePointColor());
+    linePen.setWidth(1);
+    lineSeries->setPen(linePen);
     if(GbpController::getInstance().useDarkModeForChart()==true){
         // point color
         series->setBrush(GbpController::getInstance().getDarkModePointColor());
@@ -562,27 +625,107 @@ void VisualizeOccurrencesDialog::replaceChartSeries(QList<QPointF> data)
     // first destroy the current series and all the data they have
     chart->removeAllSeries();
 
-    // rebuild
+    // rebuild : the markers are created later, for the visible points only (see
+    // rebuildMarkers())
+    allPoints = data;
+    lineSeries = new QLineSeries();
+    lineSeries->setVisible(false);
     series = new QScatterSeries(); // only true data, for markers only, superimposed
-
-    // set colors and characteristics for the series
-    setSeriesCharacteristics();
 
     // intercept point selection
     connect(series, SIGNAL(clicked(QPointF)), this, SLOT(mypoint_clicked(QPointF)));
 
-    // fill series with data
-    series->append(data); // take ownership
-
     // attach to chart
+    chart->addSeries(lineSeries);  // chart takes ownership
     chart->addSeries(series);  // chart takes ownership
 
     // re-attach axis
+    lineSeries->attachAxis(axisX);
+    lineSeries->attachAxis(axisY);
     series->attachAxis(axisX);
     series->attachAxis(axisY);
 
+    // set colors and characteristics for the series, after addSeries() which applies the
+    // chart theme to all the series
+    setSeriesCharacteristics();
+
     // no point have been selected yet
     indexLastPointSelected = -1;
+    selectedPoint.reset();
+    selectedPointText.clear();
+
+    rebuildMarkers();
+}
+
+
+void VisualizeOccurrencesDialog::rebuildMarkers()
+{
+    markersTimer.stop();
+    if ( (series == nullptr) || (lineSeries == nullptr) ) {
+        return; // dialog closed
+    }
+    ui->pointsLimitLabel->clear();
+    ui->pointsLimitLabel->setToolTip(QString());
+
+    // Visible points (sorted by date)
+    const qreal xMinMs = static_cast<qreal>(axisX->min().toMSecsSinceEpoch());
+    const qreal xMaxMs = static_cast<qreal>(axisX->max().toMSecsSinceEpoch());
+    auto byX = [](const QPointF& p, qreal x) { return p.x() < x; };
+    auto xBy = [](qreal x, const QPointF& p) { return x < p.x(); };
+    auto first = std::lower_bound(allPoints.cbegin(), allPoints.cend(), xMinMs, byX);
+    auto last = std::upper_bound(first, allPoints.cend(), xMaxMs, xBy);
+    QList<QPointF> markers;
+    // Maximum number of markers displayed at once. Beyond that, the markers are not created (Qt
+    // Charts creates one graphic item per marker, which becomes very slow)
+    const qsizetype maxMarkers = GbpController::getInstance().getChartMaxPoints();
+    if ((last - first) > maxMarkers) {
+        // Too many points in view : show the events as a line instead of markers. No point can
+        // be selected without markers : hide the selected point info
+        ui->selectedPointLabel->setVisible(false);
+        if (lineSeries->count() == 0) {
+            lineSeries->replace(allPoints);
+        }
+        lineSeries->setVisible(true);
+        // "ⓘ" sign 1 average character away, the reason in its tooltip
+        ui->pointsLimitLabel->setIndent(
+            ui->pointsLimitLabel->fontMetrics().averageCharWidth());
+        ui->pointsLimitLabel->setText("\u24D8");
+        ui->pointsLimitLabel->setToolTip(tr("Too many events in view to show them as points\n"
+            "(limit set in Options) : they are shown as a line.\nZoom in to see the points."));
+    } else {
+        lineSeries->setVisible(false);
+        ui->selectedPointLabel->setVisible(true);
+        // The markers also cover half the visible width on each side, so that they are already
+        // there when these points come into view during a pan (unless it makes too many)
+        const qreal margin = (xMaxMs - xMinMs) / 2;
+        auto firstM = std::lower_bound(allPoints.cbegin(), first, xMinMs - margin, byX);
+        auto lastM = std::upper_bound(last, allPoints.cend(), xMaxMs + margin, xBy);
+        if ((lastM - firstM) <= 2 * maxMarkers) {
+            markers = QList<QPointF>(firstM, lastM);
+        } else {
+            markers = QList<QPointF>(first, last);
+        }
+    }
+
+    // Replace the markers. The selection must be cleared first : Qt keeps the selected
+    // positions (indexes) when the points are replaced, so the selection would move to another
+    // point.
+    series->deselectAllPoints();
+    series->replace(markers);
+
+    // Select again the point selected by the user, if it has a marker. Its info stays displayed
+    // as long as points are shown, even if it is out of view (it is hidden above only when the
+    // events are shown as a line)
+    indexLastPointSelected = -1;
+    if (selectedPoint.has_value()) {
+        const qsizetype index = markers.indexOf(selectedPoint.value());
+        if (index >= 0) {
+            series->setPointSelected(index, true);
+            indexLastPointSelected = static_cast<int>(index);
+        }
+    }
+    ui->selectedPointLabel->setText(selectedPoint.has_value() ? selectedPointText :
+        tr("Selected point :"));
 }
 
 
@@ -590,7 +733,7 @@ void VisualizeOccurrencesDialog::replaceChartSeries(QList<QPointF> data)
 void VisualizeOccurrencesDialog::rescaleChart()
 {
     // Get chart raw data
-    QList<QPointF> timeData = series->points();
+    const QList<QPointF>& timeData = allPoints;
 
     // *** Rescale X axis. Data can be empty. ***
     QDateTime xFrom;
@@ -670,8 +813,8 @@ void VisualizeOccurrencesDialog::on_exportPushButton_clicked()
 
     // *** STEP 2 : Populate rows ***
     QList<QList<QVariant>> data;
-    QList<QPointF> timeData = series->points();
-    double cumul;
+    const QList<QPointF>& timeData = allPoints;
+    double cumul = 0;
     foreach(QPointF pt, timeData){
         QDate date = (QDateTime::fromMSecsSinceEpoch(pt.x())).date();
         double value = pt.y();

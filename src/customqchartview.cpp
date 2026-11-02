@@ -36,6 +36,11 @@ CustomQChartView::CustomQChartView(QChart *chart, bool rotatedAwayZoomIn, QWidge
     xAxisRangeMaxInSec = static_cast<quint64>(200 * (365.25*24*60*60)); // 200 average-length year
     yAxisRangeMinInSec = 1; // 1 unit of currency
     yAxisRangeMaxInSec = 2 * CurrencyHelper::maxValueAllowedForAmountInDouble(0);
+
+    // pan : apply the accumulated mouse moves at most once per screen refresh (~60 Hz)
+    scrollTimer.setSingleShot(true);
+    scrollTimer.setInterval(16);
+    connect(&scrollTimer, &QTimer::timeout, this, &CustomQChartView::applyPendingScroll);
 }
 
 
@@ -197,12 +202,39 @@ void CustomQChartView::mouseMoveEvent(QMouseEvent *event) {
         // event->pos is in viewport coordinate
         QPoint p = event->pos();
         QPointF newValue = mapToScene(p);
-        QPointF delta = newValue - m_lastMousePos;
-        theChart->scroll(-delta.x(), 0);
-        theChart->scroll(0, delta.y());
+        // Do not move the chart now : add the move to the pending ones, applied together
+        // in a single scroll by applyPendingScroll()
+        pendingScroll += newValue - m_lastMousePos;
         m_lastMousePos = newValue;
+        if (!scrollTimer.isActive()) {
+            scrollTimer.start();
+        }
     }
     QGraphicsView::mouseMoveEvent(event); // forward it
+}
+
+
+void CustomQChartView::mouseReleaseEvent(QMouseEvent *event)
+{
+    // end of the drag : apply the last moves now, so that the chart ends exactly where the
+    // mouse is
+    applyPendingScroll();
+    QChartView::mouseReleaseEvent(event); // forward it
+}
+
+
+void CustomQChartView::applyPendingScroll()
+{
+    scrollTimer.stop();
+    QChart *theChart = this->chart();
+    if ( (theChart==nullptr) || pendingScroll.isNull() ) {
+        pendingScroll = QPointF();
+        return;
+    }
+    // One scroll for both directions : each scroll recalculates the position of all the points
+    // of the chart
+    theChart->scroll(-pendingScroll.x(), pendingScroll.y());
+    pendingScroll = QPointF();
 }
 
 

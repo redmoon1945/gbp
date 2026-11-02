@@ -1,6 +1,7 @@
 #include "csvexporter.h"
 #include "gbpcontroller.h"
 #include "gbplogger.h"
+#include "util.h"
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFile>
@@ -31,11 +32,10 @@ CsvExportResult CsvExporter::exportToCsv(
     }
 
     // Ask user for file
-    QString defaultExtensionUsed = "CSV files (*.csv *.CSV)";
     QString filter = QObject::tr("CSV files (*.csv *.CSV);;Text files (*.txt *.TXT);;"
                                  "All files (*)");
     QString fileName = QFileDialog::getSaveFileName(nullptr, QObject::tr("Select a file"),
-        GbpController::getInstance().getLastDirExport(), filter, &defaultExtensionUsed);
+        GbpController::getInstance().getLastDirExport(), filter, nullptr);
 
     if (fileName.isEmpty()) {
         result.status = CsvExportResult::Status::Canceled;
@@ -80,7 +80,7 @@ CsvExportResult CsvExporter::exportToCsv(
     // Write header row
     QStringList headerCells;
     for (const auto& col : columns) {
-        headerCells.append(col.header);
+        headerCells.append(quoteCell(col.header, separator));
     }
     if (!writeLine(headerCells.join(separator) + "\n")) {
         handleWriteError();
@@ -106,7 +106,7 @@ CsvExportResult CsvExporter::exportToCsv(
         for (int colIndex = 0; colIndex < columnCount; ++colIndex) {
             QString cellValue = formatCell(row.at(colIndex), columns.at(colIndex).type,
                 locale, currInfo);
-            rowCells.append(cellValue);
+            rowCells.append(quoteCell(cellValue, separator));
         }
         if (!writeLine(rowCells.join(separator) + "\n")) {
             handleWriteError();
@@ -123,6 +123,40 @@ CsvExportResult CsvExporter::exportToCsv(
         .arg(result.rowsExported).arg(REDACT(fileName)));
 
     return result;
+}
+
+
+QString CsvExporter::quoteCell(const QString& cell, QChar separator)
+{
+    // RFC 4180: a cell containing the separator, a line break or a quote is put between
+    // quotes, and its own quotes are doubled
+    if (!cell.contains(separator) && !cell.contains('\n') && !cell.contains('\r')
+        && !cell.contains('"')) {
+        return cell;
+    }
+    QString quoted = cell;
+    quoted.replace('"', "\"\"");
+    return '"' + quoted + '"';
+}
+
+
+QString CsvExporter::formatFullPrecision(double val, bool localized, const QLocale& locale)
+{
+    // Shortest representation that reads back as the same double. Without an explicit
+    // precision, Qt would keep only 6 significant digits.
+    QString s = QString::number(val, 'g', QLocale::FloatingPointShortest);
+    if (localized == false) {
+        return s;
+    }
+    qsizetype ePos = s.indexOf('e');
+    if (ePos == -1) {
+        return locale.toString(val, 'f', QLocale::FloatingPointShortest);
+    }
+    // Scientific notation : only the mantissa is localized. The exponent stays ASCII
+    // ("e+06"), because some locales write it in a way spreadsheets cannot read
+    // (e.g. "1,23457×10^+06" in Swedish, a Cyrillic "е" in Ukrainian).
+    double mantissa = s.left(ePos).toDouble();
+    return locale.toString(mantissa, 'f', QLocale::FloatingPointShortest) + s.mid(ePos);
 }
 
 
@@ -153,7 +187,7 @@ QString CsvExporter::formatCell(
                     return date.toString("yyyy-MM");
                 case CsvDateFormat::YearMonthDay:
                     return colType.locale
-                        ? locale.toString(date, QLocale::ShortFormat)
+                        ? locale.toString(date, Util::shortDateFormatFullYear(locale))
                         : date.toString("yyyy-MM-dd");
             }
             return date.toString("yyyy-MM-dd");
@@ -167,7 +201,7 @@ QString CsvExporter::formatCell(
         case CsvColumnType::Double: {
             double val = value.toDouble();
             if (colType.param == 0) {
-                return colType.locale ? locale.toString(val) : QString::number(val);
+                return formatFullPrecision(val, colType.locale, locale);
             }
             return colType.locale
                 ? locale.toString(val, 'f', colType.param)

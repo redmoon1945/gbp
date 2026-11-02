@@ -128,7 +128,10 @@ private slots:
     /** @brief Deletes all currently selected growth entries. */
     void on_deletePushButton_clicked();
 
-    /** @brief Hides the dialog without saving changes. */
+    /** @brief Hides the dialog (no change, or changes discarded). */
+    void on_closePushButton_clicked();
+
+    /** @brief Discards the changes not applied yet and hides the dialog. */
     void on_cancelPushButton_clicked();
 
     /** @brief Opens the growth-element sub-dialog in edit mode for the selected row. */
@@ -137,7 +140,7 @@ private slots:
     /** @brief Triggers editing on double-click, equivalent to the edit button. */
     void on_growthTableView_doubleClicked(const QModelIndex &index);
 
-    /** @brief Handles dialog rejection (window close button) by delegating to cancel. */
+    /** @brief Handles dialog rejection (window close button) by delegating to close. */
     void on_EditVariableGrowthDialog_rejected();
 
     /** @brief Selects all rows in the growth table. */
@@ -148,6 +151,9 @@ private slots:
 
     /** @brief Opens the import sub-dialog. */
     void on_importPushButton_clicked();
+
+    /** @brief Exports the content of the growth table to a CSV file. */
+    void on_exportPushButton_clicked();
 
 protected:
     /** @brief Logs the initial dialog size after the first paint. */
@@ -176,6 +182,56 @@ private:
      * @return List of zero-based row indices.
      */
     QList<int> getSelectedRows();
+
+    /**
+     * @brief Record that the growth has been modified (or not), and update some UI hints :
+     * warning sign, "*" in the window title, bottom buttons.
+     * @details The only function allowed to write ContentChange::changed - enforced by
+     * ContentChange's friend declaration. See ContentChange below.
+     * @param v New value of the flag.
+     */
+    void contentHasChanged(bool v);
+
+    /**
+     * @brief Whether the growth in the table differs from originalGrowth.
+     * @return True if there are changes not applied yet.
+     */
+    bool hasContentChanged() const;
+
+    /**
+     * @brief Detect if the growth in the table differs from originalGrowth, and update the
+     * "content has changed" flag and the bottom buttons accordingly.
+     * @details Compares the model's growth to originalGrowth (Growth::operator==). Called each
+     * time the model is reset, which covers add, edit, delete and import. Does nothing while
+     * slotPrepareContent() fills the table (fillingForm).
+     */
+    void updateContentChanged();
+
+    /**
+     * @brief Guards the "content has changed" flag so that only contentHasChanged() and
+     * hasContentChanged() can read or write it (same as in EditScenarioDialog).
+     */
+    class ContentChange
+    {
+        bool changed = false;
+        bool get() const { return changed; }
+        void set(bool v)  { changed = v; }
+        friend void EditVariableGrowthDialog::contentHasChanged(bool v);
+        friend bool EditVariableGrowthDialog::hasContentChanged() const;
+    };
+
+    ContentChange contentChanged;
+
+    /**
+     * @brief Copy of the growth as it was when the dialog was prepared, kept as a reference for
+     * detecting changes not applied yet.
+     */
+    Growth originalGrowth;
+
+    /**
+     * @brief True while slotPrepareContent() fills the table : change detection is suspended.
+     */
+    bool fillingForm = false;
 };
 
 #endif // EDITVARIABLEGROWTHDIALOG_H

@@ -27,6 +27,7 @@
 #include "gbpcontroller.h"
 #include "ui_loadirregulartextfiledialog.h"
 #include "currencyhelper.h"
+#include "csvimporter.h"
 #include "gbplogger.h"
 #include "uiutil.h"
 #include "gbpqmessage.h"
@@ -46,7 +47,47 @@ LoadIrregularTextFileDialog::LoadIrregularTextFileDialog(QLocale aLocale, QWidge
     QFont font = appFont;
     Util::changeFontSize(font, Util::FontResizeIntensity::AVERAGE, true,
         "LoadIrregularTextFileDialog - instructions");
-    ui->instructionsPlainTextEdit->setFont(font);
+    ui->instructionsTextEdit->setFont(font);
+    ui->instructionsTextEdit->setHtml(tr(
+        "<h3>Importing events</h3>"
+        "<p>Loads the events of this irregular Cash Stream Definition from a file. "
+        "<b>The current events are deleted.</b> This is useful when there are many events, or "
+        "when they come from a model outside GBP, such as dividends from a stock portfolio.</p>"
+
+        "<h3>File format</h3>"
+        "<ul>"
+        "<li>Unicode text file (UTF-8, UTF-16 or UTF-32).</li>"
+        "<li>One event per line, with no empty lines.</li>"
+        "<li>The first line can be a header : it is ignored if at least one of its fields is "
+        "not valid, and the final message then shows it.</li>"
+        "<li>[TAB] is the TAB character (0x09).</li>"
+        "</ul>"
+        "<p>Format of a line : <code>&lt;date&gt;[TAB]&lt;amount&gt;[TAB]&lt;notes&gt;</code><br>"
+        "Example : <code>2025-12-31[TAB]1250.50[TAB]Dividends</code></p>"
+
+        "<h3>Fields</h3>"
+        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"4\">"
+        "<tr><th>Field</th><th>Format</th></tr>"
+        "<tr><td><b>Date</b></td><td>ISO 8601 (YYYY-MM-DD), e.g. 2025-12-31</td></tr>"
+        "<tr><td><b>Amount</b></td><td>No thousands separator, &quot;.&quot; as the decimal "
+        "separator, between 0 and the maximum below</td></tr>"
+        "<tr><td><b>Notes</b></td><td><i>Optional.</i> Max 100 characters, with no TAB or line "
+        "break. Can be in double quotes, with inner quotes doubled, as in the CSV export : "
+        "<code>&quot;say &quot;&quot;hi&quot;&quot;&quot;</code></td></tr>"
+        "</table>"
+
+        "<h3>Maximum amount</h3>"
+        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"4\">"
+        "<tr><th>Currency decimals</th><th>Maximum</th></tr>"
+        "<tr><td>0 (e.g. Yen)</td><td>99 999 999 999 999</td></tr>"
+        "<tr><td>1</td><td>9 999 999 999 999.9</td></tr>"
+        "<tr><td>2</td><td>999 999 999 999.99</td></tr>"
+        "<tr><td>3</td><td>99 999 999 999.999</td></tr>"
+        "<tr><td>4</td><td>9 999 999 999.9999</td></tr>"
+        "</table>"
+
+        "<p>All imported events are marked as active, so they count in the Cash Balance "
+        "curve.</p>"));
 
     theLocale = aLocale;
 }
@@ -74,176 +115,95 @@ void LoadIrregularTextFileDialog::on_cancelPushButton_clicked()
 
 void LoadIrregularTextFileDialog::on_importPushButton_clicked()
 {
-    QString userErrorMessage, logErrorMessage, line, lineTrimmed;
-    QStringList tokens;
     QString fileName = ui->fileNameLineEdit->text();
-    int lineNo = 0;
 
     LOG_INFO( QString("Attempting to import a text file containing values for an irregular "
         "cash stream definition : file name=\"%1\"").arg(REDACT(fileName)));
 
-    // open the file
-    QFile file(fileName);   // file is closed automatically by Qt
-    if (!file.exists()){
-        userErrorMessage = QString(tr("File %1 does not exist")).arg(fileName);
-        logErrorMessage = QString("File %1 does not exist").arg(fileName);
+    // Show an error to the user and log it
+    auto importFailed = [](const QString &userErrorMessage, const QString &logErrorMessage) {
         GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
             userErrorMessage, {tr("OK")}, 0, 0);
         LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
-        return;
-    }
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
+    };
 
-        try {
-            // read and parse lines
-            QTextStream stream(&file);
-            stream.setAutoDetectUnicode(true);
-            QMap<QDate,IrregularCsd::AmountInfo> data;
-            while (!stream.atEnd()){
-                line = stream.readLine();
-                lineNo++;
-                // process line
-                if ( !line.isNull() ){
-
-                    lineTrimmed = line.trimmed();
-                    tokens = lineTrimmed.split('\t');
-                    if ( (tokens.length() != 3) && (tokens.length() != 2) ) {
-                        userErrorMessage = tr("Bad format for line no %1 (no of tokens "
-                            "is not 3 or 2, but %2).").arg(lineNo).arg(tokens.size());
-                        logErrorMessage = QString("Bad format for line no %1 (no of tokens is "
-                            "not 3 or 2, but %2).").arg(lineNo).arg(tokens.size());
-                        GbpQMessage::messageBoxQuestion(nullptr,
-                            GbpQMessage::Type::ERROR, tr("Error"),
-                            userErrorMessage, {tr("OK")}, 0, 0);
-                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
-                        return;
-                    }
-                    // convert the date
-                    QDate date = QDate::fromString(tokens[0],Qt::ISODate);
-                    if (!date.isValid()) {
-                        userErrorMessage = tr("Date \"%1\" is invalid at line no %2.")
-                            .arg(tokens[0]).arg(lineNo);
-                        logErrorMessage = QString("Date \"%1\" is invalid at line no %2.")
-                            .arg(tokens[0]).arg(lineNo);
-                        GbpQMessage::messageBoxQuestion(nullptr,
-                            GbpQMessage::Type::ERROR, tr("Error"),
-                            userErrorMessage, {tr("OK")}, 0, 0);
-                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
-                        return;
-                    }
-                    // convert the amount
-                    bool ok;
-                    double d = tokens[1].toDouble(&ok);
-                    if ( ok==false ){
-                        userErrorMessage = tr("Amount \"%1\" is not a valid number at line no %2.")
-                            .arg(tokens[1]).arg(lineNo);
-                        logErrorMessage = QString("Amount \"%1\" is not a valid number "
-                            "at line no %2.").arg(tokens[1]).arg(lineNo);
-                        GbpQMessage::messageBoxQuestion(nullptr,
-                            GbpQMessage::Type::ERROR, tr("Error"),
-                            userErrorMessage, {tr("OK")}, 0, 0);
-                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
-                        return;
-                    }
-                    if (d<0) {
-                        userErrorMessage = tr("Amount \"%1\" is smaller than 0 at line %2.")
-                            .arg(tokens[1]).arg(lineNo);
-                        logErrorMessage = QString("Amount \"%1\" is smaller than 0 at line %2.")
-                            .arg(tokens[1]).arg(lineNo);
-                        GbpQMessage::messageBoxQuestion(nullptr,
-                            GbpQMessage::Type::ERROR, tr("Error"),
-                            userErrorMessage, {tr("OK")}, 0, 0);
-                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
-                        return;
-                    }
-                    if ( d > CurrencyHelper::maxValueAllowedForAmountInDouble(
-                            currInfo.noOfDecimal) ) {
-                        double maxAllowed =  CurrencyHelper::maxValueAllowedForAmountInDouble(
-                            currInfo.noOfDecimal);
-                        QString maxAllowedString = theLocale.toString(maxAllowed, 'f',
-                            currInfo.noOfDecimal);
-                        userErrorMessage = tr("Amount \"%1\" is bigger than the maximum allowed of %2"
-                            " at line %3.").arg(tokens[1]).arg(maxAllowedString).arg(lineNo);
-                        logErrorMessage = QString("Amount \"%1\" is bigger than the maximum"
-                            " allowed of %2 at line %3.").arg(tokens[1]).arg(maxAllowedString)
-                            .arg(lineNo);
-                        GbpQMessage::messageBoxQuestion(nullptr,
-                            GbpQMessage::Type::ERROR, tr("Error"),
-                            userErrorMessage, {tr("OK")}, 0, 0);
-                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
-                        return;
-                    }
-                    int res;
-                    qint64 amountDecimal = CurrencyHelper::amountDoubleToQint64(d,
-                        currInfo.noOfDecimal,res);
-                    if (res != 0) {
-                        userErrorMessage = tr("Amount \"%1\" cannot be processed at line %2.")
-                            .arg(tokens[1]).arg(lineNo);
-                        logErrorMessage = QString("Amount \"%1\" cannot be processed at line %2.")
-                            .arg(tokens[1]).arg(lineNo);
-                        GbpQMessage::messageBoxQuestion(nullptr,
-                            GbpQMessage::Type::ERROR, tr("Error"),
-                            userErrorMessage, {tr("OK")}, 0, 0);
-                        LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
-                        return;
-                    }
-                    // get the notes and check length. Only if there is a third token
-                    QString notes;
-                    if (tokens.size()==3) {
-                        notes = tokens[2];
-                        if (notes.length() > IrregularCsd::AmountInfo::NOTES_MAX_LEN) {
-                            userErrorMessage = tr("Notes length (%1 char.) is longer than the max"
-                                " allowed of %2 at line %3.").arg(notes.length()).arg(
-                                IrregularCsd::AmountInfo::NOTES_MAX_LEN).arg(lineNo);
-                            logErrorMessage = QString("Notes length (%1 char.) is longer than"
-                                " the max allowed of %2 at line %3.").arg(notes.length())
-                                .arg(IrregularCsd::AmountInfo::NOTES_MAX_LEN).arg(lineNo);
-                            GbpQMessage::messageBoxQuestion(nullptr,
-                            GbpQMessage::Type::ERROR, tr("Error"),
-                                userErrorMessage, {tr("OK")}, 0, 0);
-                            LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
-                            return;
-                        }
-                    }
-
-                    // record the data. we know the amount is >= 0
-                    IrregularCsd::AmountInfo ai = {.amount=static_cast<quint64>(amountDecimal),
-                        .notes=notes};
-                    data.insert(date, ai);
-
-                }
-            }
-
-            // send back the result and close the window
-            GbpQMessage::messageBoxQuestion(nullptr,
-                GbpQMessage::Type::INFORMATION, tr("Information"),
-                QString(
-                tr("Import succeeded, %1 entries have been imported.")).arg(data.size()),
-                {tr("OK")}, 0, 0);
-            emit signalImportResult(data);
-            this->hide();
-            LOG_INFO( QString("Import succeeded") );
-
-        } catch (const std::exception& e) {
-            userErrorMessage = tr("An unexpected error has occurred.<br><br>Details : %1").arg(e.what());
-            logErrorMessage = QString("An unexpected error has occurred.\n\nDetails : %1")
-                .arg(e.what());
-            GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-                userErrorMessage, {tr("OK")}, 0, 0);
-            LOG_ERROR( QString("Import failed : %1").arg(logErrorMessage) );
+    try {
+        // read and check the lines
+        CsvImportResult result = CsvImporter::importFile(fileName, {
+            {tr("Date"), CsvImportColumn::Type::Date},
+            {tr("Amount"), CsvImportColumn::Type::Number},
+            {tr("Notes"), CsvImportColumn::Type::Text, true}
+        });
+        if (!result.success) {
+            importFailed(result.userErrorMessage, result.logErrorMessage);
             return;
         }
 
-    } else {
-        userErrorMessage = tr("Cannot open file %1 in read-only mode").arg(fileName);
-        logErrorMessage = QString("Cannot open file %1 in read-only mode")
-            .arg(REDACT(fileName));
-        GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-            userErrorMessage, {tr("OK")}, 0, 0);
-        LOG_ERROR(  QString("Import failed : %1").arg(logErrorMessage) );
-        return ;
-    }
+        // check the meaning of the values
+        QMap<QDate,IrregularCsd::AmountInfo> data;
+        for (const CsvImportRow &row : result.rows) {
+            QDate date = row.cells[0].toDate();
+            double d = row.cells[1].toDouble();
+            const QString &amountString = row.rawCells[1];
+            if (d<0) {
+                importFailed(tr("Amount \"%1\" is smaller than 0 at line %2.")
+                    .arg(amountString).arg(row.lineNo),
+                    QString("Amount \"%1\" is smaller than 0 at line %2.")
+                    .arg(amountString).arg(row.lineNo));
+                return;
+            }
+            double maxAllowed = CurrencyHelper::maxValueAllowedForAmountInDouble(
+                currInfo.noOfDecimal);
+            if (d > maxAllowed) {
+                QString maxAllowedString = theLocale.toString(maxAllowed, 'f',
+                    currInfo.noOfDecimal);
+                importFailed(tr("Amount \"%1\" is bigger than the maximum"
+                    " allowed of %2 at line %3.").arg(amountString).arg(maxAllowedString)
+                    .arg(row.lineNo),
+                    QString("Amount \"%1\" is bigger than the maximum"
+                    " allowed of %2 at line %3.").arg(amountString).arg(maxAllowedString)
+                    .arg(row.lineNo));
+                return;
+            }
+            int res;
+            qint64 amountDecimal = CurrencyHelper::amountDoubleToQint64(d,
+                currInfo.noOfDecimal,res);
+            if (res != 0) {
+                importFailed(tr("Amount \"%1\" cannot be processed at line %2.")
+                    .arg(amountString).arg(row.lineNo),
+                    QString("Amount \"%1\" cannot be processed at line %2.")
+                    .arg(amountString).arg(row.lineNo));
+                return;
+            }
+            QString notes = row.cells[2].toString();
+            if (notes.length() > IrregularCsd::AmountInfo::NOTES_MAX_LEN) {
+                importFailed(tr("Notes length (%1 char.) is longer than the max allowed of %2"
+                    " at line %3.").arg(notes.length())
+                    .arg(IrregularCsd::AmountInfo::NOTES_MAX_LEN).arg(row.lineNo),
+                    QString("Notes length (%1 char.) is longer than the max allowed of %2"
+                    " at line %3.").arg(notes.length())
+                    .arg(IrregularCsd::AmountInfo::NOTES_MAX_LEN).arg(row.lineNo));
+                return;
+            }
 
+            // record the data. we know the amount is >= 0
+            IrregularCsd::AmountInfo ai = {.amount=static_cast<quint64>(amountDecimal),
+                .notes=notes};
+            data.insert(date, ai);
+        }
+
+        // send back the result and close the window
+        GbpQMessage::messageBoxQuestion(nullptr,
+            GbpQMessage::Type::INFORMATION, tr("Information"),
+            CsvImporter::successMessage(data.size(), result), {tr("OK")}, 0, 0);
+        emit signalImportResult(data);
+        this->hide();
+        LOG_INFO( QString("Import succeeded") );
+
+    } catch (const std::exception& e) {
+        importFailed(tr("An unexpected error has occurred.<br><br>Details : %1").arg(e.what()),
+            QString("An unexpected error has occurred.\n\nDetails : %1").arg(e.what()));
+    }
 }
 
 

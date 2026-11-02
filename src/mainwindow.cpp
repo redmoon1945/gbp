@@ -33,8 +33,11 @@
 #include "util.h"
 #include "uiutil.h"
 #include <QDateTime>
+#include <QTimeZone>
 #include <QTimer>
 #include <QDesktopServices>
+#include <QClipboard>
+#include <QGuiApplication>
 #include <qforeach.h>
 #include <QSizePolicy>
 #include "gbpqmessage.h"
@@ -65,6 +68,9 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     optionsDlg->setModal(true);
     aboutDlg = new AboutDialog(this); //  auto destroyed by Qt
     aboutDlg->setModal(true);
+    shortcutsDlg = new ShortcutsDialog({ui->actionNew, ui->actionOpen, ui->actionSave,
+        ui->actionEdit, ui->actionAnalysis}, this); //  auto destroyed by Qt
+    shortcutsDlg->setModal(true);
     analysisDlg = new AnalysisDialog(locale, this); //  auto destroyed by Qt
     analysisDlg->setModal(true);
     dateIntervalDlg = new DateIntervalDialog(this); //  auto destroyed by Qt
@@ -119,7 +125,19 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     ui->ciDelta->setFont(ciFont);
     ui->ciDeltaLabel->setFont(ciFont);
 
-    // use smaller font for statistics area
+    // "ⓘ" sign shown next to "Points" when there are too many points to show them (its tooltip
+    // gives the reason) : no message, there is no room for it
+    ui->pointsLimitLabel->setFont(appFont);
+    ui->showPointsCheckBox->setToolTip(tr("<html><head/><body><p>If <span style=\" "
+        "font-weight:700;\">checked</span>, show data points on Cash Balance curve as "
+        "color-filled disks</p><p>If <span style=\" font-weight:700;\">unchecked</span>, don't "
+        "show data points.</p><p>Points are shown only when there are not too many of them in "
+        "the visible part of the chart : otherwise, zoom in to see them. The limit is set in "
+        "Options.</p></body></html>"));
+    ui->giPointsDisplayedLabel->setToolTip(tr("<html><head/><body><p>How many of the points in "
+        "the visible part of the chart are actually shown. It is 0 when \"Points\" is unchecked, "
+        "or when there are too many points in view.</p>"
+        "</body></html>"));
     QFont giFont = appFont;
     Util::changeFontSize(giFont, Util::FontResizeIntensity::WEAK, true,
         "Main window - gi widgets");
@@ -127,6 +145,10 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     ui->giNoDaysLabel->setFont(giFont);
     ui->giNoEvents->setFont(giFont);
     ui->giNoEventsLabel->setFont(giFont);
+    ui->giPointsInView->setFont(giFont);
+    ui->giPointsInViewLabel->setFont(giFont);
+    ui->giPointsDisplayed->setFont(giFont);
+    ui->giPointsDisplayedLabel->setFont(giFont);
 
     // use smaller font for date range area
     QFont drFont = appFont;
@@ -539,6 +561,8 @@ void MainWindow::emptyGeneralInfoSection()
 {
     ui->giNoDaysLabel->setText("");
     ui->giNoEventsLabel->setText("");
+    ui->giPointsInViewLabel->setText("");
+    ui->giPointsDisplayedLabel->setText("");
 }
 
 
@@ -840,7 +864,9 @@ void MainWindow::initChart()
     // initial values for axes limits
     // we are interested only from TOMORROW to infinity
     fullFromDateX = QDateTime(GbpController::getInstance().getTomorrow(),QTime(0,0,0));
-    fullToDateX = fullFromDateX.addYears(Constants::DEFAULT_DURATION_FE_GENERATION).addDays(-1);
+    fullToDateX = QDateTime(Scenario::getMaxDateFeGeneration(
+        GbpController::getInstance().getToday(), Constants::DEFAULT_DURATION_FE_GENERATION),
+        QTime(0,0,0));
 
     // Step 1 : Create the chart
     chart = new QChart();
@@ -864,6 +890,27 @@ void MainWindow::initChart()
     // monospace prevents label shift on value change
     axisY->setLabelsFont(UiUtil::screenMonoFont("MainWindow - axis Y labels"));
     chart->addAxis(axisY, Qt::AlignLeft);
+
+    // The markers only cover the visible X range (plus a margin) : rebuild them when it
+    // changes, at most every 100 ms during a pan or a zoom (not at each mouse move, which would
+    // make the pan jerky, nor only at its end, which would leave the new part of the curve
+    // without markers during a long pan)
+    chartMarkersTimer = new QTimer(this);
+    chartMarkersTimer->setSingleShot(true);
+    chartMarkersTimer->setInterval(100);
+    connect(chartMarkersTimer, &QTimer::timeout, this, &MainWindow::rebuildChartMarkers);
+    connect(axisX, &QDateTimeAxis::rangeChanged, this, [this]() {
+        if (!chartMarkersTimer->isActive()) {
+            chartMarkersTimer->start();
+        }
+    });
+    // A Y range change (vertical zoom or pan) does not change the markers, but changes the
+    // number of points on screen shown in the Stats panel
+    connect(axisY, &QValueAxis::rangeChanged, this, [this]() {
+        if (!chartMarkersTimer->isActive()) {
+            chartMarkersTimer->start();
+        }
+    });
 
     // Step 4 : create empty series and attach them to both axis and chart
     QList<QPointF> timeData = {};        // raw data for scatterSeries (real data)
@@ -940,6 +987,12 @@ void MainWindow::on_actionAbout_triggered()
 }
 
 
+void MainWindow::on_actionShortcuts_triggered()
+{
+    shortcutsDlg->show();
+}
+
+
 void MainWindow::on_actionAbout_Qt_triggered()
 {
     QApplication::aboutQt();
@@ -956,10 +1009,9 @@ void MainWindow::on_actionOpen_triggered()
 
     QSharedPointer<Scenario> scenario;
     QString dir = GbpController::getInstance().getLastDir();
-    QString defaultExtensionUsed = "GBP Files (*.json)";
     QString theFilter = tr("GBP Files (*.json);;All files (*)");
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open an existing scenario"),dir,
-        theFilter, &defaultExtensionUsed);
+        theFilter, nullptr);
     if (fileName != ""){
         // load the scenario file. Error message will be displayed in loadScenarioFile()
         bool success = loadScenarioFile(fileName);
@@ -1048,10 +1100,9 @@ void MainWindow::on_actionSave_As_triggered()
 
     // ask the file name
     QString dir = GbpController::getInstance().getLastDir();
-    QString defaultExtensionUsed = "GBP Files (*.json)";
     QString theFilter = tr("GBP Files (*.json);;All files (*)");
     QString fileName = QFileDialog::getSaveFileName(this,tr("Choose a filename"),dir,
-        theFilter, &defaultExtensionUsed);
+        theFilter, nullptr);
 
     // Check the answer and process it
     if(fileName==""){
@@ -1127,6 +1178,10 @@ bool MainWindow::loadScenarioFile(QString fileName)
                     "upgraded to the current version. Check that you have write permission for "
                     "the file. See the log file for details : \n%1"))
                     .arg(GbpLogger::getInstance().getLogFullFileName());
+            } else if (fr.code==Scenario::FileResultCode::LOAD_NO_CURRENCY_FOR_COUNTRY) {
+                userErrorMessage = QString(tr("This file was created by GBP 1.7 or older for "
+                    "country %1, whose currency is unknown. It cannot be opened."))
+                    .arg(fr.countryCode);
             } else {
                 userErrorMessage = QString(tr("This file cannot be loaded. Error code "
                     "= \"%1\". See the log file for details : \n%2"))
@@ -1169,6 +1224,7 @@ bool MainWindow::loadScenarioFile(QString fileName)
     GbpController::getInstance().setFullFileName(fileName);
     chart->setTitle(fr.scenarioPtr->getName());
     setWindowTopTitle();
+    resetSavedScenario();   // just loaded : no "*" in the title
 
     // update the "last directory" used in settings
     QFileInfo fi(fileName);
@@ -1260,6 +1316,9 @@ Scenario::FileResult MainWindow::saveScenario(QString fileName){
 
     LOG_INFO( "Scenario saved successully" );
 
+    // just saved : new reference, no "*" in the title
+    resetSavedScenario();
+
     // update the "last directory" used in settings
     QFileInfo fi(fileName);
     GbpController::getInstance().setLastDir(fi.path());
@@ -1316,10 +1375,12 @@ void MainWindow::rescaleChart(xAxisRescale xAxisRescaleMode, bool addMarginAroun
     }
 
     // recalculate X axis scenario max limits ( "Options->Scenario years" may have changed)
-    fullToDateX = fullFromDateX.addYears(scenario->getFeGenerationDuration()).addDays(-1);
+    fullToDateX = QDateTime(Scenario::getMaxDateFeGeneration(
+        GbpController::getInstance().getToday(), scenario->getFeGenerationDuration()),
+        QTime(0,0,0));
 
     // Get chart raw data
-    QList<QPointF> timeData = scatterSeries->points();
+    const QList<QPointF>& timeData = chartAllPoints;
     QList<QPointF> shadowTimeData = shadowSeries->points();
 
     // Get current currency
@@ -1417,8 +1478,8 @@ void MainWindow::regenerateRawData(QList<QPointF>& timeData, QList<QPointF>& sha
     // regenerate the flow data from the Scenario (can be long). Always regenerate for maximum
     // duration
     uint saturationNo;
-    QDate toLimit = GbpController::getInstance().getTomorrow().addYears(
-        scenario->getFeGenerationDuration()).addDays(-1);
+    QDate toLimit = Scenario::getMaxDateFeGeneration(GbpController::getInstance().getToday(),
+        scenario->getFeGenerationDuration());
     chartRawData.clear();
     chartRawData = scenario->generateFinancialEvents(GbpController::getInstance().getToday(),
         locale, DateRange(GbpController::getInstance().getTomorrow(), toLimit),
@@ -1444,6 +1505,9 @@ void MainWindow::regenerateRawData(QList<QPointF>& timeData, QList<QPointF>& sha
     const QList<CombinedFeStreams::DailyInfo> combinedStreams = chartRawData->getCombinedStreams();
     const qsizetype theSize = combinedStreams.size();
     QDate tomorrow = GbpController::getInstance().getTomorrow();
+    // Explicit system time zone: same result as local time, but Qt reads the zone rules once
+    // instead of going through the C library for each day (about 100x faster)
+    const QTimeZone sysTz = QTimeZone::systemTimeZone();
     for (int var = 0; var < theSize; ++var) {
         const CombinedFeStreams::DailyInfo item = combinedStreams[var];
         if(item.used==true){
@@ -1451,7 +1515,7 @@ void MainWindow::regenerateRawData(QList<QPointF>& timeData, QList<QPointF>& sha
                 currInfo.noOfDecimal);
             cumulAmount = CurrencyHelper::add(cumulAmount, dailyDelta, currInfo.noOfDecimal);
             QDate date = tomorrow.addDays(var);
-            dtMsec = QDateTime(date, QTime(0,0,0)).toMSecsSinceEpoch();
+            dtMsec = QDateTime(date, QTime(0,0,0), sysTz).toMSecsSinceEpoch();
             // real data
             pt = {dtMsec,cumulAmount};
             timeData.append(pt);
@@ -1482,13 +1546,6 @@ void MainWindow::replaceChartSeries(QList<QPointF> data, QList<QPointF> shadowDa
     shadowSeries = new QLineSeries();           // to simulate step curve
     zeroYvalueLineSeries = new QLineSeries();   // to simulate y value = 0 gridline
 
-    // Set scatter chart characteristics
-    if (ui->showPointsCheckBox->isChecked()==true) {
-        scatterSeries->show();
-    } else {
-        scatterSeries->hide();
-    }
-
     // intercept point selection
     connect(scatterSeries, SIGNAL(clicked(QPointF)), this, SLOT(mypoint_clicked(QPointF)));
 
@@ -1502,7 +1559,8 @@ void MainWindow::replaceChartSeries(QList<QPointF> data, QList<QPointF> shadowDa
     QDateTime absoluteMaxDate = QDateTime(QDate(4000,1,1),QTime(0,0,0));
     zeroLinePointList.append({static_cast<qreal>(absoluteMaxDate.toMSecsSinceEpoch()),0});
     zeroYvalueLineSeries->append(zeroLinePointList); // take ownership
-    scatterSeries->append(data); // take ownership
+    // the markers are created later, for the visible points only (see rebuildChartMarkers())
+    chartAllPoints = data;
     shadowSeries->append(shadowData); // take ownership
 
     // set visibility of Y=0line
@@ -1535,6 +1593,134 @@ void MainWindow::replaceChartSeries(QList<QPointF> data, QList<QPointF> shadowDa
 
     // no point have been selected yet
     indexLastPointSelected = -1;
+    chartSelectedPoint.reset();
+    dailyInfoHidden = false;
+
+    // markers for the visible part of the new data
+    rebuildChartMarkers();
+}
+
+
+void MainWindow::rebuildChartMarkers()
+{
+    if (chartMarkersTimer != nullptr) {
+        chartMarkersTimer->stop();
+    }
+    ui->showPointsCheckBox->setEnabled(true);
+    ui->pointsLimitLabel->clear();
+    ui->pointsLimitLabel->setToolTip(QString());
+
+    // Visible points (sorted by date)
+    const qreal xMin = static_cast<qreal>(axisX->min().toMSecsSinceEpoch());
+    const qreal xMax = static_cast<qreal>(axisX->max().toMSecsSinceEpoch());
+    auto first = std::lower_bound(chartAllPoints.cbegin(), chartAllPoints.cend(), xMin,
+        [](const QPointF& p, qreal x) { return p.x() < x; });
+    auto last = std::upper_bound(first, chartAllPoints.cend(), xMax,
+        [](qreal x, const QPointF& p) { return x < p.x(); });
+
+    // Points on screen : inside both the visible X range and the visible Y range
+    const double yMin = axisY->min();
+    const double yMax = axisY->max();
+    auto inYrange = [](const QPointF& p, double low, double high) {
+        return (p.y() >= low) && (p.y() <= high); };
+    const qint64 noInView = std::count_if(first, last, [&](const QPointF& p) {
+        return inYrange(p, yMin, yMax); });
+
+    QList<QPointF> visible;
+    qint64 noOfDisplayed = 0;   // markers drawn in the visible part of the chart
+    // Maximum number of markers displayed at once. Beyond that, the markers are not created :
+    // they would be too dense to be useful, and Qt Charts creates one graphic item per marker,
+    // which becomes very slow (tens of seconds for a 100-year scenario).
+    const qint64 maxMarkers = GbpController::getInstance().getChartMaxPoints();
+    if (ui->showPointsCheckBox->isChecked()) {
+        if (noInView > maxMarkers) {
+            // Too many : the checkbox is inactive (but stays checked) until the limit is no
+            // longer exceeded, e.g. after a zoom in : the markers then come back by themselves.
+            ui->showPointsCheckBox->setEnabled(false);
+            // "ⓘ" sign 1 average character away from the checkbox, the reason in its tooltip
+            ui->pointsLimitLabel->setIndent(
+                ui->pointsLimitLabel->fontMetrics().averageCharWidth());
+            ui->pointsLimitLabel->setText("\u24D8");
+            ui->pointsLimitLabel->setToolTip(tr("Too many points in view to show them\n"
+                "(limit set in Options) : zoom in to see them."));
+        } else {
+            // The markers also cover half the visible width and height on each side, so that
+            // they are already there when these points come into view during a pan (unless it
+            // makes too many markers). Points far above or below the view get no marker.
+            const qreal margin = (xMax - xMin) / 2;
+            const double yMargin = (yMax - yMin) / 2;
+            auto firstM = std::lower_bound(chartAllPoints.cbegin(), first, xMin - margin,
+                [](const QPointF& p, qreal x) { return p.x() < x; });
+            auto lastM = std::upper_bound(last, chartAllPoints.cend(), xMax + margin,
+                [](qreal x, const QPointF& p) { return x < p.x(); });
+            for (auto it = firstM; it != lastM; ++it) {
+                if (inYrange(*it, yMin - yMargin, yMax + yMargin)) {
+                    visible.append(*it);
+                }
+            }
+            if (visible.size() > 2 * maxMarkers) {
+                visible.clear();
+                for (auto it = first; it != last; ++it) {
+                    if (inYrange(*it, yMin, yMax)) {
+                        visible.append(*it);
+                    }
+                }
+            }
+            noOfDisplayed = noInView;
+        }
+    }
+
+    // Stats panel : number of points in the visible part of the chart, and number of those
+    // actually displayed as markers (0 if "Points" is unchecked or if there are too many points
+    // to show them)
+    if (GbpController::getInstance().isScenarioLoaded()) {
+        ui->giPointsInViewLabel->setText(locale.toString(noInView));
+        ui->giPointsDisplayedLabel->setText(locale.toString(noOfDisplayed));
+        // "Points in view" color : default if "Points" is unchecked, otherwise income color if
+        // the points are shown and expense color if there are too many of them to be shown
+        QPalette palette = QApplication::palette(ui->giPointsInViewLabel);
+        if (ui->showPointsCheckBox->isChecked()) {
+            palette.setColor(QPalette::WindowText, (noInView > maxMarkers) ?
+                GbpController::getInstance().getExpenseColor() :
+                GbpController::getInstance().getIncomeColor());
+        }
+        ui->giPointsInViewLabel->setPalette(palette);
+    } else {
+        ui->giPointsInViewLabel->clear();
+        ui->giPointsDisplayedLabel->clear();
+    }
+
+    // Replace the markers (no new series : adding a series would reset the colors of all
+    // the series of the chart). The selection must be cleared first : Qt keeps the selected
+    // positions (indexes) when the points are replaced, so the selection would move to another
+    // point.
+    scatterSeries->deselectAllPoints();
+    scatterSeries->replace(visible);
+
+    // Markers hidden ("Points" unchecked or limit exceeded) : the Daily Info panel is cleared, as
+    // no marker is there to show what it refers to. The selected point is kept : when the markers
+    // are shown again, the panel is filled again, even if the point is not in view (as after a
+    // pan).
+    indexLastPointSelected = -1;
+    const bool markersHidden = (!ui->showPointsCheckBox->isChecked()) || (noInView > maxMarkers);
+    if (chartSelectedPoint.has_value()) {
+        if (markersHidden && !dailyInfoHidden) {
+            emptyDailyInfoSection();
+            dailyInfoHidden = true;
+        } else if (!markersHidden && dailyInfoHidden) {
+            showDailyInfo(chartSelectedPoint.value());
+            dailyInfoHidden = false;
+        }
+    }
+
+    // Select again the point selected by the user, if it is visible
+    if (chartSelectedPoint.has_value()) {
+        const qsizetype index = visible.indexOf(chartSelectedPoint.value());
+        if (index >= 0) {
+            scatterSeries->setPointSelected(index, true);
+            indexLastPointSelected = static_cast<int>(index);
+        }
+    }
 }
 
 
@@ -1564,6 +1750,9 @@ void MainWindow::slotEditScenarioResult(bool regenerateData)
     }
     // notify user
     msgStatusbar(tr("Current scenario has been modified"));
+
+    // "*" in the window title if the scenario now differs from its saved version
+    updateScenarioModified();
 
     // Reset the chart title, because we cannot know if it has changed
     QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
@@ -1605,6 +1794,7 @@ void MainWindow::slotSelectCountryResult(CurrencyInfo currInfo)
 
     // Change window title and char title
     setWindowTopTitle();
+    resetSavedScenario();   // new scenario : no "*" until it is modified
     chart->setTitle(newScenario->getName());
 
     // Then, prepare and display Edit Scenario Dialog
@@ -1656,13 +1846,11 @@ void MainWindow::slotOptionsResult(OptionsDialog::OptionsChangesImpact impact)
             // update scenario StreamDef list now
             editScenarioDlg->allowColoredCsdNames(
                 GbpController::getInstance().getAllowDecorationColor());
-            // redisplay Daily Info info panel to update the name colors. To do so, simulate
-            // a click on the already selected point.
-            QList<int> selPoints = scatterSeries->selectedPoints();
-            if (selPoints.size()==1){
-                QList<QPointF> thePoints = scatterSeries->points();
-                QPointF pt = thePoints.at(selPoints.at(0));
-                mypoint_clicked(pt);
+            // redisplay Daily Info panel to update the name colors (unless it has been cleared
+            // because the markers are hidden : it is then filled with the new colors when they
+            // are shown again)
+            if (chartSelectedPoint.has_value() && !dailyInfoHidden) {
+                showDailyInfo(chartSelectedPoint.value());
             }
         }
     }
@@ -1685,6 +1873,14 @@ void MainWindow::slotOptionsResult(OptionsDialog::OptionsChangesImpact impact)
     if (impact.xaxisDateFormat ==
         OptionsDialog::OPTIONS_IMPACT_XAXIS_DATE_FORMAT::XAXIS_DATE_FORMAT_REFRESH){
         setXaxisDateFormat();  // redraw the X Axis labels
+    }
+
+    // Act for "max number of points shown" change : the zoom and the data are unchanged, only the
+    // markers have to be refreshed
+    if (impact.pointLimit == OptionsDialog::OPTIONS_IMPACT_POINT_LIMIT::POINT_LIMIT_REFRESH){
+        if (impact.data != OptionsDialog::OPTIONS_IMPACT_DATA::DATA_RECALCULATE){
+            rebuildChartMarkers(); // already done by replaceChartSeries() otherwise
+        }
     }
 
     GbpController::getInstance().saveSettings();
@@ -1851,6 +2047,9 @@ void MainWindow::slotAnonymizeResult(AnonymizeDialog::AnonymizeOptions opts)
     fillGeneralInfoSection();
     chart->setTitle(scenario->getName());
 
+    // "*" in the window title : the scenario has been modified in place, not saved
+    updateScenarioModified();
+
     // Refresh Edit Scenario dialog, so it shows the anonymized names
     bool found;
     CurrencyInfo currInfo = CurrencyHelper::getCurrencyInfoFromIsoCode(
@@ -1880,13 +2079,6 @@ void MainWindow::mypoint_clicked(QPointF pt)
         return;
     }
 
-    // Find what date it is
-    const QDateTime dt = QDateTime::fromMSecsSinceEpoch(pt.x());
-    if (dt.isValid()==false){
-        return;
-    }
-    const QDate date = dt.date(); // drop the time portion (get rid of the "shadow point" problem)
-
     // set selected points to normal color, then unselect
     //
     if (indexLastPointSelected==index) {
@@ -1894,6 +2086,8 @@ void MainWindow::mypoint_clicked(QPointF pt)
         scatterSeries->setPointSelected(indexLastPointSelected,false);
         indexLastPointSelected = -1;
         emptyDailyInfoSection();
+        chartSelectedPoint.reset();
+        dailyInfoHidden = false;
     } else {
         // Select the point.
         // Those 2 are very slow with high number of points. Need optimization...
@@ -1904,31 +2098,46 @@ void MainWindow::mypoint_clicked(QPointF pt)
         }
         scatterSeries->setPointSelected(index,true);
 
-        // From the selected point, convert X coord. to date and get the corresponding DI
-        // Index is the offset from tomorrow (which is index=0)
-        CombinedFeStreams::DailyInfo di;
-        qint64 diIndex = GbpController::getInstance().getTomorrow().daysTo(date);
-        const QList<CombinedFeStreams::DailyInfo> list = chartRawData->getCombinedStreams();
-        if( (diIndex>=0) && (diIndex<list.size()) ){
-            di = list[diIndex];
-            if (di.used==false) {
-                // should never happen...
-                QString msg = QString("Entry not used pt(x)=%1 pt(y)=%2"
-                    " index=%3 diIndex=%4 max_val=%5: ").arg(pt.x()).arg(pt.y()).arg(index)
-                    .arg(diIndex).arg(chartRawData->getNoOfDays());
-                throw std::runtime_error(qUtf8Printable(msg));
-            }
-        } else {
+        showDailyInfo(pt);
+        indexLastPointSelected = index;
+        chartSelectedPoint = pt;
+        dailyInfoHidden = false;
+    }
+}
+
+
+void MainWindow::showDailyInfo(QPointF pt)
+{
+    // Find what date it is
+    const QDateTime dt = QDateTime::fromMSecsSinceEpoch(pt.x());
+    if (dt.isValid()==false){
+        return;
+    }
+    const QDate date = dt.date(); // drop the time portion (get rid of the "shadow point" problem)
+
+    // From the point, convert X coord. to date and get the corresponding DI
+    // Index is the offset from tomorrow (which is index=0)
+    CombinedFeStreams::DailyInfo di;
+    qint64 diIndex = GbpController::getInstance().getTomorrow().daysTo(date);
+    const QList<CombinedFeStreams::DailyInfo> list = chartRawData->getCombinedStreams();
+    if( (diIndex>=0) && (diIndex<list.size()) ){
+        di = list[diIndex];
+        if (di.used==false) {
             // should never happen...
-            QString msg = QString("Selected point index is wrong pt(x)=%1 pt(y)=%2"
-                " index=%3 diIndex=%4 max_val=%5: ").arg(pt.x()).arg(pt.y()).arg(index)
+            QString msg = QString("Entry not used pt(x)=%1 pt(y)=%2"
+                " diIndex=%3 max_val=%4: ").arg(pt.x()).arg(pt.y())
                 .arg(diIndex).arg(chartRawData->getNoOfDays());
             throw std::runtime_error(qUtf8Printable(msg));
         }
-
-        fillDailyInfoSection(date, pt.y(), di );
-        indexLastPointSelected = index;
+    } else {
+        // should never happen...
+        QString msg = QString("Selected point index is wrong pt(x)=%1 pt(y)=%2"
+            " diIndex=%3 max_val=%4: ").arg(pt.x()).arg(pt.y())
+            .arg(diIndex).arg(chartRawData->getNoOfDays());
+        throw std::runtime_error(qUtf8Printable(msg));
     }
+
+    fillDailyInfoSection(date, pt.y(), di );
 }
 
 
@@ -2164,11 +2373,7 @@ void MainWindow::on_toolButton_EOY_clicked()
 
 void MainWindow::on_showPointsCheckBox_stateChanged(int arg1)
 {
-    if (ui->showPointsCheckBox->isChecked()==true) {
-        scatterSeries->show();
-    } else {
-        scatterSeries->hide();
-    }
+    rebuildChartMarkers();
 }
 
 void MainWindow::on_showGridlinesCheckBox_stateChanged(int arg1)
@@ -2321,7 +2526,8 @@ void MainWindow::on_customToolButton_clicked()
     // actually generate financial events for : tomorrow through the scenario's max calculation
     // date -- not the chart's currently zoomed-in view.
     QDate from = GbpController::getInstance().getTomorrow();
-    QDate to = from.addYears(scenario->getFeGenerationDuration()).addDays(-1);
+    QDate to = Scenario::getMaxDateFeGeneration(GbpController::getInstance().getToday(),
+        scenario->getFeGenerationDuration());
 
     emit signalDateIntervalPrepareContent(from,to);
     dateIntervalDlg->show();
@@ -2331,6 +2537,8 @@ void MainWindow::on_customToolButton_clicked()
 void MainWindow::on_actionUser_Manual_triggered()
 {
     bool french = (locale.language() == QLocale::French);
+
+#ifdef GBP_EMBEDDED_MANUALS
     QString resourcePath = QString(":/Doc/resources/user_manual-%1.pdf")
         .arg(french ? "fr" : "en");
 
@@ -2380,12 +2588,19 @@ void MainWindow::on_actionUser_Manual_triggered()
                 {tr("OK")}, 0, 0);
             break;
     }
+#else
+    showOnlineDocumentAddress(QString("user_manual-%1.pdf").arg(french ? "fr" : "en"),
+        tr("User Manual"));
+#endif
 }
 
 
 void MainWindow::showWelcomeScreen()
 {
     bool french = (locale.language() == QLocale::French);
+
+    // A PDF in both the "Embedded manuals version" and the "Online manuals version" : it is
+    // small, so it is always built into the executable (gbp_welcome.qrc)
     QString resourcePath = QString(":/Doc/resources/welcome-%1.pdf")
         .arg(french ? "fr" : "en");
 
@@ -2441,6 +2656,8 @@ void MainWindow::showWelcomeScreen()
 void MainWindow::on_actionQuick_Tutorial_triggered()
 {
     bool french = (locale.language() == QLocale::French);
+
+#ifdef GBP_EMBEDDED_MANUALS
     QString resourcePath = QString(":/Doc/resources/quick_tutorial-%1.pdf")
         .arg(french ? "fr" : "en");
 
@@ -2490,8 +2707,28 @@ void MainWindow::on_actionQuick_Tutorial_triggered()
             {tr("OK")}, 0, 0);
         break;
     }
+#else
+    showOnlineDocumentAddress(QString("quick_tutorial-%1.pdf").arg(french ? "fr" : "en"),
+        tr("Quick Tutorial"));
+#endif
 }
 
+
+
+void MainWindow::showOnlineDocumentAddress(const QString &fileName, const QString &docName)
+{
+    // GBP never accesses the Internet : the address is only shown, the user downloads the file
+    QString urlString = Constants::ONLINE_DOC_URL.arg(fileName);
+    LOG_INFO(QString("Showing the address of online document %1").arg(urlString));
+    int choice = GbpQMessage::messageBoxQuestion(this, GbpQMessage::Type::INFORMATION, docName,
+        tr("The %1 is not included in this version of GBP. You can download it from&nbsp;:<br>%2"
+        "<br><br>You can also download the version of GBP that includes the User Manual, "
+        "the Quick Tutorial and the Change Log.")
+        .arg(docName, urlString), {tr("Copy %1 address").arg(docName), tr("OK")}, 1, 1);
+    if (choice == 0) {
+        QGuiApplication::clipboard()->setText(urlString);
+    }
+}
 
 
 void MainWindow::on_actionProperties_triggered()
@@ -2512,6 +2749,7 @@ void MainWindow::on_actionProperties_triggered()
 // Visualize the Change Log file
 void MainWindow::on_actionChange_Log_triggered()
 {
+#ifdef GBP_EMBEDDED_MANUALS
     ViewResourceFileResult result;
     // Always in english
     viewResourceFile(":/Doc/resources/changelog-en.pdf", result);
@@ -2559,6 +2797,10 @@ void MainWindow::on_actionChange_Log_triggered()
                 {tr("OK")}, 0, 0);
             break;
     }
+#else
+    // Always in english
+    showOnlineDocumentAddress("changelog-en.pdf", tr("Change Log"));
+#endif
 }
 
 void MainWindow::changeYaxisLabelFormat(){
@@ -2594,16 +2836,58 @@ void MainWindow::setWindowTopTitle()
         QString ffn = GbpController::getInstance().getFullFileName();
         if (""==ffn) {
             // new scenario not yet saved
-            this->setWindowTitle(tr("Not saved yet %1 GBP").arg(QChar(0x2014)));
+            // [*] : replaced by "*" when the scenario has changes not saved yet
+            // (see updateScenarioModified())
+            this->setWindowTitle(tr("Not saved yet[*] %1 GBP").arg(QChar(0x2014)));
             return;
         } else {
             QFileInfo fileInfo(ffn);
             QString baseName = Util::elideText(fileInfo.fileName(),50,true);
-            this->setWindowTitle(tr("%1 %2 GBP").arg(baseName).arg(QChar(0x2014)));
+            this->setWindowTitle(tr("%1 %2 GBP").arg(baseName + "[*]").arg(QChar(0x2014)));
             return;
         }
     }
 
+}
+
+
+void MainWindow::resetSavedScenario()
+{
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if (scenario.isNull()) {
+        savedScenario.clear();
+        setWindowModified(false);
+        return;
+    }
+
+    // Deep copy : the copy constructor shares the Csds, so give the copy its own Csds.
+    // Tags, relationships, inflation, etc. are values, already copied.
+    QSharedPointer<Scenario> copy(new Scenario(*scenario));
+    copy->setIncomePeriodicCsds(PeriodicCsd::deepCopyHashmap(scenario->getIncomePeriodicCsds()));
+    copy->setIncomeIrregularCsds(
+        IrregularCsd::deepCopyHashmap(scenario->getIncomeIrregularCsds()));
+    copy->setExpensePeriodicCsds(
+        PeriodicCsd::deepCopyHashmap(scenario->getExpensePeriodicCsds()));
+    copy->setExpenseIrregularCsds(
+        IrregularCsd::deepCopyHashmap(scenario->getExpenseIrregularCsds()));
+    savedScenario = copy;   // the previous copy, if any, is freed here
+
+    setWindowModified(false);
+}
+
+
+void MainWindow::updateScenarioModified()
+{
+    QSharedPointer<Scenario> scenario = GbpController::getInstance().getScenario().toStrongRef();
+    if (scenario.isNull()) {
+        setWindowModified(false);   // no scenario : nothing to save
+        return;
+    }
+    if (savedScenario.isNull()) {
+        setWindowModified(true);    // no reference (should not happen) : assume modified
+        return;
+    }
+    setWindowModified( !(*scenario == *savedScenario) );
 }
 
 

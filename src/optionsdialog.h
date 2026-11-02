@@ -21,6 +21,9 @@
 
 #include <QDialog>
 #include <QToolButton>
+#include <QColor>
+#include <QDate>
+#include "gbpcontroller.h"
 
 namespace Ui {
 class OptionsDialog;
@@ -51,6 +54,8 @@ public:
         quint8 xaxisDateFormat;
         // effect for some "incomes / expenses" colors throughtout the application
         quint8 incomeExpenseColor;
+        // effect on the chart markers (max number of points shown has changed)
+        quint8 pointLimit;
     };
     enum OPTIONS_IMPACT_DATA {DATA_UNCHANGED=0, DATA_RECALCULATE=1};
     enum OPTIONS_IMPACT_CHART_SCALING {CHART_SCALING_NONE=0, CHART_SCALING_RESCALE=1};
@@ -60,6 +65,7 @@ public:
     enum OPTIONS_IMPACT_Y_ZERO_LINE {Y_ZERO_LINE_NONE=0, Y_ZERO_LINE_REFRESH=1 };
     enum OPTIONS_IMPACT_XAXIS_DATE_FORMAT {XAXIS_DATE_FORMAT_NONE=0, XAXIS_DATE_FORMAT_REFRESH=1 };
     enum OPTIONS_IMPACT_IECOLOR{IECOLOR_UNCHANGED=0, IE_COLOR_REFRESH=1};
+    enum OPTIONS_IMPACT_POINT_LIMIT {POINT_LIMIT_NONE=0, POINT_LIMIT_REFRESH=1};
 
     explicit OptionsDialog(QWidget *parent = nullptr);
     ~OptionsDialog();
@@ -76,6 +82,7 @@ signals:
 private slots:
     void on_applyPushButton_clicked();
     void on_cancelPushButton_clicked();
+    void on_closePushButton_clicked();
     void on_OptionsDialog_rejected();
     void on_setCustomFontPushButton_clicked();
     void on_systemFontRadioButton_toggled(bool checked);
@@ -144,7 +151,111 @@ private:
     QString newCustomFontString;
 
 
+    /**
+     * @brief All the settings as defined in the form, i.e. what "Save" would store.
+     */
+    struct FormValues {
+        GbpController::ChartTheming chartTheming;
+        uint chartPointSize;
+        uint chartMaxPoints;
+        uint percentageMainChartScaling;
+        QColor darkModeCurveColor;
+        QColor darkModePointColor;
+        QColor darkModeSelectedPointColor;
+        QColor lightModeCurveColor;
+        QColor lightModePointColor;
+        QColor lightModeSelectedPointColor;
+        QColor yZeroLineDarkModeColor;
+        QColor yZeroLineLightModeColor;
+        QColor gridlinesDarkModeColor;
+        QColor gridlinesLightModeColor;
+        QColor incomeColor;
+        QColor expenseColor;
+        bool exportTextNumberLocalized;
+        bool exportTextDateLocalized;
+        bool useDefaultSystemFont;
+        QString customApplicationFont;
+        bool todayUseSystemDate;
+        QDate todayCustomDate;
+        bool allowDecorationColor;
+        bool usePresentValue;
+        double pvDiscountRate;
+        bool wheelRotatedAwayZoomIn;
+        bool showYzeroLine;
+        uint xAxisDateFormat;
+        bool showTooltips;
+
+        /**
+         * @brief Compare 2 sets of settings, ignoring the values greyed out in the form.
+         * @details The discount rate is compared only if the present value is used in both, the
+         * custom today's date only if the system date is not used in both, the custom font only
+         * if the system font is not used in both.
+         */
+        bool operator==(const FormValues &o) const;
+    };
+
+    /**
+     * @brief Settings as they were when the dialog was prepared, read back from the form (not
+     * from GbpController, so that widget rounding does not look like a change). Reference for
+     * detecting changes not saved yet.
+     */
+    FormValues originalValues;
+
+    /**
+     * @brief True while the form is filled : change detection is suspended. True at start,
+     * since the constructor sets some widgets before slotPrepareContent() is called.
+     */
+    bool fillingForm = true;
+
+
     // *** METHODS ***
+
+    /**
+     * @brief Read all the settings as currently defined in the form.
+     * @details Single place where the form is read : used both by "Save" and by the change
+     * detection.
+     * @return The settings defined in the form.
+     */
+    FormValues collectFormValues() const;
+
+    /**
+     * @brief Record that the settings have been modified (or not), and update some UI hints :
+     * warning sign, "*" in the window title, bottom buttons.
+     * @details The only function allowed to write ContentChange::changed - enforced by
+     * ContentChange's friend declaration. See ContentChange below.
+     * @param v New value of the flag.
+     */
+    void contentHasChanged(bool v);
+
+    /**
+     * @brief Whether the settings in the form differ from originalValues.
+     * @return True if there are changes not saved yet.
+     */
+    bool hasContentChanged() const;
+
+    /**
+     * @brief Detect if the settings in the form differ from originalValues, and update the
+     * "content has changed" flag and the bottom buttons accordingly.
+     * @details Called by every widget signal of the form, by setColorInfo() (all the color
+     * changes) and by setCustomFontlabel() (all the font changes). Does nothing while
+     * fillingForm is true.
+     */
+    void updateContentChanged();
+
+    /**
+     * @brief Guards the "content has changed" flag so that only contentHasChanged() and
+     * hasContentChanged() can read or write it (same as in EditScenarioDialog).
+     */
+    class ContentChange
+    {
+        bool changed = false;
+        bool get() const { return changed; }
+        void set(bool v)  { changed = v; }
+        friend void OptionsDialog::contentHasChanged(bool v);
+        friend bool OptionsDialog::hasContentChanged() const;
+    };
+
+    ContentChange contentChanged;
 
     /**
      * @brief Set the color of a particular "color indicator", that is a push button and a label.

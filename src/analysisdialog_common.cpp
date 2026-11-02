@@ -32,6 +32,9 @@
 #include <QMessageBox>
 #include <QLegendMarker>
 #include <QStringView>
+#include <QHelpEvent>
+#include <QToolTip>
+#include <QTimeZone>
 #include <QBarSet>
 #include <QBarCategoryAxis>
 #include <QValueAxis>
@@ -122,7 +125,7 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
 
     // misc init
     ui->noElementsLabel->setText(tr("No of most significant items :"));
-    ui->rwNoElementsSpinBox->setValue(10);
+    ui->rwNoElementsSpinBox->setValue(15);
     ui->chartRelativeWeigthWidget->installEventFilter(this);
 
     // Set color of "incomes" and "expenses" radio buttons
@@ -222,6 +225,9 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
         ui->tagsTableWidget->setHorizontalHeaderItem(col, headerItem);
     }
     ui->tagsTableWidget->setSortingEnabled(true);
+    // The Weight column shows a bar in front of the percentage
+    tagsWeightDelegate = new WeightBarDelegate(ui->tagsTableWidget);
+    ui->tagsTableWidget->setItemDelegateForColumn(2, tagsWeightDelegate);
 
     // Set color of "incomes" and "expenses" radio buttons
     ui->tagsIncomesRadioButton->setStyleSheet(Util::getStyleSheetStringForColor(
@@ -241,6 +247,52 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
 
     // Force tag table to be initially sorted by weigth (descending)
     ui->tagsTableWidget->sortItems(2, Qt::DescendingOrder);
+
+    // Breakdown table : CSDs contributing to the selected tag
+    ui->tagsBreakdownTableWidget->setFont(appFont);
+    ui->tagsBreakdownTableWidget->setColumnCount(4);
+    QStringList breakdownHeaders = {tr("Cash Stream Definition"), tr("Total amount"),
+        tr("%1 of tag").arg("%"), tr("Count")};
+    QStringList breakdownHeadersTooltips = {"","",
+        tr("<html>Percentage of the tag's total amount coming from this Cash Stream "
+           "Definition.</html>"),
+        tr("<html>Number of individual financial events of this Cash Stream Definition "
+           "in the period.</html>")};
+    for (int col = 0; col < 4; ++col) {
+        QTableWidgetItem *headerItem = new QTableWidgetItem(breakdownHeaders[col]);
+        if (col>=2) {
+            headerItem->setToolTip(breakdownHeadersTooltips[col]);
+        }
+        ui->tagsBreakdownTableWidget->setHorizontalHeaderItem(col, headerItem);
+    }
+    QHeaderView *breakdownHeader = ui->tagsBreakdownTableWidget->horizontalHeader();
+    breakdownHeader->setFont(appFont);
+    breakdownHeader->setMinimumHeight(fm2.height() + 10);
+    ui->tagsBreakdownTableWidget->verticalHeader()->hide();
+    ui->tagsBreakdownTableWidget->setSortingEnabled(true);
+    ui->tagsBreakdownTableWidget->sortItems(1, Qt::DescendingOrder);
+    // The "% of tag" column shows a bar in front of the percentage
+    tagsBreakdownPctDelegate = new WeightBarDelegate(ui->tagsBreakdownTableWidget);
+    ui->tagsBreakdownTableWidget->setItemDelegateForColumn(2, tagsBreakdownPctDelegate);
+    ui->tagsSplitter->setStretchFactor(0, 1);
+    ui->tagsSplitter->setStretchFactor(1, 1);
+    ui->tagsBreakdownSplitter->setStretchFactor(0, 3);
+    ui->tagsBreakdownSplitter->setStretchFactor(1, 1);
+
+    // Pie chart of the breakdown, at the right of the breakdown table
+    tagsPieChart = new QChart;
+    tagsPieChart->legend()->hide();
+    tagsPieChart->layout()->setContentsMargins(1, 1, 1, 1);
+    tagsPieChart->setBackgroundRoundness(0);
+    tagsPieChartView = new QChartView(tagsPieChart, ui->tagsPieWidget); // take ownership
+    tagsPieChartView->setRenderHint(QPainter::Antialiasing);
+    if(GbpController::getInstance().useDarkModeForChart()==true){
+        tagsPieChart->setTheme(QChart::ChartThemeDark);
+    } else {
+        tagsPieChart->setTheme(QChart::ChartThemeLight);
+    }
+    ui->tagsPieWidget->installEventFilter(this);
+    tagsPieChartView->viewport()->installEventFilter(this);
 
     // Set tags no of label to have smaller fonts and italic
     font = appFont;
@@ -267,8 +319,154 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
     }
     ui->csdChartWidget->installEventFilter(this);
     csdInitChart();
+    // "ⓘ" sign shown next to "Points" when there are too many points to show them (its tooltip
+    // gives the reason) : no message, there is no room for it
+    ui->csdPointsHiddenLabel->setFont(appFont);
 
     // *** HELP ***
+    updateHelpText();
+
+    // Set focus on "Close" button
+    ui->closePushButton->setDefault(true);
+
+    // *** PERIOD - HEATMAP defaults (set once; preserved across dialog re-opens) ***
+    ui->periodHeatmapMonthlyRadioButton->setChecked(true);
+    ui->periodHeatmapExcludeCurrentCheckBox->setText(tr("Exclude current month"));
+
+    // *** Dialog children and connections ***
+
+    // Create Dialog for selecting tags
+    selectTagsDlg = new ChooseTagsDialog(this);
+    selectTagsDlg->setModal(true);
+
+    // connect emitters & receivers for Dialogs : choose Tags
+    QObject::connect(this, &AnalysisDialog::signalChooseTagsPrepareContent, selectTagsDlg,
+        &ChooseTagsDialog::slotPrepareContent);
+    QObject::connect(selectTagsDlg, &ChooseTagsDialog::signalResult, this,
+        &AnalysisDialog::slotChooseTagsResult);
+    QObject::connect(selectTagsDlg, &ChooseTagsDialog::signalCompleted, this,
+        &::AnalysisDialog::slotChooseTagsCompleted);
+
+    ready = true;
+}
+
+
+AnalysisDialog::~AnalysisDialog()
+{
+    delete ui;
+}
+
+
+void AnalysisDialog::slotAnalysisPrepareContent( QWeakPointer<CombinedFeStreams> chartRawDataRef,
+    Tags availabletags, CurrencyInfo currencyInfo, double startingAmount)
+{
+    this->chartRawDataRef = chartRawDataRef;
+    this->currInfo = currencyInfo;
+    this->startingAmount = startingAmount;
+
+    // Enforce the "to" date upper bound: today + scenario duration.
+    // Done here (not in the constructor) because the scenario is guaranteed loaded at this point.
+    {
+        QSharedPointer<Scenario> scenario =
+            GbpController::getInstance().getScenario().toStrongRef();
+        if (!scenario.isNull()) {
+            QDate maxToDate = Scenario::getMaxDateFeGeneration(
+                GbpController::getInstance().getToday(), scenario->getFeGenerationDuration());
+            ui->globalToDateEdit->setMaximumDate(maxToDate);
+            if (globalPreviousToDate > maxToDate) {
+                globalPreviousToDate = maxToDate;
+                ui->globalToDateEdit->setDate(maxToDate);
+            }
+        }
+    }
+
+    // The financial events may have changed since the last time : the event data shared by
+    // the tabs is rebuilt by the first tab needing it
+    eventDataClear();
+
+    // *** RELATIVE WEIGTH ***
+    rwUpdateChart();
+
+    // *** PERIOD - LIST ***
+
+    // calculate data : will be used by tables and charts.
+    recalculate_BinsData(PeriodType::MONTHLY, ui->detailsReportTableWidget);
+    recalculate_BinsData(PeriodType::YEARLY, ui->detailsReportTableWidget);
+    // update report table for the currently selected granularity
+    periodListRedisplayTableData(
+        ui->periodListMonthlyRadioButton->isChecked()
+            ? PeriodType::MONTHLY : PeriodType::YEARLY);
+    // restore visibility based on current mode selection (preserves user's last choice)
+    bool isMonthly = ui->periodChartMonthlyRadioButton->isChecked();
+    if (chartViewMonthlyReport) chartViewMonthlyReport->setVisible(isMonthly);
+    if (chartViewYearlyReport)  chartViewYearlyReport->setVisible(!isMonthly);
+    periodChartOffset = 0;
+    periodChartRedisplayChart(isMonthly ? PeriodType::MONTHLY : PeriodType::YEARLY);
+
+    // *** PERIOD - HEATMAP ***
+    {
+        if (!periodHeatmapIncomeToColor.isValid())  periodHeatmapIncomeToColor  = Qt::green;
+        if (!periodHeatmapExpenseToColor.isValid()) periodHeatmapExpenseToColor = Qt::red;
+        if (!periodHeatmapDeltaFromColor.isValid()) periodHeatmapDeltaFromColor = Qt::red;
+        if (!periodHeatmapDeltaToColor.isValid())   periodHeatmapDeltaToColor   = Qt::green;
+    }
+    periodHeatmapUpdateColorButtons();
+    periodHeatmapRedisplayTable();
+
+    // *** TAGS ***
+
+    this->availableTags = availabletags;
+
+    // Try to conserve the tags already selected from previous invocation of the dialog.
+    // Scenario or tags set may have changed. Otherwise, we take all the tag available
+    QSet<QUuid> formerSet = selectedTags.getFilterTagIdSet();
+    availableTags.cleanIdList(formerSet);
+    selectedTags.setFilterTagIdSet(formerSet);
+    if (formerSet.size()==0) {
+        // scenario may have changed or tags modified in the current scenario. In that case,
+        // we select all the tags for convenience.
+        selectedTags.setFilterTagIdSet(availableTags.getTagIdSetAsQset());
+    }
+
+    // Update no of tags selected
+    tagsUpdateNoTagsSelected();
+
+    // Rebuild data and update tag table
+    tagsRedisplayTable();
+
+    // *** CSD COMPARISON ***
+    csdCheckedIncomeIds.clear();
+    csdCheckedExpenseIds.clear();
+    ui->csdListWidget->clear();
+    csdRedisplayList();
+
+    // Set focus on Close button
+    ui->closePushButton->setFocus();
+
+    LOG_DEBUG_INFO(QString("Analysis dialog invoked"));
+}
+
+
+void AnalysisDialog::slotChooseTagsResult(QSet<QUuid> chosenTags)
+{
+    selectedTags.setFilterTagIdSet(chosenTags);
+
+    // Update no of tags selected
+    tagsUpdateNoTagsSelected();
+
+    // Rebuild the data and update the tag chart
+    tagsRedisplayTable();
+}
+
+
+void AnalysisDialog::slotChooseTagsCompleted(bool canceled)
+{
+
+}
+
+
+void AnalysisDialog::updateHelpText()
+{
     ui->helpTextEdit->setHtml(tr(
         "<h2>Analysis — Help</h2>"
 
@@ -367,6 +565,19 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
         "<li>The table lists each tag with its total <b>amount</b>, <b>weight</b> "
         "(percentage of the period total), and <b>event count</b> (number of individual "
         "financial events carrying that tag).</li>"
+        "<li>Click a tag in the table to display its <b>breakdown</b> below: the CSDs "
+        "contributing to that tag, each with its total <b>amount</b>, its <b>% of tag</b> "
+        "(share of the tag's amount) and its <b>count</b> of financial events. Each mode "
+        "(Income or Expenses) remembers its own selected tag, which also remains selected "
+        "when the dates or the selected tags change.</li>"
+        "<li>The pie chart at the right of the breakdown shows the share of each CSD in "
+        "the tag. The colored square in front of each CSD name gives the color of its slice. "
+        "Hover a slice to highlight it (lighter color) and see its name, amount and "
+        "percentage. When there are more than 20 "
+        "CSDs, the smallest ones are grouped in a gray &ldquo;Others&rdquo; slice.</li>"
+        "<li>Drag the separator between the two tables to change their respective "
+        "heights, and the one between the breakdown and the pie chart to change their "
+        "respective widths.</li>"
         "<li>A CSD can contribute to a tag even if the tag is not its primary tag, "
         "as long as the tag relationship is defined.</li>"
         "<li>Use <b>Export table…</b> to save the results as a CSV file.</li>"
@@ -377,8 +588,9 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
         "Definitions side by side as step curves, making it easy to compare their timing "
         "and amounts.</p>"
         "<ul>"
-        "<li>Choose <b>Income</b> or <b>Expenses</b> mode. Only active CSDs of the "
-        "selected type appear in the list.</li>"
+        "<li>Choose <b>Income</b> or <b>Expenses</b> mode. All the active CSDs of the "
+        "selected type appear in the list, including those without any financial event "
+        "(their curve is then empty). Inactive CSDs are not listed.</li>"
         "<li>Only financial events falling within the global <b>From / To</b> date range "
         "are shown. Press <b>Apply dates</b> at the top to refresh.</li>"
         "<li>Check up to <b>10 CSDs</b> from the list on the left. Each checked CSD is "
@@ -394,6 +606,12 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
         "force the same reset manually.</li>"
         "<li>The chart supports <b>pan</b> (click and drag) and <b>zoom</b> "
         "(mouse wheel, Shift = horizontal only, Ctrl = vertical only).</li>"
+        "<li>When <b>Points</b> is checked, a marker is shown for each financial event "
+        "visible in the chart. If there are too many of them (the limit is set in Options), "
+        "the markers are hidden, "
+        "the <b>Points</b> checkbox is grayed out and an &#9432; sign is shown next to it (hover "
+        "it for the reason) : zoom in or select fewer CSDs to see them again. When no marker is "
+        "shown, the <b>Selection</b> date and value are hidden too.</li>"
         "<li>Click a data point to highlight it and display its date and value below "
         "the chart. Click the same point again to deselect it.</li>"
         "<li>Income/Expenses selection and individual checkmarks are preserved when you "
@@ -402,140 +620,6 @@ AnalysisDialog::AnalysisDialog(QLocale theLocale, QWidget *parent)
         "<li>Use <b>Export image…</b> to save the chart as a PNG file.</li>"
         "</ul>"
     ));
-
-    // Set focus on "Close" button
-    ui->closePushButton->setDefault(true);
-
-    // *** PERIOD - HEATMAP defaults (set once; preserved across dialog re-opens) ***
-    ui->periodHeatmapMonthlyRadioButton->setChecked(true);
-    ui->periodHeatmapExcludeCurrentCheckBox->setText(tr("Exclude current month"));
-
-    // *** Dialog children and connections ***
-
-    // Create Dialog for selecting tags
-    selectTagsDlg = new ChooseTagsDialog(this);
-    selectTagsDlg->setModal(true);
-
-    // connect emitters & receivers for Dialogs : choose Tags
-    QObject::connect(this, &AnalysisDialog::signalChooseTagsPrepareContent, selectTagsDlg,
-        &ChooseTagsDialog::slotPrepareContent);
-    QObject::connect(selectTagsDlg, &ChooseTagsDialog::signalResult, this,
-        &AnalysisDialog::slotChooseTagsResult);
-    QObject::connect(selectTagsDlg, &ChooseTagsDialog::signalCompleted, this,
-        &::AnalysisDialog::slotChooseTagsCompleted);
-
-    ready = true;
-}
-
-
-AnalysisDialog::~AnalysisDialog()
-{
-    delete ui;
-}
-
-
-void AnalysisDialog::slotAnalysisPrepareContent( QWeakPointer<CombinedFeStreams> chartRawDataRef,
-    Tags availabletags, CurrencyInfo currencyInfo, double startingAmount)
-{
-    this->chartRawDataRef = chartRawDataRef;
-    this->currInfo = currencyInfo;
-    this->startingAmount = startingAmount;
-
-    // Enforce the "to" date upper bound: tomorrow + scenario duration - 1 day.
-    // Done here (not in the constructor) because the scenario is guaranteed loaded at this point.
-    {
-        QSharedPointer<Scenario> scenario =
-            GbpController::getInstance().getScenario().toStrongRef();
-        if (!scenario.isNull()) {
-            QDate tomorrow = GbpController::getInstance().getTomorrow();
-            QDate maxToDate =
-                tomorrow.addYears(scenario->getFeGenerationDuration()).addDays(-1);
-            ui->globalToDateEdit->setMaximumDate(maxToDate);
-            if (globalPreviousToDate > maxToDate) {
-                globalPreviousToDate = maxToDate;
-                ui->globalToDateEdit->setDate(maxToDate);
-            }
-        }
-    }
-
-    // *** RELATIVE WEIGTH ***
-    rwUpdateChart();
-
-    // *** PERIOD - LIST ***
-
-    // calculate data : will be used by tables and charts.
-    recalculate_BinsData(PeriodType::MONTHLY, ui->detailsReportTableWidget);
-    recalculate_BinsData(PeriodType::YEARLY, ui->detailsReportTableWidget);
-    // update report table for the currently selected granularity
-    periodListRedisplayTableData(
-        ui->periodListMonthlyRadioButton->isChecked()
-            ? PeriodType::MONTHLY : PeriodType::YEARLY);
-    // restore visibility based on current mode selection (preserves user's last choice)
-    bool isMonthly = ui->periodChartMonthlyRadioButton->isChecked();
-    if (chartViewMonthlyReport) chartViewMonthlyReport->setVisible(isMonthly);
-    if (chartViewYearlyReport)  chartViewYearlyReport->setVisible(!isMonthly);
-    periodChartOffset = 0;
-    periodChartRedisplayChart(isMonthly ? PeriodType::MONTHLY : PeriodType::YEARLY);
-
-    // *** PERIOD - HEATMAP ***
-    {
-        if (!periodHeatmapIncomeToColor.isValid())  periodHeatmapIncomeToColor  = Qt::green;
-        if (!periodHeatmapExpenseToColor.isValid()) periodHeatmapExpenseToColor = Qt::red;
-        if (!periodHeatmapDeltaFromColor.isValid()) periodHeatmapDeltaFromColor = Qt::red;
-        if (!periodHeatmapDeltaToColor.isValid())   periodHeatmapDeltaToColor   = Qt::green;
-    }
-    periodHeatmapUpdateColorButtons();
-    periodHeatmapRedisplayTable();
-
-    // *** TAGS ***
-
-    this->availableTags = availabletags;
-
-    // Try to conserve the tags already selected from previous invocation of the dialog.
-    // Scenario or tags set may have changed. Otherwise, we take all the tag available
-    QSet<QUuid> formerSet = selectedTags.getFilterTagIdSet();
-    availableTags.cleanIdList(formerSet);
-    selectedTags.setFilterTagIdSet(formerSet);
-    if (formerSet.size()==0) {
-        // scenario may have changed or tags modified in the current scenario. In that case,
-        // we select all the tags for convenience.
-        selectedTags.setFilterTagIdSet(availableTags.getTagIdSetAsQset());
-    }
-
-    // Update no of tags selected
-    tagsUpdateNoTagsSelected();
-
-    // Rebuild data and update tag table
-    tagsRedisplayTable();
-
-    // *** CSD COMPARISON ***
-    csdCheckedIncomeIds.clear();
-    csdCheckedExpenseIds.clear();
-    ui->csdListWidget->clear();
-    csdRedisplayList();
-
-    // Set focus on Close button
-    ui->closePushButton->setFocus();
-
-    LOG_DEBUG_INFO(QString("Analysis dialog invoked"));
-}
-
-
-void AnalysisDialog::slotChooseTagsResult(QSet<QUuid> chosenTags)
-{
-    selectedTags.setFilterTagIdSet(chosenTags);
-
-    // Update no of tags selected
-    tagsUpdateNoTagsSelected();
-
-    // Rebuild the data and update the tag chart
-    tagsRedisplayTable();
-}
-
-
-void AnalysisDialog::slotChooseTagsCompleted(bool canceled)
-{
-
 }
 
 
@@ -545,11 +629,15 @@ void AnalysisDialog::themeChanged()
         chartMonthlyReport->setTheme(QChart::ChartThemeDark);
         chartYearlyReport->setTheme(QChart::ChartThemeDark);
         chartRelativeWeight->setTheme(QChart::ChartThemeDark);
+        tagsPieChart->setTheme(QChart::ChartThemeDark);
     } else {
         chartMonthlyReport->setTheme(QChart::ChartThemeLight);
         chartYearlyReport->setTheme(QChart::ChartThemeLight);
         chartRelativeWeight->setTheme(QChart::ChartThemeLight);
+        tagsPieChart->setTheme(QChart::ChartThemeLight);
     }
+    // Changing the theme resets the slice colors : redraw the pie with the table colors
+    tagsRedisplayBreakdown();
     if (!binsMonthly.isEmpty()) {
         periodHeatmapUpdateColorButtons();
         periodHeatmapRedisplayTable();
@@ -572,8 +660,109 @@ bool AnalysisDialog::eventFilter(QObject *object, QEvent *event)
     if ( (event->type() == QEvent::Resize) && (object == ui->csdChartWidget) ) {
         if (csdChartView) csdChartView->resize(ui->csdChartWidget->size());
     }
+    if ( (event->type() == QEvent::Resize) && (object == ui->tagsPieWidget) ) {
+        if (tagsPieChartView) tagsPieChartView->resize(ui->tagsPieWidget->size());
+    }
+    // When the mouse rests, the chart view gets a tooltip event and, as no chart item has a
+    // tooltip, it hides the current tooltip : show the text of the hovered slice instead
+    if ( (event->type() == QEvent::ToolTip) && (tagsPieChartView != nullptr)
+        && (object == tagsPieChartView->viewport()) ) {
+        if (tagsPieHoveredText.isEmpty()) {
+            QToolTip::hideText();
+        } else {
+            QToolTip::showText(static_cast<QHelpEvent*>(event)->globalPos(), tagsPieHoveredText,
+                tagsPieChartView->viewport());
+        }
+        return true;
+    }
 
     return QObject::eventFilter(object, event);
+}
+
+
+void AnalysisDialog::eventDataEnsure(QDate from, QDate to)
+{
+    if (!eventDataValid || (eventDataFrom != from) || (eventDataTo != to)) {
+        eventDataRebuild(from, to);
+    }
+}
+
+
+void AnalysisDialog::eventDataRebuild(QDate from, QDate to)
+{
+    eventDataClear();
+    eventDataValid = true;
+    eventDataFrom  = from;
+    eventDataTo    = to;
+
+    QSharedPointer<CombinedFeStreams> chartRawData = chartRawDataRef.toStrongRef();
+    if (chartRawData.isNull()) {
+        return;
+    }
+    QDate tomorrow = GbpController::getInstance().getTomorrow();
+
+    // Single pass through raw data — listDi is already in ascending date order
+    const QList<CombinedFeStreams::DailyInfo>& listDi = chartRawData->getCombinedStreams();
+    const qsizetype diSize = listDi.size();
+    // Explicit system time zone: same result as local time, but Qt reads the zone rules once
+    // instead of going through the C library for each day (about 250x faster)
+    const QTimeZone sysTz = QTimeZone::systemTimeZone();
+
+    // Add one financial event to the totals of its CSD and to the points of the CSD cache
+    auto addFe = [this](const Fe& fe, qreal xVal, QHash<QUuid, CsdEventTotal>& totals,
+        double& absTotal, QHash<QUuid, QList<QPointF>>& points) {
+        QSharedPointer<Csd> csd = fe.csdPtr.toStrongRef();
+        if (csd.isNull()) return; // should never happen
+        const QUuid id = csd->getId();
+        CsdEventTotal& t = totals[id];
+        if (t.count == 0) {
+            t.name  = csd->getName();
+            t.color = csd->getDecorationColor();
+        }
+        t.amount    = CurrencyHelper::add(t.amount, fe.amount, currInfo.noOfDecimal);
+        t.absAmount = CurrencyHelper::add(t.absAmount, fabs(fe.amount), currInfo.noOfDecimal);
+        t.count++;
+        absTotal = CurrencyHelper::add(absTotal, fabs(fe.amount), currInfo.noOfDecimal);
+        points[id].append({xVal, qAbs(fe.amount)});
+    };
+
+    for (qsizetype var = 0; var < diSize; ++var) {
+        const CombinedFeStreams::DailyInfo& di = listDi[var];
+        if (!di.used) continue;
+        QDate diDate = tomorrow.addDays(static_cast<int>(var));
+        if (diDate < from || diDate > to) continue;
+
+        eventDaysTotalIncomes = CurrencyHelper::add(eventDaysTotalIncomes, di.totalIncomes,
+            currInfo.noOfDecimal);
+        eventDaysTotalExpenses = CurrencyHelper::add(eventDaysTotalExpenses, di.totalExpenses,
+            currInfo.noOfDecimal);
+
+        qreal xVal = static_cast<qreal>(
+            QDateTime(diDate, QTime(0, 0, 0), sysTz).toMSecsSinceEpoch());
+        for (const Fe& fe : di.incomesList) {
+            addFe(fe, xVal, eventCsdTotalsIncomes, eventAbsTotalIncomes, csdPointsCacheIncomes);
+        }
+        for (const Fe& fe : di.expensesList) {
+            addFe(fe, xVal, eventCsdTotalsExpenses, eventAbsTotalExpenses,
+                csdPointsCacheExpenses);
+        }
+    }
+}
+
+
+void AnalysisDialog::eventDataClear()
+{
+    // clear() frees all the memory used by the hashes and their lists of points (the Compare
+    // CSD curves sharing some of these lists must be cleared too, see csdClearCachedData())
+    eventCsdTotalsIncomes.clear();
+    eventCsdTotalsExpenses.clear();
+    csdPointsCacheIncomes.clear();
+    csdPointsCacheExpenses.clear();
+    eventDaysTotalIncomes  = 0;
+    eventDaysTotalExpenses = 0;
+    eventAbsTotalIncomes   = 0;
+    eventAbsTotalExpenses  = 0;
+    eventDataValid = false;
 }
 
 
@@ -585,13 +774,16 @@ void AnalysisDialog::on_closePushButton_clicked()
     binsYearly = {};
     availableTags.clear();
     tagsTableData.clear();
+    tagsBreakdownData.clear();
+    tagsPieChart->removeAllSeries();
+    tagsPieHoveredText.clear();
     chartRelativeWeight->removeAllSeries();
     seriesRelativeWeigth = nullptr; // rwUpdateChart() recreates it on next open
     chartMonthlyReport->removeAllSeries();
     chartYearlyReport->removeAllSeries();
     if (csdChart) csdChart->removeAllSeries();
-    csdLastSelectedSeries = nullptr;
-    csdLastSelectedIndex  = -1;
+    csdClearCachedData();
+    eventDataClear();
     ui->detailsReportTableWidget->setRowCount(0);
     ui->periodHeatmapTableWidget->clearContents();
     ui->periodHeatmapTableWidget->setRowCount(0);
@@ -611,10 +803,9 @@ void AnalysisDialog::exportChartAsImage(QWidget* chartWidget, QString desc)
     LOG_INFO("Initiating chart export in PNG format : "+desc);
 
     // get file name
-    QString defaultExtensionUsed = "PNG files (*.png *.PNG)";
     QString filter = tr("PNG files (*.png *.PNG);;All files (*)");
     QString fileName = QFileDialog::getSaveFileName(this, tr("Select an image file"),
-        GbpController::getInstance().getLastDirExport(), filter, &defaultExtensionUsed);
+        GbpController::getInstance().getLastDirExport(), filter, nullptr);
     if (fileName != ""){
         // fix the filename to add the proper suffix
         QFileInfo fi(fileName);
@@ -672,7 +863,8 @@ void AnalysisDialog::recalculate_BinsData(PeriodType rTypr,
     // for this bin.
     QDate tomorrow = GbpController::getInstance().getTomorrow();
     qint64 tomorrowJulianDay = tomorrow.toJulianDay();
-    QDate to = tomorrow.addYears(scenario->getFeGenerationDuration()).addDays(-1);
+    QDate to = Scenario::getMaxDateFeGeneration(GbpController::getInstance().getToday(),
+        scenario->getFeGenerationDuration());
     QDate toMonthYear = QDate(to.year(), (rTypr==PeriodType::MONTHLY)?(to.month()):(1), 1);
     QDate date = QDate(tomorrow.year(), (rTypr==PeriodType::MONTHLY)?(tomorrow.month()):(1), 1);
     while( date <= toMonthYear ){
@@ -952,8 +1144,8 @@ void AnalysisDialog::on_globalApplyDatesPushButton_clicked()
         QSharedPointer<Scenario> scenario =
             GbpController::getInstance().getScenario().toStrongRef();
         if (!scenario.isNull()) {
-            QDate maxToDate =
-                tomorrow.addYears(scenario->getFeGenerationDuration()).addDays(-1);
+            QDate maxToDate = Scenario::getMaxDateFeGeneration(
+                GbpController::getInstance().getToday(), scenario->getFeGenerationDuration());
             if (to > maxToDate) {
                 GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
                     QString(tr("\"To\" date %1 cannot exceed the scenario end date %2"))

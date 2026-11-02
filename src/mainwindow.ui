@@ -294,14 +294,18 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;checked&lt;/span&gt;, show data points on Cash Balance curve as big color-filled disks&lt;/p&gt;&lt;p&gt;If &lt;span style=&quot; font-weight:700;&quot;&gt;unchecked&lt;/span&gt;, don't show data points.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
             <property name="text">
              <string>Points</string>
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="pointsLimitLabel">
+            <property name="text">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -588,7 +592,7 @@
                <item row="1" column="0">
                 <widget class="QLabel" name="giNoEvents">
                  <property name="text">
-                  <string>No of events :</string>
+                  <string>Total events :</string>
                  </property>
                 </widget>
                </item>
@@ -612,8 +616,56 @@
                  </item>
                 </layout>
                </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="giPointsInView">
+                 <property name="text">
+                  <string>Points in view :</string>
+                 </property>
+                </widget>
+               </item>
                <item row="2" column="1">
-                <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+                <layout class="QHBoxLayout" name="horizontalLayout_giPointsInView">
+                 <item>
+                  <widget class="QLabel" name="giPointsInViewLabel">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How many points of the Cash Balance curve are in the visible part of the chart, whether they are shown or not.&lt;/p&gt;&lt;p&gt;When &quot;Points&quot; is checked : green if they are shown, red if there are too many to show them.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string notr="true"/>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="giPointsDisplayed">
+                 <property name="text">
+                  <string>Points displayed :</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_giPointsDisplayed">
+                 <item>
+                  <widget class="QLabel" name="giPointsDisplayedLabel">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string notr="true"/>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </item>
@@ -781,6 +833,7 @@
     <addaction name="actionQuick_Tutorial"/>
     <addaction name="actionUser_Manual"/>
     <addaction name="actionChange_Log"/>
+    <addaction name="actionShortcuts"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
@@ -897,6 +950,11 @@
   <action name="actionChange_Log">
    <property name="text">
     <string>Change log</string>
+   </property>
+  </action>
+  <action name="actionShortcuts">
+   <property name="text">
+    <string>Keyboard and mouse shortcuts</string>
    </property>
   </action>
   <action name="actionPV_Calculator">

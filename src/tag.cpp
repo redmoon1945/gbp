@@ -44,7 +44,7 @@ Tag::Tag(QUuid anId, const QString &aName, const QString &aDescription) {
         throw std::domain_error("QUuid is invalid");
     }
     this->id = anId;;
-    this->name = aName.trimmed().left(Tag::MAX_NAME_LEN);
+    this->name = Util::toSingleLine(aName).trimmed().left(Tag::MAX_NAME_LEN);
     this->description = aDescription.trimmed().left(Tag::MAX_DESC_LEN);
 }
 
@@ -196,7 +196,7 @@ QString Tag::getName() const
 
 void Tag::setName(const QString &newName)
 {
-    name = newName.trimmed().left(Tag::MAX_NAME_LEN);
+    name = Util::toSingleLine(newName).trimmed().left(Tag::MAX_NAME_LEN);
 }
 
 

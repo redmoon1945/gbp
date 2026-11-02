@@ -55,10 +55,46 @@ OptionsDialog::OptionsDialog(QWidget *parent)
     // make sure first tab is selected
     ui->tabWidget->setCurrentIndex(0);
 
+    // allowed range for the max number of points shown in charts
+    ui->maxPointsSpinBox->setRange(GbpController::CHART_MAX_POINTS_MIN,
+        GbpController::CHART_MAX_POINTS_MAX);
+
     // Set default income and expense color
     setColorInfo(CI_INCOME_COLOR, Util::getOptimizedGreen());
     setColorInfo(CI_EXPENSE_COLOR, Util::getOptimizedRed());
 
+    // Warning sign displayed next to the buttons when there are changes not saved yet
+    // (same as in EditScenarioDialog). Shown/hidden by contentHasChanged().
+    ui->modifiedWarningLabel->setText("\u26A0");
+    ui->modifiedWarningLabel->setStyleSheet("color: #FF9800;");
+    ui->modifiedWarningLabel->setVisible(false);
+
+    // Change detection for the settings stored in widgets. Colors and custom font are covered
+    // by setColorInfo() and setCustomFontlabel().
+    QList<QRadioButton*> radioButtons = {ui->todaySystemRadioButton,
+        ui->todaySpecificRadioButton, ui->systemFontRadioButton, ui->customFontRadioButton,
+        ui->wheelZoomOutRadioButton, ui->wheelZoomInRadioButton,
+        ui->xAxisDateLocaleRadioButton, ui->xAxisDateIsoRadioButton,
+        ui->xAxisDateIsoTwoDigitsRadioButton, ui->chartThemingLightRadioButton,
+        ui->chartThemingDarkRadioButton, ui->chartThemingFollowRadioButton};
+    foreach (QRadioButton* rb, radioButtons) {
+        QObject::connect(rb, &QRadioButton::toggled, this, &OptionsDialog::updateContentChanged);
+    }
+    QList<QCheckBox*> checkBoxes = {ui->allowDecorationColorCheckBox,
+        ui->exportTextAmountLocalizedCheckBox, ui->exportTextDateLocalizedCheckBox,
+        ui->usePresentValueCheckBox, ui->tooltipsCheckBox, ui->showYzeroLineCheckBox};
+    foreach (QCheckBox* cb, checkBoxes) {
+        QObject::connect(cb, &QCheckBox::toggled, this, &OptionsDialog::updateContentChanged);
+    }
+    QList<QSpinBox*> spinBoxes = {ui->pointSizeSpinBox, ui->maxPointsSpinBox,
+        ui->scalingMainChartSpinBox};
+    foreach (QSpinBox* sb, spinBoxes) {
+        QObject::connect(sb, &QSpinBox::valueChanged, this, &OptionsDialog::updateContentChanged);
+    }
+    QObject::connect(ui->pvDiscountRateDoubleSpinBox, &QDoubleSpinBox::valueChanged,
+        this, &OptionsDialog::updateContentChanged);
+    QObject::connect(ui->todayDateEdit, &QDateEdit::dateChanged,
+        this, &OptionsDialog::updateContentChanged);
 }
 
 
@@ -71,6 +107,12 @@ OptionsDialog::~OptionsDialog()
 // Dialog is about to be displayed with new data
 void OptionsDialog::slotPrepareContent()
 {
+    fillingForm = true;     // suspend change detection while the form is filled
+
+    // [*] : replaced by "*" when there are changes not saved yet (see setWindowModified() in
+    // contentHasChanged())
+    this->setWindowTitle(tr("Options Settings") + "[*]");
+
     // Set chart theming
     switch(GbpController::getInstance().getChartTheming()){
         case GbpController::ChartTheming::FORCE_LIGHT:
@@ -83,11 +125,15 @@ void OptionsDialog::slotPrepareContent()
             ui->chartThemingFollowRadioButton->setChecked(true);
             break;
         default: // should never happen
+            fillingForm = false;
             return;
         }
 
     // chart point size
     ui->pointSizeSpinBox->setValue(GbpController::getInstance().getChartPointSize());
+
+    // max number of points shown in charts
+    ui->maxPointsSpinBox->setValue(GbpController::getInstance().getChartMaxPoints());
 
     // curve Dark Mode widgets
     darkModeCurveColor = GbpController::getInstance().getDarkModeCurveColor();
@@ -175,7 +221,7 @@ void OptionsDialog::slotPrepareContent()
     if (GbpController::getInstance().getWheelRotatedAwayZoomIn()==true) {
         ui->wheelZoomInRadioButton->setChecked(true);
     } else {
-        ui->wheelZoomInRadioButton->setChecked(false);
+        ui->wheelZoomOutRadioButton->setChecked(true);
     }
 
     // show Y=0 line
@@ -238,6 +284,11 @@ void OptionsDialog::slotPrepareContent()
     } else {
         ui->todaySpecificRadioButton->setFocus();
     }
+
+    // Keep the settings as displayed, to detect changes not saved yet
+    originalValues = collectFormValues();
+    fillingForm = false;
+    contentHasChanged(false);   // only "Close" at first
 }
 
 
@@ -247,39 +298,8 @@ void OptionsDialog::on_applyPushButton_clicked()
 {
     LOG_INFO("Options Dialog : \"Save\" requested by user");
 
-    // For the parameters for which the values are stored directly in widgets,
-    // get the current values as currently entered in the form
-    bool newUseSystemDateForToday = ui->todaySystemRadioButton->isChecked();
-    QDate newCustomTodayDate = ui->todayDateEdit->date();
-    bool newUseSystemFont = ui->systemFontRadioButton->isChecked();
-    bool newAllowDecorationColor = ui->allowDecorationColorCheckBox->isChecked();
-    bool newExportTextNumberLocalized = ui->exportTextAmountLocalizedCheckBox->isChecked();
-    bool newExportTextDateLocalized = ui->exportTextDateLocalizedCheckBox->isChecked();
-    bool newUsePv = ui->usePresentValueCheckBox->isChecked();
-    double newDiscountrate = ui->pvDiscountRateDoubleSpinBox->value();
-    bool newShowTooltips = ui->tooltipsCheckBox->isChecked();
-    uint newChartPointSize = ui->pointSizeSpinBox->value();
-    uint newMainChartScaling = ui->scalingMainChartSpinBox->value();
-    bool newWheelZoomIn = ui->wheelZoomInRadioButton->isChecked();
-    bool newShowYzeroLine = ui->showYzeroLineCheckBox->isChecked();
-    uint newXAxisDateFormat = 0;
-    if( ui->xAxisDateLocaleRadioButton->isChecked()==true){
-        newXAxisDateFormat = 0;
-    } else if (ui->xAxisDateIsoRadioButton->isChecked()==true){
-        newXAxisDateFormat = 1;
-    } else if (ui->xAxisDateIsoTwoDigitsRadioButton->isChecked()==true){
-        newXAxisDateFormat = 2;
-    }
-
-    // get chart theming
-    GbpController::ChartTheming newChartTheming;
-    if (ui->chartThemingLightRadioButton->isChecked()==true) {
-        newChartTheming = GbpController::ChartTheming::FORCE_LIGHT;
-    } else if(ui->chartThemingDarkRadioButton->isChecked()==true) {
-        newChartTheming = GbpController::ChartTheming::FORCE_DARK;
-    } else {
-        newChartTheming = GbpController::ChartTheming::FOLLOW_DESKTOP_THEME;
-    }
+    // Get all the settings as currently defined in the form
+    FormValues v = collectFormValues();
 
 
     // *** DETERMINE IMPACTS OF CHOICES MADE ***
@@ -288,18 +308,19 @@ void OptionsDialog::on_applyPushButton_clicked()
     OptionsChangesImpact impact = {.data=DATA_UNCHANGED, .chart_scaling=CHART_SCALING_NONE,
         .decorationColorStreamDef=DECO_NONE, .mouseWheelZoom=WHEEL_ZOOM_NONE,
         .charts_theme=CHARTS_THEME_NONE, .yzeroLine = Y_ZERO_LINE_NONE,
-        .xaxisDateFormat=XAXIS_DATE_FORMAT_NONE, .incomeExpenseColor=IECOLOR_UNCHANGED};
+        .xaxisDateFormat=XAXIS_DATE_FORMAT_NONE, .incomeExpenseColor=IECOLOR_UNCHANGED,
+        .pointLimit=POINT_LIMIT_NONE};
 
     // determine impact of options changes for data. All data have to be recalculated if PV changes
-    if ( (newUsePv != GbpController::getInstance().getUsePresentValue()) ||
-        ( (newUsePv==true) &&
-        (newDiscountrate!=GbpController::getInstance().getPvDiscountRate()) )  ) {
+    if ( (v.usePresentValue != GbpController::getInstance().getUsePresentValue()) ||
+        ( (v.usePresentValue==true) &&
+        (v.pvDiscountRate!=GbpController::getInstance().getPvDiscountRate()) )  ) {
         // All data need to be recalculated, charts completely rebuilt
         impact.data = DATA_RECALCULATE;
     }
 
     // determine impact of options changes on Cash Balance chart scaling (overscaling factor).
-    if (newMainChartScaling !=
+    if (v.percentageMainChartScaling !=
             GbpController::getInstance().getPercentageMainChartScaling()  ) {
         // Data stay the same but chart must be rescaled
         impact.chart_scaling = CHART_SCALING_RESCALE;
@@ -307,18 +328,18 @@ void OptionsDialog::on_applyPushButton_clicked()
 
     // determine impact of options changes on charts theme (overscaling factor).
     if  (
-        ( newChartTheming != GbpController::getInstance().getChartTheming() ) ||
-        ( darkModeCurveColor != GbpController::getInstance().getDarkModeCurveColor() ) ||
-        ( lightModeCurveColor != GbpController::getInstance().getLightModeCurveColor() ) ||
-        ( darkModePointColor != GbpController::getInstance().getDarkModePointColor() ) ||
-        ( lightModePointColor != GbpController::getInstance().getLightModePointColor() ) ||
-        ( darkModeSelectedPointColor !=
+        ( v.chartTheming != GbpController::getInstance().getChartTheming() ) ||
+        ( v.darkModeCurveColor != GbpController::getInstance().getDarkModeCurveColor() ) ||
+        ( v.lightModeCurveColor != GbpController::getInstance().getLightModeCurveColor() ) ||
+        ( v.darkModePointColor != GbpController::getInstance().getDarkModePointColor() ) ||
+        ( v.lightModePointColor != GbpController::getInstance().getLightModePointColor() ) ||
+        ( v.darkModeSelectedPointColor !=
             GbpController::getInstance().getDarkModeSelectedPointColor() ) ||
-        ( lightModeSelectedPointColor !=
+        ( v.lightModeSelectedPointColor !=
             GbpController::getInstance().getLightModeSelectedPointColor() ) ||
-        ( newChartPointSize != GbpController::getInstance().getChartPointSize() ) ||
-        ( gridlinesDarkModeColor != GbpController::getInstance().getGridlinesDarkModeColor() ) ||
-        ( gridlinesLightModeColor != GbpController::getInstance().getGridlinesLightModeColor() ) )
+        ( v.chartPointSize != GbpController::getInstance().getChartPointSize() ) ||
+        ( v.gridlinesDarkModeColor != GbpController::getInstance().getGridlinesDarkModeColor() ) ||
+        ( v.gridlinesLightModeColor != GbpController::getInstance().getGridlinesLightModeColor() ) )
         {
         // Data and chart's scaling stay the same : just redraw charts with different
         // colors or background
@@ -326,48 +347,54 @@ void OptionsDialog::on_applyPushButton_clicked()
     }
 
     // determine impact for decorationsd names) change
-    if (newAllowDecorationColor != GbpController::getInstance().getAllowDecorationColor()){
+    if (v.allowDecorationColor != GbpController::getInstance().getAllowDecorationColor()){
         impact.decorationColorStreamDef = DECO_REFRESH;
     }
 
     // determine impact for wheel mouse zooming behavior
-    if (newWheelZoomIn != GbpController::getInstance().getWheelRotatedAwayZoomIn()){
+    if (v.wheelRotatedAwayZoomIn != GbpController::getInstance().getWheelRotatedAwayZoomIn()){
         impact.mouseWheelZoom = WHEEL_ZOOM_REFRESH;
     }
 
     // determine impact for "show line at Y=0"
-    if (newShowYzeroLine != GbpController::getInstance().getShowYzeroLine()){
+    if (v.showYzeroLine != GbpController::getInstance().getShowYzeroLine()){
         impact.yzeroLine = Y_ZERO_LINE_REFRESH;
     }
 
     // determine impact for "Y=0 line color"
-    if (yZeroLineDarkModeColor != GbpController::getInstance().getYZeroLineDarkModeColor()){
+    if (v.yZeroLineDarkModeColor != GbpController::getInstance().getYZeroLineDarkModeColor()){
         impact.yzeroLine = Y_ZERO_LINE_REFRESH;
     }
-    if (yZeroLineLightModeColor != GbpController::getInstance().getYZeroLineLightModeColor()){
+    if (v.yZeroLineLightModeColor != GbpController::getInstance().getYZeroLineLightModeColor()){
         impact.yzeroLine = Y_ZERO_LINE_REFRESH;
     }
 
     // determine impact for "x-Axis Date Format"
-    if (newXAxisDateFormat != GbpController::getInstance().getXAxisDateFormat()){
+    if (v.xAxisDateFormat != GbpController::getInstance().getXAxisDateFormat()){
         impact.xaxisDateFormat = XAXIS_DATE_FORMAT_REFRESH;
     }
 
     // determine impact for incomes / expenses colors
-    if (incomeColor != GbpController::getInstance().getIncomeColor()){
+    if (v.incomeColor != GbpController::getInstance().getIncomeColor()){
         impact.incomeExpenseColor = IE_COLOR_REFRESH;
     }
-    if (expenseColor != GbpController::getInstance().getExpenseColor()){
+    if (v.expenseColor != GbpController::getInstance().getExpenseColor()){
         impact.incomeExpenseColor = IE_COLOR_REFRESH;
+    }
+
+    // determine impact for the max number of points shown in charts
+    if (v.chartMaxPoints != GbpController::getInstance().getChartMaxPoints()){
+        impact.pointLimit = POINT_LIMIT_REFRESH;
     }
 
     // *** WARN USER SECTION ***
 
     // if custom font selected, a choice must have been made
-    if ( newUseSystemFont==false) {
-        if ( newCustomFontString.length() == 0 ){
+    if ( v.useDefaultSystemFont==false) {
+        if ( v.customApplicationFont.length() == 0 ){
             GbpQMessage::messageBoxQuestion(nullptr, GbpQMessage::Type::ERROR, tr("Error"),
-                tr("You must choose a custom font if you don't use the default system font"), {tr("OK")}, 0, 0);
+                tr("You must choose a custom font if you don't use the default system font"),
+                {tr("OK")}, 0, 0);
             LOG_DEBUG_INFO("Options Dialog : Aborted : Custom Font not selected");
             return;
         }
@@ -377,9 +404,9 @@ void OptionsDialog::on_applyPushButton_clicked()
     QStringList changesRequiringStart;
 
     // if application font has changed, warn user the app has to be restarted
-    if ( (GbpController::getInstance().getUseDefaultSystemFont() != newUseSystemFont) ||
-        ( (newUseSystemFont==false) &&
-        (GbpController::getInstance().getCustomApplicationFont() != newCustomFontString) ) ) {
+    if ( (GbpController::getInstance().getUseDefaultSystemFont() != v.useDefaultSystemFont) ||
+        ( (v.useDefaultSystemFont==false) &&
+        (GbpController::getInstance().getCustomApplicationFont() != v.customApplicationFont) ) ) {
 
         warnUserAppRestartRequired = true;
         changesRequiringStart.append(tr("Application font setting has changed."));
@@ -390,16 +417,16 @@ void OptionsDialog::on_applyPushButton_clicked()
     // warn user the app has to be restarted
     QString oldCustomDateString = GbpController::getInstance().getTodayCustomDate().toString(
         Qt::DateFormat::ISODate);
-    QString newCustomDateString = newCustomTodayDate.toString(Qt::DateFormat::ISODate);
-    if ( GbpController::getInstance().getTodayUseSystemDate() != newUseSystemDateForToday ) {
+    QString newCustomDateString = v.todayCustomDate.toString(Qt::DateFormat::ISODate);
+    if ( GbpController::getInstance().getTodayUseSystemDate() != v.todayUseSystemDate ) {
         warnUserAppRestartRequired = true;
         changesRequiringStart.append(tr("Today's date settings have changed."));
         LOG_INFO(
             QString("    * Today's date settings have changed, restart required : new value is : "
-            " Use System date = %1").arg(newUseSystemDateForToday) );
+            " Use System date = %1").arg(v.todayUseSystemDate) );
 
-    } else if ( (newUseSystemDateForToday==false) &&
-        (GbpController::getInstance().getTodayCustomDate() != newCustomTodayDate) ){
+    } else if ( (v.todayUseSystemDate==false) &&
+        (GbpController::getInstance().getTodayCustomDate() != v.todayCustomDate) ){
         warnUserAppRestartRequired = true;
         changesRequiringStart.append(tr("Today's replacement date has changed."));
         LOG_INFO(
@@ -409,23 +436,23 @@ void OptionsDialog::on_applyPushButton_clicked()
     }
 
     // if income color has changed, warn user the app has to be restarted
-    if ( GbpController::getInstance().getIncomeColor() != incomeColor  ) {
+    if ( GbpController::getInstance().getIncomeColor() != v.incomeColor  ) {
         warnUserAppRestartRequired = true;
         changesRequiringStart.append(tr("Income color has changed."));
         LOG_INFO( QString("    * Income color has changed to %1, restart required")
-            .arg(incomeColor.name(QColor::HexRgb)));
+            .arg(v.incomeColor.name(QColor::HexRgb)));
     }
 
     // if expense color has changed, warn user the app has to be restarted
-    if ( GbpController::getInstance().getExpenseColor() != expenseColor  ) {
+    if ( GbpController::getInstance().getExpenseColor() != v.expenseColor  ) {
         warnUserAppRestartRequired = true;
         changesRequiringStart.append(tr("Expense color has changed."));
         LOG_INFO( QString("    * Expense color has changed to %1, restart required")
-            .arg(expenseColor.name(QColor::HexRgb)));
+            .arg(v.expenseColor.name(QColor::HexRgb)));
     }
 
     // check tooltips show status
-    if ( GbpController::getInstance().getShowTooltips() != newShowTooltips ) {
+    if ( GbpController::getInstance().getShowTooltips() != v.showTooltips ) {
         warnUserAppRestartRequired = true;
         changesRequiringStart.append(tr("Show tooltips setting has changed."));
         LOG_INFO("   * Show tooltips have been modified, restart required");
@@ -443,77 +470,77 @@ void OptionsDialog::on_applyPushButton_clicked()
 
     LOG_INFO("    => All settings have been saved on disk as requested by user. New values are :");
     LOG_INFO(QString("    Impact : data=%1 chart_scaling=%2 deco=%3 charts theme=%4 y_zero_line=%5 "
-        "x_axis_date_format=%6 income_expense_color=%7")
+        "x_axis_date_format=%6 income_expense_color=%7 point_limit=%8")
         .arg(impact.data).arg(impact.chart_scaling).arg(impact.decorationColorStreamDef)
         .arg(impact.charts_theme).arg(impact.yzeroLine).arg(impact.xaxisDateFormat)
-        .arg(impact.incomeExpenseColor));
+        .arg(impact.incomeExpenseColor).arg(impact.pointLimit));
 
     LOG_INFO( QString("    ChartTheming = %1 %2")
-        .arg(GbpController::chartThemingToString(newChartTheming))
-        .arg( (newChartTheming!=GbpController::getInstance().getChartTheming())?(
+        .arg(GbpController::chartThemingToString(v.chartTheming))
+        .arg( (v.chartTheming!=GbpController::getInstance().getChartTheming())?(
             "(CHANGED)"):("")));
 
-    LOG_INFO( QString("    ChartPointSize = %1 %2").arg(newChartPointSize)
-        .arg( (newChartPointSize!=GbpController::getInstance()
+    LOG_INFO( QString("    ChartPointSize = %1 %2").arg(v.chartPointSize)
+        .arg( (v.chartPointSize!=GbpController::getInstance()
         .getChartPointSize())?("(CHANGED)"):("")));
 
     LOG_INFO( QString("    DarkModeCurveColor = %1 %2")
-        .arg(darkModeCurveColor.name(QColor::HexRgb))
-        .arg((darkModeCurveColor!=GbpController::getInstance().getDarkModeCurveColor())?
+        .arg(v.darkModeCurveColor.name(QColor::HexRgb))
+        .arg((v.darkModeCurveColor!=GbpController::getInstance().getDarkModeCurveColor())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    DarkModePointColor = %1 %2")
-        .arg(darkModePointColor.name(QColor::HexRgb))
-        .arg((darkModePointColor!=GbpController::getInstance().getDarkModePointColor())?
+        .arg(v.darkModePointColor.name(QColor::HexRgb))
+        .arg((v.darkModePointColor!=GbpController::getInstance().getDarkModePointColor())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    DarkModeSelectedPointColor = %1 %2")
-        .arg(darkModeSelectedPointColor.name(QColor::HexRgb))
-        .arg((darkModeSelectedPointColor!=GbpController::getInstance()
+        .arg(v.darkModeSelectedPointColor.name(QColor::HexRgb))
+        .arg((v.darkModeSelectedPointColor!=GbpController::getInstance()
             .getDarkModeSelectedPointColor())?("(CHANGED)"):("")));
 
     LOG_INFO( QString("    LightModeCurveColor = %1 %2")
-        .arg(lightModeCurveColor.name(QColor::HexRgb))
-        .arg((lightModeCurveColor!=GbpController::getInstance().getLightModeCurveColor())?
+        .arg(v.lightModeCurveColor.name(QColor::HexRgb))
+        .arg((v.lightModeCurveColor!=GbpController::getInstance().getLightModeCurveColor())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    LightModePointColor = %1 %2")
-        .arg(lightModePointColor.name(QColor::HexRgb))
-        .arg((lightModePointColor!=GbpController::getInstance().getLightModePointColor())?
+        .arg(v.lightModePointColor.name(QColor::HexRgb))
+        .arg((v.lightModePointColor!=GbpController::getInstance().getLightModePointColor())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    LightModeSelectedPointColor = %1 %2")
-        .arg(lightModeSelectedPointColor.name(QColor::HexRgb))
-        .arg((lightModeSelectedPointColor!=GbpController::getInstance()
+        .arg(v.lightModeSelectedPointColor.name(QColor::HexRgb))
+        .arg((v.lightModeSelectedPointColor!=GbpController::getInstance()
             .getLightModeSelectedPointColor())?("(CHANGED)"):("")));
 
     LOG_INFO( QString("    ExportTextNumberLocalized = %1 %2")
-        .arg(newExportTextNumberLocalized)
-        .arg((newExportTextNumberLocalized!=GbpController::getInstance().
+        .arg(v.exportTextNumberLocalized)
+        .arg((v.exportTextNumberLocalized!=GbpController::getInstance().
             getExportTextNumberLocalized())?("(CHANGED)"):("")));
 
     LOG_INFO( QString("    ExportTextDateLocalized = %1 %2")
-        .arg(newExportTextDateLocalized)
-        .arg((newExportTextDateLocalized!=GbpController::getInstance()
+        .arg(v.exportTextDateLocalized)
+        .arg((v.exportTextDateLocalized!=GbpController::getInstance()
             .getExportTextDateLocalized())?("(CHANGED)"):("")));
 
     LOG_INFO( QString("    PercentageMainChartScaling = %1 %2")
-        .arg(newMainChartScaling)
-        .arg((newMainChartScaling!=GbpController::getInstance().getPercentageMainChartScaling())?
-            ("(CHANGED)"):("")));
+        .arg(v.percentageMainChartScaling)
+        .arg((v.percentageMainChartScaling!=
+            GbpController::getInstance().getPercentageMainChartScaling())?("(CHANGED)"):("")));
 
-    LOG_INFO( QString("    UseDefaultSystemFont = %1 %2").arg(newUseSystemFont)
-        .arg((newUseSystemFont != GbpController::getInstance().getUseDefaultSystemFont())?
+    LOG_INFO( QString("    UseDefaultSystemFont = %1 %2").arg(v.useDefaultSystemFont)
+        .arg((v.useDefaultSystemFont != GbpController::getInstance().getUseDefaultSystemFont())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    CustomApplicationFont = %1 %2")
-        .arg(newCustomFontString)
-        .arg((newCustomFontString!=GbpController::getInstance().getCustomApplicationFont())?
+        .arg(v.customApplicationFont)
+        .arg((v.customApplicationFont!=GbpController::getInstance().getCustomApplicationFont())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    UseSystemDateForToday = %1 %2")
-        .arg(newUseSystemDateForToday)
-        .arg((newUseSystemDateForToday!=GbpController::getInstance()
+        .arg(v.todayUseSystemDate)
+        .arg((v.todayUseSystemDate!=GbpController::getInstance()
             .getTodayUseSystemDate())?("(CHANGED)"):("")));
 
     LOG_INFO( QString("    CustomTodayDate = %1 %2")
@@ -521,98 +548,106 @@ void OptionsDialog::on_applyPushButton_clicked()
         .arg((oldCustomDateString!=newCustomDateString)?("(CHANGED)"):("")));
 
     LOG_INFO( QString("    AllowDecorationColor = %1 %2")
-        .arg(newAllowDecorationColor)
-        .arg((newAllowDecorationColor!=GbpController::getInstance().getAllowDecorationColor())?
+        .arg(v.allowDecorationColor)
+        .arg((v.allowDecorationColor!=GbpController::getInstance().getAllowDecorationColor())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    UsePresentValue = %1 %2")
-        .arg(newUsePv)
-        .arg((newUsePv!=GbpController::getInstance().getUsePresentValue())?("(CHANGED)"):("")));
+        .arg(v.usePresentValue)
+        .arg((v.usePresentValue!=GbpController::getInstance().getUsePresentValue())?
+            ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    pvDiscountrate = %1 %2")
-        .arg(newDiscountrate)
-        .arg((newDiscountrate!=GbpController::getInstance().getPvDiscountRate())?
+        .arg(v.pvDiscountRate)
+        .arg((v.pvDiscountRate!=GbpController::getInstance().getPvDiscountRate())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    ShowTooltips = %1 %2")
-        .arg(newShowTooltips)
-        .arg((newShowTooltips!=GbpController::getInstance().getShowTooltips())?("(CHANGED)"):("")));
+        .arg(v.showTooltips)
+        .arg((v.showTooltips!=GbpController::getInstance().getShowTooltips())?("(CHANGED)"):("")));
 
     LOG_INFO( QString("    WheelRotatedAwayZoomIn = %1 %2")
-        .arg(newWheelZoomIn)
-        .arg((newWheelZoomIn!=GbpController::getInstance().getWheelRotatedAwayZoomIn())?
+        .arg(v.wheelRotatedAwayZoomIn)
+        .arg((v.wheelRotatedAwayZoomIn!=GbpController::getInstance().getWheelRotatedAwayZoomIn())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    ShowYzeroLine = %1 %2")
-        .arg(newShowYzeroLine)
-        .arg((newShowYzeroLine!=GbpController::getInstance().getShowYzeroLine())?
+        .arg(v.showYzeroLine)
+        .arg((v.showYzeroLine!=GbpController::getInstance().getShowYzeroLine())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    yZeroLineDarkModeColor = %1 %2")
-        .arg(yZeroLineDarkModeColor.name(QColor::HexRgb))
-        .arg((yZeroLineDarkModeColor!=GbpController::getInstance().getYZeroLineDarkModeColor())?
+        .arg(v.yZeroLineDarkModeColor.name(QColor::HexRgb))
+        .arg((v.yZeroLineDarkModeColor!=GbpController::getInstance().getYZeroLineDarkModeColor())?
             ("(CHANGED)"):("")));
 
-    LOG_INFO( QString("    yZeroLineLightModeColor = %1 %2").arg(yZeroLineLightModeColor.name(QColor::HexRgb))
-        .arg((yZeroLineLightModeColor!=GbpController::getInstance().getYZeroLineLightModeColor())?
+    LOG_INFO( QString("    yZeroLineLightModeColor = %1 %2")
+        .arg(v.yZeroLineLightModeColor.name(QColor::HexRgb))
+        .arg((v.yZeroLineLightModeColor!=GbpController::getInstance().getYZeroLineLightModeColor())?
         ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    gridlinesDarkModeColor = %1 %2")
-        .arg(gridlinesDarkModeColor.name(QColor::HexRgb))
-        .arg((gridlinesDarkModeColor!=GbpController::getInstance().getGridlinesDarkModeColor())?
+        .arg(v.gridlinesDarkModeColor.name(QColor::HexRgb))
+        .arg((v.gridlinesDarkModeColor!=GbpController::getInstance().getGridlinesDarkModeColor())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    gridlinesLightModeColor = %1 %2")
-        .arg(gridlinesLightModeColor.name(QColor::HexRgb))
-        .arg((gridlinesLightModeColor!=GbpController::getInstance().getGridlinesLightModeColor())?
+        .arg(v.gridlinesLightModeColor.name(QColor::HexRgb))
+        .arg((v.gridlinesLightModeColor!=GbpController::getInstance().getGridlinesLightModeColor())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    XAxis Date Format = %1 %2")
-        .arg(newXAxisDateFormat)
-        .arg((newXAxisDateFormat!=GbpController::getInstance().getXAxisDateFormat())?
+        .arg(v.xAxisDateFormat)
+        .arg((v.xAxisDateFormat!=GbpController::getInstance().getXAxisDateFormat())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    Income Color = %1 %2")
-        .arg(incomeColor.name(QColor::HexRgb))
-        .arg((incomeColor!=GbpController::getInstance().getIncomeColor())?
+        .arg(v.incomeColor.name(QColor::HexRgb))
+        .arg((v.incomeColor!=GbpController::getInstance().getIncomeColor())?
             ("(CHANGED)"):("")));
 
     LOG_INFO( QString("    Expense Color = %1 %2")
-        .arg(expenseColor.name(QColor::HexRgb))
-        .arg((expenseColor!=GbpController::getInstance().getExpenseColor())?
+        .arg(v.expenseColor.name(QColor::HexRgb))
+        .arg((v.expenseColor!=GbpController::getInstance().getExpenseColor())?
             ("(CHANGED)"):("")));
+
+    LOG_INFO( QString("    ChartMaxPoints = %1 %2").arg(v.chartMaxPoints)
+                 .arg( (v.chartMaxPoints!=GbpController::getInstance()
+                                                .getChartMaxPoints())?("(CHANGED)"):("")));
+
 
     // *** RECORD NEW VALUES IN THE SETTING ***
     // Update everything even if not changed
 
-    GbpController::getInstance().setChartTheming(newChartTheming);
-    GbpController::getInstance().setChartPointSize(newChartPointSize);
-    GbpController::getInstance().setDarkModeCurveColor(darkModeCurveColor);
-    GbpController::getInstance().setDarkModePointColor(darkModePointColor);
-    GbpController::getInstance().setDarkModeSelectedPointColor(darkModeSelectedPointColor);
-    GbpController::getInstance().setLightModeCurveColor(lightModeCurveColor);
-    GbpController::getInstance().setLightModePointColor(lightModePointColor);
-    GbpController::getInstance().setLightModeSelectedPointColor(lightModeSelectedPointColor);
-    GbpController::getInstance().setExportTextNumberLocalized(newExportTextNumberLocalized);
-    GbpController::getInstance().setExportTextDateLocalized(newExportTextDateLocalized);
-    GbpController::getInstance().setPercentageMainChartScaling(newMainChartScaling);
-    GbpController::getInstance().setUseDefaultSystemFont(newUseSystemFont);
-    GbpController::getInstance().setCustomApplicationFont(newCustomFontString);
-    GbpController::getInstance().setAllowDecorationColor(newAllowDecorationColor);
-    GbpController::getInstance().setTodayUseSystemDate(newUseSystemDateForToday);
-    GbpController::getInstance().setTodayCustomDate(newCustomTodayDate);
-    GbpController::getInstance().setPvDiscountRate(newDiscountrate);
-    GbpController::getInstance().setUsePresentValue(newUsePv);
-    GbpController::getInstance().setWheelRotatedAwayZoomIn(newWheelZoomIn);
-    GbpController::getInstance().setShowYzeroLine(newShowYzeroLine);
-    GbpController::getInstance().setYZeroLineDarkModeColor(yZeroLineDarkModeColor);
-    GbpController::getInstance().setYZeroLineLightModeColor(yZeroLineLightModeColor);
-    GbpController::getInstance().setGridlinesDarkModeColor(gridlinesDarkModeColor);
-    GbpController::getInstance().setGridlinesLightModeColor(gridlinesLightModeColor);
-    GbpController::getInstance().setXAxisDateFormat(newXAxisDateFormat);
-    GbpController::getInstance().setShowTooltips(newShowTooltips);
-    GbpController::getInstance().setIncomeColor(incomeColor);
-    GbpController::getInstance().setExpenseColor(expenseColor);
+    GbpController::getInstance().setChartTheming(v.chartTheming);
+    GbpController::getInstance().setChartPointSize(v.chartPointSize);
+    GbpController::getInstance().setDarkModeCurveColor(v.darkModeCurveColor);
+    GbpController::getInstance().setDarkModePointColor(v.darkModePointColor);
+    GbpController::getInstance().setDarkModeSelectedPointColor(v.darkModeSelectedPointColor);
+    GbpController::getInstance().setLightModeCurveColor(v.lightModeCurveColor);
+    GbpController::getInstance().setLightModePointColor(v.lightModePointColor);
+    GbpController::getInstance().setLightModeSelectedPointColor(v.lightModeSelectedPointColor);
+    GbpController::getInstance().setExportTextNumberLocalized(v.exportTextNumberLocalized);
+    GbpController::getInstance().setExportTextDateLocalized(v.exportTextDateLocalized);
+    GbpController::getInstance().setPercentageMainChartScaling(v.percentageMainChartScaling);
+    GbpController::getInstance().setUseDefaultSystemFont(v.useDefaultSystemFont);
+    GbpController::getInstance().setCustomApplicationFont(v.customApplicationFont);
+    GbpController::getInstance().setAllowDecorationColor(v.allowDecorationColor);
+    GbpController::getInstance().setTodayUseSystemDate(v.todayUseSystemDate);
+    GbpController::getInstance().setTodayCustomDate(v.todayCustomDate);
+    GbpController::getInstance().setPvDiscountRate(v.pvDiscountRate);
+    GbpController::getInstance().setUsePresentValue(v.usePresentValue);
+    GbpController::getInstance().setWheelRotatedAwayZoomIn(v.wheelRotatedAwayZoomIn);
+    GbpController::getInstance().setShowYzeroLine(v.showYzeroLine);
+    GbpController::getInstance().setYZeroLineDarkModeColor(v.yZeroLineDarkModeColor);
+    GbpController::getInstance().setYZeroLineLightModeColor(v.yZeroLineLightModeColor);
+    GbpController::getInstance().setGridlinesDarkModeColor(v.gridlinesDarkModeColor);
+    GbpController::getInstance().setGridlinesLightModeColor(v.gridlinesLightModeColor);
+    GbpController::getInstance().setXAxisDateFormat(v.xAxisDateFormat);
+    GbpController::getInstance().setShowTooltips(v.showTooltips);
+    GbpController::getInstance().setIncomeColor(v.incomeColor);
+    GbpController::getInstance().setExpenseColor(v.expenseColor);
+    GbpController::getInstance().setChartMaxPoints(v.chartMaxPoints);
 
     GbpController::getInstance().saveSettings();
     LOG_INFO("Options Dialog : \"Save\" request completed successfully" );
@@ -624,7 +659,14 @@ void OptionsDialog::on_applyPushButton_clicked()
 }
 
 
+// Changes not saved : discard them and close
 void OptionsDialog::on_cancelPushButton_clicked()
+{
+    on_closePushButton_clicked();
+}
+
+
+void OptionsDialog::on_closePushButton_clicked()
 {
     this->hide();
     emit signalOptionsCompleted();
@@ -701,6 +743,8 @@ void OptionsDialog::setColorInfo(ColorItem item, QColor theColor)
 
     pushButton->setStyleSheet(COLOR_STYLE.arg(theColor.name()));
     label->setText(Util::buildColorDisplayName(theColor));
+
+    updateContentChanged();
 }
 
 
@@ -789,6 +833,8 @@ void OptionsDialog::setCustomFontlabel(QString fontLabel)
 {
     QString widgetString = QString(tr("Custom : %1")).arg(fontLabel);
     ui->customFontRadioButton->setText(widgetString);
+
+    updateContentChanged();
 }
 
 
@@ -1129,8 +1175,13 @@ void OptionsDialog::on_resetPushButton_clicked()
     setColorInfo(CI_EXPENSE_COLOR, expenseColor);
 
     ui->pointSizeSpinBox->setValue(fs.chartPointSize);
+    ui->maxPointsSpinBox->setValue(fs.chartMaxPoints);
     ui->scalingMainChartSpinBox->setValue(fs.percentageMainChartScaling);
-    ui->wheelZoomInRadioButton->setChecked(fs.wheelRotatedAwayZoomIn);
+    if (fs.wheelRotatedAwayZoomIn==true) {
+        ui->wheelZoomInRadioButton->setChecked(true);
+    } else {
+        ui->wheelZoomOutRadioButton->setChecked(true);
+    }
     ui->showYzeroLineCheckBox->setChecked(fs.showYzeroLine);
     switch(fs.xAxisDateFormat){
         case 0:
@@ -1172,6 +1223,150 @@ void OptionsDialog::on_resetPushButton_clicked()
     setColorInfo(CI_YZERO_LINE_LT, yZeroLineLightModeColor);
     yZeroLineDarkModeColor = fs.yZeroLineDarkModeColor;
     setColorInfo(CI_YZERO_LINE_DT, fs.yZeroLineDarkModeColor);
+    gridlinesDarkModeColor = fs.gridlinesDarkModeColor;
+    setColorInfo(CI_GRIDLINES_DT, gridlinesDarkModeColor);
+    gridlinesLightModeColor = fs.gridlinesLightModeColor;
+    setColorInfo(CI_GRIDLINES_LT, gridlinesLightModeColor);
+
+    // also reset the values greyed out by the choices above (used again if re-enabled)
+    ui->pvDiscountRateDoubleSpinBox->setValue(fs.pvDiscountRate);
+    ui->todayDateEdit->setDate(fs.todayCustomDate);
+}
+
+
+OptionsDialog::FormValues OptionsDialog::collectFormValues() const
+{
+    FormValues v;
+
+    // values stored directly in widgets
+    v.todayUseSystemDate = ui->todaySystemRadioButton->isChecked();
+    v.todayCustomDate = ui->todayDateEdit->date();
+    v.useDefaultSystemFont = ui->systemFontRadioButton->isChecked();
+    v.allowDecorationColor = ui->allowDecorationColorCheckBox->isChecked();
+    v.exportTextNumberLocalized = ui->exportTextAmountLocalizedCheckBox->isChecked();
+    v.exportTextDateLocalized = ui->exportTextDateLocalizedCheckBox->isChecked();
+    v.usePresentValue = ui->usePresentValueCheckBox->isChecked();
+    v.pvDiscountRate = ui->pvDiscountRateDoubleSpinBox->value();
+    v.showTooltips = ui->tooltipsCheckBox->isChecked();
+    v.chartPointSize = ui->pointSizeSpinBox->value();
+    v.chartMaxPoints = ui->maxPointsSpinBox->value();
+    v.percentageMainChartScaling = ui->scalingMainChartSpinBox->value();
+    v.wheelRotatedAwayZoomIn = ui->wheelZoomInRadioButton->isChecked();
+    v.showYzeroLine = ui->showYzeroLineCheckBox->isChecked();
+    v.xAxisDateFormat = 0;
+    if( ui->xAxisDateLocaleRadioButton->isChecked()==true){
+        v.xAxisDateFormat = 0;
+    } else if (ui->xAxisDateIsoRadioButton->isChecked()==true){
+        v.xAxisDateFormat = 1;
+    } else if (ui->xAxisDateIsoTwoDigitsRadioButton->isChecked()==true){
+        v.xAxisDateFormat = 2;
+    }
+    if (ui->chartThemingLightRadioButton->isChecked()==true) {
+        v.chartTheming = GbpController::ChartTheming::FORCE_LIGHT;
+    } else if(ui->chartThemingDarkRadioButton->isChecked()==true) {
+        v.chartTheming = GbpController::ChartTheming::FORCE_DARK;
+    } else {
+        v.chartTheming = GbpController::ChartTheming::FOLLOW_DESKTOP_THEME;
+    }
+
+    // values kept in explicit variables
+    v.customApplicationFont = newCustomFontString;
+    v.darkModeCurveColor = darkModeCurveColor;
+    v.darkModePointColor = darkModePointColor;
+    v.darkModeSelectedPointColor = darkModeSelectedPointColor;
+    v.lightModeCurveColor = lightModeCurveColor;
+    v.lightModePointColor = lightModePointColor;
+    v.lightModeSelectedPointColor = lightModeSelectedPointColor;
+    v.yZeroLineDarkModeColor = yZeroLineDarkModeColor;
+    v.yZeroLineLightModeColor = yZeroLineLightModeColor;
+    v.gridlinesDarkModeColor = gridlinesDarkModeColor;
+    v.gridlinesLightModeColor = gridlinesLightModeColor;
+    v.incomeColor = incomeColor;
+    v.expenseColor = expenseColor;
+
+    return v;
+}
+
+
+bool OptionsDialog::FormValues::operator==(const FormValues &o) const
+{
+    if ( (chartTheming != o.chartTheming) ||
+        (chartPointSize != o.chartPointSize) ||
+        (chartMaxPoints != o.chartMaxPoints) ||
+        (percentageMainChartScaling != o.percentageMainChartScaling) ||
+        (darkModeCurveColor != o.darkModeCurveColor) ||
+        (darkModePointColor != o.darkModePointColor) ||
+        (darkModeSelectedPointColor != o.darkModeSelectedPointColor) ||
+        (lightModeCurveColor != o.lightModeCurveColor) ||
+        (lightModePointColor != o.lightModePointColor) ||
+        (lightModeSelectedPointColor != o.lightModeSelectedPointColor) ||
+        (yZeroLineDarkModeColor != o.yZeroLineDarkModeColor) ||
+        (yZeroLineLightModeColor != o.yZeroLineLightModeColor) ||
+        (gridlinesDarkModeColor != o.gridlinesDarkModeColor) ||
+        (gridlinesLightModeColor != o.gridlinesLightModeColor) ||
+        (incomeColor != o.incomeColor) ||
+        (expenseColor != o.expenseColor) ||
+        (exportTextNumberLocalized != o.exportTextNumberLocalized) ||
+        (exportTextDateLocalized != o.exportTextDateLocalized) ||
+        (useDefaultSystemFont != o.useDefaultSystemFont) ||
+        (todayUseSystemDate != o.todayUseSystemDate) ||
+        (allowDecorationColor != o.allowDecorationColor) ||
+        (usePresentValue != o.usePresentValue) ||
+        (wheelRotatedAwayZoomIn != o.wheelRotatedAwayZoomIn) ||
+        (showYzeroLine != o.showYzeroLine) ||
+        (xAxisDateFormat != o.xAxisDateFormat) ||
+        (showTooltips != o.showTooltips) ) {
+        return false;
+    }
+
+    // Values greyed out in the form are ignored (the "use" flags are equal at this point)
+    if ( (usePresentValue==true) && (pvDiscountRate != o.pvDiscountRate) ) {
+        return false;
+    }
+    if ( (todayUseSystemDate==false) && (todayCustomDate != o.todayCustomDate) ) {
+        return false;
+    }
+    if ( (useDefaultSystemFont==false) && (customApplicationFont != o.customApplicationFont) ) {
+        return false;
+    }
+    return true;
+}
+
+
+void OptionsDialog::contentHasChanged(bool v)
+{
+    // override the value, don't care if it is the same as the cost is negligible
+    contentChanged.set(v);
+
+    // Visual indicators : warning sign next to the buttons, "*" in the window title
+    ui->modifiedWarningLabel->setVisible(hasContentChanged());
+    setWindowModified(hasContentChanged());
+
+    // Update buttons to reflect the new situation
+    if (hasContentChanged()==true) {
+        ui->closePushButton->setVisible(false);
+        ui->cancelPushButton->setVisible(true);
+        ui->applyPushButton->setVisible(true);
+    } else {
+        ui->closePushButton->setVisible(true);
+        ui->cancelPushButton->setVisible(false);
+        ui->applyPushButton->setVisible(false);
+    }
+}
+
+
+bool OptionsDialog::hasContentChanged() const
+{
+    return contentChanged.get();
+}
+
+
+void OptionsDialog::updateContentChanged()
+{
+    if (fillingForm) {
+        return;     // form being filled : nothing to check
+    }
+    contentHasChanged( !(collectFormValues() == originalValues) );
 }
 
 

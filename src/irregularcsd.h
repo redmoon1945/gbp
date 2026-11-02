@@ -133,6 +133,8 @@ public:
 
     /**
      * @brief Generates a list of financial events from the properties of that IrregularCsd.
+     * @details Events occurring before tomorrow are ignored (they are in the past and the
+     * stream starts tomorrow), like in PeriodicCsd.
      * @param feStream FeStream to put the result in. It is reset before use. It is up
      * to the caller of this method to set the QWeakPointer to the proper Csd.
      * @param tomorrow The date of tomorrow.

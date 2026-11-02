@@ -23,6 +23,7 @@
 #include "util.h"
 #include "uiutil.h"
 #include <QCoreApplication>
+#include <QAbstractItemView>
 
 SelectCurrencyDialog::SelectCurrencyDialog(QLocale theLocale, QWidget *parent) :
     QDialog(parent),locale(theLocale),
@@ -38,6 +39,12 @@ SelectCurrencyDialog::SelectCurrencyDialog(QLocale theLocale, QWidget *parent) :
     for (auto it = currencies.constBegin(); it != currencies.constEnd(); ++it) {
         ui->currenciesComboBox->addItem(it.value(), it.key()); // userData = ISO code
     }
+    // Some styles (e.g. Fusion) show the list as a popup ignoring maxVisibleItems, which then
+    // takes the whole screen height. Force the drop-down list, limited to 15 items.
+    ui->currenciesComboBox->setStyleSheet("QComboBox { combobox-popup: 0; }");
+    ui->currenciesComboBox->setMaxVisibleItems(15);
+    // the list was created in popup mode, which turned its scroll bar off : turn it back on
+    ui->currenciesComboBox->view()->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     QFont appFont = QApplication::font();
 
@@ -79,8 +86,8 @@ void SelectCurrencyDialog::on_selectPushButton_clicked()
     if(!found){
         return; // should never happen
     }
-    emit signalSelectCountryResult(currInfo);
     hide();
+    emit signalSelectCountryResult(currInfo);
     emit signalSelectCountryCompleted();    // follow our pattern, even if in this case, this is useless
 }
 

@@ -182,6 +182,41 @@ EditPeriodicDialog::EditPeriodicDialog(QLocale aLocale, QWidget *parent) :
     QObject::connect(csdBreakdownDialog,
         &CsdBreakdownDialog::signalCompleted, this,
         &EditPeriodicDialog::slotCsdBreakdownCompleted);
+
+    // Change detection (edit mode only) for every field used to build the Csd. Decoration
+    // color and variable growth are not widgets : they are handled in their own slots.
+    QObject::connect(ui->nameLineEdit, &QLineEdit::textChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->descPlainTextEdit, &QPlainTextEdit::textChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->amountDoubleSpinBox, &QDoubleSpinBox::valueChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->periodComboBox, &QComboBox::currentIndexChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->periodMultiplierSpinBox, &QSpinBox::valueChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->fromDateEdit, &QDateEdit::dateChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->toDateEdit, &QDateEdit::dateChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->toScenarioRadioButton, &QRadioButton::toggled,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->activeYesRadioButton, &QRadioButton::toggled,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->growthComboBox, &QComboBox::currentIndexChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->growthTypeScenaroInflationDoubleSpinBox, &QDoubleSpinBox::valueChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->growthTypeCustomConstantDoubleSpinBox, &QDoubleSpinBox::valueChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+    QObject::connect(ui->gapSpinBox, &QSpinBox::valueChanged,
+        this, &EditPeriodicDialog::updateContentChanged);
+
+    // Indicator of changes not applied yet : orange warning sign, explained by its tooltip
+    // (same as in EditScenarioDialog). Shown/hidden by contentHasChanged().
+    ui->modifiedWarningLabel->setText("⚠");
+    ui->modifiedWarningLabel->setStyleSheet("color: #FF9800;");
+    ui->modifiedWarningLabel->setVisible(false);
 }
 
 
@@ -208,6 +243,17 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
     if ( theMaxDateFeGeneration.isValid()==false ) {
         throw std::invalid_argument(QString("%1: Invalid max date for FeGenerationDuration")
             .arg(Q_FUNC_INFO).toStdString());
+    }
+
+    // Suspend change detection while the form is filled : each field set below emits a
+    // change signal, and checking a half-filled form is useless
+    fillingForm = true;
+
+    // Edit mode : keep a copy of the Csd to detect changes not applied yet. Create mode : none.
+    if (isNewCsd) {
+        originalCsd.clear();
+    } else {
+        originalCsd = QSharedPointer<const PeriodicCsd>(new PeriodicCsd(*psCsd));
     }
 
     // remember some variables
@@ -252,14 +298,16 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
         // remember the id
         initialId = psCsd->getId();
 
-        // Set title
+        // Set title. [*] : replaced by "*" when there are changes not applied yet
+        // (see setWindowModified() in contentHasChanged())
         if(isIncome){
-            this->setWindowTitle(tr("Editing periodic income"));
+            this->setWindowTitle(tr("Editing periodic income") + "[*]");
         } else {
-            this->setWindowTitle(tr("Editing periodic expense"));
+            this->setWindowTitle(tr("Editing periodic expense") + "[*]");
         }
         ui->applyPushButton->setText(tr("Apply"));
-        ui->closePushButton->setText(tr("Cancel"));
+        ui->closePushButton->setText(tr("Close"));
+        ui->cancelPushButton->setText(tr("Cancel"));
         ui->nameLineEdit->setText(psCsd->getName());
         ui->descPlainTextEdit->setPlainText(psCsd->getDesc());
         int result;
@@ -273,14 +321,15 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
         ui->amountDoubleSpinBox->setValue(amountDouble);
         ui->fromDateEdit->setDate(psCsd->getStartDate());
 
-        // set "to" date : do not clear value (handy)
+        // set "to" date. Always load the stored end date, even when the scenario defines it
+        // (it is then not used) : Apply must give back an identical Csd if nothing changed.
+        ui->toDateEdit->setDate(psCsd->getEndDate());
         if (psCsd->getUseScenarioForEndDate()==true) {
             // used scenario value for end date
             ui->toScenarioRadioButton->setChecked(true);
             ui->toDateEdit->setEnabled(false);
         } else {
             // use custom value for end date
-            ui->toDateEdit->setDate(psCsd->getEndDate());
             ui->toCustomRadioButton->setChecked(true);
             ui->toDateEdit->setEnabled(true);
         }
@@ -304,14 +353,16 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
         Growth ag = psCsd->getGrowth();
         PeriodicCsd::GrowthStrategy gs = psCsd->getGrowthStrategy();
 
+        // Always load the stored inflation multiplier, even when it is not used (growth is not
+        // "scenario's inflation") : Apply must give back an identical Csd if nothing changed.
+        ui->growthTypeScenaroInflationDoubleSpinBox->setValue(
+            psCsd->getInflationAdjustmentFactor());
+
         if(gs == PeriodicCsd::GrowthStrategy::NONE){
-            ui->growthTypeScenaroInflationDoubleSpinBox->setValue(1);
             ui->growthTypeCustomConstantDoubleSpinBox->setValue(0);
             updateGrowthTypeCombobox(GrowthType::NONE);
 
         } else if ( gs == PeriodicCsd::GrowthStrategy::INFLATION){
-            ui->growthTypeScenaroInflationDoubleSpinBox->setValue(
-                psCsd->getInflationAdjustmentFactor());
             ui->growthTypeCustomConstantDoubleSpinBox->setValue(0);
             updateGrowthTypeCombobox(GrowthType::SCENARIO);
         } else {
@@ -319,13 +370,11 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
             if (ag.getType()==Growth::Type::CONSTANT){
                 qint64 d = ag.getAnnualConstantGrowth();
                 double d2 = Growth::fromDecimalToDouble(d);
-                ui->growthTypeScenaroInflationDoubleSpinBox->setValue(1);
                 ui->growthTypeCustomConstantDoubleSpinBox->setValue(d2);
                 updateGrowthTypeCombobox(GrowthType::CUSTOM_CONSTANT);
 
             }else{
                 tempVariableGrowth = ag;    // stock it
-                ui->growthTypeScenaroInflationDoubleSpinBox->setValue(1);
                 ui->growthTypeCustomConstantDoubleSpinBox->setValue(0);
                 updateGrowthTypeCombobox(GrowthType::CUSTOM_VARIABLE);
             }
@@ -351,6 +400,13 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
         ui->applyPushButton->setText(tr("Create"));
         ui->closePushButton->setText(tr("Close"));
 
+        // No change detection in create mode : always "Close" and "Create", no indicator
+        ui->modifiedWarningLabel->setVisible(false);
+        setWindowModified(false);
+        ui->closePushButton->setVisible(true);
+        ui->cancelPushButton->setVisible(false);
+        ui->applyPushButton->setVisible(true);
+
         // Init fields for a new Csd
         prepareDataToCreateANewStreamDef(true);
     }
@@ -359,12 +415,17 @@ void EditPeriodicDialog::slotPrepareContent(bool isNewCsd, bool isIncome,
     setVisibilityStartDateWarningSign();
 
     ui->nameLineEdit->setFocus();
+
+    // Form complete : resume change detection and check once (edit mode, expected : no change)
+    fillingForm = false;
+    updateContentChanged();
 }
 
 
 void EditPeriodicDialog::slotEditVariableGrowthResult(Growth growthOut)
 {
     tempVariableGrowth = growthOut;
+    updateContentChanged();
 }
 
 
@@ -436,6 +497,7 @@ void EditPeriodicDialog::on_applyPushButton_clicked()
     // if editing an existing Csd, then this is the end of it. For create,
     // then stay right there to facilitate the rapid creation of multiple Csd
     if(editingExistingStreamDef){
+        originalCsd.clear();    // released : set again at the next slotPrepareContent
         hide();
         emit signalEditPeriodicCsdCompleted();
         LOG_INFO("Modifications applied to periodic csd");
@@ -448,12 +510,23 @@ void EditPeriodicDialog::on_applyPushButton_clicked()
 }
 
 // Set form's widgets contents for creation of a new Stream Def
-// If slotPrepare == true, some more field are initialized
+// If slotPrepare == true (dialog is opened), all fields are initialized. Otherwise (a Stream Def
+// has just been created and the dialog stays open), only the fields identifying the Stream Def
+// are reset : the others are kept to facilitate the rapid creation of similar Stream Defs.
 void EditPeriodicDialog::prepareDataToCreateANewStreamDef(bool slotPrepare)
 {
     initialId = QUuid::createUuid();
     ui->nameLineEdit->setText("");
     ui->descPlainTextEdit->setPlainText("");
+
+    // tags
+    ui->tagsEdit->clear();
+    tagIdSet.clear();   // new fsd will have no association with tags when created
+
+    if (slotPrepare==false) {
+        return;
+    }
+
     ui->amountDoubleSpinBox->setValue(0);
 
     // set from date
@@ -467,16 +540,10 @@ void EditPeriodicDialog::prepareDataToCreateANewStreamDef(bool slotPrepare)
     ui->gapSpinBox->setValue(1);
     ui->periodMultiplierSpinBox->setValue(1);
 
-    // inflation adjustment factor
+    // growth : follow scenario's inflation (factor 1) by default
     ui->growthTypeScenaroInflationDoubleSpinBox->setValue(1);
-
-    // growth is constant & 0 by default if slotPrepare = true
-    // Otherwise, dot touch it.
-    if (slotPrepare==true) {
-        ui->growthTypeScenaroInflationDoubleSpinBox->setValue(1);
-        ui->growthTypeCustomConstantDoubleSpinBox->setValue(0);
-        updateGrowthTypeCombobox(GrowthType::SCENARIO);
-    }
+    ui->growthTypeCustomConstantDoubleSpinBox->setValue(0);
+    updateGrowthTypeCombobox(GrowthType::SCENARIO);
 
     // but initialize an empty Variable Growth if ever user decide to switch to that type
     tempVariableGrowth = Growth::fromVariableDataAnnualBasisDecimal(QMap<QDate, qint64>());
@@ -484,10 +551,6 @@ void EditPeriodicDialog::prepareDataToCreateANewStreamDef(bool slotPrepare)
     // decoration color
     ui->decorationColorCheckBox->setChecked(false);
     on_decorationColorCheckBox_clicked();
-
-    // tags
-    ui->tagsEdit->clear();
-    tagIdSet.clear();   // new fsd will have no association with tags when created
 }
 
 
@@ -621,7 +684,8 @@ void EditPeriodicDialog::buildPeriodicCsdFromFormData(BuildFromFormDataResult &r
     // build item
     try {
         result.sharedPtrCsd = QSharedPointer<PeriodicCsd>( new PeriodicCsd(periodicType, periodMultiplier, amount, growth, gs,
-            gap, initialId, (ui->nameLineEdit->text().trimmed()).left(Csd::NAME_MAX_LEN),
+            gap, initialId,
+            Util::toSingleLine(ui->nameLineEdit->text()).trimmed().left(Csd::NAME_MAX_LEN),
             ui->descPlainTextEdit->toPlainText().left(Csd::DESC_MAX_LEN),
             ui->activeYesRadioButton->isChecked(), isIncome, decorationColor, from, to,
             ui->toScenarioRadioButton->isChecked(),inflationModifFactor));
@@ -853,8 +917,16 @@ QSharedPointer<FeStream> EditPeriodicDialog::generateFinancialEvents(
 
 void EditPeriodicDialog::on_closePushButton_clicked()
 {
+    originalCsd.clear();    // released : set again at the next slotPrepareContent
     hide();
     emit signalEditPeriodicCsdCompleted();
+}
+
+
+// Edit mode, changes not applied : discard them and close
+void EditPeriodicDialog::on_cancelPushButton_clicked()
+{
+    on_closePushButton_clicked();
 }
 
 
@@ -867,15 +939,21 @@ void EditPeriodicDialog::on_EditPeriodicDialog_rejected()
 
 void EditPeriodicDialog::on_decorationColorPushButton_clicked()
 {
+    chooseDecorationColor();
+    updateContentChanged();
+}
+
+
+bool EditPeriodicDialog::chooseDecorationColor()
+{
     //QColorDialog::ColorDialogOptions opt = QColorDialog::DontUseNativeDialog;
-    QColor color;
-    color = QColorDialog::getColor(decorationColor, this, tr("Color chooser"));
+    QColor color = QColorDialog::getColor(decorationColor, this, tr("Color chooser"));
     if (color.isValid()==false) {
-        return; // user cancelled
-    } else {
-        decorationColor = color;
-        setDecorationColorInfo();
+        return false; // user cancelled
     }
+    decorationColor = color;
+    setDecorationColorInfo();
+    return true;
 }
 
 
@@ -889,8 +967,11 @@ void EditPeriodicDialog::on_decorationColorCheckBox_clicked()
         decorationColor = QColor::fromRgb(128,128,128);
         // take note of it
         setDecorationColorInfo();
-        // user must select a color now (cancelling is allowed)
-        on_decorationColorPushButton_clicked();
+        // user must select a color now : if cancelled, back to the normal color
+        if (chooseDecorationColor()==false) {
+            ui->decorationColorCheckBox->setChecked(false);
+            on_decorationColorCheckBox_clicked();   // "custom to normal" branch : resets all
+        }
     } else{
         // custom to normal color
         ui->decorationColorCustomTextLabel->setEnabled(false);
@@ -898,6 +979,7 @@ void EditPeriodicDialog::on_decorationColorCheckBox_clicked()
         decorationColor = QColor();
         setDecorationColorInfo();
     }
+    updateContentChanged();
 }
 
 
@@ -1040,6 +1122,54 @@ void EditPeriodicDialog::on_breakdownPushButton_clicked()
     // and will disappear when it completes.
     emit signalCsdBreakdownPrepareContent(currInfo, feStream, maxDateFeGeneration);
     csdBreakdownDialog->show();
+}
+
+
+void EditPeriodicDialog::contentHasChanged(bool v)
+{
+    // override the value, don't care if it is the same as the cost is negligible
+    contentChanged.set(v);
+
+    // Visual indicators : warning sign next to the buttons, "*" in the window title
+    ui->modifiedWarningLabel->setVisible(hasContentChanged());
+    setWindowModified(hasContentChanged());
+
+    // Update buttons to reflect the new situation
+    if (hasContentChanged()==true) {
+        ui->closePushButton->setVisible(false);
+        ui->cancelPushButton->setVisible(true);
+        ui->applyPushButton->setVisible(true);
+    } else {
+        ui->closePushButton->setVisible(true);
+        ui->cancelPushButton->setVisible(false);
+        ui->applyPushButton->setVisible(false);
+    }
+}
+
+
+bool EditPeriodicDialog::hasContentChanged() const
+{
+    return contentChanged.get();
+}
+
+
+void EditPeriodicDialog::updateContentChanged()
+{
+    if (fillingForm || originalCsd.isNull()) {
+        return;     // form being filled, or create mode : nothing to check
+    }
+    BuildFromFormDataResult r;
+    try {
+        buildPeriodicCsdFromFormData(r);
+    } catch (const std::exception&) {
+        r.result.status = Util::ResultOfOperationStatus::ERROR;
+    }
+    if ( (r.result.status != Util::ResultOfOperationStatus::SUCCESS) ||
+        r.sharedPtrCsd.isNull() ) {
+        contentHasChanged(true);    // keep Apply available : it will report the error
+        return;
+    }
+    contentHasChanged( !(*r.sharedPtrCsd == *originalCsd) );
 }
 
 

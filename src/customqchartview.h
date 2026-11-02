@@ -21,6 +21,7 @@
 
 #include <QChartView>
 #include <QChart>
+#include <QTimer>
 
 class CustomQChartView : public QChartView
 {
@@ -35,6 +36,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
     double zoomInFactor;
@@ -46,6 +48,16 @@ private:
     double yAxisRangeMinInSec;
 
     QPointF m_lastMousePos;  // last now position of the mouse
+
+    /**
+     * @brief Pan distance (scene coordinates) of the mouse moves not applied to the chart yet.
+     * During a drag, the mouse moves are added here and applied in a single scroll at most once
+     * per screen refresh (scrollTimer), so that they cannot pile up when moving the chart is
+     * slower than the mouse (e.g. curve with tens of thousands of points).
+     */
+    QPointF pendingScroll;
+    QTimer scrollTimer;
+    void applyPendingScroll();
 
     // If true :
     //   vertical wheel rotating AWAY from the user will ZOOM IN
