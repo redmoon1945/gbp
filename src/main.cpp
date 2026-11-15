@@ -28,6 +28,7 @@
 #include "gbpcontroller.h"
 #include "gbplogger.h"
 #include <QStyleFactory>
+#include <QProxyStyle>
 #include "constants.h"
 #include <QProcess>
 #include <QLoggingCategory>
@@ -51,6 +52,35 @@ enum class XWaylandBehavior {
     Prevented,   // -noxwayland switch was passed
     Unspecified  // neither switch was passed
 };
+
+/**
+ * @brief Style wrapper that only changes the color of the grid lines of the tables.
+ * @details Fusion draws them in the window color made 20% darker : fine on a light
+ * background, but invisible on a dark one (nearly-black lines on a nearly-black table).
+ * Here the line color is a mix of the table background and text colors (25% toward the
+ * text), so it is visible in both light and dark themes, and follows a theme change.
+ */
+class GridLineStyle : public QProxyStyle {
+public:
+    explicit GridLineStyle(const QString &baseStyleKey) : QProxyStyle(baseStyleKey) {}
+
+    int styleHint(StyleHint hint, const QStyleOption *option = nullptr,
+        const QWidget *widget = nullptr, QStyleHintReturn *returnData = nullptr) const override
+    {
+        if (hint == SH_Table_GridLineColor && option != nullptr) {
+            const QColor bg = option->palette.color(QPalette::Base);
+            const QColor fg = option->palette.color(QPalette::Text);
+            const double ratio = 0.25;
+            QColor line = QColor::fromRgbF(
+                bg.redF() + (fg.redF() - bg.redF()) * ratio,
+                bg.greenF() + (fg.greenF() - bg.greenF()) * ratio,
+                bg.blueF() + (fg.blueF() - bg.blueF()) * ratio);
+            return static_cast<int>(line.rgba());
+        }
+        return QProxyStyle::styleHint(hint, option, widget, returnData);
+    }
+};
+
 
 // Function to create a dark palette
 static QPalette createDarkPalette()
@@ -701,7 +731,7 @@ static void checkHelpArgument(int argc, char *argv[])
             std::string appVer = Constants::APP_VERSION.toStdString();
             std::cout <<  appName << " v" << appVer << "\n";
             std::cout << "\nUSAGE:\n";
-            std::cout << "  Linux   : ./gbp-" << appVer << "-x86_64.AppImage [options]\n";
+            std::cout << "  Linux   : ./gbp-" << appVer << "-linux-x86_64.AppImage [options]\n";
             std::cout << "  Windows : gbp.exe [options]\n";
             std::cout << "\nOPTIONS:\n";
             std::cout << "  -h, --help\n";
@@ -723,6 +753,18 @@ static void checkHelpArgument(int argc, char *argv[])
             std::cout << "\n  LOCALIZATION OPTIONS:\n";
             std::cout << "  -locale=LANG-TERRITORY\n";
             std::cout << "    Override system locale (e.g., -locale=en-US) (all platforms)\n";
+            std::cout << "    With it, this one locale sets the language of the texts, the\n";
+            std::cout << "    numbers and the dates; all system settings are ignored.\n";
+            std::cout << "    Without it, GBP asks the system separately for each of them:\n";
+            std::cout << "      Linux   : texts from LC_MESSAGES, numbers from LC_NUMERIC,\n";
+            std::cout << "                dates from LC_TIME (LC_ALL overrides all; LANG\n";
+            std::cout << "                if unset). They can differ: e.g. French texts with\n";
+            std::cout << "                numbers written 1,234.56. The locale shown in the\n";
+            std::cout << "                About window is the one of the texts only.\n";
+            std::cout << "      Windows : texts, numbers and dates from the Regional format\n";
+            std::cout << "                (not the Windows display language), with the\n";
+            std::cout << "                custom separators set in the Region settings.\n";
+            std::cout << "    See the user manual, section 9.4 Localization options.\n";
             std::cout << "\n  LOGGING OPTIONS:\n";
             std::cout << "  -logprivacy=ALLOW_PRIVATE\n";
             std::cout << "    Allow sensitive data in logs (all platforms)\n";
@@ -919,6 +961,9 @@ int main(int argc, char *argv[])
     // they flood the console when the currency picker populates its list of all world currencies.
     QLoggingCategory::setFilterRules("qt.text.font.db=false");
 
+    // true when GBP sets its own dark palette (Fusion on X11 or Windows)
+    bool customPaletteApplied = false;
+
     // *** Dark theme detection  ***
     bool darkThemeDetected = detectDarkTheme(desktop);
     if (darkThemeDetected) {
@@ -948,6 +993,7 @@ int main(int argc, char *argv[])
         QApplication::setStyle(QStyleFactory::create("Fusion"));
         if (darkThemeDetected) {
             QApplication::setPalette(createDarkPalette());
+            customPaletteApplied = true;
             QString msg("Windows: using Fusion style with dark palette");
             qInfo().noquote() << msg.toStdString();
             logBuffer.append(msg);
@@ -971,6 +1017,7 @@ int main(int argc, char *argv[])
         // If Dark mode theme detected, apply custom palette
         if (darkThemeDetected==true) {
             QApplication::setPalette(createDarkPalette());
+            customPaletteApplied = true;
             msg = "X11: applying custom dark palette";
             logBuffer.append(msg);
             qInfo().noquote() << msg.toStdString();
@@ -978,6 +1025,19 @@ int main(int argc, char *argv[])
     }
 
 #endif
+
+    // Wrap the style chosen above to get visible table grid lines in dark themes too.
+    // Changing the style may reset the palette : put back GBP's own dark palette if it was
+    // set (a system palette is not set again, so that it still follows theme changes)
+    {
+        QString styleKey = QApplication::style()->name();
+        QApplication::setStyle(new GridLineStyle(styleKey));
+        if (customPaletteApplied) {
+            QApplication::setPalette(createDarkPalette());
+        }
+        // written in the log file only (not on the terminal)
+        logBuffer.append(QString("Table grid line color adjusted (style %1)").arg(styleKey));
+    }
 
     LOG_INFO(QString("Application started"));
 

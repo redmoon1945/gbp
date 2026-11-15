@@ -55,9 +55,9 @@ public:
         QColor darkModeCurveColor = QColor(255, 0, 0);
         QColor lightModeCurveColor = QColor(0, 0, 128);
         QColor darkModePointColor = QColor(255, 255, 0);
-        QColor lightModePointColor = QColor(255, 140, 0);
+        QColor lightModePointColor = QColor(230, 115, 0);
         QColor darkModeSelectedPointColor = QColor(0, 255, 0);
-        QColor lightModeSelectedPointColor = QColor(0, 128, 0);
+        QColor lightModeSelectedPointColor = QColor(0, 0, 0);
         bool exportTextNumberLocalized = false;
         bool exportTextDateLocalized = false;
         uint percentageMainChartScaling = 5;

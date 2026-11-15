@@ -1,5 +1,22 @@
 # Change log for GBP
 
+## 1.9.0 to 1.9.1 (16 nov 2026)
+
+### Fixes
+
+- **Dotted Y=0 line drawn as a plain line** : in the main window, when less than about 20 years were shown, the dotted line at Y=0 became a plain, paler line on screens with display scaling (e.g. 4K screens, on Linux and Windows). It now stays dotted at any zoom level and any display scaling.
+- **Start amount kept in the curve after opening a scenario** : in the main window, after typing a "Start amount as of today", opening, reloading or creating a scenario reset the field to 0 but still drew the curve with the former start amount, so the points, the vertical axis and the "Selected point info" panel were wrong, while the Analysis and the export used 0. The curve is now always drawn with the start amount shown (0 after opening, reloading or creating a scenario). This problem already existed in the previous versions.
+- **Example and old scenarios not opened with some Region settings** : on Linux, when the Region (numbers, currency, dates) was set to a country with another currency than the country of the language (e.g. language French (Canada) with the Region of Germany), the example scenario and the scenarios created by GBP 1.7 or older for that country could not be opened ("This file was created by GBP 1.7 or older for country CA, whose currency is unknown"). They now open normally, and the example scenario is now stored in the current format. This problem already existed in 1.9.0.
+- **Table grid lines invisible with a dark theme** : in all the tables with grid lines (Edit Scenario, irregular cash stream definition, variable growth, Manage Tags, Analysis, CSD breakdown), the grid lines were drawn almost in the same color as the background with a dark theme. They are now visible with both light and dark themes, on all Linux desktops (X11 and Wayland) and on Windows with each of the 3 styles (Fusion, native and Vista). They also follow a change of theme while GBP is running, when the desktop supports it.
+- **Easier to read details of the selected point** : in the main window, when you click a point of the chart, the list of its incomes and expenses is now easier to read at a glance.
+  - Incomes and expenses are told apart at once by the color of their amount, while each name keeps its own color.
+  - The biggest incomes are at the top and the biggest expenses at the bottom.
+  - The amounts are neatly lined up, and the names are always shown in full.
+- **Selected point easier to spot in the light theme** : in the charts with the light theme, the default selected point color (green) was not easy to tell apart from the other points (orange), especially for color-blind users. The default selected point is now black, and the default points are a slightly deeper orange, easier to see on the white background. The curve is unchanged. Existing settings are kept : use the ↺ button next to each color in Options to get the new defaults.
+- **Help of the -locale option** : the text shown by --help did not explain where GBP takes the language of the texts, the numbers and the dates from. It now tells that, without -locale, they are asked separately from the system (on Linux : LC_MESSAGES, LC_NUMERIC and LC_TIME, so French texts can come with numbers written 1,234.56; on Windows : the Regional format, with its custom separators), and that with -locale this one locale sets all of them. The user manual (section 9.4 Localization options) explains it in detail.
+- **Selected point lost when changing the start amount** : in the main window, when a point was selected, changing "Start amount as of today" redrew the curve without the selected point, while the "Selected point info" panel still showed its former amount. The point now stays selected at its new height, and the panel shows its new amount.
+- **Wider list of the selected point** : in the main window, the list of the incomes and expenses of the selected point is a little wider, so that longer names are shown without scrolling. The right panel grows accordingly, and the chart still takes the rest of the window.
+
 ## 1.8.2 to 1.9.0 (5-nov-2026)
 
 ### New features : The big ones

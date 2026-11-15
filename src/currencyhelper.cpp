@@ -332,11 +332,16 @@ CurrencyInfo CurrencyHelper::getCurrencyInfoFromCountryCode(
     // All the Qt locales of that country must agree on one currency. Do not use
     // QLocale(AnyLanguage, country) : when Qt cannot find a locale for it (e.g. Vanuatu), it
     // silently returns the default locale, so the currency would depend on the user's system.
+    // matchingLocales() also returns the system locale when it is of that country, and on Linux
+    // its currency comes from LC_MONETARY (e.g. LANG=fr_CA with LC_MONETARY=de_DE gives EUR).
+    // So the currency is read from the Qt data of each locale, rebuilt from its language,
+    // script and country : the user's settings never take part in it.
     QSet<QString> isoCodes;
     const QList<QLocale> locales = QLocale::matchingLocales(QLocale::AnyLanguage,
         QLocale::AnyScript, country);
     for (const QLocale &loc : locales) {
-        isoCodes.insert(loc.currencySymbol(QLocale::CurrencyIsoCode));
+        const QLocale qtData(loc.language(), loc.script(), loc.territory());
+        isoCodes.insert(qtData.currencySymbol(QLocale::CurrencyIsoCode));
     }
     if (isoCodes.size() != 1) {
         return dummy;

@@ -4,10 +4,10 @@
 EN = dict(
     lang="en", country="CA",
     file_title="Quick Tutorial",
-    product="Graphical Budget Planner 1.9.0",
+    product="Graphical Budget Planner 1.9.1",
     tagline="See where your money is heading, in about 15 minutes.",
     version="Version : 2026-10-28",
-    footer="Graphical Budget Planner 1.9.0 · Quick Tutorial",
+    footer="Graphical Budget Planner 1.9.1 · Quick Tutorial",
     intro="This tutorial takes you from an empty window to your first cash balance "
           "forecast. Read it in order the first time; afterwards, the last pages work as a "
           "reference card.",
@@ -206,10 +206,10 @@ EN = dict(
 FR = dict(
     lang="fr", country="CA",
     file_title="Tutoriel rapide",
-    product="Graphical Budget Planner 1.9.0",
+    product="Graphical Budget Planner 1.9.1",
     tagline="Voyez où va votre argent, en 15 minutes environ.",
     version="Version : 2026-10-28",
-    footer="Graphical Budget Planner 1.9.0 · Tutoriel rapide",
+    footer="Graphical Budget Planner 1.9.1 · Tutoriel rapide",
     intro="Ce tutoriel vous mène d'une fenêtre vide à votre première prévision de solde. "
           "Lisez-le dans l'ordre la première fois; ensuite, il sert d'aide-mémoire.",
 

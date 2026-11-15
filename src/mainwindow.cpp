@@ -109,12 +109,30 @@ MainWindow::MainWindow(QLocale systemLocale, QWidget *parent)
     // This ensures consistent behaviour across all platforms and desktop environments.
     QFont appFont = QApplication::font();
 
-    // use smaller font for ciWidgets + enable custom sorting for the list
+    // use smaller font for ciWidgets. The table is sorted by code after each fill
+    // (sorting is not enabled : rows would move while being filled)
     QFont listFont = appFont;
     Util::changeFontSize(listFont, Util::FontResizeIntensity::WEAK, true,
         "Main window - ci info list");
-    ui->ciDetailsListWidget->setFont(listFont);
-    ui->ciDetailsListWidget->setSortingEnabled(true);
+    ui->ciDetailsTableWidget->setFont(listFont);
+    // a little wider than its default : about 32 average characters of the list font. It sets
+    // the width of the whole right panel (the chart takes the rest of the window)
+    ui->ciDetailsTableWidget->setMinimumWidth(QFontMetrics(listFont).averageCharWidth() * 32);
+    // column 0 = amount, column 1 = empty gap, column 2 = Csd name. Amount and name are
+    // sized to contents : long names are never elided, a horizontal scroll bar appears
+    // instead. The gap is as wide as a space
+    QHeaderView *ciHHeader = ui->ciDetailsTableWidget->horizontalHeader();
+    ciHHeader->setStretchLastSection(false);
+    ciHHeader->setMinimumSectionSize(0);
+    ciHHeader->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    ciHHeader->setSectionResizeMode(1, QHeaderView::Fixed);
+    ciHHeader->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    ciHHeader->resizeSection(1, QFontMetrics(listFont).horizontalAdvance(' '));
+    // table rows are taller than list rows by default : match list density
+    QHeaderView *ciVHeader = ui->ciDetailsTableWidget->verticalHeader();
+    ciVHeader->setMinimumSectionSize(1);
+    ciVHeader->setDefaultSectionSize(QFontMetrics(listFont).height() + 2);
+    ciVHeader->setSectionResizeMode(QHeaderView::Fixed);
     QFont ciFont = appFont;
     Util::changeFontSize(ciFont, Util::FontResizeIntensity::WEAK, true,
         "Main window - ci widgets");
@@ -476,62 +494,64 @@ void MainWindow::fillDailyInfoSection(const QDate& date, double amount,
 
     // *** list box content ***
 
-    // we need this class in order to sort the list by Csd name
-    class CustomListItem : public QListWidgetItem {
+    // amount item : sorts on the signed amount, then on the Csd name for equal amounts.
+    // Sorted in descending order : largest income first, largest expense last
+    class AmountItem : public QTableWidgetItem {
     public:
-        CustomListItem(const QString& text, QString theName) : QListWidgetItem(text) {
-            this->setData(Qt::UserRole, theName);
+        AmountItem(const QString& text, double theAmount, const QString& theName)
+            : QTableWidgetItem(text) {
+            this->setData(Qt::UserRole, theAmount);
+            this->setData(Qt::UserRole + 1, theName);
+            this->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
         }
-        bool operator<(const QListWidgetItem& other) const {
-            QString theName = this->data(Qt::UserRole).toString();
-            QString otherName = other.data(Qt::UserRole).toString();
-            if ( QString::localeAwareCompare(theName,otherName) < 0 ){
-                return true;
-            } else {
-                return false;
+        bool operator<(const QTableWidgetItem& other) const override {
+            double a = this->data(Qt::UserRole).toDouble();
+            double b = other.data(Qt::UserRole).toDouble();
+            if (a != b) {
+                return a < b;
             }
+            // same amount : names in alphabetical order once the order is reversed
+            return QString::localeAwareCompare(this->data(Qt::UserRole + 1).toString(),
+                other.data(Qt::UserRole + 1).toString()) > 0;
         }
     };
 
-    ui->ciDetailsListWidget->clear();
-    QString sName;
-    QColor color;
-    QListWidgetItem *item;
-    ui->ciDetailsListWidget->clear();
+    QTableWidget *table = ui->ciDetailsTableWidget;
+    bool allowDecoColor = GbpController::getInstance().getAllowDecorationColor();
+    table->setRowCount(0);
+    table->setRowCount(di.incomesList.size() + di.expensesList.size());
+    int row = 0;
 
-    // incomes
+    // add one row : amount colored as income/expense, name in the Csd color (if allowed).
+    // The table takes ownership of the items
+    auto addRow = [&](const Fe& fe, const QColor& amountColor) {
+        QSharedPointer<Csd> theCsd = fe.csdPtr.toStrongRef();
+        if(theCsd.isNull()){
+            return;   // should never happen
+        }
+        QString sName = theCsd->getName();
+        QTableWidgetItem *amountItem = new AmountItem(
+            locale.toString(fe.amount, 'f', currInfo.noOfDecimal), fe.amount, sName);
+        amountItem->setForeground(amountColor);
+        QTableWidgetItem *nameItem = new QTableWidgetItem(sName);
+        QColor color = theCsd->getDecorationColor();
+        if( allowDecoColor && color.isValid() ){
+            nameItem->setForeground(color);
+        }
+        table->setItem(row, 0, amountItem);
+        table->setItem(row, 2, nameItem);   // column 1 stays empty (gap)
+        row++;
+    };
+
+    // color by list membership rather than by sign, so a zero amount is still colored
     foreach(Fe fe, di.incomesList){
-        // get the Qshared pointer to the Csd
-        QSharedPointer<Csd> theCsd = fe.csdPtr.toStrongRef();
-        if(theCsd.isNull()){
-            continue;   // should never happen
-        }
-        sName = theCsd->getName();
-        color = theCsd->getDecorationColor();
-        item = new CustomListItem(fe.toString(sName, currInfo, locale),sName);
-        if( (GbpController::getInstance().getAllowDecorationColor()==true) &&
-            (color.isValid())){
-            item->setForeground(color);
-        }
-        ui->ciDetailsListWidget->addItem(item) ;  // list widget will take ownership of the item
+        addRow(fe, posAmountColor);
     }
-
-    // expenses
     foreach(Fe fe, di.expensesList){
-        // get the Qshared pointer to the Csd
-        QSharedPointer<Csd> theCsd = fe.csdPtr.toStrongRef();
-        if(theCsd.isNull()){
-            continue;   // should never happen
-        }
-        sName = theCsd->getName();
-        color = theCsd->getDecorationColor();
-        item = new CustomListItem(fe.toString(sName, currInfo, locale), sName);
-        if( (GbpController::getInstance().getAllowDecorationColor()==true) && (color.isValid())){
-            item->setForeground(color);
-        }
-        ui->ciDetailsListWidget->addItem(item) ;  // list widget will take ownership of the item
-     }
-
+        addRow(fe, negAmountColor);
+    }
+    table->setRowCount(row);  // in case some Csd were skipped
+    table->sortItems(0, Qt::DescendingOrder);
 }
 
 
@@ -540,7 +560,7 @@ void MainWindow::emptyDailyInfoSection()
     ui->ciDateLabel->setText("");
     ui->ciDeltaLabel->setText("");
     ui->ciAmountLabel->setText("");
-    ui->ciDetailsListWidget->clear();
+    ui->ciDetailsTableWidget->setRowCount(0);
 }
 
 
@@ -900,6 +920,7 @@ void MainWindow::initChart()
     chartMarkersTimer->setInterval(100);
     connect(chartMarkersTimer, &QTimer::timeout, this, &MainWindow::rebuildChartMarkers);
     connect(axisX, &QDateTimeAxis::rangeChanged, this, [this]() {
+        updateZeroLine();   // at once : only 2 points to move
         if (!chartMarkersTimer->isActive()) {
             chartMarkersTimer->start();
         }
@@ -1230,6 +1251,10 @@ bool MainWindow::loadScenarioFile(QString fileName)
     QFileInfo fi(fileName);
     GbpController::getInstance().setLastDir(fi.path());
 
+    // start amount back to 0 (and currency decimals of this scenario) BEFORE the curve is
+    // computed, because the curve is computed from it
+    resetBaselineWidgets();
+
     // update the scenario data : recalculate flow data and refresh chart
     // Chart will take ownership of the data
     QList<QPointF> timeData;
@@ -1241,7 +1266,6 @@ bool MainWindow::loadScenarioFile(QString fileName)
     // house keeping
     emptyDailyInfoSection();
     fillGeneralInfoSection();
-    resetBaselineWidgets();
     changeYaxisLabelFormat();
 
     // update status bar
@@ -1550,15 +1574,9 @@ void MainWindow::replaceChartSeries(QList<QPointF> data, QList<QPointF> shadowDa
     connect(scatterSeries, SIGNAL(clicked(QPointF)), this, SLOT(mypoint_clicked(QPointF)));
 
 
-    // fill series with data. For the line representing the Y=0 X axis, min and max are
-    // set absurdly high, to cover all the possible cases (including enormous unzoom)
-    QList<QPointF> zeroLinePointList;
-    zeroLinePointList.append({
-        static_cast<qreal>(QDateTime(QDate(1000,1,1),QTime(0,0,0))
-        .toMSecsSinceEpoch()),0});
-    QDateTime absoluteMaxDate = QDateTime(QDate(4000,1,1),QTime(0,0,0));
-    zeroLinePointList.append({static_cast<qreal>(absoluteMaxDate.toMSecsSinceEpoch()),0});
-    zeroYvalueLineSeries->append(zeroLinePointList); // take ownership
+    // fill series with data. The line representing the Y=0 X axis covers only the visible X
+    // range : it is moved each time this range changes (see updateZeroLine())
+    updateZeroLine();
     // the markers are created later, for the visible points only (see rebuildChartMarkers())
     chartAllPoints = data;
     shadowSeries->append(shadowData); // take ownership
@@ -1598,6 +1616,25 @@ void MainWindow::replaceChartSeries(QList<QPointF> data, QList<QPointF> shadowDa
 
     // markers for the visible part of the new data
     rebuildChartMarkers();
+}
+
+
+void MainWindow::updateZeroLine()
+{
+    if (zeroYvalueLineSeries == nullptr) {
+        return;
+    }
+    QDateTime from = axisX->min();
+    QDateTime to = axisX->max();
+    if (!from.isValid() || !to.isValid()) {
+        // no range yet : today +/- 1 year (replaced as soon as a range is set)
+        from = QDateTime(QDate::currentDate().addYears(-1), QTime(0, 0, 0));
+        to = QDateTime(QDate::currentDate().addYears(1), QTime(0, 0, 0));
+    }
+    // 1 day more on each side, so that the line always reaches both edges of the plot area
+    zeroYvalueLineSeries->replace({
+        QPointF(static_cast<qreal>(from.addDays(-1).toMSecsSinceEpoch()), 0),
+        QPointF(static_cast<qreal>(to.addDays(1).toMSecsSinceEpoch()), 0)});
 }
 
 
@@ -1777,6 +1814,10 @@ void MainWindow::slotSelectCountryResult(CurrencyInfo currInfo)
     // New scenario has not been saved yet
     GbpController::getInstance().setFullFileName("");
 
+    // start amount back to 0 (and currency decimals of this scenario) BEFORE the curve is
+    // computed, because the curve is computed from it
+    resetBaselineWidgets();
+
     // All data have to be re-generated (emoty set), chart updated
     QList<QPointF> timeData;        // raw data for scatterSeries (real data)
     QList<QPointF> shadowTimeData;
@@ -1784,7 +1825,6 @@ void MainWindow::slotSelectCountryResult(CurrencyInfo currInfo)
     replaceChartSeries(timeData, shadowTimeData);
     rescaleChart({.mode=X_RESCALE::X_RESCALE_DATA_MAX}, true);
     emptyDailyInfoSection();
-    resetBaselineWidgets();
     changeYaxisLabelFormat();
 
     // update general info section
@@ -2506,11 +2546,37 @@ void MainWindow::on_baselineDoubleSpinBox_editingFinished()
         return;
     }
 
+    // A new start amount moves all the points up or down but keeps their dates : remember the
+    // date of the selected point (if any), to select it again once the curve is rebuilt
+    std::optional<qreal> selectedX;
+    if (chartSelectedPoint.has_value()) {
+        selectedX = chartSelectedPoint->x();
+    }
+
     QList<QPointF> timeData;
     QList<QPointF> shadowTimeData;
     regenerateRawData(timeData, shadowTimeData);
-    replaceChartSeries(timeData, shadowTimeData);
+    replaceChartSeries(timeData, shadowTimeData);   // clears the selection
     rescaleChart({.mode=X_RESCALE::X_RESCALE_NONE}, false);
+
+    if (selectedX.has_value()) {
+        // find the point of the same date in the new data (sorted by date)
+        auto it = std::lower_bound(chartAllPoints.cbegin(), chartAllPoints.cend(),
+            selectedX.value(), [](const QPointF& p, qreal x) { return p.x() < x; });
+        if ( (it != chartAllPoints.cend()) && (it->x() == selectedX.value()) ) {
+            chartSelectedPoint = *it;
+            dailyInfoHidden = false;
+            // selects the point again if it is visible, and clears the Daily Info panel
+            // (dailyInfoHidden set to true) if the markers are hidden
+            rebuildChartMarkers();
+            if (!dailyInfoHidden) {
+                showDailyInfo(chartSelectedPoint.value());  // new amount
+            }
+        } else {
+            // should never happen
+            emptyDailyInfoSection();
+        }
+    }
     ui->baselineDoubleSpinBox->clearFocus();
 }
 

@@ -1,6 +1,9 @@
 @echo off
 REM Variables set here (PATH included) stay local to this script
 setlocal
+REM Version of this script : increase it at each change, so that we know which one was used
+set SCRIPT_VERSION=1.0.0
+echo gbp_windows_deploy.bat version: %SCRIPT_VERSION%
 REM Usage : gbp_windows_deploy.bat x.y.z  (e.g. gbp_windows_deploy.bat 1.9.0)
 REM Empties DEPLOY_DIR, deploys GBP in DEPLOY_DIR\gbp-x.y.z, then zips that folder as
 REM gbp-x.y.z-windows-x86_64.zip in the directory of this script (the zip contains the gbp-x.y.z

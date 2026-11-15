@@ -1,6 +1,9 @@
 @echo off
 REM Variables set here (PATH included) stay local to this script
 setlocal
+REM Version of this script : increase it at each change, so that we know which one was used
+set SCRIPT_VERSION=1.0.0
+echo gbp_windows_compile_and_deploy.bat version: %SCRIPT_VERSION%
 REM Usage : gbp_windows_compile_and_deploy.bat x.y.z  (e.g. gbp_windows_compile_and_deploy.bat 1.9.0)
 REM Compiles GBP with gbp_windows_compile.bat, then, only if the compilation succeeded, deploys
 REM and zips it with gbp_windows_deploy.bat. Both scripts must be in the same directory as this one.

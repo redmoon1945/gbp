@@ -1,13 +1,14 @@
 #!/bin/bash
 
-# Version of this build script (bump when the plugin-trimming logic below changes).
-SCRIPT_VERSION="1.3.0"
+# Version of this script : increase it at each change, so that we know which one was used
+# 1.4.0 (2026-11-14) : AppImage named gbp-<version>-linux[-nomanual]-x86_64.AppImage
+SCRIPT_VERSION="1.4.0"
 
 # Usage: ./gbp_linux_deploy.sh <gbp-version> [nomanual]   (e.g. ./gbp_linux_deploy.sh 1.9.0)
 #
-# Without "nomanual" : "Embedded manuals version", gbp-<version>-x86_64.AppImage
-# With "nomanual"    : "Online manuals version", gbp-<version>-nomanual-x86_64.AppImage, made from
-#                      the build of "gbp_linux_compile.sh nomanual" (own BUILD_DIR)
+# Without "nomanual" : "Embedded manuals version", gbp-<version>-linux-x86_64.AppImage
+# With "nomanual"    : "Online manuals version", gbp-<version>-linux-nomanual-x86_64.AppImage,
+#                      made from the build of "gbp_linux_compile.sh nomanual" (own BUILD_DIR)
 #
 # Builds the AppImage in WORK_DIR (GBP_APP_IMAGE_BUILD_DIR in BUILDING.md), from :
 #   - the executable and the translation files (.qm) compiled by gbp_linux_compile.sh, taken
@@ -31,7 +32,7 @@ case "$2" in
     nomanual) EMBEDDED_MANUALS=OFF; SUFFIX="-nomanual" ;;
     *)        die "unknown argument \"$2\". Usage: $0 <gbp-version> [nomanual]" ;;
 esac
-APPIMAGE_FILE="gbp-$GBP_VERSION$SUFFIX-x86_64.AppImage"
+APPIMAGE_FILE="gbp-$GBP_VERSION-linux$SUFFIX-x86_64.AppImage"
 
 # Define Qt version once
 QT_VERSION="${QT_VERSION:-6.11.3}"
@@ -228,6 +229,6 @@ echo "✅ AppImage build complete."
 echo "AppImage size: $(du -h "$APPIMAGE_FILE" | cut -f1)  ($APPIMAGE_FILE)"
 
 # AppDir was only the staging directory of the AppImage : no longer needed. (To look at what
-# went into the AppImage, use :  ./gbp-x.y.z-x86_64.AppImage --appimage-extract)
+# went into the AppImage, use :  ./gbp-x.y.z-linux-x86_64.AppImage --appimage-extract)
 rm -rf AppDir
 

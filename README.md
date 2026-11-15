@@ -2,7 +2,9 @@
 
 ## What's new ?
 
-Version **1.9.0**, released on 5 November 2026, brings <u>substantial</u> improvements ! Here are the main changes compared to 1.8.2 (see CHANGELOG for the many other changes and additional details) :
+Current version is **1.9.1** (16 nov 2026), which includes some minor fixes for 1.9.0.
+
+Version 1.9.0, released on 5 November 2026, brings <u>substantial</u> improvements. Here are the main changes compared to 1.8.2 (see CHANGELOG for the many other changes and additional details) :
 
 - **Dramatically faster loading and calculations** : GBP now handles very large scenarios with ease, even with daily financial streams over 100 years. Operations that took many seconds (sometimes minutes) now take two seconds at most, most of them almost instantly. This is done in part by limiting the number of points (a.k.a. "markers") displayed to a configurable ceiling (2000 by default).
 
@@ -42,7 +44,15 @@ Analysis - Heatmap
 
 ![](doc/images/f.png)
 
+Analysis - Tags
+
+![](doc/images/g.png)
+
 ## Installation
+
+### On Windows®
+
+GBP is distributed as a simple zip file (see https://github.com/redmoon1945/gbp/releases) : unzip it in a folder of your choice and run the gbp.exe application found inside. The zip file includes the User Manual and the Quick Tutorial.
 
 ### On Linux
 
@@ -52,12 +62,12 @@ GBP is distributed as an “AppImage” on Linux platform, which is a single-fil
 
 Two AppImages are provided for each version of GBP. They differ only by how the documentation is provided ; GBP works the same way in both :
 
-* `gbp-x.y.z-x86_64.AppImage`, the "Embedded manuals version" : the User Manual, the Quick Tutorial (PDF, English and French) and the Change Log (PDF, English) are included, and opened by the default PDF viewer of the system.
-* `gbp-x.y.z-nomanual-x86_64.AppImage`, the "Online manuals version" : use it when disk space is really critical. Much smaller, it does not include these documents. "Help → User Manual", "Help → Quick Tutorial" and "Help → Change log" show the address where the PDF can be downloaded from this repository (directory "doc"), with a button to copy it : paste it in your web browser. GBP itself never accesses the Internet.
+* `gbp-x.y.z-linux-x86_64.AppImage`, this is the **recommanded** option, where the doc is "embedded" in the application itself : the User Manual, the Quick Tutorial (PDF, English and French) and the Change Log (PDF, English) are included, and opened by the default PDF viewer of the system.
+* `gbp-x.y.z-linux-nomanual-x86_64.AppImage`, the "Online manuals version" : use it <u>when disk space is really critical</u>. Much smaller, it does not include these documents. "Help → User Manual", "Help → Quick Tutorial" and "Help → Change log" show the address where the PDF can be downloaded from this repository (directory "doc"), with a button to copy it : paste it in your web browser. GBP itself never accesses the Internet.
 
 In both versions, the Welcome document (PDF) is included and opens at the first start.
 
-###### NixOS case
+###### The NixOS distribution case
 
 NixOS does not use the traditional Linux filesystem layout (no `/lib64`, no FHS-style directories) that AppImages expect, so the GBP AppImage will **not** launch directly, even after setting the executable permission. Running it as-is typically fails with an error such as `cannot execute binary file`.
 
@@ -65,7 +75,7 @@ To run the GBP AppImage on NixOS, you have two options :
 
 * **One-off / try it out** : run it through `appimage-run`, without installing anything permanently :
 
-  `nix-shell -p appimage-run --run "appimage-run ./gbp-x.y.z-x86_64.AppImage"`
+  `nix-shell -p appimage-run --run "appimage-run ./gbp-x.y.z-linux-x86_64.AppImage"`
 
 * **Permanent fix (recommended)** : enable AppImage support system-wide by adding this to your `configuration.nix`, then running `sudo nixos-rebuild switch` :
 
@@ -76,11 +86,11 @@ To run the GBP AppImage on NixOS, you have two options :
   };
   ```
 
-  Once enabled, AppImages (including GBP's) can be launched directly, e.g. `./gbp-x.y.z-x86_64.AppImage`, or by double-clicking them in a file manager, just like on any other distribution.
+  Once enabled, AppImages (including GBP's) can be launched directly, e.g. `./gbp-x.y.z-linux-x86_64.AppImage`, or by double-clicking them in a file manager, just like on any other distribution.
 
 Note that GBP's configuration and log files are stored under the standard XDG user directories (`~/.config` and `~/.local/share`), so they behave normally on NixOS regardless of how the AppImage is launched.
 
-###### Omarchy case
+###### The Omarchy distribution case
 
 On Omarchy (Hyprland), in the "About Graphical Budget Planner" window (Help menu), the "View" button next to "Log file :" opens the `.txt` log file through the system's default handler for the `text/plain` MIME type. On a default Omarchy setup, that handler is `nvim`, a terminal-based editor. Since `nvim` isn't spawned in its own terminal window, it takes over the terminal GBP was launched from instead of opening in a separate window.
 
@@ -93,10 +103,6 @@ xdg-mime default <your-editor>.desktop text/plain
 ```
 
 Replace `<your-editor>.desktop` with the `.desktop` file of any installed GUI editor (e.g. `gnome-text-editor.desktop`, `kate.desktop`, `code.desktop`). Once set, "View" will open the log file in that GUI editor instead of taking over the terminal.
-
-### On Windows®
-
-GBP is distributed as a simple zip file (see https://github.com/redmoon1945/gbp/releases) : unzip it in a folder of your choice and run the gbp.exe application found inside. The zip file includes the User Manual and the Quick Tutorial.
 
 ## Supported Platforms and Languages, System Requirements
 
@@ -117,7 +123,7 @@ As of November 2026, GBP has been extensively tested on the following platforms 
 
 It has also been tested, but not as extensively, on the following platforms :
 
-* LCOS 1.0, XFCE 4.20, Libre X11, Kernel 7.2.6-lunduke1
+* LCOS 1.0.2, XFCE 4.20, Libre X11, Kernel 7.2.6-lunduke1
 * Omarchy 4.04, Wayland Hyprland, Kernel 7.2.3
 * MX linux 25.3, XFCE 4.20.1, X11, Kernel 7.2.8
 * Fedora 44, KDE Plasma 6.7.5, Wayland, Kernel 7.2.13

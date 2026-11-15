@@ -6,11 +6,11 @@ import diagrams as D
 
 EN = dict(
     lang="en", country="CA",
-    product="Graphical Budget Planner 1.9.0",
+    product="Graphical Budget Planner 1.9.1",
     file_title="Welcome !",
     tagline="Plan your future cash balance, simply.",
     version="",
-    footer="Graphical Budget Planner 1.9.0 · Welcome",
+    footer="Graphical Budget Planner 1.9.1 · Welcome",
     intro="It looks like this is the first time GBP starts on this computer (no settings were "
           "found). Here is how to get going.",
     s_start="Start here",
@@ -50,11 +50,11 @@ EN = dict(
 
 FR = dict(
     lang="fr", country="CA",
-    product="Graphical Budget Planner 1.9.0",
+    product="Graphical Budget Planner 1.9.1",
     file_title="Bienvenue !",
     tagline="Planifiez votre solde futur, simplement.",
     version="",
-    footer="Graphical Budget Planner 1.9.0 · Bienvenue",
+    footer="Graphical Budget Planner 1.9.1 · Bienvenue",
     intro="Il semble que GBP démarre pour la première fois sur cet ordinateur (aucun réglage "
           "n'a été trouvé). Voici comment commencer.",
     s_start="Pour commencer",

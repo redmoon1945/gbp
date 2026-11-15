@@ -33,6 +33,10 @@
 # pipelines (-o pipefail)
 set -euo pipefail
 
+# Version of this script : increase it at each change, so that we know which one was used
+SCRIPT_VERSION="1.0.0"
+echo "gbp_linux_compile.sh version: $SCRIPT_VERSION"
+
 # -----------------------------------------------------------------------------
 #  CONFIGURATION
 # -----------------------------------------------------------------------------

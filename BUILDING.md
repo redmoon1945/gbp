@@ -7,10 +7,10 @@ If you want to rebuild yourself the application binary **for Linux** and not use
 
 Two AppImages can be built from the same sources. They differ only by the documentation :
 
-| Version                      | Command to build only this one (Step 6)            | Build directory (`BUILD_DIR`)                          | AppImage produced                    |
-| ---------------------------- | -------------------------------------------------- | ------------------------------------------------------ | ------------------------------------ |
-| **Embedded manuals version** | `./gbp_linux_compile_and_deploy.sh x.y.z manual`   | `…/build/gbp/Desktop_Qt_<qt_version>-Release`          | `gbp-x.y.z-x86_64.AppImage`          |
-| **Online manuals version**   | `./gbp_linux_compile_and_deploy.sh x.y.z nomanual` | `…/build/gbp/Desktop_Qt_<qt_version>-Release-nomanual` | `gbp-x.y.z-nomanual-x86_64.AppImage` |
+| Version                      | Command to build only this one (Step 6)            | Build directory (`BUILD_DIR`)                          | AppImage produced                          |
+|------------------------------|----------------------------------------------------|--------------------------------------------------------|--------------------------------------------|
+| **Embedded manuals version** | `./gbp_linux_compile_and_deploy.sh x.y.z manual`   | `…/build/gbp/Desktop_Qt_<qt_version>-Release`          | `gbp-x.y.z-linux-x86_64.AppImage`          |
+| **Online manuals version**   | `./gbp_linux_compile_and_deploy.sh x.y.z nomanual` | `…/build/gbp/Desktop_Qt_<qt_version>-Release-nomanual` | `gbp-x.y.z-linux-nomanual-x86_64.AppImage` |
 
 **By default, without `manual` or `nomanual`, `./gbp_linux_compile_and_deploy.sh x.y.z` builds both versions** (see Step 6).
 
@@ -115,16 +115,16 @@ It builds **both versions** : first the Embedded manuals version (compilation, t
 
 For the Online manuals version, gbp is compiled with `GBP_EMBEDDED_MANUALS=OFF`, in the build directory `BUILD_DIR` followed by "-nomanual".
 
-**The resulting executables "gbp-1.9.0-x86_64.AppImage" (Embedded manuals version) and "gbp-1.9.0-nomanual-x86_64.AppImage" (Online manuals version), named after the version passed to the script, are now in the directory GBP_APP_IMAGE_BUILD_DIR** . Set permission to “execute”. These are your gbp executable files for Linux.
+**The resulting executables "gbp-1.9.0-linux-x86_64.AppImage" (Embedded manuals version) and "gbp-1.9.0-linux-nomanual-x86_64.AppImage" (Online manuals version), named after the version passed to the script, are now in the directory GBP_APP_IMAGE_BUILD_DIR** . Set permission to “execute”. These are your gbp executable files for Linux.
 
 #### Building only one version
 
 Building both versions takes about twice as long as one. To build only one, add `manual` or `nomanual` at the end of the command :
 
-| Command                                            | AppImage produced                         |
-| -------------------------------------------------- | ----------------------------------------- |
-| `./gbp_linux_compile_and_deploy.sh 1.9.0 manual`   | "gbp-1.9.0-x86_64.AppImage" only          |
-| `./gbp_linux_compile_and_deploy.sh 1.9.0 nomanual` | "gbp-1.9.0-nomanual-x86_64.AppImage" only |
+| Command                                            | AppImage produced                               |
+|----------------------------------------------------|-------------------------------------------------|
+| `./gbp_linux_compile_and_deploy.sh 1.9.0 manual`   | "gbp-1.9.0-linux-x86_64.AppImage" only          |
+| `./gbp_linux_compile_and_deploy.sh 1.9.0 nomanual` | "gbp-1.9.0-linux-nomanual-x86_64.AppImage" only |
 
 #### Running the 2 steps separately
 
@@ -310,6 +310,6 @@ Pick a recent release and grab the `runtime-x86_64` asset (there are also `runti
 4. **Universal fallback**, works regardless of FUSE setup on any AppImage: extract and run directly, bypassing FUSE mounting entirely:
 
    ```
-   ./gbp-1.9.0-x86_64.AppImage --appimage-extract
+   ./gbp-1.9.0-linux-x86_64.AppImage --appimage-extract
    ./squashfs-root/AppRun
    ```

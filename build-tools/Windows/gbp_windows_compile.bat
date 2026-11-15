@@ -1,6 +1,9 @@
 @echo off
 REM Variables set here (PATH included) stay local to this script
 setlocal
+REM Version of this script : increase it at each change, so that we know which one was used
+set SCRIPT_VERSION=1.0.0
+echo gbp_windows_compile.bat version: %SCRIPT_VERSION%
 REM Usage : gbp_windows_compile.bat  (no argument)
 REM Compiles GBP in "Release" without Qt Creator, with the CMake, Ninja and MinGW installed with
 REM Qt. The result goes in the same build directory as Qt Creator, the one used by gbp_windows_deploy.bat.

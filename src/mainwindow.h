@@ -144,6 +144,13 @@ public slots:
      * again when the markers are shown again.
      */
     void rebuildChartMarkers();
+    /**
+     * @brief Set the 2 points of the Y=0 line at the edges of the visible X range (plus 1 day
+     * on each side). Qt draws a dashed line as a plain one when it needs more than 10000
+     * repetitions of the dash pattern : a line covering only the visible range stays dashed at
+     * any zoom level.
+     */
+    void updateZeroLine();
     void handleYaxisRangeChange(qreal min, qreal max);
 
 protected:
@@ -285,7 +292,7 @@ private:
     // true when the Daily Info panel has been cleared because the markers are hidden, while a
     // point is still selected (the panel is filled again when the markers are shown again)
     bool dailyInfoHidden = false;
-    QLineSeries *zeroYvalueLineSeries;  // line at y value = 0
+    QLineSeries *zeroYvalueLineSeries = nullptr;  // line at y value = 0
     QDateTimeAxis *axisX;
     QValueAxis *axisY;
     QDateTime fullFromDateX;        // tomorrow

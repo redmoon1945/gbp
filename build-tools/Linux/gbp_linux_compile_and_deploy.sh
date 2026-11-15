@@ -7,14 +7,18 @@
 #          (e.g. ./gbp_linux_compile_and_deploy.sh 1.9.0)
 #
 #  No 2nd argument : both AppImages, the Embedded manuals version first
-#  manual          : only the "Embedded manuals version", gbp-x.y.z-x86_64.AppImage
-#  nomanual        : only the "Online manuals version", gbp-x.y.z-nomanual-x86_64.AppImage
+#  manual          : only the "Embedded manuals version", gbp-x.y.z-linux-x86_64.AppImage
+#  nomanual        : only the "Online manuals version", gbp-x.y.z-linux-nomanual-x86_64.AppImage
 #
 #  For each version, runs gbp_linux_compile.sh, then, only if the compilation
 #  succeeded, gbp_linux_deploy.sh with the version ("nomanual" is passed to both
 #  for the Online manuals version). It stops at the first failure. Both scripts
 #  must be in the same directory as this one. It can be run from any directory.
 # =============================================================================
+
+# Version of this script : increase it at each change, so that we know which one was used
+SCRIPT_VERSION="1.0.0"
+echo "gbp_linux_compile_and_deploy.sh version: $SCRIPT_VERSION"
 
 die() { echo "ERROR : $*" >&2; exit 1; }
 
